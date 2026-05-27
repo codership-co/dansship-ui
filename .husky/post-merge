@@ -1,0 +1,10 @@
+# Get the current branch name
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+# Check if the current branch is 'main'
+if [ "$current_branch" = "main" ]; then
+  echo "Skipping post-merge hook on master branch."
+  exit 0 # Exit successfully without running further commands
+fi
+
+pnpm lint:fix

@@ -1,0 +1,277 @@
+@import "tailwindcss";
+@import "./animations.css";
+
+@theme {
+  /*
+   * COLORS
+   */
+  --color-active: hsl(147 100% 35%);
+  --color-alert: hsl(359 90% 62%);
+  --color-warning: hsl(38 100% 50%);
+  --color-info: hsl(210 100% 51%);
+  --color-primary: hsl(299 30% 27%);
+  --color-secondary: hsl(20 31% 94%);
+  --color-tertiary: hsl(10 100% 67%);
+  --color-white: hsl(0 0 100%);
+  --color-black: hsl(0 0 0%);
+  /*
+   * PALETTE CONTROLS
+   */
+  --light-base: #fff;
+  --dark-base: #000;
+  --scale-step: 20%;
+  --scale-50: calc(var(--scale-step) * 1);
+  --scale-100: calc(var(--scale-step) * 1.5);
+  --scale-200: calc(var(--scale-step) * 2.5);
+  --scale-300: calc(var(--scale-step) * 3.5);
+  --scale-400: calc(var(--scale-step) * 4.5);
+  --scale-600: calc(var(--scale-step) * 4.5);
+  --scale-700: calc(var(--scale-step) * 3.5);
+  --scale-800: calc(var(--scale-step) * 2.5);
+  --scale-900: calc(var(--scale-step) * 1.5);
+  /*
+   * ACTIVE
+   */
+  --color-active-50: color-mix(in hsl, var(--color-active) var(--scale-50), var(--light-base));
+  --color-active-100: color-mix(in hsl, var(--color-active) var(--scale-100), var(--light-base));
+  --color-active-200: color-mix(in hsl, var(--color-active) var(--scale-200), var(--light-base));
+  --color-active-300: color-mix(in hsl, var(--color-active) var(--scale-300), var(--light-base));
+  --color-active-400: color-mix(in hsl, var(--color-active) var(--scale-400), var(--light-base));
+  --color-active-500: var(--color-active);
+  --color-active-600: color-mix(in hsl, var(--color-active) var(--scale-600), var(--dark-base));
+  --color-active-700: color-mix(in hsl, var(--color-active) var(--scale-700), var(--dark-base));
+  --color-active-800: color-mix(in hsl, var(--color-active) var(--scale-800), var(--dark-base));
+  --color-active-900: color-mix(in hsl, var(--color-active) var(--scale-900), var(--dark-base));
+  /*
+   * ALERT
+   */
+  --color-alert-50: color-mix(in hsl, var(--color-alert) var(--scale-50), var(--light-base));
+  --color-alert-100: color-mix(in hsl, var(--color-alert) var(--scale-100), var(--light-base));
+  --color-alert-200: color-mix(in hsl, var(--color-alert) var(--scale-200), var(--light-base));
+  --color-alert-300: color-mix(in hsl, var(--color-alert) var(--scale-300), var(--light-base));
+  --color-alert-400: color-mix(in hsl, var(--color-alert) var(--scale-400), var(--light-base));
+  --color-alert-500: var(--color-alert);
+  --color-alert-600: color-mix(in hsl, var(--color-alert) var(--scale-600), var(--dark-base));
+  --color-alert-700: color-mix(in hsl, var(--color-alert) var(--scale-700), var(--dark-base));
+  --color-alert-800: color-mix(in hsl, var(--color-alert) var(--scale-800), var(--dark-base));
+  --color-alert-900: color-mix(in hsl, var(--color-alert) var(--scale-900), var(--dark-base));
+  /*
+   * WARNING
+   */
+  --color-warning-50: color-mix(in hsl, var(--color-warning) var(--scale-50), var(--light-base));
+  --color-warning-100: color-mix(in hsl, var(--color-warning) var(--scale-100), var(--light-base));
+  --color-warning-200: color-mix(in hsl, var(--color-warning) var(--scale-200), var(--light-base));
+  --color-warning-300: color-mix(in hsl, var(--color-warning) var(--scale-300), var(--light-base));
+  --color-warning-400: color-mix(in hsl, var(--color-warning) var(--scale-400), var(--light-base));
+  --color-warning-500: var(--color-warning);
+  --color-warning-600: color-mix(in hsl, var(--color-warning) var(--scale-600), var(--dark-base));
+  --color-warning-700: color-mix(in hsl, var(--color-warning) var(--scale-700), var(--dark-base));
+  --color-warning-800: color-mix(in hsl, var(--color-warning) var(--scale-800), var(--dark-base));
+  --color-warning-900: color-mix(in hsl, var(--color-warning) var(--scale-900), var(--dark-base));
+  /*
+   * INFO
+   */
+  --color-info-50: color-mix(in hsl, var(--color-info) var(--scale-50), var(--light-base));
+  --color-info-100: color-mix(in hsl, var(--color-info) var(--scale-100), var(--light-base));
+  --color-info-200: color-mix(in hsl, var(--color-info) var(--scale-200), var(--light-base));
+  --color-info-300: color-mix(in hsl, var(--color-info) var(--scale-300), var(--light-base));
+  --color-info-400: color-mix(in hsl, var(--color-info) var(--scale-400), var(--light-base));
+  --color-info-500: var(--color-info);
+  --color-info-600: color-mix(in hsl, var(--color-info) var(--scale-600), var(--dark-base));
+  --color-info-700: color-mix(in hsl, var(--color-info) var(--scale-700), var(--dark-base));
+  --color-info-800: color-mix(in hsl, var(--color-info) var(--scale-800), var(--dark-base));
+  --color-info-900: color-mix(in hsl, var(--color-info) var(--scale-900), var(--dark-base));
+  /*
+   * NEUTRAL
+   */
+  --color-neutral: hsl(0 0 53%);
+  --color-neutral-50: color-mix(in hsl, var(--color-neutral) var(--scale-50), var(--light-base));
+  --color-neutral-100: color-mix(in hsl, var(--color-neutral) var(--scale-100), var(--light-base));
+  --color-neutral-200: color-mix(in hsl, var(--color-neutral) var(--scale-200), var(--light-base));
+  --color-neutral-300: color-mix(in hsl, var(--color-neutral) var(--scale-300), var(--light-base));
+  --color-neutral-400: color-mix(in hsl, var(--color-neutral) var(--scale-400), var(--light-base));
+  --color-neutral-500: var(--color-neutral);
+  --color-neutral-600: color-mix(in hsl, var(--color-neutral) var(--scale-600), var(--dark-base));
+  --color-neutral-700: color-mix(in hsl, var(--color-neutral) var(--scale-700), var(--dark-base));
+  --color-neutral-800: color-mix(in hsl, var(--color-neutral) var(--scale-800), var(--dark-base));
+  --color-neutral-900: color-mix(in hsl, var(--color-neutral) var(--scale-900), var(--dark-base));
+  /*
+   * PRIMARY
+   */
+  --color-primary-50: color-mix(in hsl, var(--color-primary) var(--scale-50), var(--light-base));
+  --color-primary-100: color-mix(in hsl, var(--color-primary) var(--scale-100), var(--light-base));
+  --color-primary-200: color-mix(in hsl, var(--color-primary) var(--scale-200), var(--light-base));
+  --color-primary-300: color-mix(in hsl, var(--color-primary) var(--scale-300), var(--light-base));
+  --color-primary-400: color-mix(in hsl, var(--color-primary) var(--scale-400), var(--light-base));
+  --color-primary-500: var(--color-primary);
+  --color-primary-600: color-mix(in hsl, var(--color-primary) var(--scale-600), var(--dark-base));
+  --color-primary-700: color-mix(in hsl, var(--color-primary) var(--scale-700), var(--dark-base));
+  --color-primary-800: color-mix(in hsl, var(--color-primary) var(--scale-800), var(--dark-base));
+  --color-primary-900: color-mix(in hsl, var(--color-primary) var(--scale-900), var(--dark-base));
+  /*
+   * SECONDARY
+   */
+  --color-secondary-50:color-mix(in hsl, var(--color-secondary) var(--scale-50), var(--light-base));
+  --color-secondary-100: color-mix(in hsl, var(--color-secondary) var(--scale-100), var(--light-base));
+  --color-secondary-200: color-mix(in hsl, var(--color-secondary) var(--scale-200), var(--light-base));
+  --color-secondary-300: color-mix(in hsl, var(--color-secondary) var(--scale-300), var(--light-base));
+  --color-secondary-400: color-mix(in hsl, var(--color-secondary) var(--scale-400), var(--light-base));
+  --color-secondary-500: var(--color-secondary);
+  --color-secondary-600: color-mix(in hsl, var(--color-secondary) var(--scale-600), var(--dark-base));
+  --color-secondary-700: color-mix(in hsl, var(--color-secondary) var(--scale-700), var(--dark-base));
+  --color-secondary-800: color-mix(in hsl, var(--color-secondary) var(--scale-800), var(--dark-base));
+  --color-secondary-900: color-mix(in hsl, var(--color-secondary) var(--scale-900), var(--dark-base));
+  /*
+   * TERTIARY
+   */
+  --color-tertiary-50: color-mix(in hsl, var(--color-tertiary) var(--scale-50), var(--light-base));
+  --color-tertiary-100: color-mix(in hsl, var(--color-tertiary) var(--scale-100), var(--light-base));
+  --color-tertiary-200: color-mix(in hsl, var(--color-tertiary) var(--scale-200), var(--light-base));
+  --color-tertiary-300: color-mix(in hsl, var(--color-tertiary) var(--scale-300), var(--light-base));
+  --color-tertiary-400: color-mix(in hsl, var(--color-tertiary) var(--scale-400), var(--light-base));
+  --color-tertiary-500: var(--color-tertiary);
+  --color-tertiary-600: color-mix(in hsl, var(--color-tertiary) var(--scale-600), var(--dark-base));
+  --color-tertiary-700: color-mix(in hsl, var(--color-tertiary) var(--scale-700), var(--dark-base));
+  --color-tertiary-800: color-mix(in hsl, var(--color-tertiary) var(--scale-800), var(--dark-base));
+  --color-tertiary-900: color-mix(in hsl, var(--color-tertiary) var(--scale-900), var(--dark-base));
+  /*
+   * STATES
+   */
+  --color-accent: var(--color-neutral-200);
+  --color-background: var(--color-white);
+  --color-background-paper: var(--color-neutral-50);
+  --color-background-disabled: var(--color-neutral-100);
+  --color-foreground: var(--color-neutral-900);
+  --color-foreground-disabled: var(--color-neutral-900);
+  --color-border: var(--color-neutral-300);
+  /*
+   * TYPOGRAPHY
+   */
+  --font-main: 'Josefin Sans', 'Segoe UI', sans-serif;
+  --font-code: ui-monospace, Consolas, monospace;
+  --text-small: 0.75rem;
+  --text-small--line-height: 140%;
+  --text-label: 0.875rem;
+  --text-label--line-height: 140%;
+  --text-body: 1rem;
+  --text-body--line-height: 140%;
+  --text-header4: 1.5rem;
+  --text-header4--line-height: 120%;
+  --text-header3: 2.0rem;
+  --text-header3--line-height: 120%;
+  --text-header2: 2.5rem;
+  --text-header2--line-height: 120%;
+  --text-header1: 3.0rem;
+  --text-header1--line-height: 120%;
+  --text-hero: 3.75rem;
+  --text-hero--line-height: 120%;
+  /*
+   * BREAKPOINTS
+   */
+  --breakpoint-mobile: 360px;
+  --breakpoint-mobileL: 480px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-laptopS: 1024px;
+  --breakpoint-laptopM: 1280px;
+  --breakpoint-laptopL: 1440px;
+  --breakpoint-desktop: 1920px;
+  --breakpoint-large: 2560px;
+  --spacing: 0.25rem;
+
+  --background-image-brand-gradient: linear-gradient(135deg, var(--color-primary-100), var(--color-primary-400));
+}
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  /* width */
+  ::-webkit-scrollbar {
+    width: 0;
+    height: 0;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    border-radius: 10px;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #cecece;
+    border-radius: 10px;
+  }
+
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #cecece;
+  }
+
+  *,
+  *:before,
+  *:after {
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  :root {
+    @apply bg-background text-foreground font-main text-body min-h-screen;
+    color-scheme: light dark;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-width: var(--breakpoint-mobile);
+  }
+
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  input, textarea {
+    @apply text-label;
+    color: currentColor;
+    font-family: inherit;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    background: transparent;
+  }
+
+  input {
+    border: 0;
+    outline: 0;
+    padding: 0;
+    width: 100%;
+  }
+
+  h1 {
+    @apply text-header1;
+  }
+
+  h2 {
+    @apply text-header2;
+  }
+
+  h3 {
+    @apply text-header3;
+  }
+
+  h4 {
+    @apply text-header4;
+  }
+
+  label {
+    @apply text-label;
+  }
+
+  small {
+    @apply text-small;
+  }
+}
