@@ -1,0 +1,20 @@
+{
+  "title": "Combo Details",
+  "difficulty": "Overall Difficulty",
+  "duration": "Estimated Duration",
+  "figures": "Included Figures",
+  "prerequisites": "Prerequisites",
+  "description": "Description",
+  "tips": "Tips & Notes",
+  "addToTraining": "Add to Training Plan",
+  "status": {
+    "title": "Progress Status",
+    "notstarted": "Not Started",
+    "inprogress": "In Progress",
+    "completed": "Completed"
+  },
+  "edit": {
+    "title": "Edit Combo",
+    "name": "Combo Name"
+  }
+}

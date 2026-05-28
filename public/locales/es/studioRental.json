@@ -1,0 +1,87 @@
+{
+  "browse": {
+    "title": "Renta de Estudio",
+    "subtitle": "Consulta disponibilidad por hora y crea una solicitud agrupada.",
+    "room": "Sala",
+    "roomPlaceholder": "Selecciona una sala",
+    "roomHint": "Selecciona una sala y un rango para cargar disponibilidad.",
+    "roomsLoading": "Cargando salas disponibles...",
+    "roomsLoadError": "No se pudieron cargar las salas.",
+    "selectedRoom": "Sala seleccionada:",
+    "roomType": "Tipo:",
+    "capacity": "Capacidad:",
+    "notSpecified": "No especificado",
+    "startAt": "Inicio",
+    "endAt": "Fin",
+    "loading": "Cargando disponibilidad...",
+    "loadError": "No se pudo cargar la disponibilidad.",
+    "availableSlots": "Slots disponibles",
+    "selectedCount": "{{count}} seleccionados",
+    "noSlots": "No hay slots disponibles para este rango.",
+    "createRequest": "Crear solicitud",
+    "creating": "Creando..."
+  },
+  "status": {
+    "draft": "Borrador",
+    "pendingPayment": "Pago pendiente",
+    "pendingApproval": "Aprobacion pendiente",
+    "confirmed": "Confirmada",
+    "cancelled": "Cancelada"
+  },
+  "myRequests": {
+    "title": "Mis solicitudes de renta",
+    "subtitle": "Revisa estado de aprobacion y pago de tus solicitudes.",
+    "loading": "Cargando solicitudes...",
+    "loadError": "No se pudieron cargar tus solicitudes.",
+    "empty": "Aun no tienes solicitudes de renta.",
+    "total": "Total",
+    "createdAt": "Creada",
+    "slots": "{{count}} slots",
+    "cancel": "Cancelar solicitud"
+  },
+  "admin": {
+    "title": "Admin de renta de estudio",
+    "subtitle": "Gestiona aprobaciones y reglas de disponibilidad.",
+    "tabs": {
+      "approval": "Cola de aprobacion",
+      "rules": "Reglas de disponibilidad"
+    },
+    "approval": {
+      "loading": "Cargando aprobaciones pendientes...",
+      "loadError": "No se pudo cargar la cola de aprobacion.",
+      "empty": "No hay aprobaciones pendientes.",
+      "total": "Total",
+      "slots": "{{count}} slots",
+      "approve": "Aprobar",
+      "reject": "Rechazar"
+    },
+    "rules": {
+      "room": "Sala",
+      "roomPlaceholder": "Selecciona una sala",
+      "roomsLoading": "Cargando salas disponibles...",
+      "roomsLoadError": "No se pudieron cargar las salas.",
+      "addDefaultRule": "Agregar regla de bloqueo por defecto",
+      "selectRoom": "Selecciona una sala para ver reglas.",
+      "loading": "Cargando reglas...",
+      "loadError": "No se pudieron cargar las reglas.",
+      "empty": "No hay reglas para esta sala.",
+      "type": "Tipo",
+      "time": "Horario",
+      "dayOfWeek": "Dia de la semana",
+      "allDays": "Todos los dias"
+    }
+  },
+  "toast": {
+    "requestCreated": "Solicitud de renta creada",
+    "requestFailed": "No se pudo crear la solicitud",
+    "requestCancelled": "Solicitud cancelada",
+    "requestCancelFailed": "No se pudo cancelar la solicitud",
+    "requestApproved": "Solicitud aprobada",
+    "requestApproveFailed": "No se pudo aprobar la solicitud",
+    "requestRejected": "Solicitud rechazada",
+    "requestRejectFailed": "No se pudo rechazar la solicitud",
+    "ruleCreated": "Regla creada",
+    "ruleUpdated": "Regla actualizada",
+    "ruleDeleted": "Regla eliminada"
+  }
+}

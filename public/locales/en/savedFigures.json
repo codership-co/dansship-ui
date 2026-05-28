@@ -1,0 +1,11 @@
+{
+  "title": "Saved Figures",
+  "noFigures": "You haven't saved any figures yet",
+  "savedTime": "Saved {{time}}",
+  "stats": {
+    "title": "Overview",
+    "total": "Total Saved Figures",
+    "byDifficulty": "By Difficulty Level",
+    "byType": "By Figure Type"
+  }
+}

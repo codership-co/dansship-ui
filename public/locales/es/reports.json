@@ -1,0 +1,52 @@
+{
+  "reportingRange": "Periodo de Reporte:",
+  "dateFrom": "Fecha desde",
+  "dateTo": "Fecha hasta",
+  "applyDateRange": "Aplicar",
+  "invalidDateRange": "La fecha inicial debe ser menor o igual que la fecha final",
+  "occupancyTitle": "Ocupacion de Clases (Tasa de Llenado)",
+  "occupancy": {
+    "classHeader": "Clase",
+    "enrolledCap": "Inscritos / Cap",
+    "fillRate": "Tasa de Llenado",
+    "summaryTitle": "Resumen de Ocupacion por Clase",
+    "summaryAverage": "Llenado Promedio",
+    "summarySessions": "Sesiones",
+    "summaryClasses": "Tipos de Clase",
+    "sessions": "Sesiones",
+    "averageFillRate": "Tasa Promedio de Llenado",
+    "instructorFallback": "Instructor",
+    "detailTitle": "Detalle de Tasa de Llenado por Horario",
+    "detailSearchLabel": "Buscar por clase, sala o instructor",
+    "detailSearchPlaceholder": "Escribe para filtrar filas",
+    "detailSortLabel": "Ordenar filas",
+    "sort": {
+      "mostRecent": "Mas recientes primero",
+      "highestFill": "Mayor tasa de llenado",
+      "lowestFill": "Menor tasa de llenado",
+      "className": "Nombre de clase (A-Z)"
+    },
+    "detail": {
+      "scheduleHeader": "Horario",
+      "instructorHeader": "Instructor",
+      "roomHeader": "Sala"
+    }
+  },
+  "attendanceTitle": "Asistencia y No Shows",
+  "attendance": {
+    "week": "Semana",
+    "attended": "Asistieron",
+    "noShow": "No Asistieron",
+    "rate": "Tasa"
+  },
+  "revenueTitle": "Ingresos por Suscripciones (Operativo)",
+  "revenue": {
+    "plan": "Plan",
+    "sold": "Vendidos",
+    "gross": "Bruto",
+    "discounts": "Descuentos",
+    "netRevenue": "Ingreso Neto",
+    "noPermissionTitle": "Acceso financiero restringido",
+    "noPermissionDescription": "No tienes permisos para ver informacion financiera sensible."
+  }
+}

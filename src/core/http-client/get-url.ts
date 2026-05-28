@@ -67,7 +67,9 @@ function getSearchParams({ params }: GetSearchParams): URLSearchParams {
     const searchParams = new URLSearchParams();
 
     for (const [key, value] of Object.entries(params)) {
-      searchParams.append(key, `${value}`);
+      if (value !== undefined && value !== null) {
+        searchParams.append(key, `${value}`);
+      }
     }
 
     return searchParams;

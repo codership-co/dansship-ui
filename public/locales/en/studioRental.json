@@ -1,0 +1,87 @@
+{
+  "browse": {
+    "title": "Studio Rental",
+    "subtitle": "Browse hourly availability and create a grouped rental request.",
+    "room": "Room",
+    "roomPlaceholder": "Select a room",
+    "roomHint": "Select a room and date range to load availability.",
+    "roomsLoading": "Loading available rooms...",
+    "roomsLoadError": "Could not load rooms right now.",
+    "selectedRoom": "Selected room:",
+    "roomType": "Type:",
+    "capacity": "Capacity:",
+    "notSpecified": "Not specified",
+    "startAt": "Start",
+    "endAt": "End",
+    "loading": "Loading availability...",
+    "loadError": "Could not load availability right now.",
+    "availableSlots": "Available Slots",
+    "selectedCount": "{{count}} selected",
+    "noSlots": "No slots available for this range.",
+    "createRequest": "Create Request",
+    "creating": "Creating..."
+  },
+  "status": {
+    "draft": "Draft",
+    "pendingPayment": "Pending Payment",
+    "pendingApproval": "Pending Approval",
+    "confirmed": "Confirmed",
+    "cancelled": "Cancelled"
+  },
+  "myRequests": {
+    "title": "My Rental Requests",
+    "subtitle": "Track approval and payment status for your requests.",
+    "loading": "Loading rental requests...",
+    "loadError": "Could not load your rental requests.",
+    "empty": "No rental requests yet.",
+    "total": "Total",
+    "createdAt": "Created",
+    "slots": "{{count}} slots",
+    "cancel": "Cancel Request"
+  },
+  "admin": {
+    "title": "Studio Rental Admin",
+    "subtitle": "Manage approvals and availability rules.",
+    "tabs": {
+      "approval": "Approval Queue",
+      "rules": "Availability Rules"
+    },
+    "approval": {
+      "loading": "Loading pending approvals...",
+      "loadError": "Could not load approval queue.",
+      "empty": "No pending rental approvals.",
+      "total": "Total",
+      "slots": "{{count}} slots",
+      "approve": "Approve",
+      "reject": "Reject"
+    },
+    "rules": {
+      "room": "Room",
+      "roomPlaceholder": "Select a room",
+      "roomsLoading": "Loading available rooms...",
+      "roomsLoadError": "Could not load rooms right now.",
+      "addDefaultRule": "Add Default Block Rule",
+      "selectRoom": "Select a room to view rules.",
+      "loading": "Loading rules...",
+      "loadError": "Could not load availability rules.",
+      "empty": "No rules found for this room.",
+      "type": "Type",
+      "time": "Time",
+      "dayOfWeek": "Day of week",
+      "allDays": "All days"
+    }
+  },
+  "toast": {
+    "requestCreated": "Rental request created",
+    "requestFailed": "Could not create rental request",
+    "requestCancelled": "Rental request cancelled",
+    "requestCancelFailed": "Could not cancel rental request",
+    "requestApproved": "Rental request approved",
+    "requestApproveFailed": "Could not approve rental request",
+    "requestRejected": "Rental request rejected",
+    "requestRejectFailed": "Could not reject rental request",
+    "ruleCreated": "Availability rule created",
+    "ruleUpdated": "Availability rule updated",
+    "ruleDeleted": "Availability rule deleted"
+  }
+}

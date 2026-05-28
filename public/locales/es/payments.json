@@ -1,0 +1,122 @@
+{
+  "checkoutTitle": "Checkout",
+  "selectMethod": "Como deseas pagar?",
+  "selectedMethod": "Metodo de pago",
+  "confirmationTitle": "Confirma tu compra",
+  "confirmPurchase": "Confirmar compra",
+  "intentCreatedTitle": "Compra registrada",
+  "intentCreatedDesc": "Tu pago quedo pendiente de revision manual. Sube el comprobante si aplica.",
+  "reference": "Referencia",
+  "total": "Total",
+  "startDate": "Fecha de inicio",
+  "createdAt": "Creado",
+  "methodLabel": "Metodo",
+  "planLabel": "Plan",
+  "planFallback": "Plan",
+  "userLabel": "Usuario",
+  "proofLabel": "Comprobante",
+  "uploadProof": "Subir comprobante",
+  "replaceProof": "Reemplazar comprobante",
+  "proofPreviewAlt": "Vista previa del comprobante",
+  "proofUploading": "Subiendo comprobante...",
+  "proofUploadSuccess": "Comprobante subido exitosamente",
+  "proofUploadFailed": "Error al subir comprobante",
+  "proofUploadFailedDesc": "No se pudo subir tu comprobante de pago.",
+  "viewProof": "Ver comprobante subido",
+  "proofViewFailed": "No se pudo abrir el comprobante",
+  "proofViewFailedDesc": "Intenta de nuevo en unos momentos.",
+  "proofInvalidTypeTitle": "Archivo no compatible",
+  "proofInvalidTypeDesc": "Solo se permiten imagenes JPG, PNG o WEBP.",
+  "proofRequiredTitle": "Comprobante requerido",
+  "proofRequiredDesc": "Este metodo de pago requiere un comprobante de imagen antes de confirmar tu compra.",
+  "proofRequiredInline": "Sube una imagen del comprobante para continuar.",
+  "proofUploadInCheckoutTitle": "Sube el comprobante ahora",
+  "proofUploadInCheckoutDesc": "Adjunta tu comprobante para completar este checkout en un solo paso.",
+  "cancelIntent": "Cancelar",
+  "cancelSuccess": "Intento de pago cancelado",
+  "cancelFailed": "Error al cancelar",
+  "cancelFailedDesc": "No se pudo cancelar el intento de pago.",
+  "createSuccess": "Intento de pago creado",
+  "createFailed": "Error en la compra",
+  "createFailedDesc": "No se pudo crear el intento de pago.",
+  "myPayments": "Mis Pagos",
+  "inProgressEmptyState": "No tienes pagos en proceso.",
+  "historicalEmptyState": "Aun no tienes pagos historicos.",
+  "emptyState": "Aun no tienes pagos.",
+  "steps": {
+    "review": "Resumen",
+    "method": "Metodo",
+    "confirm": "Confirmar"
+  },
+  "method": {
+    "transfer": "Transferencia bancaria",
+    "cash": "Efectivo",
+    "nequi": "Nequi",
+    "daviplata": "Daviplata",
+    "card": "Tarjeta de credito/debito"
+  },
+  "methodDesc": {
+    "transfer": "Transfiere a nuestra cuenta bancaria y sube el recibo.",
+    "cash": "Paga directamente en recepcion del estudio.",
+    "nequi": "Envia el pago a nuestro numero Nequi.",
+    "daviplata": "Envia el pago a nuestro numero Daviplata."
+  },
+  "purchaseType": {
+    "plan": "Plan",
+    "merch": "Merch",
+    "workshop": "Taller",
+    "event": "Evento",
+    "private_class": "Clase Privada",
+    "studio_rental": "Alquiler de Estudio"
+  },
+  "instructions": {
+    "transfer": {
+      "title": "Instrucciones de transferencia",
+      "description": "Completa la transferencia y conserva el comprobante para subirlo."
+    },
+    "cash": {
+      "title": "Instrucciones de pago en efectivo",
+      "description": "Paga en el estudio y comparte el comprobante si el staff lo solicita."
+    },
+    "nequi": {
+      "title": "Instrucciones de pago Nequi",
+      "description": "Envia el pago a la cuenta Nequi configurada y sube la captura."
+    },
+    "daviplata": {
+      "title": "Instrucciones de pago Daviplata",
+      "description": "Envia el pago a la cuenta Daviplata configurada y sube la captura."
+    }
+  },
+  "status": {
+    "pending": "Pendiente",
+    "pending_manual_review": "Pendiente de revision",
+    "approved": "Aprobado",
+    "rejected": "Rechazado",
+    "cancelled": "Cancelado",
+    "expired": "Expirado"
+  },
+  "admin": {
+    "pageTitle": "Revision de Pagos",
+    "pageSubtitle": "Revisa y aprueba intentos de pago offline.",
+    "title": "Pagos",
+    "empty": "No se encontraron intentos de pago.",
+    "review": "Revisar",
+    "total": "{{count}} pagos",
+    "viewProof": "Ver comprobante subido",
+    "noProof": "Sin comprobante",
+    "reviewTitle": "Revisar pago",
+    "notesLabel": "Notas del admin",
+    "notesPlaceholder": "Notas opcionales para esta revision",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "reviewSuccess": "Pago revisado exitosamente",
+    "reviewFailed": "Error al revisar",
+    "reviewFailedDesc": "No se pudo revisar el intento de pago.",
+    "rejectConfirmTitle": "Rechazar pago",
+    "rejectConfirmDesc": "Estas seguro de que deseas rechazar este pago?",
+    "filter": {
+      "all": "Todos los estados",
+      "status": "Filtrar por estado"
+    }
+  }
+}

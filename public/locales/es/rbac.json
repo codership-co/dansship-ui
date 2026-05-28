@@ -1,0 +1,48 @@
+{
+  "policies": {
+    "title": "Politicas",
+    "addPolicy": "Agregar Politica",
+    "action": "Accion",
+    "resource": "Recurso",
+    "empty": "No se encontraron politicas.",
+    "deleteTitle": "Eliminar politica",
+    "deleteConfirmNamed": "Estas seguro de que quieres eliminar \"{{name}}\"? Esta accion no se puede deshacer.",
+    "deleteConfirm": "Estas seguro de que quieres eliminar esta politica? Esta accion no se puede deshacer.",
+    "editTitle": "Editar Politica",
+    "createTitle": "Crear Politica",
+    "namePlaceholder": "ej. Puede leer usuarios",
+    "actionPlaceholder": "ej. read",
+    "resourcePlaceholder": "ej. users",
+    "descriptionPlaceholder": "Descripcion opcional"
+  },
+  "roles": {
+    "title": "Roles",
+    "empty": "No se encontraron roles.",
+    "managePolicies": "Gestionar Politicas",
+    "managePoliciesFor": "Gestionar Politicas para {{name}}",
+    "assignedPolicies": "Politicas Asignadas",
+    "noPoliciesAssigned": "No hay politicas asignadas a este rol.",
+    "availablePolicies": "Politicas Disponibles",
+    "allPoliciesAssigned": "Todas las politicas disponibles ya estan asignadas."
+  },
+  "userRoles": {
+    "title": "Gestion de Roles de Usuario",
+    "searchPlaceholder": "Buscar por correo de usuario (min 3 caracteres)",
+    "noUsersFound": "No se encontraron usuarios",
+    "errorLoadingUser": "Error al cargar usuario. Verifica que el UUID sea correcto.",
+    "userLabel": "Usuario: ",
+    "assignedRoles": "Roles Asignados",
+    "noRolesAssigned": "No hay roles asignados.",
+    "availableRoles": "Roles Disponibles",
+    "allRolesAssigned": "Todos los roles ya estan asignados.",
+    "assignAndComplete": "Asignar y Completar Perfil",
+    "completeInstructorTitle": "Completar perfil de instructor",
+    "completeInstructorDesc": "Completa la informacion requerida del perfil para asignar el rol de instructor y evitar errores de perfil faltante.",
+    "assigning": "Asignando...",
+    "assignInstructor": "Asignar Instructor",
+    "roleAssignedSuccess": "Rol \"{{name}}\" asignado exitosamente",
+    "roleAssignFailed": "Error al asignar el rol",
+    "instructorAssignedSuccess": "Rol de instructor asignado y perfil creado",
+    "instructorAssignFailed": "Error al asignar el rol de instructor"
+  }
+}

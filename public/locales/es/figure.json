@@ -1,0 +1,69 @@
+{
+  "status": {
+    "notStarted": "No Iniciado",
+    "inProgress": "En Progreso",
+    "completed": "Completado",
+    "wantToTry": "Quiero Intentar",
+    "markComplete": "Marcar como Completado",
+    "addToTryList": "Añadir a Lista de Intentos"
+  },
+  "addToCombo": {
+    "title": "Añadir a Combo",
+    "selectCombo": "Seleccionar un combo...",
+    "createNew": "Crear nuevo combo",
+    "newComboName": "Nombre del Nuevo Combo",
+    "enterComboName": "Ingresa el nombre del combo",
+    "button": "Añadir a Combo",
+    "errors": {
+      "selectCombo": "Selecciona un combo o crea uno nuevo",
+      "enterName": "Ingresa un nombre para el nuevo combo"
+    },
+    "toast": {
+      "success": "Figura agregada al combo exitosamente",
+      "error": "Error al agregar figura al combo"
+    }
+  },
+  "details": {
+    "description": "Descripción",
+    "prerequisites": "Prerrequisitos",
+    "tips": "Consejos",
+    "duration": "Tiempo para Dominar",
+    "includedInCombos": "Incluido en Combos",
+    "addToPlan": "Añadir al Plan de Entrenamiento",
+    "type": "Tipo"
+  },
+  "similar": "Figuras Similares",
+  "progress": {
+    "title": "Seguimiento del Progreso",
+    "status": "Estado Actual",
+    "mastery": "Nivel de Dominio",
+    "notes": "Notas de Progreso",
+    "addNote": "Añadir Nota",
+    "addNotePlaceholder": "Escribe tu nota de progreso...",
+    "trackProgress": "Registra tu progreso",
+    "history": "Ver Historial de Progreso",
+    "date": "Fecha",
+    "level": "Nivel",
+    "note": "Nota",
+    "howYouFeelToday": "¿Cómo te sientes hoy?",
+    "notePlaceholder": "Describe tu progreso, desafíos o logros...",
+    "statuses": {
+      "notstarted": "No Iniciado",
+      "inprogress": "En Progreso",
+      "completed": "Completado"
+    },
+    "levels": {
+      "struggling": "Aún Difícil",
+      "holding": "Puede Mantener Posición",
+      "consistent": "Rendimiento Consistente",
+      "mastered": "Totalmente Dominado"
+    },
+    "descriptions": {
+      "struggling": "Necesita más práctica para realizar el movimiento",
+      "holding": "Puede mantener la posición por 5+ segundos",
+      "consistent": "Puede realizar consistentemente con buena forma",
+      "mastered": "Control completo y ejecución perfecta"
+    }
+  },
+  "notFound": "La figura no fue encontrada"
+}

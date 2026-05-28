@@ -1,0 +1,161 @@
+import {
+  type AdminInstructorListItem,
+  type AvailabilityApiItem,
+  type AvailabilityWeek,
+  type ClassRosterResponse,
+  type CreateInstructorProfilePayload,
+  DAY_TO_INDEX,
+  INDEX_TO_DAY,
+  type InstructorProfile,
+  type InstructorUserSearchResult,
+  type ManualAddStudentPayload,
+  type UpdateAvailabilityPayload,
+  type UpdateInstructorProfilePayload,
+} from './instructors.models';
+
+import { HttpClient } from '@core/http-client';
+
+import type { ScheduledClass } from '../schedules/schedules.models';
+
+export class InstructorsAPI {
+  constructor(private readonly httpClient: HttpClient) {}
+
+  async getInstructors() {
+    return this.httpClient.call<Array<AdminInstructorListItem>>({
+      path: '/admin/instructors',
+      method: 'GET',
+    });
+  }
+
+  async getProfile() {
+    return this.httpClient.call<InstructorProfile>({
+      path: '/instructors/profile',
+      method: 'GET',
+    });
+  }
+
+  async createProfile(payload: CreateInstructorProfilePayload) {
+    return this.httpClient.call<InstructorProfile>({
+      path: '/instructors/profile',
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async updateProfile(payload: UpdateInstructorProfilePayload) {
+    return this.httpClient.call<InstructorProfile>({
+      path: '/instructors/profile',
+      method: 'PUT',
+      data: payload,
+    });
+  }
+
+  async getAvailability(week: string) {
+    const response = await this.httpClient.call<Array<AvailabilityApiItem>>({
+      path: '/instructors/availability',
+      method: 'GET',
+      params: { week },
+    });
+
+    if (response.error) {
+      return response;
+    }
+
+    return {
+      ...response,
+      data: {
+        week,
+        slots: response.data.map(item => ({
+          day_of_week: DAY_TO_INDEX[item.day_of_week],
+          start_time: item.start_time,
+          end_time: item.end_time,
+        })),
+      } as AvailabilityWeek,
+    };
+  }
+
+  async getAdminAvailability(id: string, week: string) {
+    const response = await this.httpClient.call<Array<AvailabilityApiItem>>({
+      path: `/admin/instructors/${id}/availability`,
+      method: 'GET',
+      params: { week },
+    });
+
+    if (response.error) {
+      return response;
+    }
+
+    return {
+      ...response,
+      data: {
+        week,
+        slots: response.data.map(item => ({
+          day_of_week: DAY_TO_INDEX[item.day_of_week],
+          start_time: item.start_time,
+          end_time: item.end_time,
+        })),
+      } as AvailabilityWeek,
+    };
+  }
+
+  async updateAvailability(payload: UpdateAvailabilityPayload) {
+    const response = await this.httpClient.call<Array<AvailabilityApiItem>>({
+      path: '/instructors/availability',
+      method: 'POST',
+      data: {
+        week_start_date: payload.week_start_date,
+        slots: payload.slots.map(slot => ({
+          day_of_week: INDEX_TO_DAY[slot.day_of_week],
+          start_time: slot.start_time,
+          end_time: slot.end_time,
+        })),
+      },
+    });
+
+    if (response.error) {
+      return response;
+    }
+
+    return {
+      ...response,
+      data: {
+        week: payload.week_start_date,
+        slots: response.data.map(item => ({
+          day_of_week: DAY_TO_INDEX[item.day_of_week],
+          start_time: item.start_time,
+          end_time: item.end_time,
+        })),
+      } as AvailabilityWeek,
+    };
+  }
+
+  async searchUsersByEmail(email: string) {
+    return this.httpClient.call<Array<InstructorUserSearchResult>>({
+      path: '/instructors/users/search',
+      method: 'GET',
+      params: { email },
+    });
+  }
+
+  async getClassRoster(classId: string) {
+    return this.httpClient.call<ClassRosterResponse>({
+      path: `/instructors/classes/${classId}/roster`,
+      method: 'GET',
+    });
+  }
+
+  async manualAddStudent(classId: string, payload: ManualAddStudentPayload) {
+    return this.httpClient.call<void, ManualAddStudentPayload>({
+      path: `/instructors/classes/${classId}/roster`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async getInstructorWeeklySchedule(weekStartDate: string) {
+    return this.httpClient.call<Array<ScheduledClass>>({
+      path: `/instructors/schedules/weeks/${weekStartDate}/classes`,
+      method: 'GET',
+    });
+  }
+}

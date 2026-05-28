@@ -1,0 +1,20 @@
+{
+  "title": "Detalles del Combo",
+  "difficulty": "Dificultad General",
+  "duration": "Duración Estimada",
+  "figures": "Figuras Incluidas",
+  "prerequisites": "Prerrequisitos",
+  "description": "Descripción",
+  "tips": "Consejos y Notas",
+  "addToTraining": "Añadir al Plan de Entrenamiento",
+  "status": {
+    "title": "Estado de Progreso",
+    "notstarted": "No Iniciado",
+    "inprogress": "En Progreso",
+    "completed": "Completado"
+  },
+  "edit": {
+    "title": "Editar Combo",
+    "name": "Nombre del Combo"
+  }
+}

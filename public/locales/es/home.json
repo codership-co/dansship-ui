@@ -1,24 +1,140 @@
 {
-  "aboutMe": {
-    "title": "Sobre mí",
-    "subtitle1": "Mi pasión y lo que hago",
-    "subtitle2": "Contáctame",
-    "text1": "Soy un ingeniero de software amante del código y con una gran pasión por el diseño. Actualmente me especializo en desarrollo web, creando plataformas increíbles y profesionales, cuidando la experiencia del usuario y aplicando buenas prácticas en el código para garantizar calidad y escalabilidad.",
-    "text2": "Siempre buscando nuevas oportunidades para aprender y crecer profesional y personalmente.",
-    "text3": "¿Quieres empezar con tu proyecto y necesitas mi ayuda, o simplemente quieres trabajar conmigo? Por favor, contáctame.",
-    "button1": "Descargar mi CV",
-    "button2": "Contrátame!"
+  "title": "Dansship: una nueva experiencia de bienestar",
+  "subtitle": "Un espacio para mujeres que quieren experimentar nuevas formas de bienestar con clases de danza, pole y flexibilidad, mientras siguen su progreso para lograr mejores resultados.",
+  "buttons": {
+    "explore": "Empezar a Explorar",
+    "share": "Compartir una Figura",
+    "join": "Comienza tu experiencia"
   },
-  "mySkills": {
-    "title": "Mis habilidades",
-    "yearsOfExperience_one": "{{count}} año de experiencia",
-    "yearsOfExperience_other": "{{count}} años de experiencia"
+  "pillars": {
+    "title": "Tus caminos de bienestar",
+    "dance": {
+      "title": "Clases de danza",
+      "description": "Muévete con confianza en sesiones guiadas diseñadas para expresión y bienestar."
+    },
+    "pole": {
+      "title": "Práctica de pole",
+      "description": "Desarrolla fuerza y técnica con clases estructuradas para todos los niveles."
+    },
+    "flexibility": {
+      "title": "Entrenamiento de flexibilidad",
+      "description": "Mejora movilidad y consciencia corporal con rutinas enfocadas en flexibilidad."
+    }
   },
-  "myExperience": {
-    "title": "Mi experiencia"
+  "experience": {
+    "title": "Más que un estudio",
+    "progress": {
+      "title": "Sigue tu progreso en pole",
+      "description": "Usa herramientas de progreso para seguir hitos, mantener constancia y celebrar tu evolución."
+    },
+    "community": {
+      "title": "Comunidad que acompaña",
+      "description": "Conecta con mujeres que quieren crecer, experimentar y compartir su proceso juntas."
+    },
+    "wellness": {
+      "title": "Una experiencia completa",
+      "description": "Dansship combina movimiento, bienestar y crecimiento personal en un solo espacio."
+    }
   },
-  "myProjects": {
-    "title": "Mis proyectos",
-    "viewAll": "Ver todos los proyectos"
+  "features": {
+    "discover": {
+      "title": "Descubre Figuras",
+      "description": "Explora una amplia colección de figuras de pole, desde nivel principiante hasta avanzado"
+    },
+    "share": {
+      "title": "Comparte tu Progreso",
+      "description": "Documenta tu viaje y comparte tus logros con la comunidad"
+    },
+    "connect": {
+      "title": "Conéctate",
+      "description": "Únete a una comunidad solidaria de atletas y entusiastas del pole"
+    }
+  },
+  "featured": "Figuras Destacadas",
+  "stitch": {
+    "hero": {
+      "imageAlt": "Bailarina de pole en movimiento",
+      "kicker1": "Bienvenidos",
+      "kicker2": "a Dansship",
+      "titleLine1": "Donde el cuerpo encuentra su ritmo",
+      "titleLine2": "y el alma se eleva",
+      "description": "Un espacio para fluir, crear y transformar tu práctica con disciplinas artísticas y deportivas.",
+      "bookClass": "Reserva clase",
+      "trackProgress": "Lleva tu progreso"
+    },
+    "offerings": {
+      "kicker": "Nuestras Disciplinas",
+      "title": "Explora tu Movimiento",
+      "subtitle": "Cada disciplina está diseñada para impulsar tu evolución técnica y creativa.",
+      "scheduleCtaMessage": "¿Quieres ver todas las clases disponibles? Revisa los horarios semanales.",
+      "scheduleCtaAction": "Ver horarios",
+      "learnMore": "Explorar clases",
+      "dance": {
+        "title": "Baile",
+        "description": "Ritmo, expresión y conexión a través de diferentes estilos contemporáneos."
+      },
+      "poleSport": {
+        "title": "Pole Dance Sport",
+        "description": "Fuerza acrobática y control total. Un desafío para cuerpo y mente."
+      },
+      "complementary": {
+        "title": "Complementario",
+        "description": "Flexibilidad y acondicionamiento diseñado para potenciar tu rendimiento."
+      }
+    },
+    "progress": {
+      "kicker": "Compañero Digital",
+      "title": "Lleva tu progreso contigo",
+      "subtitle": "Transforma cada práctica en un avance medible dentro de tu biblioteca de movimiento.",
+      "imageAlt": "Atleta de pole entrenando",
+      "weeklyLabel": "Progreso semanal",
+      "search": {
+        "title": "Encuentra la figura",
+        "description": "Explora un catálogo digital con más de 200 figuras clasificadas por niveles."
+      },
+      "favorites": {
+        "title": "Agrega como favorita",
+        "description": "Crea tu propia rutina guardando poses y movimientos que quieres perfeccionar."
+      },
+      "log": {
+        "title": "Entrena y registra",
+        "description": "Lleva un historial visual y técnico de tus avances clase tras clase."
+      }
+    },
+    "membership": {
+      "kicker": "Planes y Membresías",
+      "title": "Elige el ritmo para tu evolución",
+      "subtitle": "Opciones flexibles para tu viaje en {{studioName}}.",
+      "helpText": "Si necesitas ayuda para elegir, nuestro equipo te acompaña en cada paso.",
+      "viewAllPlans": "Ver todos los planes"
+    }
+  },
+  "sharedFooter": {
+    "description": "Muévete con gracia en cada sesión. Descubre clases, sigue tu progreso y construye tu propio ritmo.",
+    "explore": {
+      "title": "Explora",
+      "tricks": "Biblioteca de Figuras",
+      "training": "Entrenamiento de Fuerza",
+      "flexibility": "Flexibilidad"
+    },
+    "support": {
+      "title": "Soporte",
+      "help": "Centro de Ayuda",
+      "community": "Normas de la Comunidad",
+      "contact": "Contáctanos"
+    },
+    "legal": {
+      "title": "Legal",
+      "privacy": "Política de Privacidad",
+      "terms": "Términos del Servicio"
+    },
+    "quick": {
+      "events": "Eventos"
+    },
+    "social": {
+      "instagram": "Instagram",
+      "tiktok": "TikTok"
+    },
+    "copyright": "© {{year}} {{studio}}."
   }
 }

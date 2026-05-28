@@ -1,0 +1,16 @@
+{
+  "codes": {
+    "BAD_REQUEST_GENERIC": "No pudimos procesar esta solicitud. Revisa los datos e intenta de nuevo.",
+    "BOOKING_SUBSCRIPTION_NOT_ELIGIBLE": "Este usuario no tiene una suscripcion activa con clases disponibles.",
+    "BOOKING_TIME_OVERLAP": "Este usuario ya tiene otra clase reservada en ese horario.",
+    "BOOKING_CLASS_FULL": "Esta clase esta llena por ahora."
+  },
+  "combo": {
+    "addFigureFailed": "Error al agregar figura al combo",
+    "fetchFailed": "Error al obtener el combo"
+  },
+  "progress": {
+    "updateFailed": "Error al actualizar el progreso",
+    "fetchFailed": "Error al obtener el progreso"
+  }
+}

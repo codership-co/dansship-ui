@@ -1,0 +1,53 @@
+{
+  "inventory": {
+    "title": "Inventory & Billing Management",
+    "subtitle": "Manage rooms, class catalog, plans, and discounts.",
+    "tabs": {
+      "rooms": "Rooms",
+      "classCatalog": "Class Catalog",
+      "plans": "Plans",
+      "discounts": "Discounts"
+    }
+  },
+  "rbac": {
+    "title": "Access Management",
+    "subtitle": "Manage roles, policies, and assign access to users.",
+    "tabs": {
+      "roles": "Roles",
+      "policies": "Policies",
+      "userAssignments": "User Assignments"
+    }
+  },
+  "reports": {
+    "title": "Platform Reports & Settings",
+    "subtitle": "View operational KPIs and configure platform behavior.",
+    "tabs": {
+      "dashboard": "Operational Dashboard",
+      "notifications": "Notification Config"
+    }
+  },
+  "bookings": {
+    "title": "Book Classes for Users",
+    "subtitle": "Help users reserve classes while keeping all booking and subscription rules enforced.",
+    "userSearchLabel": "Find user by email",
+    "userSearchPlaceholder": "type user email",
+    "userSearchHint": "Enter at least 3 characters to search users.",
+    "userLabel": "User",
+    "userSelectPlaceholder": "Select user",
+    "classLabel": "Class",
+    "classSelectPlaceholder": "Select class",
+    "reasonLabel": "Internal note (optional)",
+    "reasonPlaceholder": "Reason for manual booking",
+    "submit": "Create booking",
+    "submitting": "Creating booking...",
+    "loadingUsers": "Searching users...",
+    "loadingClasses": "Loading classes...",
+    "noClasses": "No published classes found for this week.",
+    "successTitle": "Booking created successfully",
+    "errorTitle": "Could not create booking",
+    "errorDescription": "The booking could not be created.",
+    "validationUser": "Please select a user.",
+    "validationClass": "Please select a class.",
+    "selectedClassSummary": "Selected class: {{className}} ({{enrolled}}/{{capacity}} booked)"
+  }
+}

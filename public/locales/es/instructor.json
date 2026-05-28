@@ -1,0 +1,67 @@
+{
+  "dashboard": {
+    "title": "Portal de Instructor",
+    "subtitle": "Administra tu perfil, disponibilidad y listas de clase.",
+    "tabs": {
+      "roster": "Mi Horario y Lista",
+      "availability": "Disponibilidad",
+      "profile": "Perfil"
+    }
+  },
+  "biography": "Biografia",
+  "bioPlaceholder": "Experiencia docente, certificaciones y estilo.",
+  "photoUrl": "URL de Foto",
+  "photoUrlPlaceholder": "https://ejemplo.com/foto-instructor.jpg",
+  "contactInfo": "Informacion de contacto",
+  "contactInfoPlaceholder": "Correo, telefono o contacto de emergencia.",
+  "availability": {
+    "title": "Disponibilidad Semanal",
+    "description": "Declara los horarios en que estas disponible para ensenar en la semana seleccionada.",
+    "previousWeek": "Semana Anterior",
+    "nextWeek": "Semana Siguiente",
+    "noSlots": "No hay disponibilidad declarada para esta semana.",
+    "day": "Dia",
+    "selectDay": "Selecciona un dia",
+    "startTime": "Hora de Inicio",
+    "endTime": "Hora de Fin",
+    "addSlot": "Agregar Horario",
+    "save": "Guardar Disponibilidad",
+    "updateSuccess": "Disponibilidad actualizada exitosamente",
+    "updateFailed": "Error al actualizar la disponibilidad"
+  },
+  "roster": {
+    "title": "Lista de Alumnos",
+    "enrolledStudents": "Alumnos Inscritos ({{count}})",
+    "searchPlaceholder": "Buscar alumno por correo",
+    "adding": "Agregando...",
+    "manualAdd": "Agregar Manual",
+    "studentName": "Nombre del Alumno",
+    "attendance": "Asistencia",
+    "noStudents": "Aun no hay alumnos inscritos.",
+    "cannotMarkBeforeStart": "No se puede marcar antes del inicio de la clase",
+    "attended": "Asistio",
+    "noShow": "No asistio",
+    "waitlist": "Lista de Espera ({{count}})",
+    "joinedAt": "Se unio el",
+    "waitlisted": "En espera",
+    "attendanceNote": "Los botones de asistencia se activaran una vez que pase la hora de inicio de la clase.",
+    "updateAttendanceFailed": "Error al actualizar la asistencia",
+    "attendanceUpdated": "Asistencia actualizada",
+    "studentAddedSuccess": "Alumno agregado exitosamente",
+    "studentAddFailed": "Error al agregar alumno",
+    "addFailedTitle": "Error al Agregar"
+  },
+  "profile": {
+    "title": "Perfil de Instructor",
+    "description": "Administra tu biografia publica, foto e informacion de contacto privada.",
+    "bioPlaceholder": "Cuentale a tus alumnos sobre tu experiencia...",
+    "photoUrlPlaceholder": "https://ejemplo.com/mi-foto.jpg",
+    "contactInfoLabel": "Informacion de Contacto Privada (Visible solo para Administradores)",
+    "contactInfoPlaceholder": "Telefono, contacto de emergencia, etc.",
+    "saveProfile": "Guardar Perfil",
+    "createSuccess": "Perfil creado exitosamente",
+    "createFailed": "Error al crear el perfil",
+    "updateSuccess": "Perfil actualizado exitosamente",
+    "updateFailed": "Error al actualizar el perfil"
+  }
+}

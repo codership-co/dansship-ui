@@ -1,4 +1,4 @@
-import { getResponseErrorMessage } from './get-response-error-message';
+import { getResponseError } from './get-response-error';
 import { getURL, type GetUrlParams } from './get-url';
 import { HttpClientError } from './http-client-error';
 
@@ -50,6 +50,7 @@ export interface HttpClientRequestConfig<T extends object> extends HttpClientCom
   window?: null;
   disableCache?: boolean;
   data?: T;
+  retries?: number;
 }
 
 export interface HttpClientSuccessResponse<T> {
@@ -82,11 +83,22 @@ export function getHttpClientErrorResponse(error: Error): HttpClientErrorRespons
   };
 }
 
+type OnErrorCallback =
+  | ((config: HttpClientRequestConfig<object>, response: HttpClientResponse<Response>) => Promise<void>)
+  | undefined;
+
+type MappingDataResponseFunction<Response, NewResponse extends Response = Response> = (data: Response) => NewResponse;
+
 export class HttpClient {
   private readonly httpConfig: HttpClientConfig;
+  private readonly onError: OnErrorCallback = undefined;
 
-  constructor(protected config: HttpClientConfig) {
+  constructor(
+    protected config: HttpClientConfig,
+    onError: OnErrorCallback = undefined,
+  ) {
     this.httpConfig = config;
+    this.onError = onError;
   }
 
   protected async onRequest(requestInit: RequestInit): Promise<RequestInit> {
@@ -104,7 +116,7 @@ export class HttpClient {
   }
 
   private async getRequestParams<Payload extends object = object>(_config: HttpClientRequestConfig<Payload>) {
-    const { path, url, params, disableCache, data: requestData, ...config } = _config;
+    const { path, url, params, disableCache, data: requestData, retries: _, ...config } = _config;
     const { baseURL, apiName, getLogger, ...httpConfig } = this.httpConfig;
     const urlParams: GetUrlParams = { url, baseURL, path, params };
     const buildURL = getURL(urlParams);
@@ -144,11 +156,18 @@ export class HttpClient {
     const response = await fetch(buildURL, request);
 
     if (!response.ok) {
-      const message = await getResponseErrorMessage(
+      throw await getResponseError(
         response,
         `[${apiName}]: There was a problem fetching [${config.method ?? 'GET'}] - ${buildURL}`,
       );
-      throw new HttpClientError(response.status, message);
+    }
+
+    if (response.status === 204 || response.status === 202) {
+      return {
+        data: null as Response,
+        status: response.status,
+        error: null,
+      };
     }
 
     const data = (await response.json()) as Response;
@@ -160,17 +179,22 @@ export class HttpClient {
     };
   }
 
-  protected async call<Response, Payload extends object = object>(
+  public async call<Response = void, Payload extends object = object, NewResponse extends Response = Response>(
     config: HttpClientRequestConfig<Payload>,
-  ): Promise<HttpClientResponse<Response>> {
+    mapData: MappingDataResponseFunction<Response, NewResponse> = d => d as NewResponse,
+  ): Promise<HttpClientResponse<NewResponse>> {
     try {
       const response = await this.callOrThrow<Response, Payload>(config);
       await this.log(config, RequestState.RESOLVED, response);
 
-      return response;
+      return {
+        ...response,
+        data: mapData(response.data),
+      };
     } catch (error: unknown) {
       const errorResponse = getHttpClientErrorResponse(error as Error);
       await this.log(config, RequestState.REJECTED, errorResponse);
+      await this.onError(config, errorResponse);
 
       return errorResponse;
     }

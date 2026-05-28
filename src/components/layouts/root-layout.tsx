@@ -1,4 +1,6 @@
-import { NavLink, Outlet, useFetchers, useNavigation } from 'react-router';
+import { Outlet, useFetchers, useNavigation } from 'react-router';
+
+import { Navbar } from '@components/navbar';
 
 export const RootLayout = () => {
   const navigation = useNavigation();
@@ -14,12 +16,7 @@ export const RootLayout = () => {
 
   return (
     <section>
-      <nav className='flex gap-2'>
-        <NavLink to='/'>Home</NavLink>
-        <NavLink to='/user/ditto'>Ditto</NavLink>
-        <NavLink to='/user/pikachu'>Pikachu</NavLink>
-        <NavLink to='/user/metapod'>Metapod</NavLink>
-      </nav>
+      <Navbar />
 
       {/* This will show instantly on page refresh, no more blank screen! */}
       {isLoading ? <div>App is fetching data...</div> : <Outlet />}

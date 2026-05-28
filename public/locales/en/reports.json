@@ -1,0 +1,52 @@
+{
+  "reportingRange": "Reporting Range:",
+  "dateFrom": "Date from",
+  "dateTo": "Date to",
+  "applyDateRange": "Apply",
+  "invalidDateRange": "Start date must be before or equal to end date",
+  "occupancyTitle": "Class Occupancy (Fill Rate)",
+  "occupancy": {
+    "classHeader": "Class",
+    "enrolledCap": "Enrolled / Cap",
+    "fillRate": "Fill Rate",
+    "summaryTitle": "Class Occupancy Summary",
+    "summaryAverage": "Average Fill",
+    "summarySessions": "Sessions",
+    "summaryClasses": "Class Types",
+    "sessions": "Sessions",
+    "averageFillRate": "Avg Fill Rate",
+    "instructorFallback": "Instructor",
+    "detailTitle": "Schedule Fill Rate Detail",
+    "detailSearchLabel": "Search class, room or instructor",
+    "detailSearchPlaceholder": "Type to filter rows",
+    "detailSortLabel": "Sort rows",
+    "sort": {
+      "mostRecent": "Most recent first",
+      "highestFill": "Highest fill rate",
+      "lowestFill": "Lowest fill rate",
+      "className": "Class name (A-Z)"
+    },
+    "detail": {
+      "scheduleHeader": "Schedule",
+      "instructorHeader": "Instructor",
+      "roomHeader": "Room"
+    }
+  },
+  "attendanceTitle": "Attendance & No Shows",
+  "attendance": {
+    "week": "Week",
+    "attended": "Attended",
+    "noShow": "No Show",
+    "rate": "Rate"
+  },
+  "revenueTitle": "Subscription Revenue (Operational)",
+  "revenue": {
+    "plan": "Plan",
+    "sold": "Sold",
+    "gross": "Gross",
+    "discounts": "Discounts",
+    "netRevenue": "Net Revenue",
+    "noPermissionTitle": "Financial access restricted",
+    "noPermissionDescription": "You do not have permission to view sensitive financial information."
+  }
+}

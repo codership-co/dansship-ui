@@ -1,0 +1,69 @@
+{
+  "status": {
+    "notStarted": "Not Started",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "wantToTry": "Want to Try",
+    "markComplete": "Mark as Complete",
+    "addToTryList": "Add to Try List"
+  },
+  "addToCombo": {
+    "title": "Add to Combo",
+    "selectCombo": "Select a combo...",
+    "createNew": "Create new combo",
+    "newComboName": "New Combo Name",
+    "enterComboName": "Enter combo name",
+    "button": "Add to Combo",
+    "errors": {
+      "selectCombo": "Please select a combo or create a new one",
+      "enterName": "Please enter a name for the new combo"
+    },
+    "toast": {
+      "success": "Figure added to combo successfully",
+      "error": "Failed to add figure to combo"
+    }
+  },
+  "details": {
+    "description": "Description",
+    "prerequisites": "Prerequisites",
+    "tips": "Tips",
+    "duration": "Duration to Master",
+    "includedInCombos": "Included in Combos",
+    "addToPlan": "Add to Training Plan",
+    "type": "Type"
+  },
+  "similar": "Similar Figures",
+  "progress": {
+    "title": "Progress Tracking",
+    "status": "Current Status",
+    "mastery": "Mastery Level",
+    "notes": "Progress Notes",
+    "addNote": "Add Note",
+    "addNotePlaceholder": "Write your progress note...",
+    "trackProgress": "Track your progress",
+    "history": "View Progress History",
+    "date": "Date",
+    "level": "Level",
+    "note": "Note",
+    "howYouFeelToday": "How do you feel today?",
+    "notePlaceholder": "Describe your progress, challenges, or achievements...",
+    "statuses": {
+      "notstarted": "Not Started",
+      "inprogress": "In Progress",
+      "completed": "Completed"
+    },
+    "levels": {
+      "struggling": "Still Difficult",
+      "holding": "Can Hold Position",
+      "consistent": "Consistent Performance",
+      "mastered": "Fully Dominated"
+    },
+    "descriptions": {
+      "struggling": "Need more practice to perform the move",
+      "holding": "Can hold position for 5+ seconds",
+      "consistent": "Can perform consistently with good form",
+      "mastered": "Complete control and perfect execution"
+    }
+  },
+  "notFound": "The figure was not found"
+}

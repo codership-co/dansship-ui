@@ -20,7 +20,8 @@ const fetchData = async (name: string) => {
   }
 };
 
-export function UserLoader({ params }: LoaderFunctionArgs) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function UserLoader({ params }: LoaderFunctionArgs): any {
   return delayPromise(fetchData(params.id), 3000);
 }
 
@@ -31,7 +32,7 @@ export function UserPage() {
   return (
     <section>
       <h1>User</h1>
-      <p>{t('home:aboutMe.title')}</p>
+      <p>{t('home:title')}</p>
       <img src={data.sprites.front_default} alt='pokemon' />
       <button onClick={() => i18n.changeLanguage('en')}>En</button>
       <button onClick={() => i18n.changeLanguage('es')}>Es</button>

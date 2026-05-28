@@ -1,0 +1,67 @@
+{
+  "title": "Planes de Entrenamiento",
+  "subtitle": "Gestiona y sigue tus planes de entrenamiento de pole sport",
+  "createPlan": "Crear Nuevo Plan",
+  "activePlans": "Planes Activos",
+  "quickStats": "Estadísticas Rápidas",
+  "completionRate": "Tasa de Finalización General",
+  "selectPlan": {
+    "title": "Añadir al Plan de Entrenamiento",
+    "activePlans": "Planes Activos",
+    "noPlans": "No hay planes de entrenamiento activos",
+    "createNew": "Crear Nuevo Plan",
+    "weeks": "semanas"
+  },
+  "create": {
+    "title": "Crear Plan de Entrenamiento",
+    "planName": "Nombre del Plan",
+    "planNamePlaceholder": "ej., Programa de Dominio de Invertidas",
+    "duration": "Duración (semanas)",
+    "schedule": "Horario",
+    "summary": "Resumen del Plan",
+    "addFigure": "Añadir Figura",
+    "planFigures": "Figuras del Plan",
+    "noFiguresYet": "Añade figuras a tu plan para comenzar",
+    "searchFigures": "Buscar Figuras",
+    "addToDay": "Añadir al Día",
+    "noFigures": "Suelta una figura aquí",
+    "addMoreFigures": "Añadir más figuras",
+    "weeks": "Semanas",
+    "totalFigures": "Total de Figuras",
+    "figuresPerDay": "Figuras por Día",
+    "difficultyLevels": "Niveles de Dificultad",
+    "difficultyDistribution": "Distribución de Dificultad",
+    "save": "Guardar Plan de Entrenamiento"
+  },
+  "schedule": {
+    "title": "Horario",
+    "week": "Semana",
+    "day": "Día",
+    "noFigures": "Suelta una figura aquí",
+    "addMore": "Suelta para añadir más",
+    "status": {
+      "notStarted": "No Iniciado",
+      "inProgress": "En Progreso",
+      "completed": "Completado"
+    }
+  },
+  "summary": {
+    "title": "Resumen del Plan",
+    "weeks": "Semanas",
+    "totalFigures": "Total de Figuras",
+    "figuresPerDay": "Figuras por Día",
+    "difficultyLevels": "Niveles de Dificultad",
+    "difficultyDistribution": "Distribución de Dificultad",
+    "saveButton": "Guardar Plan de Entrenamiento"
+  },
+  "figureSelector": {
+    "title": "Agregar Figuras",
+    "searchPlaceholder": "Buscar figuras...",
+    "addToDay": "Agregar al Dia",
+    "dayOption": "Dia {{day}}"
+  },
+  "toast": {
+    "updateSuccess": "Plan de entrenamiento actualizado exitosamente",
+    "updateError": "Error al actualizar el plan de entrenamiento"
+  }
+}

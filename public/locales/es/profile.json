@@ -1,0 +1,100 @@
+{
+  "memberSince": "Miembro desde",
+  "subscription": "Mis Suscripciones",
+  "subscriptions": "Mis Suscripciones",
+  "stats": {
+    "savedFigures": "Figuras Guardadas",
+    "completed": "Completadas",
+    "trainingPlans": "Planes de Entrenamiento",
+    "achievements": "Logros"
+  },
+  "sportBackground": {
+    "title": "Experiencia Deportiva",
+    "experience": "Nivel de Experiencia",
+    "frequency": "Frecuencia de Entrenamiento",
+    "styles": "Estilos Preferidos",
+    "competition": "Experiencia en Competición",
+    "hasCompeted": "Sí",
+    "hasNotCompeted": "Aún no"
+  },
+  "coaching": {
+    "title": "Perfil de Instructor",
+    "experience": "Experiencia en Enseñanza",
+    "years": "años",
+    "certifications": "Certificaciones",
+    "specializations": "Especializaciones",
+    "locations": "Lugares de Enseñanza"
+  },
+  "achievements": {
+    "title": "Logros",
+    "types": {
+      "competition": "Competición",
+      "certification": "Certificación",
+      "teaching": "Enseñanza"
+    }
+  },
+  "edit": {
+    "title": "Editar Perfil",
+    "preview": "Vista Previa",
+    "save": "Guardar Cambios",
+    "cancel": "Cancelar",
+    "basicInfo": {
+      "title": "Información Básica",
+      "changePhoto": "Cambiar Foto",
+      "name": "Nombre",
+      "email": "Correo Electrónico",
+      "bio": "Biografía",
+      "isCoach": "Soy instructor de pole sport"
+    },
+    "sportBackground": {
+      "title": "Experiencia Deportiva",
+      "yearsExperience": "Años de Experiencia",
+      "frequency": "Frecuencia de Entrenamiento",
+      "styles": "Estilos Preferidos",
+      "competition": "He participado en competiciones de pole sport",
+      "frequencies": {
+        "1to2": "1-2 veces por semana",
+        "3to4": "3-4 veces por semana",
+        "5plus": "5+ veces por semana"
+      },
+      "styleOptions": {
+        "contemporary": "Contemporaneo",
+        "athletic": "Atletico",
+        "exotic": "Exotico",
+        "russianExotic": "Exotico Ruso",
+        "artistic": "Artistico"
+      }
+    },
+    "achievements": {
+      "title": "Logros",
+      "add": "Añadir Logro",
+      "remove": "Eliminar",
+      "fields": {
+        "title": "Título",
+        "type": "Tipo",
+        "position": "Posición",
+        "date": "Fecha"
+      }
+    },
+    "coaching": {
+      "title": "Perfil de Instructor",
+      "yearsTeaching": "Años de Experiencia en Enseñanza",
+      "certifications": "Certificaciones",
+      "specializations": "Especializaciones",
+      "locations": "Lugares de Enseñanza",
+      "add": "Añadir",
+      "placeholders": {
+        "certification": "ej., IPSF Nivel 1",
+        "specialization": "ej., Entrenamiento de Flexibilidad",
+        "location": "ej., Nombre del Estudio"
+      }
+    },
+    "previewTitle": "Vista Previa del Perfil"
+  },
+  "identityTitle": "Identidad",
+  "identityDescription": "El nombre completo es obligatorio. El nombre público se puede personalizar.",
+  "displayName": "Nombre público",
+  "displayNamePlaceholder": "Cómo aparecerá tu nombre públicamente",
+  "noEditableInstructorFields": "No hay campos específicos de instructor disponibles para tus roles actuales.",
+  "fetchFailed": "Error al obtener el perfil"
+}

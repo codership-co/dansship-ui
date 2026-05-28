@@ -1,0 +1,38 @@
+{
+  "title": "Explorar Figuras",
+  "filters": {
+    "search": "Buscar figuras...",
+    "difficulty": "Todas las Dificultades",
+    "type": "Todos los Tipos",
+    "sortBy": "Ordenar por",
+    "more": "Filtros",
+    "clear": "Limpiar"
+  },
+  "noResults": "No se encontraron figuras que coincidan con los criterios.",
+  "noMoreResults": "No hay más figuras para cargar",
+  "sortOptions": {
+    "name": "Ordenar por Nombre",
+    "difficulty": "Ordenar por Dificultad"
+  },
+  "catalog": {
+    "mobileTitle": "Catalogo de Figuras",
+    "mobileSubtitle": "Movimientos basicos y avanzados para apoyar tu progreso con fluidez y control.",
+    "hero": {
+      "titleLine1": "La Biblioteca",
+      "titleLine2": "del Movimiento",
+      "subtitle": "Explora nuestra coleccion curada de figuras de pole, organizada por mecanica, entradas y puntos de contacto."
+    },
+    "filterTitle": "Filtrar Biblioteca",
+    "searchLabelDesktop": "Buscar figuras",
+    "searchPlaceholderDesktop": "ej. Aysha, Butterfly",
+    "searchPlaceholderMobile": "Buscar figuras, transiciones...",
+    "sortByLabel": "Ordenar por",
+    "sortOptions": {
+      "name": "Nombre A-Z",
+      "difficulty": "Dificultad"
+    },
+    "resultsFound": "{{count}} figuras encontradas",
+    "loadingMore": "Cargando mas figuras...",
+    "cardDescriptionFallback": "Un movimiento clave para desarrollar control, fuerza y expresion."
+  }
+}

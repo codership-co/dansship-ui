@@ -1,0 +1,81 @@
+export type ScheduleStatus = 'draft' | 'published' | 'archived';
+
+export interface ScheduledClass {
+  id: string;
+  schedule_week_id: string;
+  class_definition_id: string;
+  room_id: string;
+  instructor_id: string;
+  start_time: string;
+  end_time: string;
+  capacity: number;
+  enrolled_count: number;
+  waitlist_max_size?: number | null;
+
+  class_definition?: { id: string; name: string; duration_minutes: number; level?: string | null };
+  room?: { id: string; name: string };
+  instructor?: { id: string; user_id: string; email: string };
+}
+
+export interface ScheduleWeek {
+  id: string;
+  week_start_date: string;
+  status: ScheduleStatus;
+  created_at: string;
+  classes?: Array<ScheduledClass>;
+}
+
+export type AgendaEventType = 'studio_class' | 'space_rental_external' | 'internal_reserved_use' | 'blocked_space';
+
+export interface AgendaEvent {
+  event_type: AgendaEventType;
+  source_id: string;
+  room_id: string;
+  start_time: string;
+  end_time: string;
+  status?: string | null;
+  metadata: Record<string, string>;
+}
+
+export interface GetWeeksPayload {
+  status?: string;
+  start_date?: string;
+  end_date?: string;
+}
+
+export interface GetAgendaEventsPayload {
+  start_at: string;
+  end_at: string;
+  room_id?: string;
+}
+
+export interface CreateWeekPayload {
+  week_start_date: string;
+}
+
+export interface AddClassPayload {
+  class_definition_id: string;
+  room_id: string;
+  instructor_id: string;
+  start_time: string;
+  end_time: string;
+  capacity?: number;
+  waitlist_max_size?: number | null;
+}
+
+export interface UpdateClassPayload extends Partial<AddClassPayload> {}
+
+export interface UpdateWaitlistConfigPayload {
+  waitlistMaxSize: number | null;
+}
+
+export interface GetWaitlistDefaultResponse {
+  waitlist_default_max_size: number | null;
+  source: string;
+}
+
+export interface EditPublishedClassPayload {
+  room_id?: string;
+  instructor_id?: string;
+  capacity?: number;
+}

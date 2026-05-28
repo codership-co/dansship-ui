@@ -1,0 +1,8 @@
+{
+  "settingsTitle": "Configuracion de Notificaciones",
+  "settingsDesc": "Configura los correos automaticos que se envian a usuarios e instructores.",
+  "leadTime": "Tiempo de anticipacion:",
+  "noConfigsFound": "No se encontraron configuraciones de notificaciones.",
+  "configUpdated": "Configuracion de notificacion actualizada",
+  "configUpdateFailed": "Error al actualizar la configuracion"
+}

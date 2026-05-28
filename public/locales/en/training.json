@@ -1,0 +1,67 @@
+{
+  "title": "Training Plans",
+  "subtitle": "Manage and track your pole sport training plans",
+  "createPlan": "Create New Plan",
+  "activePlans": "Active Plans",
+  "quickStats": "Quick Stats",
+  "completionRate": "Overall Completion Rate",
+  "selectPlan": {
+    "title": "Add to Training Plan",
+    "activePlans": "Active Plans",
+    "noPlans": "No active training plans",
+    "createNew": "Create New Plan",
+    "weeks": "weeks"
+  },
+  "create": {
+    "title": "Create Training Plan",
+    "planName": "Plan Name",
+    "planNamePlaceholder": "e.g., Invert Mastery Program",
+    "duration": "Duration (weeks)",
+    "schedule": "Schedule",
+    "summary": "Plan Summary",
+    "addFigure": "Add Figure",
+    "planFigures": "Plan Figures",
+    "noFiguresYet": "Add figures to your plan to get started",
+    "searchFigures": "Search Figures",
+    "addToDay": "Add to Day",
+    "noFigures": "Drop figure here",
+    "addMoreFigures": "Add more figures",
+    "weeks": "Weeks",
+    "totalFigures": "Total Figures",
+    "figuresPerDay": "Figures per Day",
+    "difficultyLevels": "Difficulty Levels",
+    "difficultyDistribution": "Difficulty Distribution",
+    "save": "Save Training Plan"
+  },
+  "schedule": {
+    "title": "Schedule",
+    "week": "Week",
+    "day": "Day",
+    "noFigures": "Drop figure here",
+    "addMore": "Drop to add more",
+    "status": {
+      "notStarted": "Not Started",
+      "inProgress": "In Progress",
+      "completed": "Completed"
+    }
+  },
+  "summary": {
+    "title": "Plan Summary",
+    "weeks": "Weeks",
+    "totalFigures": "Total Figures",
+    "figuresPerDay": "Figures per Day",
+    "difficultyLevels": "Difficulty Levels",
+    "difficultyDistribution": "Difficulty Distribution",
+    "saveButton": "Save Training Plan"
+  },
+  "figureSelector": {
+    "title": "Add Figures",
+    "searchPlaceholder": "Search figures...",
+    "addToDay": "Add to Day",
+    "dayOption": "Day {{day}}"
+  },
+  "toast": {
+    "updateSuccess": "Training plan updated successfully",
+    "updateError": "Failed to update training plan"
+  }
+}

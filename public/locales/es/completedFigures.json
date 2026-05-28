@@ -1,0 +1,10 @@
+{
+  "title": "Figuras Completadas",
+  "noFigures": "Aún no has completado ninguna figura",
+  "stats": {
+    "title": "Resumen de Progreso",
+    "total": "Total de Figuras Completadas",
+    "byDifficulty": "Por Nivel de Dificultad",
+    "byType": "Por Tipo de Figura"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "policies": {
+    "title": "Policies",
+    "addPolicy": "Add Policy",
+    "action": "Action",
+    "resource": "Resource",
+    "empty": "No policies found.",
+    "deleteTitle": "Delete policy",
+    "deleteConfirmNamed": "Are you sure you want to delete \"{{name}}\"? This action cannot be undone.",
+    "deleteConfirm": "Are you sure you want to delete this policy? This action cannot be undone.",
+    "editTitle": "Edit Policy",
+    "createTitle": "Create Policy",
+    "namePlaceholder": "e.g. Can read users",
+    "actionPlaceholder": "e.g. read",
+    "resourcePlaceholder": "e.g. users",
+    "descriptionPlaceholder": "Optional description"
+  },
+  "roles": {
+    "title": "Roles",
+    "empty": "No roles found.",
+    "managePolicies": "Manage Policies",
+    "managePoliciesFor": "Manage Policies for {{name}}",
+    "assignedPolicies": "Assigned Policies",
+    "noPoliciesAssigned": "No policies assigned to this role.",
+    "availablePolicies": "Available Policies",
+    "allPoliciesAssigned": "All available policies are already assigned."
+  },
+  "userRoles": {
+    "title": "User Roles Management",
+    "searchPlaceholder": "Search by user email (min 3 chars)",
+    "noUsersFound": "No users found",
+    "errorLoadingUser": "Error loading user. Please check if the UUID is correct.",
+    "userLabel": "User: ",
+    "assignedRoles": "Assigned Roles",
+    "noRolesAssigned": "No roles assigned.",
+    "availableRoles": "Available Roles",
+    "allRolesAssigned": "All roles are already assigned.",
+    "assignAndComplete": "Assign & Complete Profile",
+    "completeInstructorTitle": "Complete instructor profile",
+    "completeInstructorDesc": "Fill the required profile information to assign the instructor role and avoid missing profile errors.",
+    "assigning": "Assigning...",
+    "assignInstructor": "Assign Instructor",
+    "roleAssignedSuccess": "Role \"{{name}}\" assigned successfully",
+    "roleAssignFailed": "Failed to assign role",
+    "instructorAssignedSuccess": "Instructor role assigned and profile created",
+    "instructorAssignFailed": "Failed to assign instructor role"
+  }
+}

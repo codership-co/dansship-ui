@@ -1,0 +1,11 @@
+{
+  "title": "Figuras Guardadas",
+  "noFigures": "Aún no has guardado ninguna figura",
+  "savedTime": "Guardada {{time}}",
+  "stats": {
+    "title": "Resumen",
+    "total": "Total de Figuras Guardadas",
+    "byDifficulty": "Por Nivel de Dificultad",
+    "byType": "Por Tipo de Figura"
+  }
+}

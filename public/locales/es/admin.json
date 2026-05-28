@@ -1,0 +1,53 @@
+{
+  "inventory": {
+    "title": "Gestion de Inventario y Facturacion",
+    "subtitle": "Administra salas, catalogo de clases, planes y descuentos.",
+    "tabs": {
+      "rooms": "Salas",
+      "classCatalog": "Catalogo de Clases",
+      "plans": "Planes",
+      "discounts": "Descuentos"
+    }
+  },
+  "rbac": {
+    "title": "Gestion de Accesos",
+    "subtitle": "Administra roles, politicas y asigna accesos a usuarios.",
+    "tabs": {
+      "roles": "Roles",
+      "policies": "Politicas",
+      "userAssignments": "Asignaciones de Usuarios"
+    }
+  },
+  "reports": {
+    "title": "Reportes y Configuracion de la Plataforma",
+    "subtitle": "Consulta KPIs operativos y configura el comportamiento de la plataforma.",
+    "tabs": {
+      "dashboard": "Panel Operativo",
+      "notifications": "Configuracion de Notificaciones"
+    }
+  },
+  "bookings": {
+    "title": "Reservar Clases para Usuarios",
+    "subtitle": "Ayuda a los usuarios a reservar clases manteniendo todas las reglas de reserva y suscripcion.",
+    "userSearchLabel": "Buscar usuario por correo",
+    "userSearchPlaceholder": "escribe el correo del usuario",
+    "userSearchHint": "Ingresa al menos 3 caracteres para buscar usuarios.",
+    "userLabel": "Usuario",
+    "userSelectPlaceholder": "Seleccionar usuario",
+    "classLabel": "Clase",
+    "classSelectPlaceholder": "Seleccionar clase",
+    "reasonLabel": "Nota interna (opcional)",
+    "reasonPlaceholder": "Motivo de la reserva manual",
+    "submit": "Crear reserva",
+    "submitting": "Creando reserva...",
+    "loadingUsers": "Buscando usuarios...",
+    "loadingClasses": "Cargando clases...",
+    "noClasses": "No hay clases publicadas para esta semana.",
+    "successTitle": "Reserva creada exitosamente",
+    "errorTitle": "No se pudo crear la reserva",
+    "errorDescription": "No se pudo crear la reserva.",
+    "validationUser": "Selecciona un usuario.",
+    "validationClass": "Selecciona una clase.",
+    "selectedClassSummary": "Clase seleccionada: {{className}} ({{enrolled}}/{{capacity}} reservados)"
+  }
+}
