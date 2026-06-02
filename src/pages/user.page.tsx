@@ -1,7 +1,6 @@
+import { delayPromise } from '@helpers';
 import { useTranslation } from 'react-i18next';
 import { type LoaderFunctionArgs, useLoaderData } from 'react-router';
-
-import { delayPromise } from '@helpers';
 
 const fetchData = async (name: string) => {
   const url = `https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`;

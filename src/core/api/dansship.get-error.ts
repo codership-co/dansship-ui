@@ -1,4 +1,4 @@
-import { HttpClientError, type HttpClientResponseError, type NormalizedError } from './http-client-error';
+import { type DansshipAPIResponseError, type NormalizedError, DansshipAPIError } from './dansship.error';
 
 type JsonRecord = Record<string, unknown>;
 
@@ -40,8 +40,8 @@ const resolveMessageFromLegacyDetail = (detail: unknown): string | undefined => 
   return undefined;
 };
 
-async function getNormalizedError(response: Response, message: string): Promise<NormalizedError | undefined> {
-  const body = (await response.json()) as HttpClientResponseError;
+async function getNormalizedError(response: Response, defaultMessage: string): Promise<NormalizedError | undefined> {
+  const body = (await response.json()) as DansshipAPIResponseError;
 
   if (isRecord(body.error)) {
     const envelope = body.error;
@@ -54,6 +54,8 @@ async function getNormalizedError(response: Response, message: string): Promise<
 
     const explicitDetails = envelope.details;
     const details = explicitDetails ?? (shouldUseLegacyDetailAsDetails(legacyDetail) ? legacyDetail : undefined);
+
+    const message = isString(envelope.message) ?? resolveMessageFromLegacyDetail(legacyDetail) ?? defaultMessage;
 
     return {
       status: response.status,
@@ -71,33 +73,8 @@ async function getNormalizedError(response: Response, message: string): Promise<
   return undefined;
 }
 
-export async function getResponseErrorMessage(
-  response: Response,
-  defaultMessage: string = 'Unexpected error occurred.',
-) {
-  const body = (await response.json()) as HttpClientResponseError;
+export async function getResponseError(response: Response, message: string) {
+  const normalizedError = await getNormalizedError(response, message);
 
-  if (!body) {
-    return 'No error body founded on the response.';
-  }
-
-  if (body.message) {
-    return body.message;
-  }
-
-  if (isRecord(body.error)) {
-    const envelope = body.error;
-    const legacyDetail = body.detail;
-
-    return isString(envelope.message) ?? resolveMessageFromLegacyDetail(legacyDetail) ?? defaultMessage;
-  }
-
-  return defaultMessage;
-}
-
-export async function getResponseError(response: Response, defaultMessage: string = 'Unexpected error occurred.') {
-  const message = await getResponseErrorMessage(response, defaultMessage);
-  const normalizedError = getNormalizedError(response, message);
-
-  return new HttpClientError(response.status, message, normalizedError);
+  return new DansshipAPIError(response.status, normalizedError.message, normalizedError);
 }

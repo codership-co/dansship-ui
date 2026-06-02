@@ -1,3 +1,5 @@
+import { HttpClient } from 'polpo-http-client';
+
 import {
   type AdminInstructorListItem,
   type AvailabilityApiItem,
@@ -12,8 +14,6 @@ import {
   type UpdateAvailabilityPayload,
   type UpdateInstructorProfilePayload,
 } from './instructors.models';
-
-import { HttpClient } from '@core/http-client';
 
 import type { ScheduledClass } from '../schedules/schedules.models';
 
@@ -51,82 +51,64 @@ export class InstructorsAPI {
   }
 
   async getAvailability(week: string) {
-    const response = await this.httpClient.call<Array<AvailabilityApiItem>>({
-      path: '/instructors/availability',
-      method: 'GET',
-      params: { week },
-    });
-
-    if (response.error) {
-      return response;
-    }
-
-    return {
-      ...response,
-      data: {
+    return this.httpClient.call<Array<AvailabilityApiItem>, object, AvailabilityWeek>(
+      {
+        path: '/instructors/availability',
+        method: 'GET',
+        params: { week },
+      },
+      data => ({
         week,
-        slots: response.data.map(item => ({
+        slots: data.map(item => ({
           day_of_week: DAY_TO_INDEX[item.day_of_week],
           start_time: item.start_time,
           end_time: item.end_time,
         })),
-      } as AvailabilityWeek,
-    };
+      }),
+    );
   }
 
   async getAdminAvailability(id: string, week: string) {
-    const response = await this.httpClient.call<Array<AvailabilityApiItem>>({
-      path: `/admin/instructors/${id}/availability`,
-      method: 'GET',
-      params: { week },
-    });
-
-    if (response.error) {
-      return response;
-    }
-
-    return {
-      ...response,
-      data: {
+    return this.httpClient.call<Array<AvailabilityApiItem>, object, AvailabilityWeek>(
+      {
+        path: `/admin/instructors/${id}/availability`,
+        method: 'GET',
+        params: { week },
+      },
+      data => ({
         week,
-        slots: response.data.map(item => ({
+        slots: data.map(item => ({
           day_of_week: DAY_TO_INDEX[item.day_of_week],
           start_time: item.start_time,
           end_time: item.end_time,
         })),
-      } as AvailabilityWeek,
-    };
+      }),
+    );
   }
 
   async updateAvailability(payload: UpdateAvailabilityPayload) {
-    const response = await this.httpClient.call<Array<AvailabilityApiItem>>({
-      path: '/instructors/availability',
-      method: 'POST',
-      data: {
-        week_start_date: payload.week_start_date,
-        slots: payload.slots.map(slot => ({
-          day_of_week: INDEX_TO_DAY[slot.day_of_week],
-          start_time: slot.start_time,
-          end_time: slot.end_time,
-        })),
+    return this.httpClient.call<Array<AvailabilityApiItem>, object, AvailabilityWeek>(
+      {
+        path: '/instructors/availability',
+        method: 'POST',
+        data: {
+          week_start_date: payload.week_start_date,
+          slots: payload.slots.map(slot => ({
+            day_of_week: INDEX_TO_DAY[slot.day_of_week],
+            start_time: slot.start_time,
+            end_time: slot.end_time,
+          })),
+        },
       },
-    });
-
-    if (response.error) {
-      return response;
-    }
-
-    return {
-      ...response,
-      data: {
+      data => ({
         week: payload.week_start_date,
-        slots: response.data.map(item => ({
+        slots: data.map(item => ({
           day_of_week: DAY_TO_INDEX[item.day_of_week],
           start_time: item.start_time,
           end_time: item.end_time,
         })),
-      } as AvailabilityWeek,
-    };
+      }),
+    );
   }
 
   async searchUsersByEmail(email: string) {

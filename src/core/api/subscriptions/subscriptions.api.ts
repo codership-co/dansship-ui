@@ -1,6 +1,6 @@
-import { normalizePlan, normalizeSubscription, toNumber } from './subscriptions.helpers';
+import { HttpClient } from 'polpo-http-client';
 
-import { HttpClient } from '@core/http-client';
+import { normalizePlan, normalizeSubscription, toNumber } from './subscriptions.helpers';
 
 import type {
   ActiveSubscription,

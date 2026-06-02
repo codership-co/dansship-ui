@@ -1,4 +1,4 @@
-import { HttpClient } from '@core/http-client';
+import { HttpClient } from 'polpo-http-client';
 
 export class UsersAPI {
   constructor(private readonly httpClient: HttpClient) {}

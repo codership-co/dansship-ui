@@ -1,5 +1,5 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "polpo-typescript-config/vite.json",
   "include": ["vite.config.ts", "**/vite-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.json"],
   "exclude": ["node_modules"],
   "compilerOptions": {

@@ -1,4 +1,6 @@
-export type HttpClientErrorCategory =
+import { HttpClientError } from 'polpo-http-client';
+
+export type DansshipAPIErrorCategory =
   | 'AUTH'
   | 'PERMISSION'
   | 'VALIDATION'
@@ -8,7 +10,7 @@ export type HttpClientErrorCategory =
   | 'UNKNOWN'
   | (string & {});
 
-export interface HttpClientResponseError {
+export interface DansshipAPIResponseError {
   type: string;
   code: string;
   message?: string;
@@ -17,7 +19,7 @@ export interface HttpClientResponseError {
     error_code: string;
     message: string;
     code: string;
-    category: HttpClientErrorCategory;
+    category: DansshipAPIErrorCategory;
     path: string;
     timestamp: string;
     details: string;
@@ -29,7 +31,7 @@ export interface NormalizedError {
   status: number;
   message: string;
   errorCode: string;
-  category: HttpClientErrorCategory;
+  category: DansshipAPIErrorCategory;
   details: string;
   legacyDetail: string;
   detail: string;
@@ -37,18 +39,17 @@ export interface NormalizedError {
   timestamp: string;
 }
 
-export class HttpClientError extends Error {
+export class DansshipAPIError extends HttpClientError {
   normalizedError: NormalizedError | null;
 
   constructor(
     readonly status: number,
-    readonly message: string = '[HttpClientError]: Unexpected error occurred',
+    readonly message: string = 'Unexpected error occurred',
     readonly error?: unknown,
   ) {
-    super(`[HttpClientError]: ${message}`);
+    super(status, `[DansshipAPIError]: ${message}`, error);
 
     if (error instanceof Error) {
-      this.message = `[HttpClientError]: ${error.message}`;
       this.stack = error.stack ?? '';
       this.normalizedError = null;
     } else if (typeof error === 'object') {

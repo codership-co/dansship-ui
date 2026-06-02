@@ -1,6 +1,5 @@
-import React from 'react';
-
 import { cn } from '@helpers';
+import React from 'react';
 
 function Card({ className, ...props }: React.ComponentProps<'div'>) {
   return (

@@ -1,6 +1,5 @@
-import { Outlet, useFetchers, useNavigation } from 'react-router';
-
 import { Navbar } from '@components/navbar';
+import { Outlet, useFetchers, useNavigation } from 'react-router';
 
 export const RootLayout = () => {
   const navigation = useNavigation();

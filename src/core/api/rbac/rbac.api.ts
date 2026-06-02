@@ -1,12 +1,104 @@
-import { HttpClient } from '@core/http-client';
+import { HttpClient } from 'polpo-http-client';
+
+import type {
+  AssignPolicyToRolePayload,
+  AssignRoleToUserPayload,
+  PolicyCreatePayload,
+  PolicyResponse,
+  PolicyUpdatePayload,
+  RoleDetailResponse,
+  RoleResponse,
+  UserWithRolesResponse,
+} from './rbac.models';
 
 export class RBACAPI {
   constructor(private readonly httpClient: HttpClient) {}
 
-  async getStatus() {
-    return this.httpClient.call({
-      path: '',
+  async getRoles() {
+    return this.httpClient.call<Array<RoleResponse>>({
+      path: '/admin/rbac/roles',
       method: 'GET',
+    });
+  }
+
+  async getRoleDetail(roleId: string) {
+    return this.httpClient.call<RoleDetailResponse>({
+      path: `/admin/rbac/roles/${roleId}`,
+      method: 'GET',
+    });
+  }
+
+  async assignPolicyToRole(roleId: string, payload: AssignPolicyToRolePayload) {
+    return this.httpClient.call<RoleDetailResponse, AssignPolicyToRolePayload>({
+      path: `/admin/rbac/roles/${roleId}/policies`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async revokePolicyFromRole(roleId: string, policyId: string) {
+    return this.httpClient.call<RoleDetailResponse>({
+      path: `/admin/rbac/roles/${roleId}/policies/${policyId}`,
+      method: 'DELETE',
+    });
+  }
+
+  async getPolicies() {
+    return this.httpClient.call<Array<PolicyResponse>>({
+      path: '/admin/rbac/policies',
+      method: 'GET',
+    });
+  }
+
+  async getPolicyDetail(policyId: string) {
+    return this.httpClient.call<PolicyResponse>({
+      path: `/admin/rbac/policies/${policyId}`,
+      method: 'GET',
+    });
+  }
+
+  async createPolicy(payload: PolicyCreatePayload) {
+    return this.httpClient.call<PolicyResponse, PolicyCreatePayload>({
+      path: '/admin/rbac/policies',
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async updatePolicy(policyId: string, payload: PolicyUpdatePayload) {
+    return this.httpClient.call<PolicyResponse, PolicyUpdatePayload>({
+      path: `/admin/rbac/policies/${policyId}`,
+      method: 'PATCH',
+      data: payload,
+    });
+  }
+
+  async deletePolicy(policyId: string) {
+    return this.httpClient.call({
+      path: `/admin/rbac/policies/${policyId}`,
+      method: 'DELETE',
+    });
+  }
+
+  async getUserRoles(userId: string) {
+    return this.httpClient.call<UserWithRolesResponse>({
+      path: `/admin/rbac/users/${userId}/roles`,
+      method: 'GET',
+    });
+  }
+
+  async assignRoleToUser(userId: string, payload: AssignRoleToUserPayload) {
+    return this.httpClient.call<UserWithRolesResponse, AssignRoleToUserPayload>({
+      path: `/admin/rbac/users/${userId}/roles`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async revokeRoleFromUser(userId: string, roleId: string) {
+    return this.httpClient.call<UserWithRolesResponse>({
+      path: `/admin/rbac/users/${userId}/roles/${roleId}`,
+      method: 'DELETE',
     });
   }
 }

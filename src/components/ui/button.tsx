@@ -1,8 +1,7 @@
+import { cn } from '@helpers';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Slot } from 'radix-ui';
 import React from 'react';
-
-import { cn } from '@helpers';
 
 const buttonVariants = cva(
   // eslint-disable-next-line quotes

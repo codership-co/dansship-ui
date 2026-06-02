@@ -1,4 +1,4 @@
-import { HttpClient } from '@core/http-client';
+import { HttpClient } from 'polpo-http-client';
 
 import type { NotificationConfig, UpdateNotificationConfigPayload } from './notifications.models';
 

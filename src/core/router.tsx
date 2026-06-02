@@ -1,10 +1,9 @@
-import { createBrowserRouter, RouterProvider } from 'react-router';
-
-import { loggingMiddleware } from './middleware';
-
 import { RootLayout } from '@components/layouts';
 import { RootLoader } from '@components/loaders';
 import { HomePage, UserLoader, UserPage } from '@pages';
+import { createBrowserRouter, RouterProvider } from 'react-router';
+
+import { loggingMiddleware } from './middleware';
 
 const myRouter = createBrowserRouter([
   {

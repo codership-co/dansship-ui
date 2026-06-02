@@ -1,6 +1,9 @@
+import { HttpClient, type OnErrorCallback } from 'polpo-http-client';
+
 import { AuthAPI } from './auth/auth.api';
 import { BillingAPI } from './billing/billing.api';
 import { BookingsAPI } from './bookings/bookings.api';
+import { getResponseError } from './dansship.get-error';
 import { FiguresAPI } from './figures/figures.api';
 import { InstructorsAPI } from './instructors/instructors.api';
 import { InventoryAPI } from './inventory/inventory.api';
@@ -15,9 +18,7 @@ import { StudioRentalAPI } from './studio-rental/studio-rental.api';
 import { SubscriptionsAPI } from './subscriptions/subscriptions.api';
 import { UsersAPI } from './users/users.api';
 
-import { HttpClient } from '@core/http-client';
-
-export default class DansshipApi {
+export default class DansshipAPI {
   static async authenticate() {
     return '';
   }
@@ -32,24 +33,26 @@ export default class DansshipApi {
     window.dispatchEvent(new CustomEvent('auth:session-expired'));
   }
 
-  static readonly httpClient = new HttpClient(
-    {
-      apiName: 'DANSSHIP',
-      baseURL: `${import.meta.env.VITE_DANSSHIP_API_URL}`,
-      mode: 'cors',
-      getLogger: () => this.getLogger(),
-      getHeaders: async (): Promise<HeadersInit> => {
-        return {
-          Authorization: `Bearer ${await this.authenticate()}`,
-        };
-      },
-      credentials: 'include',
-      headers: {
-        accept: 'application/json',
-        'content-type': 'application/json',
-      },
+  static readonly httpClient = new HttpClient({
+    apiName: 'DANSSHIP',
+    baseURL: `${import.meta.env.VITE_DANSSHIP_API_URL}`,
+    mode: 'cors',
+    getLogger: () => this.getLogger(),
+    getResponseError,
+    getHeaders: async (): Promise<HeadersInit> => {
+      return {
+        Authorization: `Bearer ${await this.authenticate()}`,
+      };
     },
-    async (config, response) => {
+    credentials: 'include',
+    headers: {
+      accept: 'application/json',
+      'content-type': 'application/json',
+    },
+  });
+
+  static {
+    this.httpClient.setOnErrorInterceptor((async (config, response) => {
       const shouldTryRefresh =
         response.status === 401 &&
         !config.retries &&
@@ -59,24 +62,22 @@ export default class DansshipApi {
       if (shouldTryRefresh) {
         const refreshed = await this.auth.refreshToken();
 
-        if (!refreshed) {
+        if (refreshed.status !== 200) {
           this.notifySessionExpired();
 
-          return;
+          return refreshed;
         }
 
-        try {
-          return await this.httpClient.call({ ...config, retries: (config.retries ?? 0) + 1 });
-        } catch (retryError) {
-          if (retryError.status === 401) {
-            this.notifySessionExpired();
-          }
+        const response = await this.httpClient.call({ ...config, retries: (config.retries ?? 0) + 1 });
 
-          throw retryError;
+        if (response.status === 401) {
+          this.notifySessionExpired();
         }
+
+        return response;
       }
-    },
-  );
+    }) as OnErrorCallback);
+  }
 
   static auth = new AuthAPI(this.httpClient);
   static billing = new BillingAPI(this.httpClient);
