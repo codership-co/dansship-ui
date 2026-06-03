@@ -61,11 +61,3 @@ export interface UserWithRolesResponse {
   email: string;
   roles: Array<RoleResponse>;
 }
-
-export interface UserResponse {
-  id: string;
-  email: string;
-  created_at: string;
-  roles: Array<string>;
-  permissions: Array<string>;
-}

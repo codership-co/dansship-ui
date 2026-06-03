@@ -7,7 +7,7 @@ import type {
   RevenueIndicatorsReport,
 } from './reports.models';
 
-export class ReportsAPI {
+export class ReportsAdminAPI {
   constructor(private readonly httpClient: HttpClient) {}
 
   async getOccupancyReport(startDate?: string, endDate?: string) {

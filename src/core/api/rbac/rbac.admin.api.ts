@@ -11,7 +11,7 @@ import type {
   UserWithRolesResponse,
 } from './rbac.models';
 
-export class RBACAPI {
+export class RbacAdminApi {
   constructor(private readonly httpClient: HttpClient) {}
 
   async getRoles() {

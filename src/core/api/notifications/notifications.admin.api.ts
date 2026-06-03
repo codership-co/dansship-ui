@@ -2,7 +2,7 @@ import { HttpClient } from 'polpo-http-client';
 
 import type { NotificationConfig, UpdateNotificationConfigPayload } from './notifications.models';
 
-export class NotificationsAPI {
+export class NotificationsAdminApi {
   constructor(private readonly httpClient: HttpClient) {}
 
   async getConfigs() {

@@ -1,13 +1,6 @@
 import { HttpClient } from 'polpo-http-client';
 
-import type {
-  AdminBookClassPayload,
-  AdminBookingUser,
-  BookClassPayload,
-  Booking,
-  MarkAttendancePayload,
-  MyBooking,
-} from './bookings.models';
+import type { BookClassPayload, Booking, MarkAttendancePayload, MyBooking } from './bookings.models';
 
 export class BookingsAPI {
   constructor(private readonly httpClient: HttpClient) {}
@@ -22,14 +15,6 @@ export class BookingsAPI {
   async bookClass(payload: BookClassPayload) {
     return this.httpClient.call<Booking, BookClassPayload>({
       path: '/bookings',
-      method: 'POST',
-      data: payload,
-    });
-  }
-
-  async adminBookClass(payload: AdminBookClassPayload) {
-    return this.httpClient.call<Booking, AdminBookClassPayload>({
-      path: '/admin/bookings',
       method: 'POST',
       data: payload,
     });
@@ -54,14 +39,6 @@ export class BookingsAPI {
     return this.httpClient.call({
       path: `/bookings/waitlist/${id}`,
       method: 'DELETE',
-    });
-  }
-
-  async searchUsers(email: string) {
-    return this.httpClient.call<Array<AdminBookingUser>>({
-      path: '/admin/users',
-      method: 'GET',
-      params: { email },
     });
   }
 

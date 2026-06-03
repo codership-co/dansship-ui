@@ -11,7 +11,7 @@ import type {
   UpdatePlanPayload,
 } from './billing.models';
 
-export class BillingAPI {
+export class BillingAdminAPI {
   constructor(private readonly httpClient: HttpClient) {}
 
   async getPlans(payload?: GetPlansParams) {

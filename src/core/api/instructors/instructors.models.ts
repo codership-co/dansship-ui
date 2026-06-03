@@ -85,6 +85,7 @@ export interface ClassRosterResponse {
 export interface InstructorUserSearchResult {
   id: string;
   email: string;
+  name?: string | null;
 }
 
 export interface ManualAddStudentPayload {

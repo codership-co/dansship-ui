@@ -11,7 +11,7 @@ import type {
   UpdateRoomPayload,
 } from './inventory.models';
 
-export class InventoryAPI {
+export class InventoryAdminApi {
   constructor(private readonly httpClient: HttpClient) {}
 
   async getRooms(payload?: GetRoomsParams) {

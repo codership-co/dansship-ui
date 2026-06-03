@@ -1,0 +1,81 @@
+export type PaymentMethodType = 'transfer' | 'cash' | 'nequi' | 'daviplata' | 'card';
+
+export type PaymentStatus = 'pending' | 'pending_manual_review' | 'approved' | 'rejected' | 'cancelled' | 'expired';
+
+export type PurchaseType = 'plan' | 'merch' | 'workshop' | 'event' | 'private_class' | 'studio_rental' | (string & {});
+
+export interface CreatePaymentIntentPayload {
+  plan_id: string;
+  payment_method_type: PaymentMethodType;
+  discount_code?: string;
+  start_date?: string;
+}
+
+export interface PaymentProofUploadRequest {
+  content_type: 'image/jpeg' | 'image/png' | 'image/webp';
+}
+
+export interface ConfirmPaymentProofPayload {
+  file_key: string;
+}
+
+export interface AdminPaymentReviewPayload {
+  action: 'approve' | 'reject';
+  admin_notes?: string;
+}
+
+export interface PaymentEntityReference {
+  id: string;
+  name?: string | null;
+  human_identifier?: string | null;
+}
+
+export interface PaymentIntent {
+  id: string;
+  user_id: string;
+  amount: number;
+  currency: string;
+  purchase_type: PurchaseType;
+  reference_id: string;
+  payment_method_type: PaymentMethodType;
+  status: PaymentStatus;
+  gateway_provider: string | null;
+  gateway_reference: string | null;
+  proof_url: string | null;
+  subscription_id: string | null;
+  metadata: Record<string, unknown> | null;
+  admin_notes: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  expires_at: string | null;
+  created_at: string;
+  updated_at: string;
+  user?: PaymentEntityReference | null;
+  reviewer?: PaymentEntityReference | null;
+  purchase_reference?: PaymentEntityReference | null;
+  subscription?: PaymentEntityReference | null;
+}
+
+export interface GetAdminPaymentsParams {
+  status?: PaymentStatus;
+  purchase_type?: PurchaseType;
+}
+
+export interface PaymentIntentDetail extends PaymentIntent {
+  discount_code: string | null;
+}
+
+export interface PresignedUrlResponse {
+  upload_url: string;
+  file_key: string;
+}
+
+export interface ProofViewUrlResponse {
+  view_url: string;
+  expires_in: number;
+}
+
+export interface AdminPaymentListResponse {
+  items: Array<PaymentIntent>;
+  total: number;
+}

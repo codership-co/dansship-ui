@@ -1,0 +1,37 @@
+import { HttpClient } from 'polpo-http-client';
+
+import {
+  type AdminInstructorListItem,
+  type AvailabilityApiItem,
+  type AvailabilityWeek,
+  DAY_TO_INDEX,
+} from './instructors.models';
+
+export class InstructorsAdminAPI {
+  constructor(private readonly httpClient: HttpClient) {}
+
+  async getInstructors() {
+    return this.httpClient.call<Array<AdminInstructorListItem>>({
+      path: '/admin/instructors',
+      method: 'GET',
+    });
+  }
+
+  async getAdminAvailability(id: string, week: string) {
+    return this.httpClient.call<Array<AvailabilityApiItem>, object, AvailabilityWeek>(
+      {
+        path: `/admin/instructors/${id}/availability`,
+        method: 'GET',
+        params: { week },
+      },
+      data => ({
+        week,
+        slots: data.map(item => ({
+          day_of_week: DAY_TO_INDEX[item.day_of_week],
+          start_time: item.start_time,
+          end_time: item.end_time,
+        })),
+      }),
+    );
+  }
+}
