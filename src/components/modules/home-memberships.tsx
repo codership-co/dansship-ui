@@ -10,7 +10,7 @@ export const HomeMemberships = () => {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
 
-  const plansPath = isAuthenticated ? '/my-account/subscription' : '/login';
+  const plansPath = isAuthenticated ? '/my-account/subscription' : '/auth/login';
 
   return (
     <Section id='planes' className='text-center'>

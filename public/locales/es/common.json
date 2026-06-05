@@ -52,7 +52,7 @@
   "noPermissionDescription": "No tienes permisos para ver esta pagina.",
   "placeholder": {
     "email": "tu@ejemplo.com",
-    "password": "********"
+    "password": "contraseña"
   },
   "days": {
     "monday": "Lunes",

@@ -57,7 +57,7 @@ export const Navbar = () => {
   ];
 
   const cta = !isAuthenticated
-    ? { to: '/login', label: t('nav:signIn') }
+    ? { to: '/auth/login', label: t('nav:signIn') }
     : hasActivePlan
       ? { to: '/my-account/bookings', label: t('nav:myBookings') }
       : { to: '/my-account/subscription', label: t('nav:buy') };

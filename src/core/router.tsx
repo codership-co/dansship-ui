@@ -4,7 +4,16 @@ import { loggingMiddleware } from './middleware';
 
 import { RootLayout } from '@components/layouts';
 import { RootLoader } from '@components/loaders';
-import { HomePage, UserLoader, UserPage } from '@pages';
+import {
+  ForgotPasswordPage,
+  HomePage,
+  LoginPage,
+  ResetPasswordPage,
+  SignupPage,
+  UserLoader,
+  UserPage,
+  VerifyEmailPage,
+} from '@pages';
 
 const myRouter = createBrowserRouter([
   {
@@ -13,20 +22,24 @@ const myRouter = createBrowserRouter([
     middleware: [loggingMiddleware],
     hydrateFallbackElement: <RootLoader />,
     children: [
+      { index: true, Component: HomePage },
+
       {
-        index: true,
-        Component: HomePage,
+        path: 'auth',
+        children: [
+          { path: 'login', Component: LoginPage },
+          { path: 'signup', Component: SignupPage },
+          { path: 'forgot-password', Component: ForgotPasswordPage },
+          { path: 'verify-email', Component: VerifyEmailPage },
+          { path: 'reset-password', Component: ResetPasswordPage },
+        ],
       },
+
       { path: 'user/:id', Component: UserPage, loader: UserLoader },
       { path: 'figures', Component: HomePage },
       { path: 'figures/:id', Component: HomePage },
       { path: 'browse', Component: HomePage },
       { path: 'figure/:id', Component: HomePage },
-      { path: 'login', Component: HomePage },
-      { path: 'signup', Component: HomePage },
-      { path: 'verify-email', Component: HomePage },
-      { path: 'forgot-password', Component: HomePage },
-      { path: 'reset-password', Component: HomePage },
       { path: 'onboarding', Component: HomePage },
       { path: 'classes', Component: HomePage },
       { path: 'instructor/dashboard', Component: HomePage },

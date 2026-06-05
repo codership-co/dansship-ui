@@ -1,2 +1,3 @@
-export * from './basic-spinner-loader';
+export * from './spinner';
+export * from './spinner-loader';
 export * from './root-loader';

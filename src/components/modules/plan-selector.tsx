@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router';
 
 import { CheckoutModal } from './checkout-modal';
 
-import { BasicSpinnerLoader } from '@components/loaders';
+import { Spinner } from '@components/loaders';
 import { Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui';
 import { useAuth } from '@contexts';
 import { DansshipAPI, type PublicPlan } from '@core/api';
@@ -45,7 +45,7 @@ export function PlanSelector() {
   const handleSelectPlan = (plan: PublicPlan) => {
     if (!isAuthenticated) {
       setPendingPlanCheckoutIntent(plan.id);
-      navigate('/login', { state: { from: location } });
+      navigate('/auth/login', { state: { from: location } });
 
       return;
     }
@@ -84,7 +84,7 @@ export function PlanSelector() {
   if (isLoadingPublicPlans) {
     return (
       <div className='flex justify-center p-12'>
-        <BasicSpinnerLoader />
+        <Spinner />
       </div>
     );
   }

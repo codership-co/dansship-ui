@@ -206,8 +206,8 @@ export function MobileMenu({ isOpen, onClose, navItems, cta }: MobileMenuProps) 
               </div>
             )}
 
-            {!isAuthenticated && cta.to !== '/login' ? (
-              <Link to='/login' className='block py-2 text-gray-600 hover:text-primary' onClick={onClose}>
+            {!isAuthenticated && cta.to !== '/auth/login' ? (
+              <Link to='/auth/login' className='block py-2 text-gray-600 hover:text-primary' onClick={onClose}>
                 {t('nav:signIn')}
               </Link>
             ) : null}
