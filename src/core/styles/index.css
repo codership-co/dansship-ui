@@ -1,19 +1,16 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 @import "./animations.css";
 
-@theme {
-  /*
-   * COLORS
-   */
-  --color-active: hsl(147 100% 35%);
-  --color-alert: hsl(359 90% 62%);
-  --color-warning: hsl(38 100% 50%);
-  --color-info: hsl(210 100% 51%);
-  --color-primary: hsl(299 30% 27%);
-  --color-secondary: hsl(20 31% 94%);
-  --color-tertiary: hsl(10 100% 67%);
-  --color-white: hsl(0 0 100%);
-  --color-black: hsl(0 0 0%);
+@font-face {
+  font-family: 'guntertest';
+  src: url('/assets/fonts/guntertest-regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
   /*
    * PALETTE CONTROLS
    */
@@ -29,6 +26,22 @@
   --scale-700: calc(var(--scale-step) * 3.5);
   --scale-800: calc(var(--scale-step) * 2.5);
   --scale-900: calc(var(--scale-step) * 1.5);
+}
+
+@theme {
+  --animate-fade-in-down: fade-in-down 300ms ease-out forwards;
+  /*
+   * COLORS
+   */
+  --color-active: hsl(147 100% 35%);
+  --color-alert: hsl(359 90% 62%);
+  --color-warning: hsl(38 100% 50%);
+  --color-info: hsl(210 100% 51%);
+  --color-primary: hsl(299 30% 27%);
+  --color-secondary: hsl(39 58% 86%);
+  --color-tertiary: hsl(10 100% 67%);
+  --color-white: hsl(0 0 100%);
+  --color-black: hsl(0 0 0%);
   /*
    * ACTIVE
    */
@@ -42,6 +55,7 @@
   --color-active-700: color-mix(in hsl, var(--color-active) var(--scale-700), var(--dark-base));
   --color-active-800: color-mix(in hsl, var(--color-active) var(--scale-800), var(--dark-base));
   --color-active-900: color-mix(in hsl, var(--color-active) var(--scale-900), var(--dark-base));
+  --color-active-foreground: var(--color-active-50);
   /*
    * ALERT
    */
@@ -55,6 +69,7 @@
   --color-alert-700: color-mix(in hsl, var(--color-alert) var(--scale-700), var(--dark-base));
   --color-alert-800: color-mix(in hsl, var(--color-alert) var(--scale-800), var(--dark-base));
   --color-alert-900: color-mix(in hsl, var(--color-alert) var(--scale-900), var(--dark-base));
+  --color-alert-foreground: var(--color-alert-50);
   /*
    * WARNING
    */
@@ -68,6 +83,7 @@
   --color-warning-700: color-mix(in hsl, var(--color-warning) var(--scale-700), var(--dark-base));
   --color-warning-800: color-mix(in hsl, var(--color-warning) var(--scale-800), var(--dark-base));
   --color-warning-900: color-mix(in hsl, var(--color-warning) var(--scale-900), var(--dark-base));
+  --color-warning-foreground: var(--color-warning-50);
   /*
    * INFO
    */
@@ -81,6 +97,7 @@
   --color-info-700: color-mix(in hsl, var(--color-info) var(--scale-700), var(--dark-base));
   --color-info-800: color-mix(in hsl, var(--color-info) var(--scale-800), var(--dark-base));
   --color-info-900: color-mix(in hsl, var(--color-info) var(--scale-900), var(--dark-base));
+  --color-info-foreground: var(--color-info-50);
   /*
    * NEUTRAL
    */
@@ -95,6 +112,7 @@
   --color-neutral-700: color-mix(in hsl, var(--color-neutral) var(--scale-700), var(--dark-base));
   --color-neutral-800: color-mix(in hsl, var(--color-neutral) var(--scale-800), var(--dark-base));
   --color-neutral-900: color-mix(in hsl, var(--color-neutral) var(--scale-900), var(--dark-base));
+  --color-neutral-foreground: var(--color-neutral-50);
   /*
    * PRIMARY
    */
@@ -108,6 +126,7 @@
   --color-primary-700: color-mix(in hsl, var(--color-primary) var(--scale-700), var(--dark-base));
   --color-primary-800: color-mix(in hsl, var(--color-primary) var(--scale-800), var(--dark-base));
   --color-primary-900: color-mix(in hsl, var(--color-primary) var(--scale-900), var(--dark-base));
+  --color-primary-foreground: var(--color-primary-50);
   /*
    * SECONDARY
    */
@@ -121,6 +140,7 @@
   --color-secondary-700: color-mix(in hsl, var(--color-secondary) var(--scale-700), var(--dark-base));
   --color-secondary-800: color-mix(in hsl, var(--color-secondary) var(--scale-800), var(--dark-base));
   --color-secondary-900: color-mix(in hsl, var(--color-secondary) var(--scale-900), var(--dark-base));
+  --color-secondary-foreground: var(--color-secondary-900);
   /*
    * TERTIARY
    */
@@ -134,51 +154,83 @@
   --color-tertiary-700: color-mix(in hsl, var(--color-tertiary) var(--scale-700), var(--dark-base));
   --color-tertiary-800: color-mix(in hsl, var(--color-tertiary) var(--scale-800), var(--dark-base));
   --color-tertiary-900: color-mix(in hsl, var(--color-tertiary) var(--scale-900), var(--dark-base));
+  --color-tertiary-foreground: var(--color-tertiary-50);
   /*
    * STATES
    */
-  --color-accent: var(--color-neutral-200);
-  --color-background: var(--color-white);
+  --color-background: hsl(33 100% 98%);
   --color-background-paper: var(--color-neutral-50);
   --color-background-disabled: var(--color-neutral-100);
-  --color-foreground: var(--color-neutral-900);
+  --color-foreground: hsl(32 54% 13%);
   --color-foreground-disabled: var(--color-neutral-900);
-  --color-border: var(--color-neutral-300);
+  --color-border: hsl(300 18% 79%);
+  --color-input: hsl(300 18% 79%);
+  --color-outline-variant: hsl(300 16% 63%);
+  --color-ring: hsl(299 31% 27%);
+  --color-primary-container: hsl(300 45% 17%);
+  --color-primary-fixed-dim: hsl(299 24% 64%);
+  --color-accent: hsl(34 66% 87%);
+  --color-accent-foreground: hsl(32 54% 13%);
+  --color-destructive: hsl(10 77% 48%);
+  --color-destructive-foreground: hsl(34 66% 95%);
+  --color-error-container: hsl(12 100% 92%);
+  --color-highlight: hsl(347 94% 82%);
+  --color-tertiary-container: hsl(343 44% 28%);
+  --color-on-tertiary-container: hsl(347 66% 74%);
   /*
    * TYPOGRAPHY
    */
   --font-main: 'Josefin Sans', 'Segoe UI', sans-serif;
+  --font-brand: guntertest, 'Josefin Sans', 'Segoe UI', sans-serif;
   --font-code: ui-monospace, Consolas, monospace;
   --text-small: 0.75rem;
   --text-small--line-height: 140%;
+  --text-small--font-weight: regular;
   --text-label: 0.875rem;
   --text-label--line-height: 140%;
   --text-body: 1rem;
   --text-body--line-height: 140%;
   --text-header4: 1.5rem;
   --text-header4--line-height: 120%;
+  --text-header4--font-weight: bold;
   --text-header3: 2.0rem;
   --text-header3--line-height: 120%;
+  --text-header3--font-weight: bold;
   --text-header2: 2.5rem;
   --text-header2--line-height: 120%;
+  --text-header2--font-weight: bold;
   --text-header1: 3.0rem;
   --text-header1--line-height: 120%;
-  --text-hero: 3.75rem;
+  --text-header1--font-weight: bold;
+  --text-hero: 5rem;
   --text-hero--line-height: 120%;
+  --text-hero--font-weight: bolder;
   /*
    * BREAKPOINTS
    */
-  --breakpoint-mobile: 360px;
-  --breakpoint-mobileL: 480px;
-  --breakpoint-tablet: 768px;
-  --breakpoint-laptopS: 1024px;
-  --breakpoint-laptopM: 1280px;
-  --breakpoint-laptopL: 1440px;
-  --breakpoint-desktop: 1920px;
-  --breakpoint-large: 2560px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
   --spacing: 0.25rem;
 
-  --background-image-brand-gradient: linear-gradient(135deg, var(--color-primary-100), var(--color-primary-400));
+  --background-image-gradient-primary: linear-gradient(135deg, var(--color-primary-100), var(--color-primary-400));
+  --background-image-gradient-primary-transparent: linear-gradient(135deg, hsl(from var(--color-primary-100) h s l / 90%), hsl(from var(--color-primary-400) h s l / 90%));
+  --background-image-gradient-secondary: linear-gradient(135deg, var(--color-secondary-100), var(--color-secondary-400));
+  --background-image-gradient-secondary-transparent: linear-gradient(135deg, hsl(from var(--color-secondary-100) h s l / 20%), hsl(from var(--color-secondary-400) h s l / 20%));
+
+  --color-card: hsl(0 0% 100%);
+  --color-card-foreground: hsl(32 54% 13%);
+  --color-popover: hsl(0 0% 100%);
+  --color-popover-foreground: hsl(32 54% 13%);
+  --color-muted: hsl(35 88% 95%);
+  --color-muted-foreground: hsl(334 7% 29%);
+  --color-surface: hsl(33 100% 98%);
+  --color-surface-dim: hsl(37 100% 93%);
+  --color-surface-container-low: hsl(34 93% 94%);
+  --color-surface-container: hsl(35 96% 91%);
+  --color-surface-container-highest: hsl(35 58% 86%);
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -226,7 +278,7 @@
   }
 
   body {
-    min-width: var(--breakpoint-mobile);
+    min-width: var(--breakpoint-sm);
   }
 
   a {
@@ -273,5 +325,65 @@
 
   small {
     @apply text-small;
+  }
+}
+
+@layer utilities {
+  .app-soft-bg {
+    background-image: url('/assets/images/bg-girl.png');
+    background-repeat: no-repeat, no-repeat;
+    background-position: right 1rem bottom 1rem, left 1rem bottom 1rem;
+    background-attachment: fixed;
+    background-size: 240px auto, 140px auto;
+  }
+
+  @media (max-width: 640px) {
+    .app-soft-bg {
+      background-position: right 1.5rem bottom 1.5rem, left 0.75rem bottom 0.75rem;
+      background-size: 180px auto, 96px auto;
+    }
+  }
+
+  .layout-shell {
+    @apply min-h-screen flex flex-col;
+  }
+
+  .content-max {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .page-section {
+    @apply py-12 sm:py-16;
+  }
+
+  .page-section-tight {
+    @apply py-8 sm:py-10;
+  }
+
+  .display-xl {
+    @apply text-4xl font-extrabold leading-[1.02] sm:text-5xl lg:text-6xl;
+    font-family: var(--font-main);
+  }
+
+  .heading-xl {
+    @apply text-3xl font-bold leading-tight sm:text-4xl;
+    font-family: var(--font-main);
+  }
+
+  .heading-lg {
+    @apply text-2xl font-bold leading-tight sm:text-3xl;
+    font-family: var(--font-main);
+  }
+
+  .body-lg {
+    @apply text-lg leading-relaxed;
+  }
+
+  .body-md {
+    @apply text-base leading-relaxed;
+  }
+
+  .card {
+    @apply bg-card text-card-foreground rounded-lg shadow-sm;
   }
 }

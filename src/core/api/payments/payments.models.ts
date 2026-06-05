@@ -4,6 +4,12 @@ export type PaymentStatus = 'pending' | 'pending_manual_review' | 'approved' | '
 
 export type PurchaseType = 'plan' | 'merch' | 'workshop' | 'event' | 'private_class' | 'studio_rental' | (string & {});
 
+export enum PaymentProofContentType {
+  JPEG = 'image/jpeg',
+  PNG = 'image/png',
+  WEBP = 'image/webp',
+}
+
 export interface CreatePaymentIntentPayload {
   plan_id: string;
   payment_method_type: PaymentMethodType;
@@ -12,7 +18,7 @@ export interface CreatePaymentIntentPayload {
 }
 
 export interface PaymentProofUploadRequest {
-  content_type: 'image/jpeg' | 'image/png' | 'image/webp';
+  content_type: PaymentProofContentType;
 }
 
 export interface ConfirmPaymentProofPayload {

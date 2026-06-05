@@ -24,7 +24,7 @@ import { StudioRentalAPI } from './studio-rental/studio-rental.api';
 import { SubscriptionsAPI } from './subscriptions/subscriptions.api';
 import { UsersAdminAPI } from './users/users.admin.api';
 
-export default class DansshipAPI {
+export class DansshipAPI {
   static async authenticate() {
     return '';
   }

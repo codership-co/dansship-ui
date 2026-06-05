@@ -1,7 +1,8 @@
-import { cn } from '@helpers';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { Slot } from 'radix-ui';
 import React from 'react';
+
+import { cn } from '@helpers';
 
 const buttonVariants = cva(
   // eslint-disable-next-line quotes
@@ -11,7 +12,7 @@ const buttonVariants = cva(
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/90',
         destructive:
-          'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40',
+          'bg-alert text-white hover:bg-alert/90 focus-visible:ring-alert/20 dark:bg-alert/60 dark:focus-visible:ring-alert/40',
         outline:
           'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',

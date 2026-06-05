@@ -1,7 +1,7 @@
 import { HttpClient } from 'polpo-http-client';
 
 import type {
-  AvailabilitySlot,
+  StudioRentalAvailabilitySlot,
   CancelRequestPayload,
   CreateRentalRequestPayload,
   GetAvailabilityParams,
@@ -20,7 +20,7 @@ export class StudioRentalAPI {
   }
 
   async getAvailability(payload: GetAvailabilityParams) {
-    return this.httpClient.call<Array<AvailabilitySlot>>({
+    return this.httpClient.call<Array<StudioRentalAvailabilitySlot>>({
       path: '/studio-rentals/availability',
       method: 'GET',
       params: payload,

@@ -1,5 +1,6 @@
-import { Navbar } from '@components/navbar';
 import { Outlet, useFetchers, useNavigation } from 'react-router';
+
+import { Footer, Navbar } from '@components/navigation';
 
 export const RootLayout = () => {
   const navigation = useNavigation();
@@ -14,11 +15,13 @@ export const RootLayout = () => {
   const isLoading = isNavigating || isFetching;
 
   return (
-    <section>
+    <section className='min-h-screen flex flex-col'>
       <Navbar />
-
-      {/* This will show instantly on page refresh, no more blank screen! */}
-      {isLoading ? <div>App is fetching data...</div> : <Outlet />}
+      <section className='flex-1 app-soft-bg'>
+        {/* This will show instantly on page refresh, no more blank screen! */}
+        {isLoading ? <div>App is fetching data...</div> : <Outlet />}
+      </section>
+      <Footer />
     </section>
   );
 };

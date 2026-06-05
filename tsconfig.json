@@ -1,5 +1,5 @@
 {
-  "extends": "polpo-typescript-config/vite.json",
+  "extends": "polpo-typescript-config/vite",
   "include": ["vite.config.ts", "**/vite-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js", "**/*.json"],
   "exclude": ["node_modules"],
   "compilerOptions": {

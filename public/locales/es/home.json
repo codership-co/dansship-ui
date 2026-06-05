@@ -96,6 +96,9 @@
         "title": "Agrega como favorita",
         "description": "Crea tu propia rutina guardando poses y movimientos que quieres perfeccionar."
       },
+      "actions": {
+        "viewAllFigures": "Ver todas las figuras"
+      },
       "log": {
         "title": "Entrena y registra",
         "description": "Lleva un historial visual y técnico de tus avances clase tras clase."

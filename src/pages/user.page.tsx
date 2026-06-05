@@ -1,6 +1,7 @@
-import { delayPromise } from '@helpers';
 import { useTranslation } from 'react-i18next';
 import { type LoaderFunctionArgs, useLoaderData } from 'react-router';
+
+import { delayPromise } from '@helpers';
 
 const fetchData = async (name: string) => {
   const url = `https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`;
@@ -21,7 +22,7 @@ const fetchData = async (name: string) => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function UserLoader({ params }: LoaderFunctionArgs): any {
-  return delayPromise(fetchData(params.id), 3000);
+  return delayPromise(fetchData(params.id), 2000);
 }
 
 export function UserPage() {

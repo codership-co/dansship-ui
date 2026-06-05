@@ -34,6 +34,60 @@ export interface AuthUser {
   created_at: string;
 }
 
+export interface User {
+  id: number | string;
+  username: string;
+  email: string;
+  birthDate?: string;
+  preferredLanguage?: 'en' | 'es';
+  name: string;
+  fullName?: string;
+  displayName?: string;
+  phoneCountryCode?: string;
+  phoneNumber?: string;
+  documentType?: string;
+  documentValue?: string;
+  city?: string;
+  address?: string;
+  avatar?: string;
+  bio?: string;
+  isCoach: boolean;
+  roles?: Array<string>;
+  permissions?: Array<string>;
+  isActive?: boolean;
+  isEmailVerified?: boolean;
+  requiresOnboarding?: boolean;
+  onboardingRequired?: boolean;
+  onboardingCompleted?: boolean;
+  onboardingPendingSteps?: Array<string>;
+  updatedAt?: string;
+  hasInstructorProfile?: boolean;
+  profileCompletionPercent?: number;
+  instructorProfile?: {
+    id: string;
+    bio?: string | null;
+    photoUrl?: string | null;
+    contactInfo?: string | null;
+    createdAt?: string;
+    updatedAt?: string;
+    completionPercent?: number;
+  } | null;
+  joinDate: string;
+  level: 'Beginner' | 'Intermediate' | 'Advanced';
+  sportBackground?: {
+    yearsOfExperience: number;
+    trainingFrequency: string;
+    preferredStyles: Array<string>;
+    hasCompeted: boolean;
+  };
+  coachingProfile?: {
+    yearsTeaching: number;
+    certifications: Array<string>;
+    specializations: Array<string>;
+    teachingLocations: Array<string>;
+  };
+}
+
 export interface LoginPayload {
   email: string;
   password: string;

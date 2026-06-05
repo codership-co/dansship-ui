@@ -66,7 +66,7 @@ export interface AdminListInternalReservedUsesParams {
   status?: RentalRequestStatus;
 }
 
-export interface AvailabilitySlot {
+export interface StudioRentalAvailabilitySlot {
   room_id: string;
   start_time: string;
   end_time: string;
