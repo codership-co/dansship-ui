@@ -12,7 +12,7 @@ export const HomeHero = () => {
   const navigate = useNavigate();
 
   const handleShareClick = () => {
-    navigate(isAuthenticated ? '/profile' : '/signup');
+    navigate(isAuthenticated ? '/profile' : '/auth/signup');
   };
 
   return (
