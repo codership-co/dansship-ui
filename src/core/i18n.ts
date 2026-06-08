@@ -25,6 +25,7 @@ i18n
       'common',
       'completedFigures',
       'difficulty',
+      'error404',
       'errors',
       'figure',
       'figureTypes',

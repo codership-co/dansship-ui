@@ -42,9 +42,11 @@ const resolveMessageFromLegacyDetail = (detail: unknown): string | undefined => 
   return undefined;
 };
 
-async function getNormalizedError(response: Response, defaultMessage: string): Promise<NormalizedError | undefined> {
-  const body = (await response.json()) as DansshipAPIResponseError;
-
+async function getNormalizedError(
+  body: DansshipAPIResponseError,
+  status: number,
+  defaultMessage: string,
+): Promise<NormalizedError> {
   if (isRecord(body.error)) {
     const envelope = body.error;
     const legacyDetail = body.detail;
@@ -60,7 +62,7 @@ async function getNormalizedError(response: Response, defaultMessage: string): P
     const message = asString(envelope.message) ?? resolveMessageFromLegacyDetail(legacyDetail) ?? defaultMessage;
 
     return {
-      status: response.status,
+      status,
       message,
       errorCode,
       category,
@@ -72,13 +74,17 @@ async function getNormalizedError(response: Response, defaultMessage: string): P
     };
   }
 
-  return undefined;
+  return {
+    status,
+    message: defaultMessage,
+  };
 }
 
 export async function getResponseError(response: Response, message: string) {
-  const normalizedError = await getNormalizedError(response, message);
+  const body = (await response.json()) as DansshipAPIResponseError;
+  const normalizedError = await getNormalizedError(body, response.status, message);
 
-  return new DansshipAPIError(response.status, normalizedError.message, normalizedError);
+  return new DansshipAPIError(body, response.status, normalizedError.message, normalizedError);
 }
 
 // ------------

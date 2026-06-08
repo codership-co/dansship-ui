@@ -1,4 +1,4 @@
-import { HttpClient, type OnErrorCallback } from 'polpo-http-client';
+import { HttpClient, LoggerParams, type OnErrorCallback, RequestState } from 'polpo-http-client';
 
 import { AuthAPI } from './auth/auth.api';
 import { BillingAdminAPI } from './billing/billing.admin.api';
@@ -25,13 +25,13 @@ import { SubscriptionsAPI } from './subscriptions/subscriptions.api';
 import { UsersAdminAPI } from './users/users.admin.api';
 
 export class DansshipAPI {
-  static async authenticate() {
-    return '';
-  }
-
   static getLogger() {
-    // eslint-disable-next-line no-console
-    return async params => console.log(params);
+    return async ({ state, response }: LoggerParams) => {
+      if (state === RequestState.REJECTED) {
+        // eslint-disable-next-line no-console
+        console.error(response);
+      }
+    };
   }
 
   private static notifySessionExpired(): void {
@@ -45,11 +45,6 @@ export class DansshipAPI {
     mode: 'cors',
     getLogger: () => this.getLogger(),
     getResponseError,
-    getHeaders: async (): Promise<HeadersInit> => {
-      return {
-        Authorization: `Bearer ${await this.authenticate()}`,
-      };
-    },
     credentials: 'include',
     headers: {
       accept: 'application/json',
@@ -58,30 +53,12 @@ export class DansshipAPI {
   });
 
   static {
-    this.httpClient.setOnErrorInterceptor((async (config, response) => {
-      const shouldTryRefresh =
-        response.status === 401 &&
-        !config.retries &&
-        config.path !== '/auth/refresh-token' &&
-        localStorage.getItem('auth_session') === '1';
+    this.httpClient.setOnErrorInterceptor((async (request, response) => {
+      this.notifySessionExpired();
+      // eslint-disable-next-line no-console
+      console.log({ request, response });
 
-      if (shouldTryRefresh) {
-        const refreshed = await this.auth.refreshToken();
-
-        if (refreshed.status !== 200) {
-          this.notifySessionExpired();
-
-          return refreshed;
-        }
-
-        const response = await this.httpClient.call({ ...config, retries: (config.retries ?? 0) + 1 });
-
-        if (response.status === 401) {
-          this.notifySessionExpired();
-        }
-
-        return response;
-      }
+      return response;
     }) as OnErrorCallback);
   }
 

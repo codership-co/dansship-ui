@@ -39,9 +39,9 @@ export const HomeHero = () => {
         </div>
 
         <img
-          src='https://lh3.googleusercontent.com/aida-public/AB6AXuChv5_6woQEEGxJQLXO3YugWIU3v9MGvyrYeOA_6OzifdUP00Cb3xqJOWhOZnMnDqUShrNHzHio_L7-IECtL0YoINUFPFkvqh_O56vLHT2VcZPUdUsB0WZCgOH6M9EXB5IwFF2CISpjV5EMb3e3yw4Nqtk6_ejzWWXqayQinxIPGXfTptOlPNUiKkOcbzBCaEiTGW6Du8v6b8iQljVPg2dNbgLylCjUhcTao0ai_FvdECEHqDMf5Mr3y0B5Iw9AFNwnFmeiIIhsGhA'
+          src='https://t4.ftcdn.net/jpg/01/34/98/47/360_F_134984731_eW2iZhb0Oe12BSQzSef2PixuWBMe329X.jpg'
           alt={t('home:stitch.hero.imageAlt')}
-          className='card pointer-events-none absolute right-10 top-1/2 hidden h-100 max-w-none -translate-y-1/2 object-contain opacity-80 lg:block'
+          className='card pointer-events-none absolute right-10 top-1/2 hidden w-120 h-100 object-cover max-w-none -translate-y-1/2 lg:block'
         />
       </div>
 

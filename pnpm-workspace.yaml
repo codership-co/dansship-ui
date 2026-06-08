@@ -3,4 +3,4 @@ allowBuilds:
   msw: false
   unrs-resolver: false
 minimumReleaseAgeExclude:
-  - polpo-http-client@1.0.2
+  - polpo-http-client@1.0.10

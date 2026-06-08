@@ -30,6 +30,7 @@
 
 @theme {
   --animate-fade-in-down: fade-in-down 300ms ease-out forwards;
+  --animate-glitch: glitch 1s linear infinite;
   /*
    * COLORS
    */

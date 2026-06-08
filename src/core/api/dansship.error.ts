@@ -30,24 +30,25 @@ export interface DansshipAPIResponseError {
 export interface NormalizedError {
   status: number;
   message: string;
-  errorCode: string;
-  category: DansshipAPIErrorCategory;
-  details: string;
-  legacyDetail: string;
-  detail: string;
-  path: string;
-  timestamp: string;
+  errorCode?: string;
+  category?: DansshipAPIErrorCategory;
+  details?: string;
+  legacyDetail?: string;
+  detail?: string;
+  path?: string;
+  timestamp?: string;
 }
 
-export class DansshipAPIError extends HttpClientError {
-  normalizedError: NormalizedError | null;
+export class DansshipAPIError extends HttpClientError<DansshipAPIResponseError> {
+  normalizedError: NormalizedError | null = null;
 
   constructor(
+    readonly body: DansshipAPIResponseError,
     readonly status: number,
     readonly message: string = 'Unexpected error occurred',
     readonly error?: unknown,
   ) {
-    super(status, `[DansshipAPIError]: ${message}`, error);
+    super(body, status, `[DansshipAPIError]: ${message}`, error);
 
     if (error instanceof Error) {
       this.stack = error.stack ?? '';

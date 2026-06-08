@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_DANSSHIP_API_URL: string;
+  readonly VITE_IS_FIGURES_PAGE_ENABLED: string;
 }
 
 interface ImportMeta {

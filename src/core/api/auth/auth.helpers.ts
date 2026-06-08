@@ -1,12 +1,19 @@
+import { ROLE } from '@core/permissions';
+
 import type { AuthUser, User } from './auth.models';
 
 const extractUsername = (email?: string): string => email?.split('@')[0] || 'user';
 
+const getUserRoles = (authUser: AuthUser) => {
+  const userRoles = authUser.roles ?? [ROLE.USER];
+
+  return userRoles.map((r: string) => r.toLowerCase() as ROLE);
+};
+
 export const mapAuthUserToUser = (authUser: AuthUser): User => {
   const username = extractUsername(authUser.email);
-  const roles = authUser.roles || [];
+  const roles = getUserRoles(authUser);
   const permissions = authUser.permissions || [];
-  const hasInstructorRole = roles.some(role => ['instructor', 'coach'].includes(role.toLowerCase()));
   const fullName = authUser.full_name || username;
   const displayName = authUser.display_name || fullName;
 
@@ -25,7 +32,9 @@ export const mapAuthUserToUser = (authUser: AuthUser): User => {
     documentValue: authUser.document_value ?? undefined,
     city: authUser.city ?? undefined,
     address: authUser.address ?? undefined,
-    isCoach: hasInstructorRole,
+    isAdmin: roles.includes(ROLE.ADMIN),
+    isInstructor: roles.includes(ROLE.INSTRUCTOR),
+    isCoach: roles.includes(ROLE.COACH),
     roles: roles,
     permissions: permissions,
     isActive: authUser.is_active,

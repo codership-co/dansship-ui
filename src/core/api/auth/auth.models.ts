@@ -51,9 +51,11 @@ export interface User {
   address?: string;
   avatar?: string;
   bio?: string;
+  isAdmin: boolean;
+  isInstructor: boolean;
   isCoach: boolean;
-  roles?: Array<string>;
-  permissions?: Array<string>;
+  roles: Array<string>;
+  permissions: Array<string>;
   isActive?: boolean;
   isEmailVerified?: boolean;
   requiresOnboarding?: boolean;

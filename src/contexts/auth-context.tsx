@@ -1,9 +1,13 @@
 import i18next from 'i18next';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TbFaceIdError } from 'react-icons/tb';
+import { Navigate } from 'react-router';
 import { toast } from 'sonner';
 
+import { FEATURE_FLAG, useEnabledFeatureFlag } from './feature-flags.context';
+
+import { SpinnerLoader } from '@components/loaders';
 import {
   DansshipAPI,
   type ForgotPasswordPayload,
@@ -15,13 +19,11 @@ import {
   type User,
   type VerifyEmailPayload,
 } from '@core/api';
-import { type PERMISSION, ROLE } from '@core/permissions';
+import { type PERMISSION } from '@core/permissions';
 import { useEventListener } from '@hooks';
 
-interface IAuthContext {
-  isAuthenticated: boolean;
+interface CommonAuthContextState {
   error: string | null;
-  user: User | null;
   login: typeof DansshipAPI.auth.login;
   signUp: typeof DansshipAPI.auth.register;
   updateProfile: typeof DansshipAPI.auth.updateProfile;
@@ -31,9 +33,22 @@ interface IAuthContext {
   resendVerification: typeof DansshipAPI.auth.resendVerification;
   getProfile: () => Promise<User | null>;
   logout: () => Promise<void>;
+  requireOnboarding: boolean;
 }
 
-const AuthContext = createContext<IAuthContext | null>(null);
+interface AuthenticatedAuthContextState extends CommonAuthContextState {
+  user: User;
+  isAuthenticated: true;
+}
+
+interface UnAuthenticatedAuthContextState extends CommonAuthContextState {
+  user: null;
+  isAuthenticated: false;
+}
+
+type AuthContextState = AuthenticatedAuthContextState | UnAuthenticatedAuthContextState;
+
+const AuthContext = createContext<AuthContextState | null>(null);
 
 const AUTH_SESSION_KEY = 'auth_session';
 const AUTH_TOKEN_KEY = 'auth_token';
@@ -63,33 +78,23 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const { t } = useTranslation();
   const [localError, setLocalError] = useState<string | null>(null);
-  const [isSessionEnabled, setIsSessionEnabled] = useState(() => localStorage.getItem(AUTH_SESSION_KEY) === '1');
   const [user, setUser] = useState<User | null>(null);
 
   useEventListener('auth:session-expired' as keyof WindowEventMap, () => {
     clearSessionArtifacts();
-    setIsSessionEnabled(false);
     setLocalError('Session expired. Please sign in again.');
   });
 
   useEventListener('auth:logout' as keyof WindowEventMap, () => {
     clearSessionArtifacts();
-    setIsSessionEnabled(false);
     setLocalError(null);
   });
 
   async function getProfile() {
-    if (isSessionEnabled) {
-      const { data } = await DansshipAPI.auth.getProfile();
+    const { data } = await DansshipAPI.auth.getProfile();
+    setUser(data);
 
-      if (data) {
-        setUser(data);
-      }
-
-      return data;
-    }
-
-    return null;
+    return data;
   }
 
   async function login(payload: LoginPayload) {
@@ -97,7 +102,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     if (response.data) {
       setLocalError(null);
-      setIsSessionEnabled(true);
       localStorage.setItem(AUTH_SESSION_KEY, '1');
       setUser(response.data);
       toast.success(t('auth:loginSuccess'));
@@ -116,9 +120,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const response = await DansshipAPI.auth.register({ ...payload, preferred_language: lang });
 
-    if (response.data) {
+    if (response.status === 201) {
       setLocalError(null);
-      setIsSessionEnabled(false);
       clearSessionArtifacts();
       setUser(null);
       toast.success(t('auth:registerSuccess'));
@@ -227,9 +230,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   return (
     <AuthContext.Provider
       value={{
-        isAuthenticated: Boolean(user),
+        ...(user ? { isAuthenticated: true, user } : { isAuthenticated: false, user: null }),
         error: localError,
-        user,
         login,
         getProfile,
         signUp,
@@ -239,6 +241,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         resetPassword,
         verifyEmail,
         resendVerification,
+        requireOnboarding: (user?.requiresOnboarding && user?.onboardingRequired) ?? false,
       }}
     >
       {children}
@@ -246,7 +249,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   );
 };
 
-export const useAuth = (): IAuthContext => {
+export const useAuth = (): AuthContextState => {
   const context = useContext(AuthContext);
 
   if (!context) {
@@ -259,52 +262,106 @@ export const useAuth = (): IAuthContext => {
 export const useAndPermissions = (permissions: Array<PERMISSION>): boolean => {
   const { user, isAuthenticated } = useAuth();
 
-  if (!isAuthenticated || !user) return false;
+  if (permissions.length === 0) return true;
 
-  let havePermissions = true;
+  if (!isAuthenticated) return false;
 
-  for (const permission of permissions) {
-    havePermissions &&= (user.permissions ?? []).includes(permission);
-  }
-
-  return havePermissions;
+  return permissions.every(p => user.permissions.includes(p));
 };
 
 export const useOrPermissions = (permissions: Array<PERMISSION>): boolean => {
   const { user, isAuthenticated } = useAuth();
 
-  if (!isAuthenticated || !user) return false;
-
   if (permissions.length === 0) return true;
 
-  let havePermissions = false;
+  if (!isAuthenticated) return false;
 
-  for (const permission of permissions) {
-    havePermissions ||= (user.permissions ?? []).includes(permission);
-  }
-
-  return havePermissions;
+  return permissions.some(p => user.permissions.includes(p));
 };
 
-export const useUserRoles = () => {
-  const { user, isAuthenticated } = useAuth();
+interface UsePermissionsParams {
+  orPermissions?: Array<PERMISSION>;
+  andPermissions?: Array<PERMISSION>;
+}
 
-  let userRoles = [ROLE.USER];
+export const usePermissions = ({ orPermissions = [], andPermissions = [] }: UsePermissionsParams) => {
+  const validOrPermissions = useOrPermissions(orPermissions);
+  const validAndPermissions = useAndPermissions(andPermissions);
 
-  if (!isAuthenticated || !user) userRoles = [ROLE.USER];
-
-  if (user.roles && Array.isArray(user.roles) && user.roles.length > 0) {
-    userRoles = user.roles.map((r: string) => r.toLowerCase() as ROLE);
-  }
-
-  if (user.isCoach) {
-    userRoles = [ROLE.INSTRUCTOR, ROLE.USER];
-  }
-
-  return {
-    role: userRoles,
-    isAdmin: userRoles.includes(ROLE.ADMIN),
-    isInstructor: userRoles.includes(ROLE.INSTRUCTOR),
-    isCoach: userRoles.includes(ROLE.COACH),
-  };
+  return validOrPermissions && validAndPermissions;
 };
+
+interface SecurityGuardOptions {
+  orPermissions?: Array<PERMISSION>;
+  andPermissions?: Array<PERMISSION>;
+  featureFlags?: Array<FEATURE_FLAG>;
+  redirect: string;
+  requiresAuth?: boolean;
+}
+
+type GuardState = 'pending' | 'validating' | 'valid' | 'invalid';
+
+export function SecurityGuard(
+  Component: React.ComponentType,
+  { orPermissions, andPermissions, featureFlags = [], redirect, requiresAuth }: SecurityGuardOptions,
+): React.ComponentType {
+  function Guard() {
+    const { isAuthenticated, getProfile } = useAuth();
+    const [state, setState] = useState<GuardState>('pending');
+    const validPermissions = usePermissions({ orPermissions, andPermissions });
+    const validFeatureFlags = useEnabledFeatureFlag(featureFlags);
+
+    useEffect(() => {
+      if (requiresAuth && !isAuthenticated) {
+        setState('invalid');
+      }
+
+      if (requiresAuth && isAuthenticated && state === 'pending') {
+        setState('validating');
+        getProfile().then(profile => {
+          setState(profile !== null ? 'valid' : 'invalid');
+        });
+      }
+
+      if (!requiresAuth && state === 'pending') {
+        setState('valid');
+      }
+    }, [getProfile, isAuthenticated, state]);
+
+    return useMemo(() => {
+      if (state === 'valid') {
+        if (isAuthenticated) {
+          if (validPermissions && validFeatureFlags) {
+            return <Component />;
+          }
+
+          if (!validPermissions) {
+            // todo: handle invalid permissions
+          }
+
+          if (!validFeatureFlags) {
+            // todo: handle feature flags off
+          }
+        }
+
+        if (!isAuthenticated && !requiresAuth) {
+          if (validFeatureFlags) {
+            return <Component />;
+          }
+
+          if (!validFeatureFlags) {
+            // todo: handle feature flags off
+          }
+        }
+      }
+
+      if (['pending', 'validating'].includes(state)) {
+        return <SpinnerLoader />;
+      }
+
+      return <Navigate to={redirect} />;
+    }, [isAuthenticated, state, validFeatureFlags, validPermissions]);
+  }
+
+  return Guard as React.ComponentType;
+}
