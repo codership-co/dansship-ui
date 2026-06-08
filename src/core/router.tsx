@@ -26,15 +26,7 @@ const routes: Array<RouteObject> = [
     middleware: [loggingMiddleware],
     hydrateFallbackElement: <RootLoader />,
     children: [
-      {
-        index: true,
-        Component: SecurityGuard(HomePage, {
-          redirect: '/auth/login',
-          requiresAuth: true,
-          orPermissions: [PERMISSION.AVAILABILITY_READ],
-          featureFlags: [FEATURE_FLAG.isFiguresPageEnabled],
-        }),
-      },
+      { index: true, Component: HomePage },
 
       {
         path: 'auth',
@@ -51,7 +43,15 @@ const routes: Array<RouteObject> = [
       { path: 'figures', Component: HomePage }, // WIP
       { path: 'figures/:id', Component: HomePage }, // WIP
       { path: 'browse', Component: HomePage }, // WIP
-      { path: 'onboarding', Component: HomePage }, // WIP
+      {
+        path: 'onboarding',
+        Component: SecurityGuard(HomePage, {
+          redirect: '/auth/login',
+          requiresAuth: true,
+          orPermissions: [PERMISSION.AVAILABILITY_READ],
+          featureFlags: [FEATURE_FLAG.isFiguresPageEnabled],
+        }),
+      }, // WIP
       { path: 'classes', Component: HomePage }, // WIP
       { path: 'instructor/dashboard', Component: HomePage }, // WIP
 
