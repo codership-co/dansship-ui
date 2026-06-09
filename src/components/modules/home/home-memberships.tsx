@@ -1,16 +1,17 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
-import { PlanSelector } from './plan-selector';
+import { PlanSelector } from '../plan-selector';
 
 import { Section, SectionHeading } from '@components/containers';
 import { useAuth } from '@contexts';
+import { PageURLS } from '@core/constants';
 
 export const HomeMemberships = () => {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
 
-  const plansPath = isAuthenticated ? '/my-account/subscription' : '/auth/login';
+  const plansPath = isAuthenticated ? PageURLS.myAccountSubscription : PageURLS.auth.login;
 
   return (
     <Section id='planes' className='text-center'>

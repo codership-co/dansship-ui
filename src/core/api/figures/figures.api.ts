@@ -63,8 +63,8 @@ export class FiguresAPI {
       method: 'GET',
       params: {
         ...payload,
-        limit: payload.limit ?? 20,
-        offset: payload.offset ?? 0,
+        limit: payload?.limit ?? 20,
+        offset: payload?.offset ?? 0,
       },
     });
   }
@@ -99,8 +99,8 @@ export class FiguresAPI {
         method: 'GET',
         params: {
           ...payload,
-          limit: payload.limit ?? 20,
-          offset: payload.offset ?? 0,
+          limit: payload?.limit ?? 20,
+          offset: payload?.offset ?? 0,
         },
       },
       response =>

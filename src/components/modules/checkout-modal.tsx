@@ -112,7 +112,7 @@ export function CheckoutModal({ isOpen, onClose, selectedPlan }: CheckoutModalPr
           discount_code: trimmedCode,
         });
 
-        if (previewRequestRef.current !== currentRequestId) {
+        if (!data || previewRequestRef.current !== currentRequestId) {
           return;
         }
 
@@ -159,9 +159,12 @@ export function CheckoutModal({ isOpen, onClose, selectedPlan }: CheckoutModalPr
   }, [discountCode, isOpen, selectedPlan]);
 
   const apiEnabled = isOpen && Boolean(selectedPlan);
-  const proofUploadUrl = useCallablePromise(DansshipAPI.payments.getProofUploadUrl, apiEnabled);
-  const confirmationProofUpload = useCallablePromise(DansshipAPI.payments.confirmProofUpload, apiEnabled);
-  const creationIntent = useCallablePromise(DansshipAPI.payments.createIntent, apiEnabled);
+  const proofUploadUrl = useCallablePromise(((...args) =>
+    DansshipAPI.payments.getProofUploadUrl(...args)) as typeof DansshipAPI.payments.getProofUploadUrl);
+  const confirmationProofUpload = useCallablePromise(((...args) =>
+    DansshipAPI.payments.confirmProofUpload(...args)) as typeof DansshipAPI.payments.confirmProofUpload);
+  const creationIntent = useCallablePromise(((...args) =>
+    DansshipAPI.payments.createIntent(...args)) as typeof DansshipAPI.payments.createIntent);
 
   const subtotal = selectedPlan ? Number(selectedPlan.price) : 0;
   const finalPrice = previewFinalPrice ?? subtotal;
@@ -198,42 +201,44 @@ export function CheckoutModal({ isOpen, onClose, selectedPlan }: CheckoutModalPr
     const parsedStartDate =
       data.start_date && data.start_date !== todayStr ? new Date(data.start_date).toISOString() : undefined;
 
-    const { data: intent } = await creationIntent.call({
-      plan_id: selectedPlan.id,
-      payment_method_type: paymentMethod,
-      discount_code: data.discount_code?.trim() ? data.discount_code.trim() : undefined,
-      start_date: parsedStartDate,
-    });
+    if (apiEnabled) {
+      const { data: intent } = await creationIntent.call({
+        plan_id: selectedPlan.id,
+        payment_method_type: paymentMethod,
+        discount_code: data.discount_code?.trim() ? data.discount_code.trim() : undefined,
+        start_date: parsedStartDate,
+      });
 
-    if (intent?.id) {
-      if (requiresProof && selectedProofFile) {
-        try {
-          const {
-            data: { upload_url, file_key },
-          } = await proofUploadUrl.call(intent.id, {
-            content_type: selectedProofFile.type as PaymentProofContentType,
-          });
+      if (intent?.id) {
+        if (requiresProof && selectedProofFile) {
+          try {
+            const { data } = await proofUploadUrl.call(intent.id, {
+              content_type: selectedProofFile.type as PaymentProofContentType,
+            });
 
-          const uploadResponse = await fetch(upload_url, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': selectedProofFile.type,
-            },
-            body: selectedProofFile,
-          });
+            if (data) {
+              const uploadResponse = await fetch(data.upload_url, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': selectedProofFile.type,
+                },
+                body: selectedProofFile,
+              });
 
-          if (!uploadResponse.ok) {
-            throw new Error('S3_UPLOAD_FAILED');
+              if (!uploadResponse.ok) {
+                throw new Error('S3_UPLOAD_FAILED');
+              }
+
+              await confirmationProofUpload.call(intent.id, { file_key: data.file_key });
+            }
+          } catch {
+            toast.error(t('payments:proofUploadFailed'));
           }
-
-          await confirmationProofUpload.call(intent.id, { file_key });
-        } catch {
-          toast.error(t('payments:proofUploadFailed'));
         }
-      }
 
-      setCreatedIntentId(intent.id);
-      setStep(4);
+        setCreatedIntentId(intent.id);
+        setStep(4);
+      }
     }
   };
 

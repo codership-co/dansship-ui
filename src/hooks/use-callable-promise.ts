@@ -2,28 +2,28 @@ import { useCallback, useState } from 'react';
 
 export const useCallablePromise = <Result, Args extends Array<unknown> = []>(
   promise: (...args: Args) => Promise<Result>,
-  enabled: boolean = true,
 ) => {
-  const [data, setData] = useState<Result>(null);
+  const [data, setData] = useState<Result | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error>(null);
+  const [error, setError] = useState<Error | null>(null);
 
   const call = useCallback(
     async (...args: Args): Promise<Result> => {
-      if (!enabled) return;
-
       try {
         setIsLoading(true);
         const response = await promise(...args);
+        setIsLoading(false);
         setData(response);
         setError(null);
+
+        return response;
       } catch (error) {
-        setError(error);
-      } finally {
         setIsLoading(false);
+        setError(error as Error);
+        throw error;
       }
     },
-    [enabled, promise],
+    [promise],
   );
 
   return {

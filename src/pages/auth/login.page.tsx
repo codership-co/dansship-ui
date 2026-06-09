@@ -4,7 +4,8 @@ import { useLocation, useNavigate } from 'react-router';
 
 import { LoginForm, type LoginFormData } from '@components/forms';
 import { useAuth } from '@contexts';
-import { getPendingPlanCheckoutIntent, getRedirectPathByRole } from '@helpers';
+import { PageURLS } from '@core/constants';
+import { getRedirectPathByRole } from '@helpers';
 
 export function LoginPage() {
   const { t } = useTranslation();
@@ -27,21 +28,7 @@ export function LoginPage() {
   // Redirect to pending actions first, then route-origin, then role default.
   useEffect(() => {
     if (user) {
-      if (user.onboardingRequired && !user.onboardingCompleted) {
-        navigate('/onboarding', { replace: true });
-
-        return;
-      }
-
-      const hasPendingCheckoutIntent = Boolean(getPendingPlanCheckoutIntent());
-
-      if (hasPendingCheckoutIntent) {
-        navigate('/', { replace: true });
-
-        return;
-      }
-
-      if (fromPath && fromPath !== '/auth/login') {
+      if (fromPath && fromPath !== PageURLS.auth.login) {
         navigate(fromPath, { replace: true });
 
         return;

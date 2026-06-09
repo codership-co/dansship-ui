@@ -10,13 +10,13 @@ import '@core/styles';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ErrorBoundary fallback={<span>Error</span>}>
-      <AuthProvider>
+    <AuthProvider>
+      <ErrorBoundary fallback={<span>Error</span>}>
         <FeatureFlagsProvider>
           <Router />
           <Toaster />
         </FeatureFlagsProvider>
-      </AuthProvider>
-    </ErrorBoundary>
+      </ErrorBoundary>
+    </AuthProvider>
   </StrictMode>,
 );

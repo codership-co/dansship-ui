@@ -5,9 +5,9 @@ import { loggingMiddleware } from './middleware';
 import { RootLayout } from '@components/layouts';
 import { RootLoader } from '@components/loaders';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
-import { PERMISSION } from '@core/permissions';
 import {
   Error404Page,
+  FiguresPage,
   ForgotPasswordPage,
   HomePage,
   LoginPage,
@@ -40,7 +40,7 @@ const routes: Array<RouteObject> = [
       },
 
       { path: 'user/:id', Component: UserPage, loader: UserLoader },
-      { path: 'figures', Component: HomePage }, // WIP
+      { path: 'figures', Component: FiguresPage },
       { path: 'figures/:id', Component: HomePage }, // WIP
       { path: 'browse', Component: HomePage }, // WIP
       {
@@ -48,7 +48,6 @@ const routes: Array<RouteObject> = [
         Component: SecurityGuard(HomePage, {
           redirect: '/auth/login',
           requiresAuth: true,
-          orPermissions: [PERMISSION.AVAILABILITY_READ],
           featureFlags: [FEATURE_FLAG.isFiguresPageEnabled],
         }),
       }, // WIP

@@ -4,6 +4,7 @@ import { Link } from 'react-router';
 
 import { Section, SectionHeading } from '@components/containers';
 import { Button, Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui';
+import { PageURLS } from '@core/constants';
 
 const offeringCards = [
   {
@@ -44,7 +45,7 @@ export const HomeOfferings = () => {
           const isFeatured = index === 1;
 
           return (
-            <Link key={card.titleKey} to='/classes' className='block rounded-lg'>
+            <Link key={card.titleKey} to={PageURLS.classes} className='block rounded-lg'>
               <Card
                 className={`group relative min-h-100 overflow-hidden border-secondary/50 shadow-none ${
                   isFeatured ? 'bg-primary-container text-primary-foreground' : 'bg-surface-container-low text-accent'
@@ -111,7 +112,7 @@ export const HomeOfferings = () => {
         <p className='text-sm text-muted-foreground'>{t('home:stitch.offerings.scheduleCtaMessage')}</p>
 
         <Button asChild>
-          <Link to='/classes'>{t('home:stitch.offerings.scheduleCtaAction')}</Link>
+          <Link to={PageURLS.classes}>{t('home:stitch.offerings.scheduleCtaAction')}</Link>
         </Button>
       </div>
     </Section>

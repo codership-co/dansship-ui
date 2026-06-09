@@ -44,6 +44,8 @@ i18n
       'studioRental',
       'subscriptions',
       'training',
+      'unauthorized',
+      'unavailable',
       'validation',
     ],
     interpolation: {

@@ -1,13 +1,11 @@
 import i18next from 'i18next';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TbFaceIdError } from 'react-icons/tb';
-import { Navigate } from 'react-router';
+import { Navigate, useLocation } from 'react-router';
 import { toast } from 'sonner';
 
 import { FEATURE_FLAG, useEnabledFeatureFlag } from './feature-flags.context';
 
-import { SpinnerLoader } from '@components/loaders';
 import {
   DansshipAPI,
   type ForgotPasswordPayload,
@@ -19,8 +17,11 @@ import {
   type User,
   type VerifyEmailPayload,
 } from '@core/api';
+import { PageURLS } from '@core/constants';
 import { type PERMISSION } from '@core/permissions';
+import { getPendingPlanCheckoutIntent } from '@helpers';
 import { useEventListener } from '@hooks';
+import { Error404Page, UnauthorizedPage, UnavailablePage } from '@pages';
 
 interface CommonAuthContextState {
   error: string | null;
@@ -90,6 +91,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     setLocalError(null);
   });
 
+  useEffect(() => {
+    if (localStorage.getItem(AUTH_SESSION_KEY) === '1') {
+      void getProfile();
+
+      toast.success('Session detected!');
+    }
+  }, []);
+
   async function getProfile() {
     const { data } = await DansshipAPI.auth.getProfile();
     setUser(data);
@@ -107,9 +116,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       toast.success(t('auth:loginSuccess'));
     } else {
       setLocalError(t('auth:loginFailed'));
-      toast.error(t('auth:loginFailed'), {
-        icon: <TbFaceIdError />,
-      });
+      toast.error(t('auth:loginFailed'));
     }
 
     return response;
@@ -127,9 +134,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       toast.success(t('auth:registerSuccess'));
     } else {
       setLocalError(t('auth:registerFailed'));
-      toast.error(t('auth:registerFailed'), {
-        icon: <TbFaceIdError />,
-      });
+      toast.error(t('auth:registerFailed'));
     }
 
     return response;
@@ -241,7 +246,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         resetPassword,
         verifyEmail,
         resendVerification,
-        requireOnboarding: (user?.requiresOnboarding && user?.onboardingRequired) ?? false,
+        requireOnboarding:
+          (user?.requiresOnboarding && user?.onboardingRequired && !user?.onboardingCompleted) ?? false,
       }}
     >
       {children}
@@ -295,72 +301,43 @@ interface SecurityGuardOptions {
   orPermissions?: Array<PERMISSION>;
   andPermissions?: Array<PERMISSION>;
   featureFlags?: Array<FEATURE_FLAG>;
-  redirect: string;
+  redirect?: string;
   requiresAuth?: boolean;
 }
 
-type GuardState = 'pending' | 'validating' | 'valid' | 'invalid';
-
 export function SecurityGuard(
   Component: React.ComponentType,
-  { orPermissions, andPermissions, featureFlags = [], redirect, requiresAuth }: SecurityGuardOptions,
+  { orPermissions, andPermissions, featureFlags = [], redirect, requiresAuth }: SecurityGuardOptions = {},
 ): React.ComponentType {
   function Guard() {
-    const { isAuthenticated, getProfile } = useAuth();
-    const [state, setState] = useState<GuardState>('pending');
+    const { isAuthenticated, requireOnboarding } = useAuth();
+    const { pathname } = useLocation();
     const validPermissions = usePermissions({ orPermissions, andPermissions });
     const validFeatureFlags = useEnabledFeatureFlag(featureFlags);
 
-    useEffect(() => {
-      if (requiresAuth && !isAuthenticated) {
-        setState('invalid');
-      }
-
-      if (requiresAuth && isAuthenticated && state === 'pending') {
-        setState('validating');
-        getProfile().then(profile => {
-          setState(profile !== null ? 'valid' : 'invalid');
-        });
-      }
-
-      if (!requiresAuth && state === 'pending') {
-        setState('valid');
-      }
-    }, [getProfile, isAuthenticated, state]);
-
     return useMemo(() => {
-      if (state === 'valid') {
-        if (isAuthenticated) {
-          if (validPermissions && validFeatureFlags) {
-            return <Component />;
-          }
-
-          if (!validPermissions) {
-            // todo: handle invalid permissions
-          }
-
-          if (!validFeatureFlags) {
-            // todo: handle feature flags off
-          }
-        }
-
-        if (!isAuthenticated && !requiresAuth) {
-          if (validFeatureFlags) {
-            return <Component />;
-          }
-
-          if (!validFeatureFlags) {
-            // todo: handle feature flags off
-          }
-        }
+      if (requiresAuth && !isAuthenticated) {
+        return redirect ? <Navigate to={redirect} /> : <Error404Page />;
       }
 
-      if (['pending', 'validating'].includes(state)) {
-        return <SpinnerLoader />;
+      if (!validFeatureFlags) {
+        return <UnavailablePage />;
       }
 
-      return <Navigate to={redirect} />;
-    }, [isAuthenticated, state, validFeatureFlags, validPermissions]);
+      if (isAuthenticated && !validPermissions) {
+        return <UnauthorizedPage />;
+      }
+
+      if (isAuthenticated && requireOnboarding && pathname !== PageURLS.onboarding) {
+        return <Navigate to={PageURLS.onboarding} replace />;
+      }
+
+      if (isAuthenticated && getPendingPlanCheckoutIntent() && pathname !== PageURLS.home) {
+        return <Navigate to={PageURLS.home} replace />;
+      }
+
+      return <Component />;
+    }, [isAuthenticated, pathname, requireOnboarding, validFeatureFlags, validPermissions]);
   }
 
   return Guard as React.ComponentType;

@@ -32,7 +32,8 @@ export function PlanSelector() {
   const navigate = useNavigate();
   const location = useLocation();
   const { response: publicPlans, isLoading: isLoadingPublicPlans } = usePromise(
-    DansshipAPI.subscriptions.getPublicPlans,
+    () => DansshipAPI.subscriptions.getPublicPlans(),
+    isAuthenticated,
   );
 
   const [selectedPlan, setSelectedPlan] = useState<PublicPlan | null>(null);

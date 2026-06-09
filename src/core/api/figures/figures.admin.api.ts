@@ -140,6 +140,8 @@ export class FiguresAdminAPI {
       path: '/admin/figures/import',
       method: 'POST',
       data: formData,
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       headers: {
         'content-type': undefined,
       },

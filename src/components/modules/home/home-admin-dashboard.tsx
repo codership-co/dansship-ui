@@ -6,6 +6,7 @@ import { Section, SectionHeading } from '@components/containers';
 import { Button, Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui';
 import { useAuth, useOrPermissions } from '@contexts';
 import { buildAgendaConflicts, DansshipAPI } from '@core/api';
+import { PageURLS } from '@core/constants';
 import { AdminPermissions } from '@core/permissions';
 import { toIsoDayStart, toIsoDayEnd } from '@helpers';
 import { usePromise } from '@hooks';
@@ -71,7 +72,7 @@ export const HomeAdminDashboard = () => {
   const adminCards = [
     {
       id: 'agenda',
-      to: '/admin/agenda',
+      to: PageURLS.admin.agenda,
       label: t('home:admin.cards.unifiedAgenda'),
       description: t('home:admin.cards.unifiedAgendaDescription'),
       metric: canReadAgenda ? adminAgendaEvents.length : '-',
@@ -79,7 +80,7 @@ export const HomeAdminDashboard = () => {
     },
     {
       id: 'approval',
-      to: '/admin/studio-rental?tab=approval',
+      to: `${PageURLS.admin.studioRental}?tab=approval`,
       label: t('home:admin.cards.pendingApprovals'),
       description: t('home:admin.cards.pendingApprovalsDescription'),
       metric: adminListResponse?.data?.length ?? 0,
@@ -87,7 +88,7 @@ export const HomeAdminDashboard = () => {
     },
     {
       id: 'reserved-use',
-      to: '/admin/studio-rental?tab=reserved-use',
+      to: `${PageURLS.admin.studioRental}?tab=reserved-use`,
       label: t('home:admin.cards.internalReservedUse'),
       description: t('home:admin.cards.internalReservedUseDescription'),
       metric: canReadAgenda
@@ -97,7 +98,7 @@ export const HomeAdminDashboard = () => {
     },
     {
       id: 'rules',
-      to: '/admin/studio-rental?tab=rules',
+      to: `${PageURLS.admin.studioRental}?tab=rules`,
       label: t('home:admin.cards.blockedSpaces'),
       description: t('home:admin.cards.blockedSpacesDescription'),
       metric: canReadAgenda ? adminAgendaEvents.filter(event => event.event_type === 'blocked_space').length : '-',
@@ -105,7 +106,7 @@ export const HomeAdminDashboard = () => {
     },
     {
       id: 'conflicts',
-      to: '/admin/agenda/conflicts',
+      to: PageURLS.admin.agendaConflicts,
       label: t('home:admin.cards.occupancyConflicts'),
       description: t('home:admin.cards.occupancyConflictsDescription'),
       metric: canReadAgenda ? adminConflicts.length : '-',

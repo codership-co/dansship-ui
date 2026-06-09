@@ -3,12 +3,13 @@ import { useEffect } from 'react';
 import { useCallablePromise } from './use-callable-promise';
 
 export const usePromise = <Result>(promise: () => Promise<Result>, enabled: boolean = true) => {
-  const { response, isLoading, error, call } = useCallablePromise<Result>(promise, enabled);
+  const { response, isLoading, error, call } = useCallablePromise<Result>(promise);
 
   useEffect(() => {
-    void call();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled]);
+    if (enabled) {
+      void call();
+    }
+  }, [enabled, call]);
 
   return {
     response,

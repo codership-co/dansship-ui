@@ -4,8 +4,8 @@ import { Toaster as Sonner, type ToasterProps } from 'sonner';
 const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
-      theme='system'
-      className='toaster group'
+      theme='light'
+      position='bottom-left'
       icons={{
         success: <LuCircleCheck className='size-4' />,
         info: <LuInfo className='size-4' />,
@@ -15,10 +15,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       style={
         {
-          '--normal-bg': 'var(--popover)',
-          '--normal-text': 'var(--popover-foreground)',
-          '--normal-border': 'var(--border)',
-          '--border-radius': 'var(--radius)',
+          '--normal-bg': 'hsl(from var(--color-popover) h s l / 80%)',
+          '--normal-text': 'var(--color-popover-foreground)',
+          '--normal-border': 'var(--color-popover-foreground)',
+          '--border-radius': 'calc(var(--radius) * 4)',
         } as React.CSSProperties
       }
       {...props}

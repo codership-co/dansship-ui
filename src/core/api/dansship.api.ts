@@ -43,6 +43,7 @@ export class DansshipAPI {
     apiName: 'DANSSHIP',
     baseURL: `${import.meta.env.VITE_DANSSHIP_API_URL}`,
     mode: 'cors',
+    cache: 'no-cache',
     getLogger: () => this.getLogger(),
     getResponseError,
     credentials: 'include',

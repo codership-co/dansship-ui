@@ -4,28 +4,23 @@ import { Link } from 'react-router';
 
 import { Section, SectionHeading } from '@components/containers';
 import { Button } from '@components/ui';
+import { PageURLS } from '@core/constants';
 
 const progressFeatures = [
   {
     icon: LuSearch,
     titleKey: 'home:stitch.progress.search.title',
     descriptionKey: 'home:stitch.progress.search.description',
-    defaultTitle: 'Encuentra la figura',
-    defaultDescription: 'Explora nuestro catálogo digital con más de 200 figuras clasificadas por niveles.',
   },
   {
     icon: LuHeart,
     titleKey: 'home:stitch.progress.favorites.title',
     descriptionKey: 'home:stitch.progress.favorites.description',
-    defaultTitle: 'Agrega como favorita',
-    defaultDescription: 'Crea tu propia rutina guardando las poses y movimientos que quieres perfeccionar.',
   },
   {
     icon: LuCalendar,
     titleKey: 'home:stitch.progress.log.title',
     descriptionKey: 'home:stitch.progress.log.description',
-    defaultTitle: 'Entrena y registra',
-    defaultDescription: 'Lleva un historial visual y técnico de tus avances clase tras clase.',
   },
 ];
 
@@ -49,9 +44,7 @@ export const HomeAppFeature = () => {
             className='space-y-2'
             intro={t('home:stitch.progress.kicker')}
             title={t('home:stitch.progress.title')}
-            subtitle={t('home:stitch.progress.subtitle', {
-              defaultValue: 'Transforma cada práctica en un avance medible dentro de tu biblioteca de movimiento.',
-            })}
+            subtitle={t('home:stitch.progress.subtitle')}
             titleSize='lg'
           />
 
@@ -79,7 +72,7 @@ export const HomeAppFeature = () => {
 
           <div className='flex flex-col gap-2.5 sm:max-w-90 sm:flex-row'>
             <Button asChild>
-              <Link to='/figures'>{t('home:stitch.progress.actions.viewAllFigures')}</Link>
+              <Link to={PageURLS.figures}>{t('home:stitch.progress.actions.viewAllFigures')}</Link>
             </Button>
           </div>
         </div>
