@@ -4,6 +4,7 @@ import { Link, useSearchParams } from 'react-router';
 
 import { Button } from '@components/ui';
 import { useAuth } from '@contexts';
+import { DansshipAPIError } from '@core/api';
 
 type VerifyState = 'idle' | 'verifying' | 'verified' | 'failed';
 
@@ -40,17 +41,19 @@ export function VerifyEmailPage() {
         const { data } = await verifyEmail({ token });
 
         setState(data?.verified ? 'verified' : 'failed');
-        setMessage(data?.message);
+        setMessage(data?.message ?? '');
       } catch (error) {
         setState('failed');
-        setMessage(error?.apiMessage || t('auth:verifyEmail.failed'));
+        setMessage((error as DansshipAPIError)?.message || t('auth:verifyEmail.failed'));
       }
     },
     [t, verifyEmail],
   );
 
   useEffect(() => {
-    void handleVerification(token);
+    if (token) {
+      void handleVerification(token);
+    }
   }, [token, handleVerification]);
 
   const statusTitle = useMemo(() => {
@@ -77,7 +80,7 @@ export function VerifyEmailPage() {
     setIsResending(true);
     try {
       const response = await resendVerification({ email });
-      setMessage(response.data.message);
+      setMessage(response.data?.message ?? '');
       setResendCooldown(30);
     } catch {
       setMessage(t('auth:verifyEmail.resendFailed'));
@@ -89,7 +92,7 @@ export function VerifyEmailPage() {
   return (
     <div className='min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8'>
       <div className='max-w-md w-full bg-white rounded-lg shadow-sm p-8 space-y-4'>
-        <h1 className='text-2xl font-bold text-gray-900'>{statusTitle}</h1>
+        <h3>{statusTitle}</h3>
 
         <p className='text-gray-600'>{message || t('auth:verifyEmail.description')}</p>
 

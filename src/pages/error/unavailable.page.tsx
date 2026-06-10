@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import { ErrorLayout } from '@components/layouts';
-import { UnderConstruction } from '@components/svg/under-construction';
+import { UnderConstruction } from '@components/svg';
 import { Button } from '@components/ui';
 import { PageURLS } from '@core/constants';
 

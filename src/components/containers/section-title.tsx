@@ -7,5 +7,13 @@ interface SectionTitleProps extends HTMLAttributes<HTMLHeadingElement> {
 }
 
 export function SectionTitle({ className, size = 'xl', ...props }: SectionTitleProps) {
-  return <h2 className={cn(size === 'xl' ? 'heading-xl' : 'heading-lg', className)} {...props} />;
+  return (
+    <h2
+      className={cn(
+        size === 'xl' ? 'text-3xl font-bold leading-tight sm:text-4xl' : 'text-2xl font-bold leading-tight sm:text-3xl',
+        className,
+      )}
+      {...props}
+    />
+  );
 }

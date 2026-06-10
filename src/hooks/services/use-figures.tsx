@@ -2,11 +2,13 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { useCallablePromise } from '..';
 
+import { useAuth } from '@contexts';
 import { DansshipAPI, Figure, GetFiguresParams } from '@core/api';
 
 export interface BrowseFigureFilters extends Omit<GetFiguresParams, 'limit' | 'offset'> {}
 
 export const useFigures = () => {
+  const { isAuthenticated } = useAuth();
   const [filters, setFilters] = useState<BrowseFigureFilters>({
     sortBy: 'name',
   });
@@ -36,10 +38,10 @@ export const useFigures = () => {
   }, [call, filters, offset]);
 
   useEffect(() => {
-    if (offset === 0) {
+    if (offset === 0 && isAuthenticated) {
       void loadNextPage();
     }
-  }, [loadNextPage, offset]);
+  }, [loadNextPage, offset, isAuthenticated]);
 
   return {
     filters,

@@ -14,7 +14,7 @@ export const RootLoader = () => {
         />
       </div>
       <h1 className='animate-fade-in-down duration-200 opacity-0 [animation-delay:100ms] text-center text-hero text-primary-50 font-brand'>
-        Dansship
+        <img src='/assets/images/logotipo.png' alt='Dansship' className='h-22' />
       </h1>
     </section>
   );

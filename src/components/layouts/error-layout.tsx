@@ -9,7 +9,7 @@ interface ErrorLayoutProps {
 
 export const ErrorLayout = ({ hero, image, title, description, actions, footer }: ErrorLayoutProps) => {
   return (
-    <section className='relative mx-auto w-xl group'>
+    <section className='relative mx-auto w-xl group mb-60'>
       <div className='bg-primary/40 absolute -z-10 left-[-25%] top-[-5%] h-96 w-96 rounded-full animate-pulse duration-4000' />
       <div className='bg-secondary/80 absolute -z-10 right-[-20%] top-[5%] h-56 w-56 rounded-full animate-pulse duration-8000' />
       <div className='bg-tertiary/40 absolute -z-10 bottom-[-10%] right-[-10%] h-75 w-75 rounded-full animate-pulse duration-12000' />
@@ -18,7 +18,7 @@ export const ErrorLayout = ({ hero, image, title, description, actions, footer }
         {image}
 
         {Boolean(hero) && (
-          <h1 className='select-none text-hero text-shadow-[-10px_-10px_var(--color-tertiary),-9px_-9px_var(--color-tertiary),-8px_-8px_var(--color-tertiary),-7px_-7px_var(--color-tertiary),-6px_-6px_var(--color-tertiary),-5px_-5px_var(--color-tertiary),-4px_-4px_var(--color-tertiary),-3px_-3px_var(--color-tertiary),-2px_-2px_var(--color-tertiary),-1px_-1px_var(--color-tertiary),0_0_10px_var(--color-primary)] font-black tracking-tighter text-primary md:text-[10rem] animate-glitch drop-shadow-[0_0_20px_rgb(var(--color-primary)/0.5)] group-hover:scale-110 group-hover:rotate-3'>
+          <h1 className='select-none text-[7rem] text-shadow-[-10px_-10px_var(--color-tertiary),-9px_-9px_var(--color-tertiary),-8px_-8px_var(--color-tertiary),-7px_-7px_var(--color-tertiary),-6px_-6px_var(--color-tertiary),-5px_-5px_var(--color-tertiary),-4px_-4px_var(--color-tertiary),-3px_-3px_var(--color-tertiary),-2px_-2px_var(--color-tertiary),-1px_-1px_var(--color-tertiary),0_0_10px_var(--color-primary)] text-primary animate-glitch group-hover:scale-110 group-hover:rotate-3'>
             {hero}
           </h1>
         )}

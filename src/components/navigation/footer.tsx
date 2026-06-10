@@ -3,16 +3,18 @@ import { LuInstagram, LuMusic2 } from 'react-icons/lu';
 import { Link } from 'react-router';
 
 import { PageContainer } from '@components/containers';
+import { Logotype } from '@components/svg';
 
 export function Footer() {
   const { t } = useTranslation();
 
   return (
-    <footer className='mt-4 rounded-none bg-surface-container/85 py-8 shadow-[0_10px_40px_-10px_rgba(88,47,89,0.06)] backdrop-blur-xl'>
+    <footer className='mt-4 rounded-none bg-tertiary text-secondary py-12 shadow-[0_10px_40px_-10px_rgba(88,47,89,0.06)] backdrop-blur-xl'>
       <PageContainer>
+        <Logotype className='h-8' mainColor='var(--color-secondary)' />
         <div className='flex flex-col gap-6 md:flex-row md:items-center md:justify-between'>
           <div>
-            <p className='text-sm text-muted-foreground'>
+            <p>
               {t('home:sharedFooter.copyright', {
                 year: 2026,
                 studio: 'Dansship',
@@ -20,7 +22,7 @@ export function Footer() {
             </p>
           </div>
 
-          <div className='flex flex-wrap items-center gap-x-8 gap-y-2 text-sm text-muted-foreground'>
+          <div className='flex flex-wrap items-center gap-x-8 gap-y-2'>
             <Link to='/privacy' className='transition hover:text-primary'>
               {t('home:sharedFooter.legal.privacy')}
             </Link>

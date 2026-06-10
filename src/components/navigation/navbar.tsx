@@ -6,6 +6,7 @@ import { NavLink, NavLinkProps } from 'react-router';
 import { LanguageSelector } from './language-selector';
 import { MobileMenu } from './mobile-menu';
 
+import { Isotype } from '@components/svg';
 import { Button } from '@components/ui';
 import { useAuth, usePermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
@@ -83,7 +84,7 @@ export const Navbar = () => {
               to={PageURLS.home}
               className='inline-flex items-center text-header4 text-primary font-brand hover:text-primary-300 transition-[all_300ms-ease]'
             >
-              Dansship
+              <Isotype className='transition-[all_3000ms_ease] h-7 hover:drop-shadow-[0_0_16px_var(--color-primary-300)]' />
             </NavLink>
           </div>
 

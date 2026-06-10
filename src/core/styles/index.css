@@ -38,9 +38,10 @@
   --color-alert: hsl(359 90% 62%);
   --color-warning: hsl(38 100% 50%);
   --color-info: hsl(210 100% 51%);
-  --color-primary: hsl(299 30% 27%);
-  --color-secondary: hsl(39 58% 86%);
-  --color-tertiary: hsl(10 100% 67%);
+  --color-primary: hsl(299 31% 27%);
+  --color-secondary: hsl(32 100% 93%);
+  --color-tertiary: hsl(9 100% 66%);
+  --color-highlight: hsl(347 94% 82%);
   --color-white: hsl(0 0 100%);
   --color-black: hsl(0 0 0%);
   /*
@@ -157,6 +158,20 @@
   --color-tertiary-900: color-mix(in hsl, var(--color-tertiary) var(--scale-900), var(--dark-base));
   --color-tertiary-foreground: var(--color-tertiary-50);
   /*
+   * HIGHLIGHT
+   */
+  --color-highlight-50: color-mix(in hsl, var(--color-highlight) var(--scale-50), var(--light-base));
+  --color-highlight-100: color-mix(in hsl, var(--color-highlight) var(--scale-100), var(--light-base));
+  --color-highlight-200: color-mix(in hsl, var(--color-highlight) var(--scale-200), var(--light-base));
+  --color-highlight-300: color-mix(in hsl, var(--color-highlight) var(--scale-300), var(--light-base));
+  --color-highlight-400: color-mix(in hsl, var(--color-highlight) var(--scale-400), var(--light-base));
+  --color-highlight-500: var(--color-highlight);
+  --color-highlight-600: color-mix(in hsl, var(--color-highlight) var(--scale-600), var(--dark-base));
+  --color-highlight-700: color-mix(in hsl, var(--color-highlight) var(--scale-700), var(--dark-base));
+  --color-highlight-800: color-mix(in hsl, var(--color-highlight) var(--scale-800), var(--dark-base));
+  --color-highlight-900: color-mix(in hsl, var(--color-highlight) var(--scale-900), var(--dark-base));
+  --color-highlight-foreground: var(--color-highlight-50);
+  /*
    * STATES
    */
   --color-background: hsl(33 100% 98%);
@@ -175,13 +190,13 @@
   --color-destructive: hsl(10 77% 48%);
   --color-destructive-foreground: hsl(34 66% 95%);
   --color-error-container: hsl(12 100% 92%);
-  --color-highlight: hsl(347 94% 82%);
   --color-tertiary-container: hsl(343 44% 28%);
   --color-on-tertiary-container: hsl(347 66% 74%);
   /*
    * TYPOGRAPHY
    */
   --font-main: 'Josefin Sans', 'Segoe UI', sans-serif;
+  --font-title: 'Josefin Sans', 'Segoe UI', sans-serif;
   --font-brand: guntertest, 'Josefin Sans', 'Segoe UI', sans-serif;
   --font-code: ui-monospace, Consolas, monospace;
   --text-small: 0.75rem;
@@ -189,23 +204,33 @@
   --text-small--font-weight: regular;
   --text-label: 0.875rem;
   --text-label--line-height: 140%;
-  --text-body: 1.2rem;
+  --text-body: 1.0rem;
   --text-body--line-height: 140%;
   --text-header4: 1.5rem;
   --text-header4--line-height: 120%;
   --text-header4--font-weight: bold;
+  --text-header4--letter-spacing: 0;
+  --text-header4--font-family: var(--font-title);
   --text-header3: 2.0rem;
   --text-header3--line-height: 120%;
   --text-header3--font-weight: bold;
+  --text-header3--letter-spacing: 0;
+  --text-header3--font-family: var(--font-title);
   --text-header2: 2.5rem;
   --text-header2--line-height: 120%;
   --text-header2--font-weight: bold;
+  --text-header2--letter-spacing: -2px;
+  --text-header2--font-family: var(--font-title);
   --text-header1: 3.0rem;
   --text-header1--line-height: 120%;
   --text-header1--font-weight: bold;
-  --text-hero: 5rem;
+  --text-header1--letter-spacing: -4px;
+  --text-header1--font-family: var(--font-title);
+  --text-hero: 4.0rem;
   --text-hero--line-height: 120%;
   --text-hero--font-weight: bolder;
+  --text-hero--letter-spacing: -4px;
+  --text-hero--font-family: var(--font-title);
   /*
    * BREAKPOINTS
    */
@@ -217,6 +242,7 @@
   --spacing: 0.25rem;
   --radius: 0.25rem;
 
+  --background-image-gradient-hero: linear-gradient(to bottom, var(--color-secondary), transparent);
   --background-image-gradient-primary: linear-gradient(135deg, var(--color-primary-100), var(--color-primary-400));
   --background-image-gradient-primary-transparent: linear-gradient(135deg, hsl(from var(--color-primary-100) h s l / 90%), hsl(from var(--color-primary-400) h s l / 90%));
   --background-image-gradient-secondary: linear-gradient(135deg, var(--color-secondary-100), var(--color-secondary-400));
@@ -307,18 +333,22 @@
 
   h1 {
     @apply text-header1;
+    font-family: var(--text-header1--font-family);
   }
 
   h2 {
     @apply text-header2;
+    font-family: var(--text-header2--font-family);
   }
 
   h3 {
     @apply text-header3;
+    font-family: var(--text-header3--font-family);
   }
 
   h4 {
     @apply text-header4;
+    font-family: var(--text-header4--font-family);
   }
 
   label {
@@ -332,7 +362,6 @@
 
 @layer utilities {
   .app-soft-bg {
-    background-image: url('/assets/images/bg-girl.png');
     background-repeat: no-repeat, no-repeat;
     background-position: right 1rem bottom 1rem, left 1rem bottom 1rem;
     background-attachment: fixed;
@@ -350,30 +379,8 @@
     @apply min-h-screen flex flex-col;
   }
 
-  .content-max {
-    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
-  }
-
-  .page-section {
-    @apply py-12 sm:py-16;
-  }
-
-  .page-section-tight {
-    @apply py-8 sm:py-10;
-  }
-
   .display-xl {
     @apply text-4xl font-extrabold leading-[1.02] sm:text-5xl lg:text-6xl;
-    font-family: var(--font-main);
-  }
-
-  .heading-xl {
-    @apply text-3xl font-bold leading-tight sm:text-4xl;
-    font-family: var(--font-main);
-  }
-
-  .heading-lg {
-    @apply text-2xl font-bold leading-tight sm:text-3xl;
     font-family: var(--font-main);
   }
 

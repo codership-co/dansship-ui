@@ -1,9 +1,9 @@
-interface Error404Props {
+interface UnauthorizedProps {
   className?: string;
   mainColor?: string;
 }
 
-export const Unauthorized = ({ className, mainColor = 'var(--color-tertiary)' }: Error404Props) => {
+export const Unauthorized = ({ className, mainColor = 'var(--color-tertiary)' }: UnauthorizedProps) => {
   return (
     <svg xmlns='http://www.w3.org/2000/svg' className={className} viewBox='0 0 892 500.74997'>
       <path

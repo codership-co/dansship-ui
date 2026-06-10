@@ -92,7 +92,7 @@ export function PlanSelector() {
 
   if (displayPlans.length === 0) {
     return (
-      <div className='rounded-3xl bg-surface-container-low p-12 text-center'>
+      <div className='rounded-3xl bg-secondary p-12 text-center'>
         <h3 className='text-lg font-semibold text-foreground'>{t('subscriptions:noPlansAvailable')}</h3>
         <p className='mt-2 text-muted-foreground'>{t('subscriptions:noPlansDesc')}</p>
       </div>
@@ -112,12 +112,12 @@ export function PlanSelector() {
               className={cn(
                 'relative flex h-auto flex-col',
                 isFeatured
-                  ? 'border-primary/30 bg-primary-container text-primary-foreground shadow-lg transition-transform duration-300 hover:-translate-y-1 lg:-translate-y-4 lg:h-full'
-                  : 'border-secondary/50 bg-surface-container-low shadow-none transition-colors duration-200 hover:bg-surface-container lg:h-full',
+                  ? 'border-primary/30 bg-primary text-primary-foreground shadow-lg transition-transform duration-300 hover:-translate-y-1 lg:-translate-y-4 lg:h-full'
+                  : 'border-secondary/50 bg-secondary shadow-none transition-colors duration-200 hover:bg-secondary lg:h-full',
               )}
             >
               {isFeatured && (
-                <div className='pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-highlight/90 px-4 py-1 text-xs font-semibold uppercase tracking-[0.06em] text-tertiary-container shadow-[inset_0_0_0_2px_rgba(255,255,255,0.22)]'>
+                <div className='pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-highlight/90 px-4 py-1 text-xs font-semibold uppercase tracking-[0.06em] text-primary shadow-[inset_0_0_0_2px_rgba(255,255,255,0.22)]'>
                   {t('subscriptions:bestValue')}
                 </div>
               )}
@@ -228,7 +228,7 @@ export function PlanSelector() {
                   className={cn(
                     'w-full',
                     !isFeatured &&
-                      'border border-primary/50 bg-surface-container-lowest text-primary shadow-[0_14px_30px_-24px_rgba(88,47,89,0.55)] hover:bg-surface-container-highest',
+                      'border border-primary/50 bg-secondary text-primary shadow-[0_14px_30px_-24px_rgba(88,47,89,0.55)] hover:bg-secondary',
                   )}
                   variant={isFeatured ? 'outline' : 'secondary'}
                   size='lg'

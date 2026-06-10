@@ -13,13 +13,16 @@ export const HomeHero = () => {
 
   return (
     <Section compact className='py-8 relative'>
-      <div className='pointer-events-none absolute inset-x-0 -top-36 h-[calc(100%+12rem)] bg-[radial-gradient(circle_at_12%_20%,rgba(252,164,183,0.22),transparent_50%),radial-gradient(circle_at_80%_78%,rgba(88,47,89,0.16),transparent_46%)]' />
+      <div className='pointer-events-none absolute inset-x-0 -top-36 h-[calc(100%+12rem)] bg-gradient-hero' />
 
-      <div className='relative px-5 pb-7 pt-6 sm:px-8 sm:pt-8 lg:px-12 lg:pb-10'>
-        <div className='relative z-10 max-w-3xl'>
-          <h1 className='mt-2 max-w-2xl text-primary text-hero'>
+      <div className='relative flex justify-center gap-40 content-center px-5 pb-7 pt-6 sm:px-8 sm:pt-8 lg:px-12 lg:pb-10'>
+        <div className='relative z-10 max-w-md'>
+          <h1 className='mt-2 max-w-2xl text-primary-200 text-hero'>
             <span className='block'>{t('home:stitch.hero.kicker1')}</span>
-            <span className='block'>{t('home:stitch.hero.kicker2')}</span>
+            <span className='block'>
+              {t('home:stitch.hero.kicker2')}{' '}
+              <span className='text-primary text-header2 font-brand'>{t('home:stitch.hero.kicker3')}</span>
+            </span>
           </h1>
 
           <p className='mt-5 max-w-140 text-muted-foreground'>{t('home:stitch.hero.description')}</p>
@@ -40,11 +43,13 @@ export const HomeHero = () => {
           </div>
         </div>
 
-        <img
-          src='https://lh3.googleusercontent.com/aida-public/AB6AXuChv5_6woQEEGxJQLXO3YugWIU3v9MGvyrYeOA_6OzifdUP00Cb3xqJOWhOZnMnDqUShrNHzHio_L7-IECtL0YoINUFPFkvqh_O56vLHT2VcZPUdUsB0WZCgOH6M9EXB5IwFF2CISpjV5EMb3e3yw4Nqtk6_ejzWWXqayQinxIPGXfTptOlPNUiKkOcbzBCaEiTGW6Du8v6b8iQljVPg2dNbgLylCjUhcTao0ai_FvdECEHqDMf5Mr3y0B5Iw9AFNwnFmeiIIhsGhA'
-          alt={t('home:stitch.hero.imageAlt')}
-          className='card pointer-events-none absolute right-10 top-1/2 hidden w-100 h-100 object-cover max-w-none -translate-y-1/2 lg:block'
-        />
+        <section className='relative w-90 h-90 bg-primary-200/50 rounded-full hidden lg:block'>
+          <img
+            src='/assets/images/home/MujerSS.png'
+            alt='Dansship'
+            className='absolute left-1/2 top-1/2 max-w-[initial] w-110 h-110 -translate-1/2 block'
+          />
+        </section>
       </div>
     </Section>
   );

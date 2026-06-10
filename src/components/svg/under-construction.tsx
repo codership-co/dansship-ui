@@ -1,9 +1,9 @@
-interface Error404Props {
+interface UnderConstructionProps {
   className?: string;
   mainColor?: string;
 }
 
-export const UnderConstruction = ({ className, mainColor = 'var(--color-tertiary)' }: Error404Props) => {
+export const UnderConstruction = ({ className, mainColor = 'var(--color-tertiary)' }: UnderConstructionProps) => {
   return (
     <svg xmlns='http://www.w3.org/2000/svg' className={className} viewBox='0 0 1177.82 724.47' role='img'>
       <title>under construction</title>

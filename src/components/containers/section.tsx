@@ -9,8 +9,8 @@ interface SectionProps extends HTMLAttributes<HTMLElement> {
 
 export function Section({ className, contentClassName, compact = false, children, ...props }: SectionProps) {
   return (
-    <section className={cn(compact ? 'page-section-tight' : 'page-section', className)} {...props}>
-      <div className={cn('content-max', contentClassName)}>{children}</div>
+    <section className={cn(compact ? 'py-8 sm:py-10' : 'py-12 sm:py-16', className)} {...props}>
+      <div className={cn('mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8', contentClassName)}>{children}</div>
     </section>
   );
 }

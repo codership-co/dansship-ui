@@ -94,8 +94,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     if (localStorage.getItem(AUTH_SESSION_KEY) === '1') {
       void getProfile();
-
-      toast.success('Session detected!');
     }
   }, []);
 
@@ -159,6 +157,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       await DansshipAPI.auth.logout();
     } finally {
+      setUser(null);
       window.dispatchEvent(new CustomEvent('auth:logout'));
       toast.success(t('auth:logoutSuccess'));
     }
