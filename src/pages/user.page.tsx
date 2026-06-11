@@ -22,7 +22,7 @@ const fetchData = async (name: string) => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function UserLoader({ params }: LoaderFunctionArgs): any {
-  return delayPromise(fetchData(params.id), 2000);
+  return delayPromise(fetchData(params.id ?? ''), 2000);
 }
 
 export function UserPage() {

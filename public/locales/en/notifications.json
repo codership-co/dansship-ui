@@ -1,8 +1,0 @@
-{
-  "settingsTitle": "Notification Settings",
-  "settingsDesc": "Configure which automated emails are sent to users and instructors.",
-  "leadTime": "Lead time:",
-  "noConfigsFound": "No notification configurations found.",
-  "configUpdated": "Notification config updated",
-  "configUpdateFailed": "Failed to update config"
-}

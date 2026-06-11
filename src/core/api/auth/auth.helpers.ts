@@ -1,3 +1,4 @@
+import { PageURLS } from '@core/constants';
 import { ROLE } from '@core/permissions';
 
 import type { AuthUser, User } from './auth.models';
@@ -16,10 +17,18 @@ export const mapAuthUserToUser = (authUser: AuthUser): User => {
   const permissions = authUser.permissions || [];
   const fullName = authUser.full_name || username;
   const displayName = authUser.display_name || fullName;
+  let baseProfileRedirect: string = PageURLS.classes;
+
+  if (roles.includes(ROLE.ADMIN)) {
+    baseProfileRedirect = PageURLS.admin.reports;
+  } else if (roles.includes(ROLE.INSTRUCTOR)) {
+    baseProfileRedirect = PageURLS.instructorDashboard;
+  }
 
   return {
     id: authUser.id,
     username,
+    baseProfileRedirect,
     email: authUser.email || '',
     birthDate: authUser.birth_date ?? undefined,
     preferredLanguage: authUser.preferred_language,

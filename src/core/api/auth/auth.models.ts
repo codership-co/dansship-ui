@@ -37,6 +37,7 @@ export interface AuthUser {
 export interface User {
   id: number | string;
   username: string;
+  baseProfileRedirect: string;
   email: string;
   birthDate?: string;
   preferredLanguage?: 'en' | 'es';

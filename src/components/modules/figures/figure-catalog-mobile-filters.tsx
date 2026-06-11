@@ -29,7 +29,7 @@ export const catalogFilterChipVariants = cva(
   {
     variants: {
       active: {
-        true: 'bg-primary text-primary-foreground shadow-[inset_0_0_0_1px_var(--color-primary-fixed-dim)]',
+        true: 'bg-primary text-primary-foreground shadow-[inset_0_0_0_1px_var(--color-primary-400)]',
         false: 'bg-surface-container-low text-on-surface-variant hover:bg-surface-container',
       },
     },

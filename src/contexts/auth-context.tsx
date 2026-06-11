@@ -24,6 +24,7 @@ import { useEventListener } from '@hooks';
 import { Error404Page, UnauthorizedPage, UnavailablePage } from '@pages';
 
 interface CommonAuthContextState {
+  ready: boolean;
   error: string | null;
   login: typeof DansshipAPI.auth.login;
   signUp: typeof DansshipAPI.auth.register;
@@ -78,6 +79,7 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const { t } = useTranslation();
+  const [ready, setReady] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
 
@@ -93,7 +95,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEffect(() => {
     if (localStorage.getItem(AUTH_SESSION_KEY) === '1') {
-      void getProfile();
+      getProfile().then(() => {
+        setReady(true);
+      });
+    } else {
+      setReady(true);
     }
   }, []);
 
@@ -236,6 +242,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       value={{
         ...(user ? { isAuthenticated: true, user } : { isAuthenticated: false, user: null }),
         error: localError,
+        ready,
         login,
         getProfile,
         signUp,
@@ -310,13 +317,15 @@ export function SecurityGuard(
 ): React.ComponentType {
   function Guard() {
     const { isAuthenticated, requireOnboarding } = useAuth();
-    const { pathname } = useLocation();
+    const location = useLocation();
     const validPermissions = usePermissions({ orPermissions, andPermissions });
     const validFeatureFlags = useEnabledFeatureFlag(featureFlags);
 
     return useMemo(() => {
+      const { pathname } = location;
+
       if (requiresAuth && !isAuthenticated) {
-        return redirect ? <Navigate to={redirect} /> : <Error404Page />;
+        return redirect ? <Navigate to={redirect} state={{ from: location }} replace /> : <Error404Page />;
       }
 
       if (!validFeatureFlags) {
@@ -327,16 +336,16 @@ export function SecurityGuard(
         return <UnauthorizedPage />;
       }
 
-      if (isAuthenticated && requireOnboarding && pathname !== PageURLS.onboarding) {
-        return <Navigate to={PageURLS.onboarding} replace />;
+      if (isAuthenticated && requireOnboarding && pathname !== PageURLS.auth.onboarding) {
+        return <Navigate to={PageURLS.auth.onboarding} state={{ from: location }} replace />;
       }
 
       if (isAuthenticated && getPendingPlanCheckoutIntent() && pathname !== PageURLS.home) {
-        return <Navigate to={PageURLS.home} replace />;
+        return <Navigate to={PageURLS.home} state={{ from: location }} replace />;
       }
 
       return <Component />;
-    }, [isAuthenticated, pathname, requireOnboarding, validFeatureFlags, validPermissions]);
+    }, [isAuthenticated, location, requireOnboarding, validFeatureFlags, validPermissions]);
   }
 
   return Guard as React.ComponentType;

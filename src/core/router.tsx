@@ -5,12 +5,14 @@ import { loggingMiddleware } from './middleware';
 import { RootLayout } from '@components/layouts';
 import { RootLoader } from '@components/loaders';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
+import { PageURLS } from '@core/constants';
 import {
   Error404Page,
   FiguresPage,
   ForgotPasswordPage,
   HomePage,
   LoginPage,
+  OnboardingPage,
   ResetPasswordPage,
   SignupPage,
   UserLoader,
@@ -36,6 +38,14 @@ const routes: Array<RouteObject> = [
           { path: 'forgot-password', Component: ForgotPasswordPage },
           { path: 'verify-email', Component: VerifyEmailPage },
           { path: 'reset-password', Component: ResetPasswordPage },
+          {
+            path: 'onboarding',
+            Component: SecurityGuard(OnboardingPage, {
+              redirect: PageURLS.auth.login,
+              requiresAuth: true,
+              featureFlags: [FEATURE_FLAG.isFiguresPageEnabled],
+            }),
+          },
         ],
       },
 
@@ -43,14 +53,6 @@ const routes: Array<RouteObject> = [
       { path: 'figures', Component: FiguresPage },
       { path: 'figures/:id', Component: HomePage }, // WIP
       { path: 'browse', Component: HomePage }, // WIP
-      {
-        path: 'onboarding',
-        Component: SecurityGuard(HomePage, {
-          redirect: '/auth/login',
-          requiresAuth: true,
-          featureFlags: [FEATURE_FLAG.isFiguresPageEnabled],
-        }),
-      }, // WIP
       { path: 'classes', Component: HomePage }, // WIP
       { path: 'instructor/dashboard', Component: HomePage }, // WIP
 

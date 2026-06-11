@@ -7,24 +7,22 @@ export const useCallablePromise = <Result, Args extends Array<unknown> = []>(
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const call = useCallback(
-    async (...args: Args): Promise<Result> => {
-      try {
-        setIsLoading(true);
-        const response = await promise(...args);
-        setIsLoading(false);
-        setData(response);
-        setError(null);
+  const call = useCallback(async (...args: Args): Promise<Result> => {
+    try {
+      setIsLoading(true);
+      const response = await promise(...args);
+      setIsLoading(false);
+      setData(response);
+      setError(null);
 
-        return response;
-      } catch (error) {
-        setIsLoading(false);
-        setError(error as Error);
-        throw error;
-      }
-    },
-    [promise],
-  );
+      return response;
+    } catch (error) {
+      setIsLoading(false);
+      setError(error as Error);
+      throw error;
+    }
+    //eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return {
     response: data,
