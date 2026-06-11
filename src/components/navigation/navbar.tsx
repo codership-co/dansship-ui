@@ -8,7 +8,7 @@ import { MobileMenu } from './mobile-menu';
 
 import { Isotype } from '@components/svg';
 import { Button } from '@components/ui';
-import { useAuth, usePermissions } from '@contexts';
+import { FEATURE_FLAG, useAuth, usePermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions, InstructorPermissions, PERMISSION } from '@core/permissions';
@@ -21,6 +21,7 @@ export interface NavItem {
   label: string;
   andPermissions?: Array<PERMISSION>;
   orPermissions?: Array<PERMISSION>;
+  featureFlags?: Array<FEATURE_FLAG>;
   requireAuthentication?: boolean;
   icon?: IconType;
 }
@@ -37,13 +38,18 @@ export const Navbar = () => {
   const hasActivePlan = response?.data?.summary?.active_count ?? 0 > 0;
 
   const navLinks: Array<NavItem> = [
-    { to: PageURLS.figures, label: t('nav:menuFigures') },
-    { to: PageURLS.classes, label: t('nav:menuScheduleClass') },
-    { to: isAuthenticated ? PageURLS.myAccountSubscription : '/#planes', label: t('nav:menuPlans') },
+    { to: PageURLS.figures, label: t('nav:menuFigures'), featureFlags: [FEATURE_FLAG.isFiguresPageEnabled] },
+    { to: PageURLS.classes, label: t('nav:menuScheduleClass'), featureFlags: [FEATURE_FLAG.isClassesPageEnabled] },
+    {
+      to: isAuthenticated ? PageURLS.myAccountSubscription : '/#planes',
+      label: t('nav:menuPlans'),
+      featureFlags: [FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
+    },
     {
       to: PageURLS.instructorDashboard,
       label: t('nav:instructorPortal'),
       orPermissions: [...InstructorPermissions.dashboard, PERMISSION.SCHEDULE_MANAGE],
+      featureFlags: [FEATURE_FLAG.isInstructorDashboardPageEnabled],
     },
     {
       to: PageURLS.admin.root,
@@ -60,6 +66,7 @@ export const Navbar = () => {
         ...AdminPermissions.access,
         ...AdminPermissions.studioRental,
       ],
+      featureFlags: [FEATURE_FLAG.isAdminPageEnabled],
     },
   ];
 

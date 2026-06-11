@@ -6,7 +6,7 @@ import { LanguageSelector } from './language-selector';
 import { MenuItem, NavItem } from './navbar';
 
 import { Button } from '@components/ui';
-import { useAuth } from '@contexts';
+import { FEATURE_FLAG, useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions, InstructorPermissions, PERMISSION } from '@core/permissions';
 
@@ -24,26 +24,32 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     {
       to: PageURLS.profile,
       label: t('nav:profile'),
+      featureFlags: [FEATURE_FLAG.isProfilePageEnabled],
     },
     {
       to: PageURLS.classes,
       label: t('nav:menuScheduleClass'),
+      featureFlags: [FEATURE_FLAG.isClassesPageEnabled],
     },
     {
       to: PageURLS.myAccountSubscription,
       label: t('nav:menuPlans'),
+      featureFlags: [FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
     },
     {
       to: PageURLS.myAccountBookings,
       label: t('nav:menuBookings'),
+      featureFlags: [FEATURE_FLAG.isMyAccountBookingsPageEnabled],
     },
     {
       to: PageURLS.figures,
       label: t('nav:menuFigures'),
+      featureFlags: [FEATURE_FLAG.isFiguresPageEnabled],
     },
     {
       to: PageURLS.figureSaved,
       label: t('nav:menuProgress'),
+      featureFlags: [FEATURE_FLAG.isFigureSavedPageEnabled],
     },
   ];
 
@@ -63,68 +69,81 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         ...AdminPermissions.access,
         ...AdminPermissions.studioRental,
       ],
+      featureFlags: [FEATURE_FLAG.isAdminPageEnabled],
     },
     {
       to: PageURLS.admin.agenda,
       label: t('nav:adminMenu.agenda'),
       orPermissions: AdminPermissions.scheduleBuilder,
+      featureFlags: [FEATURE_FLAG.isAdminAgendaPageEnabled],
     },
     {
       to: PageURLS.admin.scheduleBuilder,
       label: t('nav:adminMenu.scheduleBuilder'),
       orPermissions: AdminPermissions.scheduleBuilder,
+      featureFlags: [FEATURE_FLAG.isAdminScheduleBuilderPageEnabled],
     },
     {
       to: PageURLS.admin.studioRental,
       label: t('nav:adminMenu.studioRental'),
       orPermissions: AdminPermissions.studioRental,
+      featureFlags: [FEATURE_FLAG.isAdminStudioRentalPageEnabled],
     },
     {
       to: PageURLS.admin.reports,
       label: t('nav:adminMenu.reportsConfig'),
       orPermissions: AdminPermissions.reports,
+      featureFlags: [FEATURE_FLAG.isAdminReportsPageEnabled],
     },
     {
       to: PageURLS.admin.access,
       label: t('nav:adminMenu.accessManagement'),
       orPermissions: AdminPermissions.access,
+      featureFlags: [FEATURE_FLAG.isAdminAccessPageEnabled],
     },
     {
       to: PageURLS.admin.inventory,
       label: t('nav:adminMenu.inventoryBilling'),
       orPermissions: AdminPermissions.inventory,
+      featureFlags: [FEATURE_FLAG.isAdminInventoryPageEnabled],
     },
     {
       to: PageURLS.admin.bookings,
       label: t('nav:adminMenu.manualBookings'),
       orPermissions: AdminPermissions.bookings,
+      featureFlags: [FEATURE_FLAG.isAdminBookingsPageEnabled],
     },
     {
       to: PageURLS.admin.payments,
       label: t('nav:adminMenu.payments'),
       orPermissions: AdminPermissions.payments,
+      featureFlags: [FEATURE_FLAG.isAdminPaymentsPageEnabled],
     },
     {
       to: PageURLS.admin.figures,
       label: t('nav:figures'),
       orPermissions: AdminPermissions.figures,
+      featureFlags: [FEATURE_FLAG.isAdminFiguresPageEnabled],
     },
     {
       to: PageURLS.admin.merch,
       label: t('nav:adminMenu.merchProducts'),
       orPermissions: AdminPermissions.merch,
+      featureFlags: [FEATURE_FLAG.isAdminMerchPageEnabled],
       icon: LuShoppingBag,
     },
     {
       to: PageURLS.admin.merchPos,
       label: t('nav:adminMenu.merchPos'),
       orPermissions: AdminPermissions.merchPos,
+      featureFlags: [FEATURE_FLAG.isAdminMerchPosPageEnabled],
       icon: LuStore,
     },
     {
       to: PageURLS.instructorDashboard,
       label: t('nav:instructorPortal'),
       orPermissions: [...InstructorPermissions.dashboard, PERMISSION.SCHEDULE_MANAGE],
+      featureFlags: [FEATURE_FLAG.isInstructorDashboardPageEnabled],
       icon: LuStore,
     },
   ];
