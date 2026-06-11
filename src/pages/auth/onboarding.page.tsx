@@ -2,9 +2,11 @@ import { useTranslation } from 'react-i18next';
 
 import { SpinnerLoader } from '@components/loaders';
 import { OnboardingStudentTrack } from '@components/modules/onboarding';
+import { FEATURE_FLAG, SecurityGuard } from '@contexts';
+import { PageURLS } from '@core/constants';
 import { useOnboarding } from '@hooks';
 
-export function OnboardingPage() {
+function OnboardingPage() {
   const { t } = useTranslation();
   const {
     status,
@@ -55,3 +57,9 @@ export function OnboardingPage() {
     </div>
   );
 }
+
+export const SecureOnboardingPage = SecurityGuard(OnboardingPage, {
+  redirect: PageURLS.auth.login,
+  requiresAuth: true,
+  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled, FEATURE_FLAG.isOnboardingPageEnabled],
+});

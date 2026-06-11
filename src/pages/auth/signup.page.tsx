@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import { SignUpForm, type SignUpFormData } from '@components/forms';
-import { useAuth } from '@contexts';
+import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
+import { PageURLS } from '@core/constants';
 
-export function SignupPage() {
+function SignupPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { signUp } = useAuth();
@@ -42,3 +43,9 @@ export function SignupPage() {
     </div>
   );
 }
+
+export const SecureSignupPage = SecurityGuard(SignupPage, {
+  redirect: PageURLS.home,
+  requiresNoAuth: true,
+  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled, FEATURE_FLAG.isSignupPageEnabled],
+});

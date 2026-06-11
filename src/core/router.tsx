@@ -4,20 +4,43 @@ import { loggingMiddleware } from './middleware';
 
 import { RootLayout } from '@components/layouts';
 import { RootLoader } from '@components/loaders';
-import { FEATURE_FLAG, SecurityGuard } from '@contexts';
-import { PageURLS } from '@core/constants';
 import {
   Error404Page,
-  FiguresPage,
-  ForgotPasswordPage,
   HomePage,
-  LoginPage,
-  OnboardingPage,
-  ResetPasswordPage,
-  SignupPage,
+  SecureAdminAccessPage,
+  SecureAdminAgendaConflictsPage,
+  SecureAdminAgendaPage,
+  SecureAdminBookingsPage,
+  SecureAdminFiguresPage,
+  SecureAdminInventoryPage,
+  SecureAdminMerchPage,
+  SecureAdminMerchPosPage,
+  SecureAdminPage,
+  SecureAdminPaymentsPage,
+  SecureAdminReportsPage,
+  SecureAdminScheduleBuilderPage,
+  SecureAdminStudioRentalPage,
+  SecureClassesPage,
+  SecureFigureCompletedPage,
+  SecureFigureDetailsPage,
+  SecureFigureSavedPage,
+  SecureFiguresDetailsPage,
+  SecureFiguresPage,
+  SecureForgotPasswordPage,
+  SecureInstructorDashboardPage,
+  SecureLoginPage,
+  SecureMyAccountBookingsPage,
+  SecureMyAccountSubscriptionPage,
+  SecureOnboardingPage,
+  SecureProfileEditPage,
+  SecureProfilePage,
+  SecureResetPasswordPage,
+  SecureSignupPage,
+  SecureStudioRentalBrowsePage,
+  SecureStudioRentalRequestsPage,
+  SecureVerifyEmailPage,
   UserLoader,
   UserPage,
-  VerifyEmailPage,
 } from '@pages';
 
 /* eslint-disable line-comment-position */ // This is temporal meanwhile I can finish the migration of all pages
@@ -33,77 +56,69 @@ const routes: Array<RouteObject> = [
       {
         path: 'auth',
         children: [
-          { path: 'login', Component: LoginPage },
-          { path: 'signup', Component: SignupPage },
-          { path: 'forgot-password', Component: ForgotPasswordPage },
-          { path: 'verify-email', Component: VerifyEmailPage },
-          { path: 'reset-password', Component: ResetPasswordPage },
-          {
-            path: 'onboarding',
-            Component: SecurityGuard(OnboardingPage, {
-              redirect: PageURLS.auth.login,
-              requiresAuth: true,
-              featureFlags: [FEATURE_FLAG.isFiguresPageEnabled],
-            }),
-          },
+          { path: 'login', Component: SecureLoginPage },
+          { path: 'signup', Component: SecureSignupPage },
+          { path: 'forgot-password', Component: SecureForgotPasswordPage },
+          { path: 'verify-email', Component: SecureVerifyEmailPage },
+          { path: 'reset-password', Component: SecureResetPasswordPage },
+          { path: 'onboarding', Component: SecureOnboardingPage },
         ],
       },
 
       { path: 'user/:id', Component: UserPage, loader: UserLoader },
-      { path: 'figures', Component: FiguresPage },
-      { path: 'figures/:id', Component: HomePage }, // WIP
-      { path: 'browse', Component: HomePage }, // WIP
-      { path: 'classes', Component: HomePage }, // WIP
-      { path: 'instructor/dashboard', Component: HomePage }, // WIP
+      { path: 'figures', Component: SecureFiguresPage },
+      { path: 'figures/:id', Component: SecureFiguresDetailsPage }, // WIP
+      { path: 'classes', Component: SecureClassesPage }, // WIP
+      { path: 'instructor/dashboard', Component: SecureInstructorDashboardPage }, // WIP
 
       {
         path: 'profile',
         children: [
-          { index: true, Component: HomePage }, // WIP
-          { path: 'edit', Component: HomePage }, // WIP
+          { index: true, Component: SecureProfilePage }, // WIP
+          { path: 'edit', Component: SecureProfileEditPage }, // WIP
         ],
       },
 
       {
         path: 'figure',
         children: [
-          { path: ':id', Component: HomePage }, // WIP
-          { path: 'completed', Component: HomePage }, // WIP
-          { path: 'saved', Component: HomePage }, // WIP
+          { path: ':id', Component: SecureFigureDetailsPage }, // WIP
+          { path: 'completed', Component: SecureFigureCompletedPage }, // WIP
+          { path: 'saved', Component: SecureFigureSavedPage }, // WIP
         ],
       },
 
       {
         path: 'my-account',
         children: [
-          { path: 'subscription', Component: HomePage }, // WIP
-          { path: 'bookings', Component: HomePage }, // WIP
+          { path: 'subscription', Component: SecureMyAccountSubscriptionPage }, // WIP
+          { path: 'bookings', Component: SecureMyAccountBookingsPage }, // WIP
         ],
       },
 
       {
         path: 'studio-rental',
         children: [
-          { path: 'browse', Component: HomePage }, // WIP
-          { path: 'requests', Component: HomePage }, // WIP
+          { path: 'browse', Component: SecureStudioRentalBrowsePage }, // WIP
+          { path: 'requests', Component: SecureStudioRentalRequestsPage }, // WIP
         ],
       },
       {
         path: 'admin',
         children: [
-          { index: true, Component: HomePage }, // WIP
-          { path: 'agenda', Component: HomePage }, // WIP
-          { path: 'agenda/conflicts', Component: HomePage }, // WIP
-          { path: 'inventory', Component: HomePage }, // WIP
-          { path: 'schedule-builder', Component: HomePage }, // WIP
-          { path: 'reports', Component: HomePage }, // WIP
-          { path: 'bookings', Component: HomePage }, // WIP
-          { path: 'payments', Component: HomePage }, // WIP
-          { path: 'merch', Component: HomePage }, // WIP
-          { path: 'merch/pos', Component: HomePage }, // WIP
-          { path: 'figures', Component: HomePage }, // WIP
-          { path: 'access', Component: HomePage }, // WIP
-          { path: 'studio-rental', Component: HomePage }, // WIP
+          { index: true, Component: SecureAdminPage }, // WIP
+          { path: 'agenda', Component: SecureAdminAgendaPage }, // WIP
+          { path: 'agenda/conflicts', Component: SecureAdminAgendaConflictsPage }, // WIP
+          { path: 'inventory', Component: SecureAdminInventoryPage }, // WIP
+          { path: 'schedule-builder', Component: SecureAdminScheduleBuilderPage }, // WIP
+          { path: 'reports', Component: SecureAdminReportsPage }, // WIP
+          { path: 'bookings', Component: SecureAdminBookingsPage }, // WIP
+          { path: 'payments', Component: SecureAdminPaymentsPage }, // WIP
+          { path: 'merch', Component: SecureAdminMerchPage }, // WIP
+          { path: 'merch/pos', Component: SecureAdminMerchPosPage }, // WIP
+          { path: 'figures', Component: SecureAdminFiguresPage }, // WIP
+          { path: 'access', Component: SecureAdminAccessPage }, // WIP
+          { path: 'studio-rental', Component: SecureAdminStudioRentalPage }, // WIP
         ],
       },
       { path: '*', Component: Error404Page },

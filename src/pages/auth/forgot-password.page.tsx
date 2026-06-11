@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
 import { ForgotPasswordForm } from '@components/forms';
+import { FEATURE_FLAG, SecurityGuard } from '@contexts';
+import { PageURLS } from '@core/constants';
 
 export function ForgotPasswordPage() {
   const { t } = useTranslation();
@@ -20,3 +22,9 @@ export function ForgotPasswordPage() {
     </div>
   );
 }
+
+export const SecureForgotPasswordPage = SecurityGuard(ForgotPasswordPage, {
+  redirect: PageURLS.home,
+  requiresNoAuth: true,
+  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled, FEATURE_FLAG.isForgotPasswordPageEnabled],
+});

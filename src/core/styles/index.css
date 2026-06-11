@@ -175,7 +175,7 @@
   /*
    * STATES
    */
-  --color-background: var(--color-secondary-300);
+  --color-background: var(--color-secondary-50);
   --color-background-paper: var(--color-neutral-50);
   --color-background-disabled: var(--color-neutral-100);
   --color-foreground: hsl(32 54% 13%);

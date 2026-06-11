@@ -4,9 +4,10 @@ import {
   FigureCatalogSidebarFilters,
   FiguresHeader,
 } from '@components/modules';
+import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { useFigures } from '@hooks';
 
-export function FiguresPage() {
+function FiguresPage() {
   const { filters, setFilters, figures, isLoading, hasMore, total, loadNextPage } = useFigures();
 
   return (
@@ -28,3 +29,7 @@ export function FiguresPage() {
     </main>
   );
 }
+
+export const SecureFiguresPage = SecurityGuard(FiguresPage, {
+  featureFlags: [FEATURE_FLAG.isFiguresPageEnabled],
+});

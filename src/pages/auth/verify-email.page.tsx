@@ -3,12 +3,13 @@ import { useTranslation } from 'react-i18next';
 import { Link, useSearchParams } from 'react-router';
 
 import { Button } from '@components/ui';
-import { useAuth } from '@contexts';
+import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
 import { DansshipAPIError } from '@core/api';
+import { PageURLS } from '@core/constants';
 
 type VerifyState = 'idle' | 'verifying' | 'verified' | 'failed';
 
-export function VerifyEmailPage() {
+function VerifyEmailPage() {
   const { t } = useTranslation();
   const { verifyEmail, resendVerification } = useAuth();
   const [searchParams] = useSearchParams();
@@ -123,3 +124,9 @@ export function VerifyEmailPage() {
     </div>
   );
 }
+
+export const SecureVerifyEmailPage = SecurityGuard(VerifyEmailPage, {
+  redirect: PageURLS.home,
+  requiresNoAuth: true,
+  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled, FEATURE_FLAG.isVerifyEmailPageEnabled],
+});

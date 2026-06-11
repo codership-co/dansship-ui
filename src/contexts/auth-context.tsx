@@ -309,11 +309,19 @@ interface SecurityGuardOptions {
   featureFlags?: Array<FEATURE_FLAG>;
   redirect?: string;
   requiresAuth?: boolean;
+  requiresNoAuth?: boolean;
 }
 
 export function SecurityGuard(
   Component: React.ComponentType,
-  { orPermissions, andPermissions, featureFlags = [], redirect, requiresAuth }: SecurityGuardOptions = {},
+  {
+    orPermissions,
+    andPermissions,
+    featureFlags = [],
+    redirect,
+    requiresAuth,
+    requiresNoAuth,
+  }: SecurityGuardOptions = {},
 ): React.ComponentType {
   function Guard() {
     const { isAuthenticated, requireOnboarding } = useAuth();
@@ -324,7 +332,7 @@ export function SecurityGuard(
     return useMemo(() => {
       const { pathname } = location;
 
-      if (requiresAuth && !isAuthenticated) {
+      if ((requiresAuth && !isAuthenticated) || (requiresNoAuth && isAuthenticated)) {
         return redirect ? <Navigate to={redirect} state={{ from: location }} replace /> : <Error404Page />;
       }
 

@@ -3,11 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import { ResetPasswordForm } from '@components/forms';
-import { useAuth } from '@contexts';
+import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
+import { PageURLS } from '@core/constants';
 
 import type { ResetPasswordPayload } from '@core/api';
 
-export function ResetPasswordPage() {
+function ResetPasswordPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -40,3 +41,9 @@ export function ResetPasswordPage() {
     </div>
   );
 }
+
+export const SecureResetPasswordPage = SecurityGuard(ResetPasswordPage, {
+  redirect: PageURLS.home,
+  requiresNoAuth: true,
+  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled, FEATURE_FLAG.isResetPasswordPageEnabled],
+});

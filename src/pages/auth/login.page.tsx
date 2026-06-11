@@ -3,11 +3,11 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 
 import { LoginForm, type LoginFormData } from '@components/forms';
-import { useAuth } from '@contexts';
+import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
 import { getRedirectPathByRole } from '@helpers';
 
-export function LoginPage() {
+function LoginPage() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
@@ -65,3 +65,9 @@ export function LoginPage() {
     </div>
   );
 }
+
+export const SecureLoginPage = SecurityGuard(LoginPage, {
+  redirect: PageURLS.home,
+  requiresNoAuth: true,
+  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled, FEATURE_FLAG.isLoginPageEnabled],
+});
