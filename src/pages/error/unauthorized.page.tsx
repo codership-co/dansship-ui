@@ -10,25 +10,23 @@ export function UnauthorizedPage() {
   const { t } = useTranslation();
 
   return (
-    <main className='flex items-center justify-center px-6 pt-20'>
-      <ErrorLayout
-        hero='Ooops'
-        title={t('unauthorized:title')}
-        description={t('unauthorized:description')}
-        image={<Unauthorized className='h-50 mx-auto' />}
-        actions={
-          <>
-            <Link to={PageURLS.home}>
-              <Button>{t('unauthorized:backToHome')}</Button>
-            </Link>
+    <ErrorLayout
+      hero='Ooops'
+      title={t('unauthorized:title')}
+      description={t('unauthorized:description')}
+      image={<Unauthorized className='h-50 mx-auto' />}
+      actions={
+        <>
+          <Link to={PageURLS.home}>
+            <Button>{t('unauthorized:backToHome')}</Button>
+          </Link>
 
-            <Button onClick={() => window.history.back()} variant='outline'>
-              {t('unauthorized:back')}
-            </Button>
-          </>
-        }
-        footer={t('unauthorized:joke')}
-      />
-    </main>
+          <Button onClick={() => window.history.back()} variant='outline'>
+            {t('unauthorized:back')}
+          </Button>
+        </>
+      }
+      footer={t('unauthorized:joke')}
+    />
   );
 }

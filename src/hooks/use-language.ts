@@ -1,27 +1,37 @@
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { useAuth } from '@contexts';
 import { DansshipAPI } from '@core/api';
-import { type LanguageCode, languages } from '@core/constants';
-
-const AUTH_SESSION_KEY = 'auth_session';
-
-const isAuthenticatedSession = () => localStorage.getItem(AUTH_SESSION_KEY) === '1';
+import { defaultLanguage, type LanguageCode, languages } from '@core/constants';
 
 export const useLanguage = () => {
   const { i18n } = useTranslation();
+  const { isAuthenticated } = useAuth();
 
-  const changeLanguage = (code: LanguageCode) => {
-    i18n.changeLanguage(code);
-    localStorage.setItem('preferredLanguage', code);
+  const changeLanguage = useCallback(
+    (code: LanguageCode) => {
+      i18n.changeLanguage(code);
 
-    if (!isAuthenticatedSession()) {
-      return;
+      if (isAuthenticated) {
+        void DansshipAPI.auth.updatePreferredLanguage({ preferred_language: code });
+      }
+    },
+    [i18n, isAuthenticated],
+  );
+
+  const currentLanguage = useMemo(() => {
+    const i18nLanguage = languages.find(lang => lang.code === i18n.language);
+    const navigatorLanguage = languages.find(lang => lang.code === (navigator.language.split('-')[0] as LanguageCode));
+
+    const finalLanguage = i18nLanguage || navigatorLanguage || defaultLanguage;
+
+    if (finalLanguage.code !== i18n.language) {
+      changeLanguage(finalLanguage.code);
     }
 
-    void DansshipAPI.auth.updatePreferredLanguage({ preferred_language: code });
-  };
-
-  const currentLanguage = languages.find(lang => lang.code === i18n.language);
+    return finalLanguage;
+  }, [changeLanguage, i18n.language]);
 
   return {
     currentLanguage,

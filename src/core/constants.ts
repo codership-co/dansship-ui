@@ -5,6 +5,7 @@ export const languages = [
 
 export const languageCodes = languages.map(l => l.code);
 export type LanguageCode = (typeof languageCodes)[number];
+export const defaultLanguage = languages[0];
 
 export const DOCUMENT_TYPE_OPTIONS = [
   { value: 'CC', label: 'C.C. (Cédula de Ciudadanía)' },

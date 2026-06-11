@@ -233,8 +233,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (i18next.language !== user.preferredLanguage) {
       void i18next.changeLanguage(user.preferredLanguage);
     }
-
-    localStorage.setItem('preferredLanguage', user.preferredLanguage);
   }, [user?.preferredLanguage]);
 
   return (

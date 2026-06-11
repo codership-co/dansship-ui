@@ -28,6 +28,7 @@ interface ImportMetaEnv {
   readonly VITE_IS_STUDIO_RENTAL_REQUESTS_PAGE_ENABLED: string;
 
   // ADMIN
+  readonly VITE_ARE_ADMIN_PAGES_ENABLED: string;
   readonly VITE_IS_ADMIN_ACCESS_PAGE_ENABLED: string;
   readonly VITE_IS_ADMIN__PAGE_ENABLED: string;
   readonly VITE_IS_ADMIN_AGENDA_PAGE_ENABLED: string;

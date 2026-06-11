@@ -26,6 +26,7 @@ export enum FEATURE_FLAG {
   isStudioRentalRequestsPageEnabled = 'isStudioRentalRequestsPageEnabled',
 
   // ADMIN
+  areAdminPagesEnabled = 'areAdminPagesEnabled',
   isAdminAccessPageEnabled = 'isAdminAccessPageEnabled',
   isAdminPageEnabled = 'isAdminPageEnabled',
   isAdminAgendaPageEnabled = 'isAdminAgendaPageEnabled',
@@ -78,6 +79,7 @@ export const FeatureFlagsProvider = ({ children }: FeatureFlagsProviderProps) =>
         isStudioRentalRequestsPageEnabled: import.meta.env.VITE_IS_STUDIO_RENTAL_REQUESTS_PAGE_ENABLED === 'true',
 
         // ADMIN
+        areAdminPagesEnabled: import.meta.env.VITE_ARE_ADMIN_PAGES_ENABLED === 'true',
         isAdminAccessPageEnabled: import.meta.env.VITE_IS_ADMIN_ACCESS_PAGE_ENABLED === 'true',
         isAdminPageEnabled: import.meta.env.VITE_IS_ADMIN__PAGE_ENABLED === 'true',
         isAdminAgendaPageEnabled: import.meta.env.VITE_IS_ADMIN_AGENDA_PAGE_ENABLED === 'true',
