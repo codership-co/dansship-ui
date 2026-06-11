@@ -8,7 +8,7 @@ import { MobileMenu } from './mobile-menu';
 
 import { Isotype } from '@components/svg';
 import { Button } from '@components/ui';
-import { FEATURE_FLAG, useAuth, useEnabledFeatureFlag, usePermissions } from '@contexts';
+import { FEATURE_FLAG, useAuth, useEnabledFeatureFlag, useFeatureFlags, usePermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions, InstructorPermissions, PERMISSION } from '@core/permissions';
@@ -34,6 +34,7 @@ export const Navbar = () => {
     () => DansshipAPI.subscriptions.getMySubscriptions(),
     isAuthenticated && !requireOnboarding,
   );
+  const { isLoginPageEnabled, isMyAccountBookingsPageEnabled, isMyAccountSubscriptionPageEnabled } = useFeatureFlags();
 
   const hasActivePlan = response?.data?.summary?.active_count ?? 0 > 0;
 
@@ -69,12 +70,6 @@ export const Navbar = () => {
       featureFlags: [FEATURE_FLAG.isAdminPageEnabled],
     },
   ];
-
-  const cta = !isAuthenticated
-    ? { to: PageURLS.auth.login, label: t('nav:signIn') }
-    : hasActivePlan
-      ? { to: PageURLS.myAccountBookings, label: t('nav:myBookings') }
-      : { to: PageURLS.myAccountSubscription, label: t('nav:buy') };
 
   return (
     <nav className='fixed w-full top-0 left-0 z-50 px-3 pb-2 pt-3 sm:px-5'>
@@ -118,7 +113,13 @@ export const Navbar = () => {
           <div className='ml-auto flex items-center justify-end gap-1.5 sm:gap-2'>
             <LanguageSelector variant='dropdown' />
             <Button asChild>
-              <NavLink to={cta.to}>{cta.label}</NavLink>
+              {!isAuthenticated && isLoginPageEnabled && <NavLink to={PageURLS.auth.login}>{t('nav:signIn')}</NavLink>}
+              {isAuthenticated && hasActivePlan && isMyAccountBookingsPageEnabled && (
+                <NavLink to={PageURLS.myAccountBookings}>{t('nav:myBookings')}</NavLink>
+              )}
+              {isAuthenticated && !hasActivePlan && isMyAccountSubscriptionPageEnabled && (
+                <NavLink to={PageURLS.myAccountSubscription}>{t('nav:buy')}</NavLink>
+              )}
             </Button>
           </div>
         </div>
