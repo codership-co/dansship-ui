@@ -8,7 +8,7 @@ import { MobileMenu } from './mobile-menu';
 
 import { Isotype } from '@components/svg';
 import { Button } from '@components/ui';
-import { FEATURE_FLAG, useAuth, usePermissions } from '@contexts';
+import { FEATURE_FLAG, useAuth, useEnabledFeatureFlag, usePermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions, InstructorPermissions, PERMISSION } from '@core/permissions';
@@ -139,11 +139,15 @@ export const MenuItem = ({
   icon: Icon,
   orPermissions = [],
   andPermissions = [],
+  featureFlags = [],
   className,
   requireAuthentication,
 }: MenuItemProps) => {
   const { isAuthenticated } = useAuth();
   const havePermissions = usePermissions({ orPermissions, andPermissions });
+  const featureFlagsEnabled = useEnabledFeatureFlag(featureFlags);
+
+  if (featureFlagsEnabled) return null;
 
   if (requireAuthentication && !isAuthenticated) return null;
 
