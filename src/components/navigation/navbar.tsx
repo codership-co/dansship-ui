@@ -112,15 +112,21 @@ export const Navbar = () => {
 
           <div className='ml-auto flex items-center justify-end gap-1.5 sm:gap-2'>
             <LanguageSelector variant='dropdown' />
-            <Button asChild>
-              {!isAuthenticated && isLoginPageEnabled && <NavLink to={PageURLS.auth.login}>{t('nav:signIn')}</NavLink>}
-              {isAuthenticated && hasActivePlan && isMyAccountBookingsPageEnabled && (
+            {!isAuthenticated && isLoginPageEnabled && (
+              <Button asChild>
+                <NavLink to={PageURLS.auth.login}>{t('nav:signIn')}</NavLink>
+              </Button>
+            )}
+            {isAuthenticated && hasActivePlan && isMyAccountBookingsPageEnabled && (
+              <Button asChild>
                 <NavLink to={PageURLS.myAccountBookings}>{t('nav:myBookings')}</NavLink>
-              )}
-              {isAuthenticated && !hasActivePlan && isMyAccountSubscriptionPageEnabled && (
+              </Button>
+            )}
+            {isAuthenticated && !hasActivePlan && isMyAccountSubscriptionPageEnabled && (
+              <Button asChild>
                 <NavLink to={PageURLS.myAccountSubscription}>{t('nav:buy')}</NavLink>
-              )}
-            </Button>
+              </Button>
+            )}
           </div>
         </div>
       </div>
