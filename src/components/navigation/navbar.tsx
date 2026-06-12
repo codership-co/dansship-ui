@@ -94,11 +94,7 @@ export const Navbar = () => {
             {navLinks.map(item => (
               <MenuItem
                 key={item.to}
-                to={item.to}
-                label={item.label}
-                icon={item.icon}
-                orPermissions={item.orPermissions}
-                andPermissions={item.andPermissions}
+                {...item}
                 className={({ isActive }) =>
                   `relative font-semibold tracking-tight transition after:absolute after:bottom-[-0.35rem] after:left-0 after:h-0.75 after:w-full after:rounded-full after:bg-primary after:transition-transform after:duration-200 ${
                     isActive

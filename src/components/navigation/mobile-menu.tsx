@@ -168,11 +168,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             {authenticatedPrimaryMenuItems.map(item => (
               <MenuItem
                 key={item.to}
-                to={item.to}
-                label={item.label}
-                icon={item.icon}
-                orPermissions={item.orPermissions}
-                andPermissions={item.andPermissions}
+                {...item}
                 className={({ isActive }) =>
                   `flex items-center gap-2 transition-all after:transition-all pl-2 relative after:rounded-full after:bg-primary-500 after:absolute after:content-[''] after:left-2 after:top-1/2 after:-translate-y-1/2 ${
                     isActive
@@ -189,11 +185,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 return (
                   <MenuItem
                     key={item.to}
-                    to={item.to}
-                    label={item.label}
-                    icon={item.icon}
-                    orPermissions={item.orPermissions}
-                    andPermissions={item.andPermissions}
+                    {...item}
                     className={({ isActive }) =>
                       `flex items-center gap-2 transition-all after:transition-all pl-2 relative after:rounded-full after:bg-primary-500 after:absolute after:content-[''] after:left-2 after:top-1/2 after:-translate-y-1/2 ${
                         isActive
