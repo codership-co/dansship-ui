@@ -34,7 +34,7 @@ export const HomeHero = () => {
             </Link>
 
             <Link to={PageURLS.figures}>
-              <Button variant='secondary'>{t('home:stitch.hero.bookClass')}</Button>
+              <Button variant='secondary'>{t('home:stitch.hero.trackProgress')}</Button>
             </Link>
           </div>
         </div>
