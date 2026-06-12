@@ -39,9 +39,9 @@ export const usePaymentIntents = () => {
       const { error } = await createIntentPromise(payload);
 
       if (error) {
-        toast.error(t('payments.createFailedDesc'));
+        toast.error(t('payments:createFailedDesc'));
       } else {
-        toast.success(t('payments.createSuccess'));
+        toast.success(t('payments:createSuccess'));
       }
     },
     [createIntentPromise, t],
@@ -52,9 +52,9 @@ export const usePaymentIntents = () => {
       const { error } = await cancelIntentPromise(id);
 
       if (error) {
-        toast.error(t('payments.cancelFailedDesc'));
+        toast.error(t('payments:cancelFailedDesc'));
       } else {
-        toast.success(t('payments.cancelSuccess'));
+        toast.success(t('payments:cancelSuccess'));
       }
     },
     [cancelIntentPromise, t],
@@ -65,9 +65,9 @@ export const usePaymentIntents = () => {
       const { error } = await confirmProofUploadPromise(id, payload);
 
       if (error) {
-        toast.error(t('payments.proofUploadFailedDesc'));
+        toast.error(t('payments:proofUploadFailedDesc'));
       } else {
-        toast.success(t('payments.proofUploadSuccess'));
+        toast.success(t('payments:proofUploadSuccess'));
       }
     },
     [confirmProofUploadPromise, t],
@@ -109,7 +109,7 @@ export const usePaymentIntents = () => {
       const { data, error } = await getProofViewUrlPromise(id);
 
       if (error) {
-        toast.error(t('payments.proofViewFailedDesc'));
+        toast.error(t('payments:proofViewFailedDesc'));
       } else {
         window.open(data.view_url, '_blank', 'noopener,noreferrer');
       }
