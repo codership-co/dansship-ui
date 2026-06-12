@@ -154,7 +154,7 @@ export const MenuItem = ({
   const havePermissions = usePermissions({ orPermissions, andPermissions });
   const featureFlagsEnabled = useEnabledFeatureFlag(featureFlags);
 
-  if (featureFlagsEnabled) return null;
+  if (!featureFlagsEnabled) return null;
 
   if (requireAuthentication && !isAuthenticated) return null;
 
