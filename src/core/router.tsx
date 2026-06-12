@@ -67,7 +67,7 @@ const routes: Array<RouteObject> = [
 
       { path: 'user/:id', Component: UserPage, loader: UserLoader },
       { path: 'figures', Component: SecureFiguresPage },
-      { path: 'figures/:id', Component: SecureFiguresDetailsPage }, // WIP
+      { path: 'figures/:id', Component: SecureFiguresDetailsPage },
       { path: 'classes', Component: SecureClassesPage }, // WIP
       { path: 'instructor/dashboard', Component: SecureInstructorDashboardPage }, // WIP
 

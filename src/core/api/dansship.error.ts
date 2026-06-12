@@ -40,7 +40,7 @@ export interface NormalizedError {
 }
 
 export class DansshipAPIError extends HttpClientError<DansshipAPIResponseError> {
-  normalizedError: NormalizedError | null = null;
+  normalizedError: NormalizedError;
 
   constructor(
     readonly body: DansshipAPIResponseError,
@@ -49,10 +49,20 @@ export class DansshipAPIError extends HttpClientError<DansshipAPIResponseError> 
     readonly error?: unknown,
   ) {
     super(body, status, `[DansshipAPIError]: ${message}`, error);
+    this.normalizedError = {
+      category: undefined,
+      detail: '',
+      details: '',
+      errorCode: '',
+      legacyDetail: '',
+      message: '',
+      path: '',
+      status: 0,
+      timestamp: '',
+    };
 
     if (error instanceof Error) {
       this.stack = error.stack ?? '';
-      this.normalizedError = null;
     } else if (typeof error === 'object') {
       this.normalizedError = error as NormalizedError;
     }
