@@ -22,7 +22,6 @@ import {
   SecureAdminStudioRentalPage,
   SecureClassesPage,
   SecureFigureCompletedPage,
-  SecureFigureDetailsPage,
   SecureFigureSavedPage,
   SecureFiguresDetailsPage,
   SecureFiguresPage,
@@ -68,7 +67,7 @@ const routes: Array<RouteObject> = [
       { path: 'user/:id', Component: UserPage, loader: UserLoader },
       { path: 'figures', Component: SecureFiguresPage },
       { path: 'figures/:id', Component: SecureFiguresDetailsPage },
-      { path: 'classes', Component: SecureClassesPage }, // WIP
+      { path: 'classes', Component: SecureClassesPage },
       { path: 'instructor/dashboard', Component: SecureInstructorDashboardPage }, // WIP
 
       {
@@ -82,7 +81,6 @@ const routes: Array<RouteObject> = [
       {
         path: 'figure',
         children: [
-          { path: ':id', Component: SecureFigureDetailsPage }, // WIP
           { path: 'completed', Component: SecureFigureCompletedPage }, // WIP
           { path: 'saved', Component: SecureFigureSavedPage }, // WIP
         ],
@@ -92,15 +90,15 @@ const routes: Array<RouteObject> = [
         path: 'my-account',
         children: [
           { path: 'subscription', Component: SecureMyAccountSubscriptionPage }, // WIP
-          { path: 'bookings', Component: SecureMyAccountBookingsPage }, // WIP
+          { path: 'bookings', Component: SecureMyAccountBookingsPage },
         ],
       },
 
       {
         path: 'studio-rental',
         children: [
-          { path: 'browse', Component: SecureStudioRentalBrowsePage }, // WIP
-          { path: 'requests', Component: SecureStudioRentalRequestsPage }, // WIP
+          { path: 'browse', Component: SecureStudioRentalBrowsePage },
+          { path: 'requests', Component: SecureStudioRentalRequestsPage },
         ],
       },
       {

@@ -1,0 +1,192 @@
+import { format, differenceInDays, isFuture } from 'date-fns';
+import { useTranslation } from 'react-i18next';
+import { LuActivity, LuCalendarDays, LuTicket, LuClock, LuLayers } from 'react-icons/lu';
+
+import { SpinnerLoader } from '@components/loaders';
+import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui';
+import { type ActiveSubscription, DansshipAPI, type SubscriptionStatus } from '@core/api';
+import { useDateLocale, usePromise } from '@hooks';
+
+function statusBadgeVariant(status: SubscriptionStatus): 'default' | 'secondary' | 'destructive' | 'outline' {
+  if (status === 'active') return 'default';
+
+  if (status === 'canceled') return 'destructive';
+
+  if (status === 'pending_payment') return 'outline';
+
+  return 'secondary';
+}
+
+function sortSubscriptions(subscriptions: Array<ActiveSubscription>): Array<ActiveSubscription> {
+  return [...subscriptions].sort((a, b) => {
+    const order: Record<SubscriptionStatus, number> = {
+      pending_payment: 0,
+      active: 1,
+      expired: 3,
+      canceled: 4,
+    };
+    const aOrder = a.status === 'active' && isFuture(new Date(a.start_date)) ? 2 : order[a.status];
+    const bOrder = b.status === 'active' && isFuture(new Date(b.start_date)) ? 2 : order[b.status];
+
+    if (aOrder !== bOrder) return aOrder - bOrder;
+
+    return new Date(a.expiration_date).getTime() - new Date(b.expiration_date).getTime();
+  });
+}
+
+export function ActiveSubscriptionWidget() {
+  const { t } = useTranslation();
+  const locale = useDateLocale();
+  const { response: mySubscriptionsResponse, isLoading } = usePromise(() =>
+    DansshipAPI.subscriptions.getMySubscriptions(),
+  );
+  const subscriptions = mySubscriptionsResponse?.data?.subscriptions ?? [];
+  const summary = mySubscriptionsResponse?.data?.summary;
+  const currentSubscriptions = subscriptions.filter(sub => sub.status === 'active' || sub.status === 'pending_payment');
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className='flex justify-center p-8'>
+          <SpinnerLoader />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (currentSubscriptions.length === 0) {
+    return (
+      <Card className='border-2 border-dashed border-secondary/60 shadow-none'>
+        <CardContent className='p-8 text-center'>
+          <h3 className='mb-2 text-lg font-semibold text-gray-900'>{t('subscriptions:noSubscriptions')}</h3>
+
+          <p className='text-sm text-gray-500'>{t('subscriptions:noSubscriptionsDesc')}</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const sorted = sortSubscriptions(currentSubscriptions);
+
+  return (
+    <div className='space-y-6'>
+      {/* Summary Section */}
+      <Card className='relative overflow-hidden border-secondary/50 shadow-sm'>
+        <div className='absolute top-0 left-0 h-full w-2 bg-primary' />
+
+        <CardHeader className='pb-4 pl-8'>
+          <CardTitle>
+            <span className='flex items-center text-xl'>
+              <LuLayers className='mr-2 h-5 w-5 text-primary' />
+              {t('subscriptions:summary')}
+            </span>
+          </CardTitle>
+        </CardHeader>
+
+        <CardContent className='pl-8'>
+          <div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
+            <div className='flex flex-col'>
+              <div className='mb-2 flex items-center text-gray-500'>
+                <LuTicket className='mr-2 h-4 w-4' />
+                <span className='text-sm font-medium'>{t('subscriptions:totalRemaining')}</span>
+              </div>
+
+              <span className='text-3xl font-extrabold text-gray-900'>{summary?.total_remaining_classes}</span>
+            </div>
+
+            <div className='flex flex-col'>
+              <div className='mb-2 flex items-center text-gray-500'>
+                <LuActivity className='mr-2 h-4 w-4' />
+                <span className='text-sm font-medium'>{t('subscriptions:activePlans')}</span>
+              </div>
+
+              <span className='text-3xl font-extrabold text-gray-900'>{summary?.active_count}</span>
+            </div>
+
+            <div className='flex flex-col'>
+              <div className='mb-2 flex items-center text-gray-500'>
+                <LuCalendarDays className='mr-2 h-4 w-4' />
+                <span className='text-sm font-medium'>{t('subscriptions:nextExpiration')}</span>
+              </div>
+
+              <span className='text-xl font-bold text-gray-900'>
+                {summary?.next_expiration
+                  ? format(new Date(summary?.next_expiration), 'MMM d, yyyy', {
+                      locale,
+                    })
+                  : '—'}
+              </span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Individual Subscription Cards */}
+      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+        {sorted.map(sub => {
+          const expDate = new Date(sub.expiration_date);
+          const daysLeft = differenceInDays(expDate, new Date());
+          const totalClasses = sub.class_count_snapshot;
+          const percentage = totalClasses > 0 ? (sub.remaining_classes / totalClasses) * 100 : 0;
+          const isFutureStart = isFuture(new Date(sub.start_date));
+
+          return (
+            <Card key={sub.id} className='relative overflow-hidden border-input shadow-sm'>
+              <CardHeader>
+                <CardTitle className='text-lg'>{sub.plan_name_snapshot}</CardTitle>
+
+                <CardDescription className='mt-1'>
+                  {sub.class_count_snapshot} {t('subscriptions:classesPackage')}
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent className='space-y-4'>
+                <div className='flex flex-wrap gap-2'>
+                  {isFutureStart && (
+                    <Badge variant='outline' className='border-blue-200 bg-blue-50 text-blue-700'>
+                      <LuClock className='mr-1 h-3 w-3' />
+                      {t('subscriptions:startsOn', {
+                        date: format(new Date(sub.start_date), 'MMM d', { locale }),
+                      })}
+                    </Badge>
+                  )}
+
+                  <Badge variant={statusBadgeVariant(sub.status)}>
+                    {sub.status === 'pending_payment' ? t('subscriptions:pendingPayment') : sub.status}
+                  </Badge>
+                </div>
+
+                <div className='grid grid-cols-2 gap-4'>
+                  <div className='flex flex-col'>
+                    <span className='mb-1 text-sm text-gray-500'>{t('subscriptions:classesRemaining')}</span>
+
+                    <span className='text-2xl font-bold text-gray-900'>{sub.remaining_classes}</span>
+
+                    <div className='mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-100'>
+                      <div
+                        className={`h-full rounded-full ${sub.remaining_classes <= 1 ? 'bg-alert-500' : 'bg-primary'}`}
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className='flex flex-col'>
+                    <span className='mb-1 text-sm text-gray-500'>{t('subscriptions:expires')}</span>
+
+                    <span className='text-lg font-bold text-gray-900'>
+                      {format(expDate, 'MMM d, yyyy', { locale })}
+                    </span>
+
+                    <p className={`mt-1 text-sm font-medium ${daysLeft <= 3 ? 'text-alert-500' : 'text-gray-500'}`}>
+                      {daysLeft > 0 ? t('subscriptions:daysLeft', { count: daysLeft }) : t('subscriptions:expired')}
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </div>
+  );
+}

@@ -6,7 +6,6 @@ export * from './user.page';
 export * from './classes.page';
 export * from './figures.page';
 export * from './profile.page';
-export * from './figure-details.page';
 export * from './figure-saved.page';
 export * from './profile-edit.page';
 export * from './figures-details.page';

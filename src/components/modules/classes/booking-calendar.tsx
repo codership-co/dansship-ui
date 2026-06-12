@@ -10,6 +10,7 @@ import { SpinnerLoader } from '@components/loaders';
 import { Button } from '@components/ui';
 import { useAuth } from '@contexts';
 import { DansshipAPI, PublishedClass } from '@core/api';
+import { PageURLS } from '@core/constants';
 import { useDateLocale, usePromise } from '@hooks';
 
 // Helpers to get current week Monday string
@@ -60,7 +61,7 @@ export function BookingCalendar() {
   const summary = mySubscriptionsResponse?.data?.summary ?? null;
 
   const redirectToLogin = () => {
-    navigate('/login', { state: { from: location } });
+    navigate(PageURLS.auth.login, { state: { from: location } });
   };
 
   useEffect(() => {
