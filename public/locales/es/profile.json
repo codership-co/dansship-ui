@@ -96,5 +96,17 @@
   "displayName": "Nombre público",
   "displayNamePlaceholder": "Cómo aparecerá tu nombre públicamente",
   "noEditableInstructorFields": "No hay campos específicos de instructor disponibles para tus roles actuales.",
-  "fetchFailed": "Error al obtener el perfil"
+  "fetchFailed": "Error al obtener el perfil",
+  "completion": "Completitud del perfil",
+  "about": "Acerca de",
+  "accountScope": "Información de identidad y cuenta compartida en todos tus roles.",
+  "noBio": "Aún no hay una biografía disponible.",
+  "lastUpdated": "Última actualización",
+  "studentSectionTitle": "Perfil de estudiante",
+  "studentSectionDescription": "Actividad de aprendizaje y suscripciones vinculadas a tu cuenta de usuario.",
+  "instructorSectionDescription": "Información pública de enseñanza mostrada a los estudiantes.",
+  "notSet": "No configurado",
+  "adminSectionTitle": "Acceso de administrador",
+  "adminSectionDescription": "Las capacidades administrativas se gestionan mediante roles y permisos.",
+  "permissionsCount": "permisos asignados"
 }
