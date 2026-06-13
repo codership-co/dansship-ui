@@ -36,7 +36,7 @@ export const Navbar = () => {
   );
   const { isLoginPageEnabled, isMyAccountBookingsPageEnabled, isMyAccountSubscriptionPageEnabled } = useFeatureFlags();
 
-  const hasActivePlan = response?.data?.summary?.active_count ?? 0 > 0;
+  const hasActivePlan = (response?.data?.summary?.active_count ?? 0) > 0;
 
   const navLinks: Array<NavItem> = [
     { to: PageURLS.figures, label: t('nav:menuFigures'), featureFlags: [FEATURE_FLAG.isFiguresPageEnabled] },
@@ -92,17 +92,7 @@ export const Navbar = () => {
 
           <div className='hidden items-center gap-8 lg:flex'>
             {navLinks.map(item => (
-              <MenuItem
-                key={item.to}
-                {...item}
-                className={({ isActive }) =>
-                  `relative font-semibold tracking-tight transition after:absolute after:bottom-[-0.35rem] after:left-0 after:h-0.75 after:w-full after:rounded-full after:bg-primary after:transition-transform after:duration-200 ${
-                    isActive
-                      ? 'text-primary after:scale-x-100'
-                      : 'text-foreground/80 after:scale-x-0 hover:text-primary hover:after:scale-x-100'
-                  }`
-                }
-              />
+              <MenuItem key={item.to} {...item} variant='navbar' />
             ))}
           </div>
 
@@ -133,7 +123,7 @@ export const Navbar = () => {
 };
 
 interface MenuItemProps extends NavItem {
-  className?: NavLinkProps['className'];
+  variant: 'navbar' | 'aside';
 }
 
 export const MenuItem = ({
@@ -143,8 +133,8 @@ export const MenuItem = ({
   orPermissions = [],
   andPermissions = [],
   featureFlags = [],
-  className,
   requireAuthentication,
+  variant,
 }: MenuItemProps) => {
   const { isAuthenticated } = useAuth();
   const havePermissions = usePermissions({ orPermissions, andPermissions });
@@ -156,8 +146,22 @@ export const MenuItem = ({
 
   if (!havePermissions) return null;
 
+  const navbarClassName: NavLinkProps['className'] = ({ isActive }) =>
+    `relative font-semibold tracking-tight transition after:absolute after:bottom-[-0.35rem] after:left-0 after:h-0.75 after:w-full after:rounded-full after:bg-primary after:transition-transform after:duration-200 ${
+      isActive
+        ? 'text-primary after:scale-x-100'
+        : 'text-foreground/80 after:scale-x-0 hover:text-primary hover:after:scale-x-100'
+    }`;
+
+  const asideClassName: NavLinkProps['className'] = ({ isActive }) =>
+    `flex items-center gap-2 transition-all after:transition-all pl-2 relative after:rounded-full after:bg-primary-500 after:absolute after:content-[''] after:left-2 after:top-1/2 after:-translate-y-1/2 ${
+      isActive
+        ? 'after:w-1 after:h-1 pl-6 font-semibold text-primary'
+        : 'hover:after:w-1 hover:after:h-1 hover:pl-6 text-gray-600 hover:text-primary'
+    }`;
+
   return (
-    <NavLink to={to} className={className}>
+    <NavLink to={to} className={variant === 'navbar' ? navbarClassName : asideClassName}>
       {Icon ? <Icon className='h-4 w-4' /> : null}
       {label}
     </NavLink>

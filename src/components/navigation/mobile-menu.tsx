@@ -166,36 +166,14 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         <div className='p-4 flex-1 flex flex-col min-h-0'>
           <nav className='space-y-4 overflow-y-auto'>
             {authenticatedPrimaryMenuItems.map(item => (
-              <MenuItem
-                key={item.to}
-                {...item}
-                className={({ isActive }) =>
-                  `flex items-center gap-2 transition-all after:transition-all pl-2 relative after:rounded-full after:bg-primary-500 after:absolute after:content-[''] after:left-2 after:top-1/2 after:-translate-y-1/2 ${
-                    isActive
-                      ? 'after:w-1 after:h-1 pl-6 font-semibold text-primary'
-                      : 'hover:after:w-1 hover:after:h-1 hover:pl-6 text-gray-600 hover:text-primary'
-                  }`
-                }
-              />
+              <MenuItem key={item.to} {...item} variant='aside' />
             ))}
 
             <div className='py-2 space-y-2'>
               <span className='text-sm font-bold text-gray-400 uppercase tracking-wider'>{t('nav:admin')}</span>
-              {adminMenuItems.map(item => {
-                return (
-                  <MenuItem
-                    key={item.to}
-                    {...item}
-                    className={({ isActive }) =>
-                      `flex items-center gap-2 transition-all after:transition-all pl-2 relative after:rounded-full after:bg-primary-500 after:absolute after:content-[''] after:left-2 after:top-1/2 after:-translate-y-1/2 ${
-                        isActive
-                          ? 'after:w-1 after:h-1 pl-6 font-semibold text-primary'
-                          : 'hover:after:w-1 hover:after:h-1 hover:pl-6 text-gray-600 hover:text-primary'
-                      }`
-                    }
-                  />
-                );
-              })}
+              {adminMenuItems.map(item => (
+                <MenuItem key={item.to} {...item} variant='aside' />
+              ))}
             </div>
           </nav>
 
