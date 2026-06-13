@@ -5,5 +5,6 @@ export * from './figure-catalog-mobile-filters';
 export * from './figure-catalog-results';
 export * from './figure-catalog-sidebar-filters';
 export * from './figures-header';
+export * from './saved-figures';
 export * from './saved-figures-list';
 export * from './saved-stats';

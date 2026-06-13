@@ -58,7 +58,6 @@ export const PageURLS = {
   instructorDashboard: '/instructor/dashboard',
   profile: '/profile',
   profileEdit: '/profile/edit',
-  figureById: (id: number) => `/figure/${id}`,
   figureCompleted: '/figure/completed',
   figureSaved: '/figure/saved',
   myAccountSubscription: '/my-account/subscription',
