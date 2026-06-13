@@ -1,9 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
-import { PlanSelector } from '../plan-selector';
-
 import { Section, SectionHeading } from '@components/containers';
+import { PlanSelector } from '@components/modules';
 import { useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
 
