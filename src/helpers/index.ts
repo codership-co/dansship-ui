@@ -6,4 +6,3 @@ export * from './figure-mappers';
 export * from './figure-utils';
 export * from './payments';
 export * from './role-redirect';
-export * from './user-mappers';
