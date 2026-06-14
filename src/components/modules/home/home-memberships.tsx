@@ -13,9 +13,9 @@ export const HomeMemberships = () => {
   const plansPath = isAuthenticated ? PageURLS.myAccountSubscription : PageURLS.auth.login;
 
   return (
-    <Section id='planes' className='text-center'>
+    <Section id='planes'>
       <SectionHeading
-        className='mx-auto max-w-2xl'
+        className='mx-auto max-w-2xl text-center'
         centered
         intro={t('home:stitch.membership.kicker')}
         title={t('home:stitch.membership.title')}
@@ -24,12 +24,13 @@ export const HomeMemberships = () => {
         })}
       />
 
-      <div className='mx-auto mt-8 max-w-6xl text-left'>
+      <div className='mx-auto mt-8 max-w-6xl'>
         <PlanSelector />
       </div>
 
-      <p className='mx-auto mt-8 max-w-2xl text-[0.92rem] leading-relaxed text-muted-foreground'>
-        {t('home:stitch.membership.helpText')}{' '}
+      <p className='text-center mx-auto mt-8 max-w-2xl text-[0.92rem] text-muted-foreground'>
+        {t('home:stitch.membership.helpText')}
+        <br />
         <Link to={plansPath} className='font-semibold text-primary underline-offset-2 transition hover:underline'>
           {t('home:stitch.membership.viewAllPlans')}
         </Link>

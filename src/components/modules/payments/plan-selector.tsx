@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from 'react-router';
 
 import { CheckoutModal } from './checkout-modal';
 
-import { Spinner } from '@components/loaders';
+import { SpinnerLoader } from '@components/loaders';
 import { Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui';
 import { useAuth } from '@contexts';
 import { DansshipAPI, type PublicPlan } from '@core/api';
@@ -31,9 +31,8 @@ export function PlanSelector() {
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { response: publicPlans, isLoading: isLoadingPublicPlans } = usePromise(
-    () => DansshipAPI.subscriptions.getPublicPlans(),
-    isAuthenticated,
+  const { response: publicPlans, isLoading: isLoadingPublicPlans } = usePromise(() =>
+    DansshipAPI.subscriptions.getPublicPlans(),
   );
 
   const [selectedPlan, setSelectedPlan] = useState<PublicPlan | null>(null);
@@ -83,11 +82,7 @@ export function PlanSelector() {
   };
 
   if (isLoadingPublicPlans) {
-    return (
-      <div className='flex justify-center p-12'>
-        <Spinner />
-      </div>
-    );
+    return <SpinnerLoader />;
   }
 
   if (displayPlans.length === 0) {
@@ -100,8 +95,8 @@ export function PlanSelector() {
   }
 
   return (
-    <div className='space-y-4 sm:space-y-6'>
-      <div className='grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-3'>
+    <div className='bg-gradient-plan-selector rounded-2xl mt-16 mx-6 lg:mx-0'>
+      <div className='grid grid-cols-1 gap-8 lg:grid-cols-3'>
         {displayPlans.map(plan => {
           const price = getPrice(plan.price);
           const isFeatured = plan.is_recommended === true;
@@ -112,12 +107,12 @@ export function PlanSelector() {
               className={cn(
                 'relative flex h-auto flex-col',
                 isFeatured
-                  ? 'border-primary/30 bg-primary text-primary-foreground shadow-lg transition-transform duration-300 hover:-translate-y-1 lg:-translate-y-4 lg:h-full'
-                  : 'border-secondary/50 bg-secondary shadow-none transition-colors duration-200 hover:bg-secondary lg:h-full',
+                  ? 'bg-gradient-plan-recommended text-primary shadow-[0_2rem_3rem_-1rem_var(--color-primary)] hover:shadow-[0_3rem_2.7rem_-1.5rem_var(--color-primary)] transition-all w-[calc(100%+48px)] left-[-24px] lg:w-auto md:-translate-y-8 duration-300 md:hover:-translate-y-10 lg:h-full border-0'
+                  : 'bg-transparent border-0 shadow-none',
               )}
             >
               {isFeatured && (
-                <div className='pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-highlight/90 px-4 py-1 text-xs font-semibold uppercase tracking-[0.06em] text-primary shadow-[inset_0_0_0_2px_rgba(255,255,255,0.22)]'>
+                <div className='pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-highlight px-4 py-1 text-xs font-semibold uppercase text-primary'>
                   {t('subscriptions:bestValue')}
                 </div>
               )}
@@ -149,11 +144,16 @@ export function PlanSelector() {
                 <div className='mb-5 flex items-end gap-1.5 sm:mb-7 sm:gap-2'>
                   <span
                     className={cn(
-                      'plan-price-amount text-[3.25rem] font-extrabold leading-none sm:text-6xl',
+                      'plan-price-amount text-[3rem] font-extrabold leading-none',
                       isFeatured ? 'text-primary-foreground' : 'text-accent-foreground',
                     )}
                   >
-                    ${price.toFixed(0)}
+                    {new Intl.NumberFormat('es-CO', {
+                      style: 'currency',
+                      currency: 'COP',
+                      minimumFractionDigits: 0,
+                      maximumFractionDigits: 0,
+                    }).format(price)}
                   </span>
 
                   <span
@@ -225,13 +225,8 @@ export function PlanSelector() {
 
               <CardFooter className='pt-4 sm:pt-6'>
                 <Button
-                  className={cn(
-                    'w-full',
-                    !isFeatured &&
-                      'border border-primary/50 bg-secondary text-primary shadow-[0_14px_30px_-24px_rgba(88,47,89,0.55)] hover:bg-secondary',
-                  )}
-                  variant={isFeatured ? 'outline' : 'secondary'}
-                  size='lg'
+                  className='w-full'
+                  variant={isFeatured ? 'default' : 'secondary'}
                   onClick={() => handleSelectPlan(plan)}
                 >
                   {t('subscriptions:choosePlan', { name: plan.name })}

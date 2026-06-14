@@ -28,21 +28,20 @@ export const HomeAppFeature = () => {
   const { t } = useTranslation();
 
   return (
-    <section id='tracking' className='p-0 bg-secondary'>
+    <section id='tracking' className='p-0 bg-secondary lg:mt-8'>
       <div className='mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8'>
-        <div className='relative grid grid-cols-1 items-center gap-5 lg:grid-cols-[1fr_1fr]'>
-          <div className='self-end'>
+        <div className='relative grid grid-cols-1 items-center gap-4 lg:grid-cols-[1fr_1fr]'>
+          <div className='self-end relative'>
             <img
               src='/assets/images/home/app.png'
               alt={t('home:stitch.app.imageAlt')}
-              className='hidden h-150 max-w-none object-contain lg:block'
+              className='hidden h-180 w-140 max-w-none object-cover lg:block absolute bottom-0 right-0'
               loading='lazy'
             />
           </div>
 
-          <div className='flex flex-col gap-7 pr-5 pb-7 pt-6 sm:pr-8 sm:pt-8 lg:pr-12 lg:pb-10 '>
+          <div className='flex flex-col gap-4 pr-5 py-7 sm:pr-8 sm:py-8 lg:pr-12 lg:py-20 '>
             <SectionHeading
-              className='space-y-2'
               intro={t('home:stitch.progress.kicker')}
               title={t('home:stitch.progress.title')}
               subtitle={t('home:stitch.progress.subtitle')}
@@ -60,18 +59,16 @@ export const HomeAppFeature = () => {
                     </span>
 
                     <div>
-                      <h6 className='text-primary'>{t(feature.titleKey)}</h6>
+                      <label className='text-primary font-bold block m-0'>{t(feature.titleKey)}</label>
 
-                      <p className='mt-1 text-[0.84rem] leading-relaxed text-muted-foreground'>
-                        {t(feature.descriptionKey)}
-                      </p>
+                      <label className='mt-0.5 text-muted-foreground block m-0'>{t(feature.descriptionKey)}</label>
                     </div>
                   </div>
                 </div>
               );
             })}
 
-            <div className='flex flex-col gap-2.5 sm:max-w-90 sm:flex-row'>
+            <div className='flex flex-col gap-2.5 sm:max-w-90 sm:flex-row mt-8'>
               <Button asChild>
                 <Link to={PageURLS.figures}>{t('home:stitch.progress.actions.viewAllFigures')}</Link>
               </Button>

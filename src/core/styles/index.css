@@ -11,9 +11,9 @@
 }
 
 :root {
-  /*
+  /* ================================================
    * CONFIG VARIABLES
-   */
+   * ================================================ */
   --light-base: #fff;
   --dark-base: #000;
   --scale-step: 20%;
@@ -32,9 +32,9 @@
   --animate-fade-in-down: fade-in-down 300ms ease-out forwards;
   --animate-glitch: glitch 1s linear infinite;
 
-  /*
+  /* ================================================
    * COLORS
-   */
+   * ================================================ */
   --color-active: hsl(147 100% 35%);
   --color-alert: hsl(359 90% 62%);
   --color-warning: hsl(38 100% 50%);
@@ -45,9 +45,10 @@
   --color-highlight: hsl(347 94% 82%);
   --color-white: hsl(0 0 100%);
   --color-black: hsl(0 0 0%);
-  /*
+
+  /* ================================================
    * ACTIVE
-   */
+   * ================================================ */
   --color-active-50: color-mix(in hsl, var(--color-active) var(--scale-50), var(--light-base));
   --color-active-100: color-mix(in hsl, var(--color-active) var(--scale-100), var(--light-base));
   --color-active-200: color-mix(in hsl, var(--color-active) var(--scale-200), var(--light-base));
@@ -59,9 +60,10 @@
   --color-active-800: color-mix(in hsl, var(--color-active) var(--scale-800), var(--dark-base));
   --color-active-900: color-mix(in hsl, var(--color-active) var(--scale-900), var(--dark-base));
   --color-active-foreground: var(--color-active-50);
-  /*
+
+  /* ================================================
    * ALERT
-   */
+   * ================================================ */
   --color-alert-50: color-mix(in hsl, var(--color-alert) var(--scale-50), var(--light-base));
   --color-alert-100: color-mix(in hsl, var(--color-alert) var(--scale-100), var(--light-base));
   --color-alert-200: color-mix(in hsl, var(--color-alert) var(--scale-200), var(--light-base));
@@ -73,9 +75,10 @@
   --color-alert-800: color-mix(in hsl, var(--color-alert) var(--scale-800), var(--dark-base));
   --color-alert-900: color-mix(in hsl, var(--color-alert) var(--scale-900), var(--dark-base));
   --color-alert-foreground: var(--color-alert-50);
-  /*
+
+  /* ================================================
    * WARNING
-   */
+   * ================================================ */
   --color-warning-50: color-mix(in hsl, var(--color-warning) var(--scale-50), var(--light-base));
   --color-warning-100: color-mix(in hsl, var(--color-warning) var(--scale-100), var(--light-base));
   --color-warning-200: color-mix(in hsl, var(--color-warning) var(--scale-200), var(--light-base));
@@ -87,9 +90,10 @@
   --color-warning-800: color-mix(in hsl, var(--color-warning) var(--scale-800), var(--dark-base));
   --color-warning-900: color-mix(in hsl, var(--color-warning) var(--scale-900), var(--dark-base));
   --color-warning-foreground: var(--color-warning-50);
-  /*
+
+  /* ================================================
    * INFO
-   */
+   * ================================================ */
   --color-info-50: color-mix(in hsl, var(--color-info) var(--scale-50), var(--light-base));
   --color-info-100: color-mix(in hsl, var(--color-info) var(--scale-100), var(--light-base));
   --color-info-200: color-mix(in hsl, var(--color-info) var(--scale-200), var(--light-base));
@@ -101,9 +105,10 @@
   --color-info-800: color-mix(in hsl, var(--color-info) var(--scale-800), var(--dark-base));
   --color-info-900: color-mix(in hsl, var(--color-info) var(--scale-900), var(--dark-base));
   --color-info-foreground: var(--color-info-50);
-  /*
+
+  /* ================================================
    * NEUTRAL
-   */
+   * ================================================ */
   --color-neutral: hsl(0 0 53%);
   --color-neutral-50: color-mix(in hsl, var(--color-neutral) var(--scale-50), var(--light-base));
   --color-neutral-100: color-mix(in hsl, var(--color-neutral) var(--scale-100), var(--light-base));
@@ -116,9 +121,10 @@
   --color-neutral-800: color-mix(in hsl, var(--color-neutral) var(--scale-800), var(--dark-base));
   --color-neutral-900: color-mix(in hsl, var(--color-neutral) var(--scale-900), var(--dark-base));
   --color-neutral-foreground: var(--color-neutral-50);
-  /*
+
+  /* ================================================
    * PRIMARY
-   */
+   * ================================================ */
   --color-primary-50: color-mix(in hsl, var(--color-primary) var(--scale-50), var(--light-base));
   --color-primary-100: color-mix(in hsl, var(--color-primary) var(--scale-100), var(--light-base));
   --color-primary-200: color-mix(in hsl, var(--color-primary) var(--scale-200), var(--light-base));
@@ -130,9 +136,10 @@
   --color-primary-800: color-mix(in hsl, var(--color-primary) var(--scale-800), var(--dark-base));
   --color-primary-900: color-mix(in hsl, var(--color-primary) var(--scale-900), var(--dark-base));
   --color-primary-foreground: var(--color-primary-50);
-  /*
+
+  /* ================================================
    * SECONDARY
-   */
+   * ================================================ */
   --color-secondary-50:color-mix(in hsl, var(--color-secondary) var(--scale-50), var(--light-base));
   --color-secondary-100: color-mix(in hsl, var(--color-secondary) var(--scale-100), var(--light-base));
   --color-secondary-200: color-mix(in hsl, var(--color-secondary) var(--scale-200), var(--light-base));
@@ -144,9 +151,10 @@
   --color-secondary-800: color-mix(in hsl, var(--color-secondary) var(--scale-800), var(--dark-base));
   --color-secondary-900: color-mix(in hsl, var(--color-secondary) var(--scale-900), var(--dark-base));
   --color-secondary-foreground: var(--color-secondary-900);
-  /*
+
+  /* ================================================
    * TERTIARY
-   */
+   * ================================================ */
   --color-tertiary-50: color-mix(in hsl, var(--color-tertiary) var(--scale-50), var(--light-base));
   --color-tertiary-100: color-mix(in hsl, var(--color-tertiary) var(--scale-100), var(--light-base));
   --color-tertiary-200: color-mix(in hsl, var(--color-tertiary) var(--scale-200), var(--light-base));
@@ -158,9 +166,10 @@
   --color-tertiary-800: color-mix(in hsl, var(--color-tertiary) var(--scale-800), var(--dark-base));
   --color-tertiary-900: color-mix(in hsl, var(--color-tertiary) var(--scale-900), var(--dark-base));
   --color-tertiary-foreground: var(--color-tertiary-50);
-  /*
+
+  /* ================================================
    * HIGHLIGHT
-   */
+   * ================================================ */
   --color-highlight-50: color-mix(in hsl, var(--color-highlight) var(--scale-50), var(--light-base));
   --color-highlight-100: color-mix(in hsl, var(--color-highlight) var(--scale-100), var(--light-base));
   --color-highlight-200: color-mix(in hsl, var(--color-highlight) var(--scale-200), var(--light-base));
@@ -172,9 +181,10 @@
   --color-highlight-800: color-mix(in hsl, var(--color-highlight) var(--scale-800), var(--dark-base));
   --color-highlight-900: color-mix(in hsl, var(--color-highlight) var(--scale-900), var(--dark-base));
   --color-highlight-foreground: var(--color-highlight-50);
-  /*
+
+  /* ================================================
    * STATES
-   */
+   * ================================================ */
   --color-background: var(--color-secondary-50);
   --color-background-paper: var(--color-neutral-50);
   --color-background-disabled: var(--color-neutral-100);
@@ -193,48 +203,53 @@
   --color-error-container: hsl(12 100% 92%);
   --color-tertiary-container: hsl(343 44% 28%);
   --color-on-tertiary-container: hsl(347 66% 74%);
-  /*
+
+  /* ================================================
    * TYPOGRAPHY
-   */
+   * ================================================ */
   --font-main: 'Montserrat Alternates', 'Segoe UI', sans-serif;
   --font-title: 'Josefin Sans', var(--font-main);
   --font-brand: guntertest, var(--font-title);
   --font-code: ui-monospace, Consolas, monospace;
   --text-small: 0.75rem;
-  --text-small--line-height: 140%;
+  --text-small--line-height: 1.6;
   --text-small--font-weight: regular;
   --text-label: 0.875rem;
-  --text-label--line-height: 140%;
-  --text-body: clamp(0.8rem, 2.4vw, 1rem);
-  --text-body--line-height: 140%;
-  --text-header4: clamp(1.2rem, 2vw, 1.5rem);
-  --text-header4--line-height: 100%;
+  --text-label--line-height: 1.6;
+  /* BODY */
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+  --text-body--font-weight: regular;
+  --text-body--letter-spacing: 0;
+  /* HEADER4 */
+  --text-header4: clamp(1.2rem, 3vw, 1.5rem); /* min=19.2px, max=24px, screen=[640px, 800px] */
+  --text-header4--line-height: 1.4;
   --text-header4--font-weight: bold;
   --text-header4--letter-spacing: 0;
-  --font-header4: var(--font-title);
-  --text-header3: clamp(1.5rem, 2.4vw, 2rem);
-  --text-header3--line-height: 100%;
+  /* HEADER3 */
+  --text-header3: clamp(1.5rem, 4vw, 2rem); /* min=24px, max=32px, screen=[600px, 800px] */
+  --text-header3--line-height: 1.4;
   --text-header3--font-weight: bold;
-  --text-header3--letter-spacing: 0;
-  --font-header3: var(--font-title);
-  --text-header2: clamp(2rem, 3.6vw, 3rem);
-  --text-header2--line-height: 100%;
+  --text-header3--letter-spacing: -1px;
+  /* HEADER2 */
+  --text-header2: clamp(2rem, 6vw, 3rem); /* min=32px, max=48px, screen=[533px, 800px] */
+  --text-header2--line-height: 1.4;
   --text-header2--font-weight: bold;
   --text-header2--letter-spacing: -2px;
-  --font-header2: var(--font-title);
-  --text-header1: clamp(3rem, 3.6vw, 4rem);
-  --text-header1--line-height: 100%;
+  /* HEADER1 */
+  --text-header1: clamp(3rem, 8vw, 4rem); /* min=48px, max=64px, screen=[600px, 800px] */
+  --text-header1--line-height: 1.4;
   --text-header1--font-weight: bold;
-  --text-header1--letter-spacing: -4px;
-  --font-header1: var(--font-title);
-  --text-hero: clamp(4rem, 7vw, 5rem);
-  --text-hero--line-height: 100%;
+  --text-header1--letter-spacing: -3px;
+  /* HERO */
+  --text-hero: clamp(4rem, 10vw, 5.5rem); /* min=64px, max=88px, screen=[640px, 880px] */
+  --text-hero--line-height: 1.4;
   --text-hero--font-weight: bolder;
   --text-hero--letter-spacing: -4px;
-  --font-hero: var(--font-title);
-  /*
+
+  /* ================================================
    * BREAKPOINTS
-   */
+   * ================================================ */
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
@@ -242,6 +257,9 @@
   --breakpoint-2xl: 1536px;
   --spacing: 0.25rem;
   --radius: 0.25rem;
+
+  --background-image-gradient-plan-recommended: linear-gradient(to bottom, var(--color-primary-500), var(--color-primary-300));
+  --background-image-gradient-plan-selector: linear-gradient(135deg, var(--color-secondary-300), var(--color-secondary-600));
 
   --background-image-gradient-hero: linear-gradient(to bottom, var(--color-secondary), transparent);
   --background-image-gradient-primary: linear-gradient(135deg, var(--color-primary-100), var(--color-primary-400));
@@ -267,24 +285,23 @@
 @layer base {
   /* width */
   ::-webkit-scrollbar {
-    width: 0;
+    width: 6px;
     height: 0;
   }
 
   /* Track */
   ::-webkit-scrollbar-track {
-    border-radius: 10px;
+    background: var(--color-primary-50);
   }
 
   /* Handle */
   ::-webkit-scrollbar-thumb {
-    background: #cecece;
-    border-radius: 10px;
+    background: var(--color-primary-200);
   }
 
   /* Handle on hover */
   ::-webkit-scrollbar-thumb:hover {
-    background: #cecece;
+    background: var(--color-primary-400);
   }
 
   *,
@@ -318,24 +335,32 @@
     @apply border-0 outline-0 p-0 w-full;
   }
 
+  .hero, h1, h2, h3, h4, h5, h6 {
+    @apply font-title mb-[0.25em] mt-[0.5em];
+  }
+
   .hero {
-    @apply text-hero font-hero;
+    @apply text-hero;
   }
 
   h1 {
-    @apply text-header1 font-header1;
+    @apply text-header1;
   }
 
   h2 {
-    @apply text-header2 font-header2;
+    @apply text-header2;
   }
 
   h3 {
-    @apply text-header3 font-header3;
+    @apply text-header3;
   }
 
   h4 {
-    @apply text-header4 font-header4;
+    @apply text-header4;
+  }
+
+  p, label, small {
+    @apply my-[1em];
   }
 
   label {
@@ -365,5 +390,28 @@
 
   .card {
     @apply bg-card text-card-foreground rounded-lg shadow-sm;
+  }
+
+  .home-hero {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    grid-template-columns: auto;
+    grid-template-areas: 'image' 'text';
+    justify-items: center;
+  }
+
+  @media (min-width: 768px) {
+    .home-hero {
+      grid-template-columns: auto auto;
+      grid-template-areas: 'image text';
+      justify-items: initial;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .home-hero {
+      grid-template-areas: 'text image';
+    }
   }
 }

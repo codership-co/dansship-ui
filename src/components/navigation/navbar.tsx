@@ -73,7 +73,7 @@ export const Navbar = () => {
 
   return (
     <nav className='fixed w-full top-0 left-0 z-50 px-3 pb-2 pt-3 sm:px-5'>
-      <div className='mx-auto max-w-350 rounded-[1.25rem] bg-white/90 shadow-[0_10px_32px_-16px_rgba(88,47,89,0.35)] backdrop-blur-xl'>
+      <div className='mx-auto max-w-7xl rounded-[1.25rem] bg-white/90 shadow-[0_10px_32px_-16px_rgba(88,47,89,0.35)] backdrop-blur-xl'>
         <div className='flex min-h-16 items-center justify-between gap-8 px-4 sm:px-6'>
           <div className='flex items-center gap-2'>
             {isAuthenticated ? (
