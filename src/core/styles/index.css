@@ -31,6 +31,11 @@
 @theme {
   --animate-fade-in-down: fade-in-down 300ms ease-out forwards;
   --animate-glitch: glitch 1s linear infinite;
+  --animate-gradients-float-1: float 5s ease-in-out infinite alternate;
+  --animate-gradients-float-2: float 8s ease-in-out infinite alternate;
+  --animate-gradients-float-3: float 3s ease-in-out infinite alternate;
+  --animate-gradients-float-4: float 12s ease-in-out infinite alternate;
+  --animate-gradients-float-5: float 9s ease-in-out infinite alternate;
 
   /* ================================================
    * COLORS
@@ -261,7 +266,7 @@
   --background-image-gradient-plan-recommended: radial-gradient(circle at bottom center, var(--color-primary-300), var(--color-primary-600));
   --background-image-gradient-plan-selector: linear-gradient(to bottom, var(--color-secondary-200), var(--color-secondary-600));
   --background-image-gradient-plan-card: linear-gradient(to bottom, var(--color-secondary-400), var(--color-secondary-100));
-  --background-image-gradient-auth: linear-gradient(135deg, var(--color-primary), var(--color-tertiary));
+  --background-image-gradient-auth: linear-gradient(-135deg, #4e4bff, #9700a3);
 
   --background-image-gradient-hero: linear-gradient(to bottom, var(--color-tertiary-200), var(--color-secondary-200));
   --background-image-gradient-primary: linear-gradient(135deg, var(--color-primary-100), var(--color-primary-400));

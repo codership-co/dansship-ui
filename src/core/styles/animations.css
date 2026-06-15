@@ -17,3 +17,9 @@
   80% { transform: translate(2px, -2px) }
   100% { transform: translate(0) }
 }
+
+@keyframes float {
+  to {
+    transform: translateY(2em);
+  }
+}
