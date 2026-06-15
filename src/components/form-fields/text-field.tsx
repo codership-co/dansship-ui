@@ -45,10 +45,10 @@ export function TextField<T extends FieldValues = Record<string, unknown>>({
       control={control}
       name={name}
       render={({ field, fieldState: { error } }) => (
-        <div className='space-y-1'>
+        <div className='grid gap-2'>
           <Label htmlFor={fieldId}>{label}</Label>
           <div className='relative'>
-            {hasLeftIcon && <div className='absolute inset-y-0 left-0 pl-3 flex items-center'>{icon}</div>}
+            {hasLeftIcon && <div className='absolute top-0 left-0 h-full pl-3 flex items-center'>{icon}</div>}
             <Input
               id={fieldId}
               type={type}
@@ -59,22 +59,26 @@ export function TextField<T extends FieldValues = Record<string, unknown>>({
               maxLength={maxLength}
               disabled={disabled}
               className={cn(
+                'pr-8',
                 hasLeftIcon && 'pl-10',
-                hasRightElement && 'pr-10',
-                error && 'border-alert-600 focus-visible:ring-alert-600',
+                hasRightElement && !error && 'pr-10',
+                hasRightElement && error && 'pr-16',
+                error && 'outline-alert-600 focus-visible:ring-alert-600',
               )}
               {...field}
             />
-            {hasRightElement && (
-              <div className='absolute inset-y-0 right-0 z-10 pr-3 flex items-center'>{rightElement}</div>
-            )}
-            {error && (
-              <div className='absolute inset-y-0 right-0 pr-3 flex items-center text-alert-600'>
-                <LuCircleAlert className='h-5 w-5' />
+            {(hasRightElement || error) && (
+              <div className='absolute top-0 right-0 h-full z-10 pr-3 flex items-center gap-2'>
+                {error && <LuCircleAlert className='h-4 w-4 text-alert-600' />}
+                {rightElement}
               </div>
             )}
           </div>
-          {error && <p className='text-sm text-alert-600'>{error.message}</p>}
+          {error && (
+            <label htmlFor={fieldId} className='m-0 text-small text-alert-600'>
+              {error.message}
+            </label>
+          )}
         </div>
       )}
     />

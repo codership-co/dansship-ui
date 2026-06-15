@@ -29,13 +29,13 @@ export const HomeAppFeature = () => {
 
   return (
     <section id='tracking' className='p-0 bg-secondary lg:mt-8'>
-      <div className='mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8'>
+      <div className='mx-auto w-full max-w-7xl px-4 py-8 lg:py-0 sm:px-8'>
         <div className='relative grid grid-cols-1 items-center gap-16 lg:grid-cols-[1fr_1fr]'>
-          <div className='relative h-full w-full'>
+          <div className='relative h-full w-full hidden lg:block'>
             <img
               src='/assets/images/home/app-filled.png'
               alt={t('home:stitch.app.imageAlt')}
-              className='hidden h-[110%] max-w-none object-cover lg:block absolute bottom-0 right-1/2 translate-x-1/2'
+              className='block h-[110%] max-w-none object-cover absolute bottom-0 right-1/2 translate-x-1/2'
               loading='lazy'
             />
           </div>
@@ -47,25 +47,27 @@ export const HomeAppFeature = () => {
               subtitle={t('home:stitch.progress.subtitle')}
             />
 
-            {progressFeatures.map(feature => {
-              const Icon = feature.icon;
+            <section className='grid gap-4'>
+              {progressFeatures.map(feature => {
+                const Icon = feature.icon;
 
-              return (
-                <div key={feature.titleKey}>
-                  <div className='flex items-start gap-2.5'>
-                    <span className='mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/30 text-primary'>
-                      <Icon className='h-3.5 w-3.5' />
-                    </span>
+                return (
+                  <div key={feature.titleKey}>
+                    <div className='flex items-start gap-2.5'>
+                      <span className='mt-0.5 shrink-0 inline-flex h-8 w-8 items-center justify-center rounded-xl bg-primary/30 text-primary'>
+                        <Icon className='h-3.5 w-3.5' />
+                      </span>
 
-                    <div>
-                      <label className='text-primary font-bold block m-0'>{t(feature.titleKey)}</label>
+                      <div>
+                        <label className='text-primary font-bold block m-0'>{t(feature.titleKey)}</label>
 
-                      <label className='mt-0.5 text-muted-foreground block m-0'>{t(feature.descriptionKey)}</label>
+                        <label className='mt-0.5 text-muted-foreground block m-0'>{t(feature.descriptionKey)}</label>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </section>
 
             <div className='flex flex-col gap-2.5 sm:max-w-90 sm:flex-row mt-8'>
               <Button asChild>

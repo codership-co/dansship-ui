@@ -15,6 +15,7 @@ export const Gradients = ({ className, flipped, img, styles }: GradientsProps) =
       style={{
         ...styles,
         viewTransitionName: 'gradients',
+        contain: 'layout',
       }}
     >
       <Fluids
