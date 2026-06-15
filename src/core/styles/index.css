@@ -185,7 +185,7 @@
   /* ================================================
    * STATES
    * ================================================ */
-  --color-background: var(--color-secondary-50);
+  --color-background: var(--color-secondary-200);
   --color-background-paper: var(--color-neutral-50);
   --color-background-disabled: var(--color-neutral-100);
   --color-foreground: hsl(32 54% 13%);
@@ -261,6 +261,7 @@
   --background-image-gradient-plan-recommended: radial-gradient(circle at bottom center, var(--color-primary-300), var(--color-primary-600));
   --background-image-gradient-plan-selector: linear-gradient(to bottom, var(--color-secondary-200), var(--color-secondary-600));
   --background-image-gradient-plan-card: linear-gradient(to bottom, var(--color-secondary-400), var(--color-secondary-100));
+  --background-image-gradient-auth: linear-gradient(135deg, var(--color-primary), var(--color-tertiary));
 
   --background-image-gradient-hero: linear-gradient(to bottom, var(--color-tertiary-200), var(--color-secondary-200));
   --background-image-gradient-primary: linear-gradient(135deg, var(--color-primary-100), var(--color-primary-400));
@@ -316,7 +317,7 @@
   }
 
   :root {
-    @apply bg-secondary-200 text-foreground font-main text-body min-h-screen;
+    @apply bg-background text-foreground font-main text-body min-h-screen;
     color-scheme: light dark;
     font-synthesis: none;
     text-rendering: optimizeLegibility;

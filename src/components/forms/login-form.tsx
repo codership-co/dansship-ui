@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { EmailField, PasswordField } from '@components/form-fields';
 import { Button } from '@components/ui';
+import { PageURLS } from '@core/constants';
 
 /*
  * Note: Using i18n directly in schema is tricky since schemas are often defined outside components,
@@ -47,42 +48,40 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
   });
 
   return (
-    <div className='relative bg-white rounded-lg shadow-sm p-8'>
-      <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-        <EmailField
-          id='email'
-          control={control}
-          name='email'
-          label={t('auth:login.email')}
-          placeholder={t('common:placeholder.email')}
-        />
+    <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+      <EmailField
+        id='email'
+        control={control}
+        name='email'
+        label={t('auth:login.email')}
+        placeholder={t('common:placeholder.email')}
+      />
 
-        <PasswordField
-          id='password'
-          control={control}
-          name='password'
-          label={t('auth:login.password')}
-          autoComplete='current-password'
-          placeholder={t('common:placeholder.password')}
-        />
+      <PasswordField
+        id='password'
+        control={control}
+        name='password'
+        label={t('auth:login.password')}
+        autoComplete='current-password'
+        placeholder={t('common:placeholder.password')}
+      />
 
-        <div className='flex items-center justify-end'>
-          <Link to='/auth/forgot-password' className='text-sm text-primary hover:text-primary/90'>
-            {t('auth:login.forgotPassword')}
-          </Link>
-        </div>
+      <div className='flex items-center justify-end'>
+        <Link to={PageURLS.auth.forgotPassword} viewTransition className='text-sm text-primary hover:text-primary/90'>
+          {t('auth:login.forgotPassword')}
+        </Link>
+      </div>
 
-        <Button type='submit' disabled={isSubmitting} className='w-full'>
-          {isSubmitting ? t('common:loading') : t('auth:login.signIn')}
-        </Button>
+      <Button type='submit' disabled={isSubmitting} className='w-full'>
+        {isSubmitting ? t('common:loading') : t('auth:login.signIn')}
+      </Button>
 
-        <div className='text-center text-sm'>
-          <span className='text-gray-600'>{t('auth:login.noAccount')}</span>{' '}
-          <Link to='/auth/signup' viewTransition className='font-medium text-primary hover:text-primary/90'>
-            {t('auth:login.signUp')}
-          </Link>
-        </div>
-      </form>
-    </div>
+      <div className='text-center text-sm'>
+        <span className='text-gray-600'>{t('auth:login.noAccount')}</span>{' '}
+        <Link to={PageURLS.auth.signup} viewTransition className='font-medium text-primary hover:text-primary/90'>
+          {t('auth:login.signUp')}
+        </Link>
+      </div>
+    </form>
   );
 }

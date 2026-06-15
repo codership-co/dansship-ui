@@ -1,5 +1,15 @@
 import { useTranslation } from 'react-i18next';
-import { LuShoppingBag, LuStore, LuX } from 'react-icons/lu';
+import {
+  LuBellElectric,
+  LuBookHeart,
+  LuBookImage,
+  LuCalendarHeart,
+  LuFootprints,
+  LuShoppingBag,
+  LuStore,
+  LuUser,
+  LuX,
+} from 'react-icons/lu';
 import { useNavigate } from 'react-router';
 
 import { LanguageSelector } from './language-selector';
@@ -25,31 +35,37 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       to: PageURLS.profile,
       label: t('nav:profile'),
       featureFlags: [FEATURE_FLAG.isProfilePageEnabled],
+      icon: LuUser,
     },
     {
       to: PageURLS.classes,
       label: t('nav:menuScheduleClass'),
       featureFlags: [FEATURE_FLAG.isClassesPageEnabled],
+      icon: LuFootprints,
     },
     {
       to: PageURLS.myAccountSubscription,
       label: t('nav:menuPlans'),
       featureFlags: [FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
+      icon: LuBellElectric,
     },
     {
       to: PageURLS.myAccountBookings,
       label: t('nav:menuBookings'),
       featureFlags: [FEATURE_FLAG.isMyAccountBookingsPageEnabled],
+      icon: LuCalendarHeart,
     },
     {
       to: PageURLS.figures,
       label: t('nav:menuFigures'),
       featureFlags: [FEATURE_FLAG.isFiguresPageEnabled],
+      icon: LuBookImage,
     },
     {
       to: PageURLS.figureSaved,
       label: t('nav:menuProgress'),
       featureFlags: [FEATURE_FLAG.isFigureSavedPageEnabled],
+      icon: LuBookHeart,
     },
   ];
 

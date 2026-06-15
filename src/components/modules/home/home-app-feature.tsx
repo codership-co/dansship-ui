@@ -30,12 +30,12 @@ export const HomeAppFeature = () => {
   return (
     <section id='tracking' className='p-0 bg-secondary lg:mt-8'>
       <div className='mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8'>
-        <div className='relative grid grid-cols-1 items-center gap-4 lg:grid-cols-[1fr_1fr]'>
-          <div className='self-end relative'>
+        <div className='relative grid grid-cols-1 items-center gap-16 lg:grid-cols-[1fr_1fr]'>
+          <div className='relative h-full w-full'>
             <img
               src='/assets/images/home/app-filled.png'
               alt={t('home:stitch.app.imageAlt')}
-              className='hidden h-190 w-140 max-w-none object-cover lg:block absolute bottom-0 right-0'
+              className='hidden h-[110%] max-w-none object-cover lg:block absolute bottom-0 right-1/2 translate-x-1/2'
               loading='lazy'
             />
           </div>

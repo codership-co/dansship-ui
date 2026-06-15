@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 
 import { LoginForm, type LoginFormData } from '@components/forms';
+import { Gradients } from '@components/modules';
 import { Logotype } from '@components/svg';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
@@ -55,20 +56,26 @@ function LoginPage() {
 
   return (
     <div className='min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8'>
-      <div className='max-w-md w-full'>
-        <div className='text-center mb-8'>
-          <Logotype
-            className='w-80 m-auto'
-            style={{
-              viewTransitionName: 'logo',
-            }}
-          />
-          <h3>{t('auth:login.title')}</h3>
-          <p className='mt-2 text-gray-600'>{t('auth:login.subtitle')}</p>
-        </div>
+      <section className='shadow-2xl max-w-100 md:max-w-6xl w-full'>
+        <div className='bg-white grid md:grid-cols-[1fr_400px] rounded-xl md:rounded-lg w-full md:h-165 overflow-hidden'>
+          <Gradients className='hidden md:block' img='/assets/images/auth/dancing-boy.png' />
 
-        <LoginForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
-      </div>
+          <section
+            className='pt-20 px-10 pb-8 self-center overflow-auto'
+            style={{
+              viewTransitionName: 'auth-form',
+            }}
+          >
+            <div className='text-center mb-8'>
+              <Logotype className='w-60 md:w-80 m-auto' />
+              <h3>{t('auth:login.title')}</h3>
+              <p className='mt-2 text-gray-600'>{t('auth:login.subtitle')}</p>
+            </div>
+
+            <LoginForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
+          </section>
+        </div>
+      </section>
     </div>
   );
 }

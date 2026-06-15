@@ -1,3 +1,4 @@
+export * from './auth';
 export * from './classes';
 export * from './figure-details';
 export * from './figures';

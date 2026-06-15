@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 import { EmailField, PasswordFieldset } from '@components/form-fields';
 import { Button } from '@components/ui';
+import { PageURLS } from '@core/constants';
 
 const createSignUpSchema = (t: (key: string) => string) =>
   z
@@ -49,42 +50,40 @@ export function SignUpForm({ onSubmit, isSubmitting }: SignUpFormProps) {
   });
 
   return (
-    <div className='bg-white rounded-lg shadow-sm p-8'>
-      <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
-        <EmailField
-          id='email'
-          control={control}
-          name='email'
-          label={t('auth:signup.email')}
-          placeholder={t('common:placeholder.email')}
-        />
+    <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+      <EmailField
+        id='email'
+        control={control}
+        name='email'
+        label={t('auth:signup.email')}
+        placeholder={t('common:placeholder.email')}
+      />
 
-        <PasswordFieldset
-          control={control}
-          passwordName='password'
-          confirmPasswordName='confirmPassword'
-          passwordLabel={t('auth:signup.password.label')}
-          confirmPasswordLabel={t('auth:signup.confirmPassword')}
-          showStrength
-          strengthLabel={t('auth:signup.password.strength')}
-          strengthLabels={{
-            weak: t('auth:signup.password.weak'),
-            good: t('auth:signup.password.good'),
-            strong: t('auth:signup.password.strong'),
-          }}
-        />
+      <PasswordFieldset
+        control={control}
+        passwordName='password'
+        confirmPasswordName='confirmPassword'
+        passwordLabel={t('auth:signup.password.label')}
+        confirmPasswordLabel={t('auth:signup.confirmPassword')}
+        showStrength
+        strengthLabel={t('auth:signup.password.strength')}
+        strengthLabels={{
+          weak: t('auth:signup.password.weak'),
+          good: t('auth:signup.password.good'),
+          strong: t('auth:signup.password.strong'),
+        }}
+      />
 
-        <Button type='submit' disabled={isSubmitting} className='w-full'>
-          {isSubmitting ? t('common:loading') : t('auth:signup.createAccount')}
-        </Button>
+      <Button type='submit' disabled={isSubmitting} className='w-full'>
+        {isSubmitting ? t('common:loading') : t('auth:signup.createAccount')}
+      </Button>
 
-        <div className='text-center text-sm'>
-          <span className='text-gray-600'>{t('auth:signup.hasAccount')}</span>{' '}
-          <Link to='/auth/login' viewTransition className='font-medium text-primary hover:text-primary/90'>
-            {t('auth:signup.signIn')}
-          </Link>
-        </div>
-      </form>
-    </div>
+      <div className='text-center text-sm'>
+        <span className='text-gray-600'>{t('auth:signup.hasAccount')}</span>{' '}
+        <Link to={PageURLS.auth.login} viewTransition className='font-medium text-primary hover:text-primary/90'>
+          {t('auth:signup.signIn')}
+        </Link>
+      </div>
+    </form>
   );
 }

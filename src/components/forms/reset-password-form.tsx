@@ -7,6 +7,7 @@ import { z } from 'zod';
 
 import { EmailField, PasswordFieldset, TextField } from '@components/form-fields';
 import { Button } from '@components/ui';
+import { PageURLS } from '@core/constants';
 
 import type { ResetPasswordPayload } from '@core/api';
 
@@ -101,7 +102,11 @@ export function ResetPasswordForm({ onSubmit, isSubmitting }: ResetPasswordFormP
         </Button>
 
         <div className='text-center'>
-          <Link to='/auth/login' className='inline-flex items-center gap-1 text-sm text-primary hover:text-primary/90'>
+          <Link
+            to={PageURLS.auth.login}
+            viewTransition
+            className='inline-flex items-center gap-1 text-sm text-primary hover:text-primary/90'
+          >
             <LuArrowLeft className='w-4 h-4' />
             {t('auth:resetPassword.backToLogin')}
           </Link>

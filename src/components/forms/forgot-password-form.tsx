@@ -9,6 +9,7 @@ import { z } from 'zod';
 import { EmailField } from '@components/form-fields';
 import { Button } from '@components/ui';
 import { useAuth } from '@contexts';
+import { PageURLS } from '@core/constants';
 
 const createForgotPasswordSchema = (t: (key: string) => string) =>
   z.object({
@@ -103,7 +104,11 @@ export function ForgotPasswordForm() {
         </Button>
 
         <div className='text-center'>
-          <Link to='/auth/login' className='inline-flex items-center gap-1 text-sm text-primary hover:text-primary/90'>
+          <Link
+            to={PageURLS.auth.login}
+            viewTransition
+            className='inline-flex items-center gap-1 text-sm text-primary hover:text-primary/90'
+          >
             <LuArrowLeft className='w-4 h-4' />
             {t('auth:forgotPassword.backToLogin')}
           </Link>
@@ -125,7 +130,8 @@ export function ForgotPasswordForm() {
       </p>
       <div className='space-y-4'>
         <Link
-          to='/auth/reset-password'
+          to={PageURLS.auth.resetPassword}
+          viewTransition
           state={{ email: submittedEmail }}
           className='w-full inline-flex items-center justify-center gap-2 py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary'
         >
@@ -138,7 +144,11 @@ export function ForgotPasswordForm() {
         >
           {t('auth:forgotPassword.tryAnother')}
         </button>
-        <Link to='/auth/login' className='inline-flex items-center gap-1 text-sm text-primary hover:text-primary/90'>
+        <Link
+          to={PageURLS.auth.login}
+          viewTransition
+          className='inline-flex items-center gap-1 text-sm text-primary hover:text-primary/90'
+        >
           <LuArrowLeft className='w-4 h-4' />
           {t('auth:forgotPassword.backToLogin')}
         </Link>

@@ -19,13 +19,13 @@ export const HomeHero = () => {
           <h1 className='text-primary-200 hero leading-none m-0'>
             <span className='block'>{t('home:stitch.hero.kicker1')}</span>
             <span className='block'>
-              {t('home:stitch.hero.kicker2')} <Logotype className='h-[0.75em] inline-block' />
+              {t('home:stitch.hero.kicker2')} <Logotype className='h-[0.65em] sm:h-[0.75em] inline-block' />
             </span>
           </h1>
 
           <p className='m-0'>{t('home:stitch.hero.description')}</p>
 
-          <div className='mt-4 flex flex-col gap-2.5 sm:max-w-90 sm:flex-row'>
+          <div className='mt-4 flex flex-row gap-2.5 sm:max-w-90'>
             <Link to={isAuthenticated ? PageURLS.profile : PageURLS.auth.signup}>
               <Button>
                 {t('home:stitch.hero.bookClass')}
