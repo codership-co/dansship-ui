@@ -1,11 +1,12 @@
 interface Error404Props {
   className?: string;
   mainColor?: string;
+  style?: React.CSSProperties;
 }
 
-export const Error404 = ({ className, mainColor = 'var(--color-tertiary)' }: Error404Props) => {
+export const Error404 = ({ mainColor = 'var(--color-tertiary)', ...props }: Error404Props) => {
   return (
-    <svg xmlns='http://www.w3.org/2000/svg' className={className} viewBox='0 0 987.9303 646.49701' role='img'>
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 987.9303 646.49701' role='img' {...props}>
       <ellipse cx='190.05489' cy='636.79969' rx='190.05489' ry='9.69733' fill='#e6e6e6' />
       <path
         d='M848.11617,518.76958l-31.51263,4.086-1.60522.20738-41.94255,5.43772L581.60689,553.33134c-8.18729-5.66044-15.91375-11.48218-23.08723-17.44216l219.09057-12.94912,37.895-2.24265,1.58984-.09216Z'

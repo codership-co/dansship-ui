@@ -1,11 +1,12 @@
 interface UnauthorizedProps {
   className?: string;
   mainColor?: string;
+  style?: React.CSSProperties;
 }
 
-export const Unauthorized = ({ className, mainColor = 'var(--color-tertiary)' }: UnauthorizedProps) => {
+export const Unauthorized = ({ mainColor = 'var(--color-tertiary)', ...props }: UnauthorizedProps) => {
   return (
-    <svg xmlns='http://www.w3.org/2000/svg' className={className} viewBox='0 0 892 500.74997'>
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 892 500.74997' {...props}>
       <path
         id='b2aec908-dac2-485e-9341-1f8763a52ddc-725'
         data-name='Path 133'

@@ -95,7 +95,7 @@ export function PlanSelector() {
   }
 
   return (
-    <div className='bg-gradient-plan-selector rounded-2xl mt-16 mx-6 lg:mx-0'>
+    <div className='bg-white rounded-2xl mt-16 mx-6 lg:mx-0 lg:px-8'>
       <div className='grid grid-cols-1 gap-8 lg:grid-cols-3'>
         {displayPlans.map(plan => {
           const price = getPrice(plan.price);
@@ -107,8 +107,8 @@ export function PlanSelector() {
               className={cn(
                 'relative flex h-auto flex-col',
                 isFeatured
-                  ? 'bg-gradient-plan-recommended text-primary shadow-[0_2rem_3rem_-1rem_var(--color-primary)] hover:shadow-[0_3rem_2.7rem_-1.5rem_var(--color-primary)] transition-all w-[calc(100%+48px)] left-[-24px] lg:w-auto md:-translate-y-8 duration-300 md:hover:-translate-y-10 lg:h-full border-0'
-                  : 'bg-transparent border-0 shadow-none',
+                  ? 'bg-gradient-plan-recommended text-primary-foreground shadow-[0_2rem_2rem_-1rem_var(--color-primary)] hover:shadow-[0_3rem_2.5rem_-2rem_var(--color-primary)] transition-all w-[calc(100%+48px)] -left-6 lg:left-0 lg:w-auto md:-translate-y-8 duration-300 md:hover:-translate-y-10 lg:h-full border-0'
+                  : 'bg-transparent text-secondary-foreground border-0 shadow-none lg:hover:-translate-y-8 lg:hover:shadow-[0_2rem_2rem_-1rem_var(--color-secondary-800)] lg:hover:bg-gradient-plan-card transition-all',
               )}
             >
               {isFeatured && (
@@ -118,21 +118,11 @@ export function PlanSelector() {
               )}
 
               <CardHeader className={cn(isFeatured ? 'pb-4 pt-6 sm:pb-5 sm:pt-8' : 'pb-4 pt-5 sm:pb-5 sm:pt-6')}>
-                <CardTitle
-                  className={cn(
-                    'text-[1.8rem] font-semibold leading-none tracking-tight sm:text-[2.1rem]',
-                    isFeatured ? 'text-primary-foreground' : 'text-accent-foreground',
-                  )}
-                >
+                <CardTitle className='text-[1.8rem] font-semibold leading-none tracking-tight sm:text-[2.1rem]'>
                   {plan.name}
                 </CardTitle>
 
-                <CardDescription
-                  className={cn(
-                    'mt-1.5 min-h-0 text-[0.95rem] leading-relaxed sm:mt-2 sm:min-h-12 sm:text-base',
-                    isFeatured ? 'text-primary-foreground/80' : 'text-muted-foreground',
-                  )}
-                >
+                <CardDescription className='mt-1.5 text-label'>
                   {plan.description ||
                     t('subscriptions:planDescFallback', {
                       count: plan.classes_included,
@@ -142,91 +132,36 @@ export function PlanSelector() {
 
               <CardContent className='flex grow flex-col pt-0'>
                 <div className='mb-5 flex items-end gap-1.5 sm:mb-7 sm:gap-2'>
-                  <span
-                    className={cn(
-                      'plan-price-amount text-[3rem] font-extrabold leading-none',
-                      isFeatured ? 'text-primary-foreground' : 'text-accent-foreground',
-                    )}
-                  >
+                  <h3 className='font-main m-0'>
                     {new Intl.NumberFormat('es-CO', {
                       style: 'currency',
                       currency: 'COP',
                       minimumFractionDigits: 0,
                       maximumFractionDigits: 0,
                     }).format(price)}
-                  </span>
+                  </h3>
 
-                  <span
-                    className={cn(
-                      'plan-price-currency mb-0.5 text-base font-medium sm:mb-1 sm:text-[1.2rem]',
-                      isFeatured ? 'text-primary-foreground/80' : 'text-muted-foreground',
-                    )}
-                  >
-                    {plan.currency}
-                  </span>
+                  <label className='mb-2'>{plan.currency}</label>
                 </div>
 
-                <ul className='space-y-3 text-[0.98rem] sm:space-y-4 sm:text-[1.05rem]'>
-                  <li
-                    className={cn(
-                      'flex items-start gap-2.5 sm:gap-3',
-                      isFeatured ? 'text-primary-foreground/90' : 'text-muted-foreground',
-                    )}
-                  >
-                    <FaCheckCircle
-                      className={cn(
-                        'mt-0.5 h-4 w-4 shrink-0 sm:h-5 sm:w-5',
-                        isFeatured ? 'text-primary-foreground/80' : 'text-primary',
-                      )}
-                    />
-
-                    <span>
-                      <strong>{plan.classes_included}</strong> {t('subscriptions:classesIncluded')}
-                    </span>
-                  </li>
-
-                  <li
-                    className={cn(
-                      'flex items-start gap-2.5 sm:gap-3',
-                      isFeatured ? 'text-primary-foreground/90' : 'text-muted-foreground',
-                    )}
-                  >
-                    <FaCheckCircle
-                      className={cn(
-                        'mt-0.5 h-4 w-4 shrink-0 sm:h-5 sm:w-5',
-                        isFeatured ? 'text-primary-foreground/80' : 'text-primary',
-                      )}
-                    />
-
-                    <span>
-                      {t('subscriptions:validForDays', {
-                        count: plan.validity_days,
-                      })}
-                    </span>
-                  </li>
-
-                  <li
-                    className={cn(
-                      'flex items-start gap-2.5 sm:gap-3',
-                      isFeatured ? 'text-primary-foreground/90' : 'text-muted-foreground',
-                    )}
-                  >
-                    <FaCheckCircle
-                      className={cn(
-                        'mt-0.5 h-4 w-4 shrink-0 sm:h-5 sm:w-5',
-                        isFeatured ? 'text-primary-foreground/80' : 'text-primary',
-                      )}
-                    />
-
-                    <span>{t('subscriptions:accessAllClasses')}</span>
-                  </li>
+                <ul className='text-label grid gap-4 px-4'>
+                  {[
+                    t('subscriptions:classesIncluded', { count: plan.classes_included }),
+                    t('subscriptions:validForDays', { count: plan.validity_days }),
+                    t('subscriptions:accessAllClasses'),
+                  ].map((item, i) => (
+                    <li key={i} className='flex items-start gap-2.5 sm:gap-3'>
+                      <FaCheckCircle className='mt-1 shrink-0 h-4 w-4' />
+                      <span>{item}</span>
+                    </li>
+                  ))}
                 </ul>
               </CardContent>
 
               <CardFooter className='pt-4 sm:pt-6'>
                 <Button
                   className='w-full'
-                  variant={isFeatured ? 'default' : 'secondary'}
+                  variant={isFeatured ? 'default' : 'outlineTertiary'}
                   onClick={() => handleSelectPlan(plan)}
                 >
                   {t('subscriptions:choosePlan', { name: plan.name })}

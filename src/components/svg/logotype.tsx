@@ -1,11 +1,12 @@
 interface LogotypeProps {
   className?: string;
   mainColor?: string;
+  style?: React.CSSProperties;
 }
 
-export const Logotype = ({ className, mainColor = 'var(--color-primary)' }: LogotypeProps) => {
+export const Logotype = ({ mainColor = 'var(--color-primary)', ...props }: LogotypeProps) => {
   return (
-    <svg xmlns='http://www.w3.org/2000/svg' className={className} viewBox='0 0 449 72' fill='none'>
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 449 72' fill='none' {...props}>
       <path
         d='M12.89 54.48V57.27H0V0H27.13C44.38 0 57.27 11.45 57.27 26.7C57.27 44.6 43.45 57.98 24.99 57.98C20.19 57.98 15.68 56.62 12.89 54.47V54.48ZM25.27 55.7C36.08 55.7 42.95 46.11 42.95 33.37C42.95 15.62 30.06 2.3 12.89 2.3V51.41C14.61 53.84 19.9 55.71 25.27 55.71V55.7Z'
         fill={mainColor}

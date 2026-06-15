@@ -15,7 +15,7 @@ export const HomeMemberships = () => {
   return (
     <Section id='planes'>
       <SectionHeading
-        className='mx-auto max-w-2xl text-center'
+        className='mx-auto max-w-2xl'
         centered
         intro={t('home:stitch.membership.kicker')}
         title={t('home:stitch.membership.title')}

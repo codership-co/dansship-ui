@@ -5,7 +5,7 @@ import { cn } from '@helpers';
 interface SectionProps extends HTMLAttributes<HTMLElement> {
   compact?: boolean;
   contentClassName?: string;
-  id: string;
+  id?: string;
 }
 
 export function Section({ id, className, contentClassName, compact = false, children, ...props }: SectionProps) {

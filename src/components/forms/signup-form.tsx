@@ -80,7 +80,7 @@ export function SignUpForm({ onSubmit, isSubmitting }: SignUpFormProps) {
 
         <div className='text-center text-sm'>
           <span className='text-gray-600'>{t('auth:signup.hasAccount')}</span>{' '}
-          <Link to='/auth/login' className='font-medium text-primary hover:text-primary/90'>
+          <Link to='/auth/login' viewTransition className='font-medium text-primary hover:text-primary/90'>
             {t('auth:signup.signIn')}
           </Link>
         </div>

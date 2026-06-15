@@ -258,10 +258,11 @@
   --spacing: 0.25rem;
   --radius: 0.25rem;
 
-  --background-image-gradient-plan-recommended: linear-gradient(to bottom, var(--color-primary-500), var(--color-primary-300));
-  --background-image-gradient-plan-selector: linear-gradient(135deg, var(--color-secondary-300), var(--color-secondary-600));
+  --background-image-gradient-plan-recommended: radial-gradient(circle at bottom center, var(--color-primary-300), var(--color-primary-600));
+  --background-image-gradient-plan-selector: linear-gradient(to bottom, var(--color-secondary-200), var(--color-secondary-600));
+  --background-image-gradient-plan-card: linear-gradient(to bottom, var(--color-secondary-400), var(--color-secondary-100));
 
-  --background-image-gradient-hero: linear-gradient(to bottom, var(--color-secondary), transparent);
+  --background-image-gradient-hero: linear-gradient(to bottom, var(--color-tertiary-200), var(--color-secondary-200));
   --background-image-gradient-primary: linear-gradient(135deg, var(--color-primary-100), var(--color-primary-400));
   --background-image-gradient-primary-transparent: linear-gradient(135deg, hsl(from var(--color-primary-100) h s l / 90%), hsl(from var(--color-primary-400) h s l / 90%));
   --background-image-gradient-secondary: linear-gradient(135deg, var(--color-secondary-100), var(--color-secondary-400));
@@ -315,7 +316,7 @@
   }
 
   :root {
-    @apply bg-background text-foreground font-main text-body min-h-screen;
+    @apply bg-secondary-200 text-foreground font-main text-body min-h-screen;
     color-scheme: light dark;
     font-synthesis: none;
     text-rendering: optimizeLegibility;

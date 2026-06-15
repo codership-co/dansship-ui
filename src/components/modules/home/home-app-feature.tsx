@@ -33,19 +33,18 @@ export const HomeAppFeature = () => {
         <div className='relative grid grid-cols-1 items-center gap-4 lg:grid-cols-[1fr_1fr]'>
           <div className='self-end relative'>
             <img
-              src='/assets/images/home/app.png'
+              src='/assets/images/home/app-filled.png'
               alt={t('home:stitch.app.imageAlt')}
-              className='hidden h-180 w-140 max-w-none object-cover lg:block absolute bottom-0 right-0'
+              className='hidden h-190 w-140 max-w-none object-cover lg:block absolute bottom-0 right-0'
               loading='lazy'
             />
           </div>
 
-          <div className='flex flex-col gap-4 pr-5 py-7 sm:pr-8 sm:py-8 lg:pr-12 lg:py-20 '>
+          <div className='pr-5 py-7 sm:pr-8 sm:py-8 lg:pr-12 lg:py-25 '>
             <SectionHeading
               intro={t('home:stitch.progress.kicker')}
               title={t('home:stitch.progress.title')}
               subtitle={t('home:stitch.progress.subtitle')}
-              titleSize='lg'
             />
 
             {progressFeatures.map(feature => {

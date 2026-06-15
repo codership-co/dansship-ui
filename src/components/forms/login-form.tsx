@@ -47,7 +47,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
   });
 
   return (
-    <div className='bg-white rounded-lg shadow-sm p-8'>
+    <div className='relative bg-white rounded-lg shadow-sm p-8'>
       <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
         <EmailField
           id='email'
@@ -78,7 +78,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
 
         <div className='text-center text-sm'>
           <span className='text-gray-600'>{t('auth:login.noAccount')}</span>{' '}
-          <Link to='/auth/signup' className='font-medium text-primary hover:text-primary/90'>
+          <Link to='/auth/signup' viewTransition className='font-medium text-primary hover:text-primary/90'>
             {t('auth:login.signUp')}
           </Link>
         </div>
