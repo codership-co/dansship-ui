@@ -2,15 +2,17 @@ import { cn } from '@helpers';
 
 interface GradientsProps {
   className?: string;
+  styles?: React.CSSProperties;
   flipped?: boolean;
   img: string;
 }
 
-export const Gradients = ({ className, flipped, img }: GradientsProps) => {
+export const Gradients = ({ className, flipped, img, styles }: GradientsProps) => {
   return (
     <section
       className={cn('pointer-events-none select-none relative bg-gradient-auth overflow-hidden', className)}
       style={{
+        ...styles,
         viewTransitionName: 'gradients',
       }}
     >
@@ -72,7 +74,7 @@ export const Gradients = ({ className, flipped, img }: GradientsProps) => {
         src={img}
         alt='Dancing'
         className={cn(
-          'm-4 max-w-75 absolute w-100 bottom-0 ',
+          'm-4 max-w-100 min-w-70 absolute w-3/4 bottom-0 ',
           flipped
             ? 'left-0 drop-shadow-[1px_1px_white,2px_2px_white]'
             : 'right-0 drop-shadow-[-1px_1px_white,-2px_2px_white]',

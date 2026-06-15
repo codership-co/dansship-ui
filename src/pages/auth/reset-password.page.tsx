@@ -1,44 +1,31 @@
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
+import { Trans, useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router';
 
 import { ResetPasswordForm } from '@components/forms';
-import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
+import { AuthFormLayout } from '@components/layouts';
+import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { PageURLS } from '@core/constants';
-
-import type { ResetPasswordPayload } from '@core/api';
 
 function ResetPasswordPage() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const { resetPassword } = useAuth();
-
-  const handleSubmit = async ({ email, new_password, code }: ResetPasswordPayload) => {
-    setIsSubmitting(true);
-
-    try {
-      await resetPassword({ email, new_password, code });
-      navigate('/auth/login');
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Reset password failed:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+  const { state } = useLocation();
+  const email: string = state?.email ?? '';
 
   return (
-    <div className='min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8'>
-      <div className='max-w-md w-full'>
-        <div className='text-center mb-8'>
-          <h3>{t('auth:resetPassword.title')}</h3>
-          <p className='mt-2 text-gray-600'>{t('auth:resetPassword.subtitle')}</p>
-        </div>
-
-        <ResetPasswordForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
-      </div>
-    </div>
+    <AuthFormLayout
+      gradientsImage='/assets/images/auth/dancing-boy-2.png'
+      title={t('auth:resetPassword.title')}
+      subtitle={
+        <Trans
+          i18nKey='auth:resetPassword.subtitle'
+          components={{
+            email: <span className='font-medium underline'>{email}</span>,
+          }}
+        />
+      }
+    >
+      <ResetPasswordForm email={email} />
+    </AuthFormLayout>
   );
 }
 

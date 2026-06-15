@@ -174,7 +174,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     if (response.status === 200) {
       setLocalError(null);
-      toast.success(t('auth:forgotPasswordSuccess'));
+      toast.success(
+        t('auth:forgotPasswordSuccess', {
+          email: payload.email,
+        }),
+      );
     } else {
       setLocalError(t('auth:forgotPasswordFailed'));
       toast.error(t('auth:forgotPasswordFailed'));

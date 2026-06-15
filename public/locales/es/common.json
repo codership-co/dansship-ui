@@ -51,7 +51,7 @@
   "noPermissionTitle": "Acceso denegado",
   "noPermissionDescription": "No tienes permisos para ver esta pagina.",
   "placeholder": {
-    "email": "tu@ejemplo.com",
+    "email": "correo@mail.com",
     "password": "contraseña"
   },
   "days": {
