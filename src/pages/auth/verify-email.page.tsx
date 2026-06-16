@@ -1,127 +1,156 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useSearchParams } from 'react-router';
+import { LuArrowLeft, LuArrowRight } from 'react-icons/lu';
+import { Link, useLocation, useSearchParams } from 'react-router';
 
+import { AuthFormLayout } from '@components/layouts';
+import { Spinner, SpinnerLoader } from '@components/loaders';
 import { Button } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
-import { DansshipAPIError } from '@core/api';
 import { PageURLS } from '@core/constants';
+import { delayPromise } from '@helpers';
+import { useCountdown } from '@hooks';
 
-type VerifyState = 'idle' | 'verifying' | 'verified' | 'failed';
+enum VerificationStatus {
+  IDLE = 'IDLE',
+  VERIFYING = 'VERIFYING',
+  VERIFIED = 'VERIFIED',
+  VERIFICATION_FAILED = 'VERIFICATION_FAILED',
+  RESENDING_EMAIL = 'RESENDING_EMAIL',
+  RESENDED_EMAIL = 'RESENDED_EMAIL',
+  RESENDED_FAILED = 'RESENDED_FAILED',
+}
 
 function VerifyEmailPage() {
   const { t } = useTranslation();
   const { verifyEmail, resendVerification } = useAuth();
   const [searchParams] = useSearchParams();
+  const { state } = useLocation();
+  const stateEmail: string = state?.email;
   const token = searchParams.get('token');
-  const email = searchParams.get('email') ?? '';
-  const pending = searchParams.get('pending') === '1';
+  const paramEmail = searchParams.get('email');
+  const email = stateEmail ?? paramEmail ?? '';
 
-  const [state, setState] = useState<VerifyState>(token ? 'verifying' : 'idle');
-  const [message, setMessage] = useState<string>('');
+  const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>(VerificationStatus.IDLE);
   const [isResending, setIsResending] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
+  const { isActive, start, reset, formattedTime } = useCountdown(120);
+
+  const handleVerification = useCallback(async () => {
+    if (!token) return;
+
+    setVerificationStatus(VerificationStatus.VERIFYING);
+
+    try {
+      const { data } = await verifyEmail({ token });
+      setVerificationStatus(data?.verified ? VerificationStatus.VERIFIED : VerificationStatus.VERIFICATION_FAILED);
+    } catch {
+      setVerificationStatus(VerificationStatus.VERIFICATION_FAILED);
+    }
+  }, [verifyEmail, token]);
 
   useEffect(() => {
-    if (resendCooldown > 0) {
-      const timer = setInterval(() => {
-        setResendCooldown(prev => prev - 1);
-      }, 1000);
-
-      return () => clearInterval(timer);
-    }
-  }, [resendCooldown]);
-
-  const handleVerification = useCallback(
-    async (token: string) => {
-      if (!token) return;
-
-      setState('verifying');
-
-      try {
-        const { data } = await verifyEmail({ token });
-
-        setState(data?.verified ? 'verified' : 'failed');
-        setMessage(data?.message ?? '');
-      } catch (error) {
-        setState('failed');
-        setMessage((error as DansshipAPIError)?.message || t('auth:verifyEmail.failed'));
-      }
-    },
-    [t, verifyEmail],
-  );
-
-  useEffect(() => {
-    if (token) {
-      void handleVerification(token);
-    }
+    void handleVerification();
   }, [token, handleVerification]);
 
   const statusTitle = useMemo(() => {
-    if (state === 'verifying') {
-      return t('auth:verifyEmail.verifying');
+    const titles = {
+      [VerificationStatus.VERIFYING]: t('auth:verifyEmail.titles.verifying'),
+      [VerificationStatus.VERIFIED]: t('auth:verifyEmail.titles.verified'),
+      [VerificationStatus.VERIFICATION_FAILED]: t('auth:verifyEmail.titles.verificationFailed'),
+      [VerificationStatus.RESENDING_EMAIL]: t('auth:verifyEmail.titles.resendingVerificationEmail'),
+      [VerificationStatus.RESENDED_EMAIL]: t('auth:verifyEmail.titles.verificationResended'),
+      [VerificationStatus.RESENDED_FAILED]: t('auth:verifyEmail.titles.verificationResendFailed'),
+    };
+
+    if (verificationStatus in titles) {
+      return titles[verificationStatus as keyof typeof titles];
     }
 
-    if (state === 'verified') {
-      return t('auth:verifyEmail.success');
+    if (email) {
+      return t('auth:verifyEmail.titles.idleEmail');
     }
 
-    if (state === 'failed') {
-      return t('auth:verifyEmail.failed');
+    return t('auth:verifyEmail.titles.idle');
+  }, [t, verificationStatus, email]);
+
+  const statusSubTitle = useMemo(() => {
+    const subtitles = {
+      [VerificationStatus.VERIFYING]: t('auth:verifyEmail.subtitles.verifying'),
+      [VerificationStatus.VERIFIED]: t('auth:verifyEmail.subtitles.verified'),
+      [VerificationStatus.VERIFICATION_FAILED]: t('auth:verifyEmail.subtitles.verificationFailed'),
+      [VerificationStatus.RESENDING_EMAIL]: t('auth:verifyEmail.subtitles.resendingVerificationEmail'),
+      [VerificationStatus.RESENDED_EMAIL]: t('auth:verifyEmail.subtitles.verificationResended', {
+        email,
+      }),
+      [VerificationStatus.RESENDED_FAILED]: t('auth:verifyEmail.subtitles.verificationResendFailed', {
+        email,
+      }),
+    };
+
+    if (verificationStatus in subtitles) {
+      return subtitles[verificationStatus as keyof typeof subtitles];
     }
 
-    return pending ? t('auth:verifyEmail.pendingTitle') : t('auth:verifyEmail.title');
-  }, [pending, state, t]);
+    if (email) {
+      return t('auth:verifyEmail.subtitles.idleEmail', {
+        email: email,
+      });
+    }
+
+    return t('auth:verifyEmail.subtitles.idle');
+  }, [verificationStatus, t, email]);
 
   const handleResend = async () => {
-    if (!email || resendCooldown > 0) {
-      return;
-    }
-
     setIsResending(true);
+    reset();
+    setVerificationStatus(VerificationStatus.RESENDING_EMAIL);
     try {
-      const response = await resendVerification({ email });
-      setMessage(response.data?.message ?? '');
-      setResendCooldown(30);
+      await delayPromise(resendVerification({ email }), 5000);
+      setVerificationStatus(VerificationStatus.RESENDED_EMAIL);
+      start();
     } catch {
-      setMessage(t('auth:verifyEmail.resendFailed'));
     } finally {
+      setVerificationStatus(VerificationStatus.RESENDED_FAILED);
       setIsResending(false);
     }
   };
 
   return (
-    <div className='min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8'>
-      <div className='max-w-md w-full bg-white rounded-lg shadow-sm p-8 space-y-4'>
-        <h3>{statusTitle}</h3>
+    <AuthFormLayout
+      gradientsImage='/assets/images/auth/dancing-girl-3.png'
+      title={statusTitle}
+      subtitle={statusSubTitle}
+    >
+      {[VerificationStatus.VERIFYING, VerificationStatus.RESENDING_EMAIL].includes(verificationStatus) && (
+        <SpinnerLoader />
+      )}
 
-        <p className='text-gray-600'>{message || t('auth:verifyEmail.description')}</p>
-
-        {(pending || state === 'failed') && email ? (
-          <Button className='w-full' onClick={handleResend} disabled={isResending || resendCooldown > 0}>
-            {isResending
-              ? t('common.loading')
-              : resendCooldown > 0
-                ? `${t('auth:verifyEmail.resend')} (${resendCooldown}s)`
-                : t('auth:verifyEmail.resend')}
+      <section className='grid gap-2 mt-4'>
+        {[VerificationStatus.VERIFICATION_FAILED, VerificationStatus.RESENDED_FAILED, VerificationStatus.IDLE].includes(
+          verificationStatus,
+        ) && (
+          <Button className='w-full' onClick={handleResend} disabled={isResending || isActive}>
+            {isResending && <Spinner />}
+            {!isResending && isActive && <span>{formattedTime}</span>}
+            {!isResending && !isActive && <span>{t('auth:verifyEmail.resend')}</span>}
           </Button>
-        ) : null}
+        )}
 
-        {state === 'verified' ? (
-          <Button asChild className='w-full'>
-            <Link to='/auth/login'>{t('auth:verifyEmail.continueToLogin')}</Link>
-          </Button>
-        ) : null}
-
-        {state !== 'verified' ? (
-          <div className='text-sm text-gray-500'>
-            <Link to='/auth/login' className='text-primary hover:text-primary/90'>
+        <Link to={PageURLS.auth.login} viewTransition>
+          {verificationStatus === VerificationStatus.VERIFIED ? (
+            <Button className='w-full'>
+              <LuArrowRight className='w-4 h-4' />
+              {t('auth:verifyEmail.continueToLogin')}
+            </Button>
+          ) : (
+            <Button variant='ghostPrimary' className='w-full'>
+              <LuArrowLeft className='w-4 h-4' />
               {t('auth:verifyEmail.backToLogin')}
-            </Link>
-          </div>
-        ) : null}
-      </div>
-    </div>
+            </Button>
+          )}
+        </Link>
+      </section>
+    </AuthFormLayout>
   );
 }
 

@@ -31,11 +31,11 @@
 @theme {
   --animate-fade-in-down: fade-in-down 300ms ease-out forwards;
   --animate-glitch: glitch 1s linear infinite;
-  --animate-gradients-float-1: float 5s ease-in-out infinite alternate;
-  --animate-gradients-float-2: float 8s ease-in-out infinite alternate;
-  --animate-gradients-float-3: float 3s ease-in-out infinite alternate;
-  --animate-gradients-float-4: float 12s ease-in-out infinite alternate;
-  --animate-gradients-float-5: float 9s ease-in-out infinite alternate;
+  --animate-gradients-float-1: float 7s ease infinite alternate;
+  --animate-gradients-float-2: float 6s ease infinite alternate;
+  --animate-gradients-float-3: float 8s ease infinite alternate;
+  --animate-gradients-float-4: float 5s ease infinite alternate;
+  --animate-gradients-float-5: float 4s ease infinite alternate;
 
   /* ================================================
    * COLORS

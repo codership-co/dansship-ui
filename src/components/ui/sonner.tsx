@@ -15,7 +15,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       style={
         {
-          '--normal-bg': 'hsl(from var(--color-popover) h s l / 80%)',
+          '--normal-bg': 'var(--color-popover)',
           '--normal-text': 'var(--color-popover-foreground)',
           '--normal-border': 'var(--color-popover-foreground)',
           '--border-radius': 'calc(var(--radius) * 4)',

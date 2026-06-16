@@ -20,6 +20,6 @@
 
 @keyframes float {
   to {
-    transform: translateY(2em);
+    transform: translateY(4rem);
   }
 }

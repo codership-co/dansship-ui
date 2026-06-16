@@ -13,21 +13,22 @@ function SignupPage() {
   const { signUp } = useAuth();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const handleSubmit = async (data: SignUpFormData) => {
+  const handleSubmit = async (formData: SignUpFormData) => {
     setIsSubmitting(true);
 
-    const response = await signUp({
-      email: data.email,
-      password: data.password,
-      confirm_password: data.confirmPassword,
+    const { data } = await signUp({
+      email: formData.email,
+      password: formData.password,
+      confirm_password: formData.confirmPassword,
     });
     setIsSubmitting(false);
 
-    if (response.status === 200) {
-      navigate(`/auth/verify-email?email=${encodeURIComponent(data.email)}&pending=1`);
-    } else {
-      // eslint-disable-next-line no-console
-      console.error('Registration failed:', response.error);
+    if (data) {
+      navigate(PageURLS.auth.verifyEmail, {
+        state: {
+          email: data.email,
+        },
+      });
     }
   };
 
