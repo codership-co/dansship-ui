@@ -8,10 +8,10 @@ export type LanguageCode = (typeof languageCodes)[number];
 export const defaultLanguage = languages[0];
 
 export const DOCUMENT_TYPE_OPTIONS = [
-  { value: 'CC', label: 'C.C. (Cédula de Ciudadanía)' },
-  { value: 'CE', label: 'C.E. (Cédula de Extranjería)' },
-  { value: 'PA', label: 'Pasaporte' },
-  { value: 'TI', label: 'T.I. (Tarjeta de Identidad)' },
+  { value: 'CC', label: 'auth:onboarding.documentTypeOptions.CC' },
+  { value: 'CE', label: 'auth:onboarding.documentTypeOptions.CE' },
+  { value: 'PA', label: 'auth:onboarding.documentTypeOptions.PA' },
+  { value: 'TI', label: 'auth:onboarding.documentTypeOptions.TI' },
 ];
 
 export const COUNTRY_CODE_OPTIONS = [
@@ -21,23 +21,47 @@ export const COUNTRY_CODE_OPTIONS = [
   { value: '+52', label: '🇲🇽 +52' },
 ];
 
-export const RELATIVE_OPTIONS = ['Madre', 'Padre', 'Hermano/a', 'Pareja', 'Amigo/a', 'Otro'];
-export const DISCOVERY_OPTIONS = ['Instagram', 'Tiktok', 'Google', 'Recomendacion', 'Otro'];
-export const GOALS_OPTIONS = [
-  'Tonificar/Moldear el cuerpo',
-  'Reducir estres',
-  'Desafío personal/Romper rutina',
-  'Pertenecer a una comunidad',
+export const RELATIVE_OPTIONS = [
+  { value: 'mother', label: 'auth:onboarding.relativeOptions.mother' },
+  { value: 'father', label: 'auth:onboarding.relativeOptions.father' },
+  { value: 'sibling', label: 'auth:onboarding.relativeOptions.sibling' },
+  { value: 'spouse', label: 'auth:onboarding.relativeOptions.spouse' },
+  { value: 'friend', label: 'auth:onboarding.relativeOptions.friend' },
+  { value: 'other', label: 'auth:onboarding.relativeOptions.other' },
 ];
-export const DISCIPLINES_OPTIONS = ['Pole Dance', 'Flexibilidad', 'Telas', 'Aro', 'Baile/Coreografía'];
-export const LEVEL_OPTIONS = ['Nunca he hecho ejercicio', 'Principiante', 'Intermedio', 'Avanzado'];
+export const DISCOVERY_OPTIONS = [
+  { value: 'instagram', label: 'auth:onboarding.discoveryOptions.instagram' },
+  { value: 'tiktok', label: 'auth:onboarding.discoveryOptions.tiktok' },
+  { value: 'google', label: 'auth:onboarding.discoveryOptions.google' },
+  { value: 'recomendation', label: 'auth:onboarding.discoveryOptions.recomendation' },
+  { value: 'other', label: 'auth:onboarding.discoveryOptions.other' },
+];
+export const GOALS_OPTIONS = [
+  { value: 'buildBody', label: 'auth:onboarding.goalsOptions.buildBody' },
+  { value: 'reduceStress', label: 'auth:onboarding.goalsOptions.reduceStress' },
+  { value: 'personalChallenge', label: 'auth:onboarding.goalsOptions.personalChallenge' },
+  { value: 'joinCommunity', label: 'auth:onboarding.goalsOptions.joinCommunity' },
+];
+export const DISCIPLINES_OPTIONS = [
+  { value: 'poleDance', label: 'auth:onboarding.disciplineOptions.poleDance' },
+  { value: 'flexibility', label: 'auth:onboarding.disciplineOptions.flexibility' },
+  { value: 'fabric', label: 'auth:onboarding.disciplineOptions.fabric' },
+  { value: 'ring', label: 'auth:onboarding.disciplineOptions.ring' },
+  { value: 'dance', label: 'auth:onboarding.disciplineOptions.dance' },
+];
+export const LEVEL_OPTIONS = [
+  { value: 'never', label: 'auth:onboarding.levelOptions.never' },
+  { value: 'beginner', label: 'auth:onboarding.levelOptions.beginner' },
+  { value: 'intermediate', label: 'auth:onboarding.levelOptions.intermediate' },
+  { value: 'advanced', label: 'auth:onboarding.levelOptions.advanced' },
+];
 export const SCHEDULE_OPTIONS = [
-  'Lunes a Viernes 6am - 10am',
-  'Lunes a Viernes 10am - 4pm',
-  'Lunes a Viernes 4pm - 9pm',
-  'Sábados',
-  'Domingos',
-  'Festivos',
+  { value: 'monFriFrom6to10', label: 'auth:onboarding.scheduleOptions.monFriFrom6to10' },
+  { value: 'monFriFrom10to16', label: 'auth:onboarding.scheduleOptions.monFriFrom10to16' },
+  { value: 'monFriFrom16to21', label: 'auth:onboarding.scheduleOptions.monFriFrom16to21' },
+  { value: 'saturday', label: 'auth:onboarding.scheduleOptions.saturday' },
+  { value: 'sunday', label: 'auth:onboarding.scheduleOptions.sunday' },
+  { value: 'holidays', label: 'auth:onboarding.scheduleOptions.holidays' },
 ];
 
 export const PageURLS = {

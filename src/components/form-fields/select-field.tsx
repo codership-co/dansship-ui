@@ -33,7 +33,7 @@ export function SelectField<T extends FieldValues = Record<string, unknown>>({
       control={control}
       name={name}
       render={({ field, fieldState: { error } }) => (
-        <div className='space-y-1'>
+        <div className='grid gap-2'>
           <Label htmlFor={fieldId}>{label}</Label>
           <Select value={field.value || ''} onValueChange={field.onChange} disabled={disabled}>
             <SelectTrigger id={fieldId} className={error ? 'border-alert-600 focus-visible:ring-alert-600' : ''}>
@@ -47,7 +47,11 @@ export function SelectField<T extends FieldValues = Record<string, unknown>>({
               ))}
             </SelectContent>
           </Select>
-          {error && <p className='text-sm text-alert-600'>{error.message}</p>}
+          {error && (
+            <label htmlFor={fieldId} className='m-0 text-small text-alert-600'>
+              {error.message}
+            </label>
+          )}
         </div>
       )}
     />

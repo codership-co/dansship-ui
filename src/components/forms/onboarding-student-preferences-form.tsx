@@ -3,7 +3,7 @@ import { useForm, useController } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-import { SelectField } from '@components/form-fields';
+import { Checkbox, SelectField } from '@components/form-fields';
 import { Button, Label } from '@components/ui';
 import {
   DISCOVERY_OPTIONS,
@@ -12,16 +12,6 @@ import {
   LEVEL_OPTIONS,
   SCHEDULE_OPTIONS,
 } from '@core/constants';
-
-const DISCOVERY_SELECT_OPTIONS = DISCOVERY_OPTIONS.map(option => ({
-  value: option,
-  label: option,
-}));
-
-const LEVEL_SELECT_OPTIONS = LEVEL_OPTIONS.map(option => ({
-  value: option,
-  label: option,
-}));
 
 export const createStudentPreferencesSchema = () =>
   z.object({
@@ -70,99 +60,90 @@ export function OnboardingStudentPreferencesForm({
   return (
     <div className='space-y-6'>
       <form className='space-y-6' onSubmit={handleSubmit(onComplete)}>
-        <div>
-          <h2 className='text-lg font-semibold text-gray-900'>{t('auth:onboarding.preferencesTitle')}</h2>
-          <p className='mt-1 text-sm text-gray-600'>{t('auth:onboarding.preferencesSubtitle')}</p>
-        </div>
-
         <div className='space-y-6'>
           <SelectField
             control={control}
             name='heardAboutUs'
-            label={t('auth:onboarding.heardAboutUs')}
-            options={DISCOVERY_SELECT_OPTIONS}
-            placeholder={t('auth:onboarding.selectOption')}
+            label={t('auth:onboarding.fields.heardAboutUs.label')}
+            options={DISCOVERY_OPTIONS.map(option => ({
+              ...option,
+              label: t(option.label),
+            }))}
+            placeholder={t('auth:onboarding.fields.heardAboutUs.placeholder')}
           />
 
-          <div className='space-y-2'>
-            <Label>{t('auth:onboarding.goals')}</Label>
-            <div className='mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2'>
-              {GOALS_OPTIONS.map(option => (
-                <label
-                  key={option}
-                  className='flex cursor-pointer items-center space-x-2 rounded-md border p-2 hover:bg-gray-50'
-                >
-                  <input
-                    type='checkbox'
-                    className='h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary'
-                    checked={goalsField.value.includes(option)}
+          <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-start'>
+            <div className='grid gap-2 mt-4'>
+              <Label>{t('auth:onboarding.goals')}</Label>
+              <div className='mt-4 grid grid-cols-1 gap-4'>
+                {GOALS_OPTIONS.map(({ value, label }) => (
+                  <Checkbox
+                    key={value}
+                    id={value}
+                    name={value}
+                    label={t(label)}
+                    checked={goalsField.value.includes(value)}
                     onChange={event => {
                       const nextValues = event.target.checked
-                        ? [...goalsField.value, option]
-                        : goalsField.value.filter(value => value !== option);
+                        ? [...goalsField.value, value]
+                        : goalsField.value.filter(v => v !== value);
                       goalsField.onChange(nextValues);
                     }}
                   />
-                  <span className='text-sm'>{option}</span>
-                </label>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div className='space-y-2'>
-            <Label>{t('auth:onboarding.disciplines')}</Label>
-            <div className='mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2'>
-              {DISCIPLINES_OPTIONS.map(option => (
-                <label
-                  key={option}
-                  className='flex cursor-pointer items-center space-x-2 rounded-md border p-2 hover:bg-gray-50'
-                >
-                  <input
-                    type='checkbox'
-                    className='h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary'
-                    checked={disciplinesField.value.includes(option)}
+            <div className='grid gap-2 mt-4'>
+              <Label>{t('auth:onboarding.disciplines')}</Label>
+              <div className='mt-4 grid grid-cols-1 gap-4'>
+                {DISCIPLINES_OPTIONS.map(({ value, label }) => (
+                  <Checkbox
+                    key={value}
+                    id={value}
+                    name={value}
+                    label={t(label)}
+                    checked={disciplinesField.value.includes(value)}
                     onChange={event => {
                       const nextValues = event.target.checked
-                        ? [...disciplinesField.value, option]
-                        : disciplinesField.value.filter(value => value !== option);
+                        ? [...disciplinesField.value, value]
+                        : disciplinesField.value.filter(v => v !== value);
                       disciplinesField.onChange(nextValues);
                     }}
                   />
-                  <span className='text-sm'>{option}</span>
-                </label>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
 
           <SelectField
             control={control}
             name='currentLevel'
-            label={t('auth:onboarding.currentLevel')}
-            options={LEVEL_SELECT_OPTIONS}
-            placeholder={t('auth:onboarding.selectOption')}
+            label={t('auth:onboarding.fields.currentLevel.label')}
+            options={LEVEL_OPTIONS.map(option => ({
+              ...option,
+              label: t(option.label),
+            }))}
+            placeholder={t('auth:onboarding.fields.currentLevel.placeholder')}
           />
 
-          <div className='space-y-2'>
+          <div className='grid gap-2 mt-4'>
             <Label>{t('auth:onboarding.preferredSchedules')}</Label>
-            <div className='mt-2 grid grid-cols-1 gap-2 sm:grid-cols-2'>
-              {SCHEDULE_OPTIONS.map(option => (
-                <label
-                  key={option}
-                  className='flex cursor-pointer items-center space-x-2 rounded-md border p-2 hover:bg-gray-50'
-                >
-                  <input
-                    type='checkbox'
-                    className='h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary'
-                    checked={preferredSchedulesField.value.includes(option)}
-                    onChange={event => {
-                      const nextValues = event.target.checked
-                        ? [...preferredSchedulesField.value, option]
-                        : preferredSchedulesField.value.filter(value => value !== option);
-                      preferredSchedulesField.onChange(nextValues);
-                    }}
-                  />
-                  <span className='text-sm'>{option}</span>
-                </label>
+            <div className='mt-4 grid grid-cols-1 gap-4'>
+              {SCHEDULE_OPTIONS.map(({ value, label }) => (
+                <Checkbox
+                  key={value}
+                  id={value}
+                  name={value}
+                  label={t(label)}
+                  checked={preferredSchedulesField.value.includes(value)}
+                  onChange={event => {
+                    const nextValues = event.target.checked
+                      ? [...preferredSchedulesField.value, value]
+                      : preferredSchedulesField.value.filter(v => v !== value);
+                    preferredSchedulesField.onChange(nextValues);
+                  }}
+                />
               ))}
             </div>
           </div>

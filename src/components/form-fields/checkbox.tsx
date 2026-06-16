@@ -23,7 +23,7 @@ export function Checkbox({ id, name, label, checked, onChange, error, disabled }
 
   return (
     <div>
-      <div className='flex items-start gap-3'>
+      <div className='flex items-start gap-2'>
         <ShadcnCheckbox
           id={id}
           checked={checked}

@@ -34,11 +34,11 @@ function OnboardingPage() {
   }
 
   return (
-    <div className='min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8'>
-      <div className='max-w-2xl w-full bg-white rounded-lg shadow-sm p-8 space-y-6'>
+    <div className='min-h-[calc(100vh-4rem)] pt-16'>
+      <div className='mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pb-24 grid gap-8'>
         <div>
           <h3>{t('auth:onboarding.title')}</h3>
-          <p className='text-gray-600 mt-2'>{t('auth:onboarding.subtitle')}</p>
+          <label>{t('auth:onboarding.subtitle')}</label>
         </div>
 
         {currentStep?.track === 'student' && (

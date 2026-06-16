@@ -4,14 +4,9 @@ import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
-import { SelectField } from '@components/form-fields';
-import { Button, Input, Label, Textarea } from '@components/ui';
+import { SelectField, TextareaField, TextField } from '@components/form-fields';
+import { Button } from '@components/ui';
 import { COUNTRY_CODE_OPTIONS, RELATIVE_OPTIONS } from '@core/constants';
-
-const RELATIVE_SELECT_OPTIONS = RELATIVE_OPTIONS.map(option => ({
-  value: option,
-  label: option,
-}));
 
 export const createHealthDataSchema = (t: TFunction) =>
   z.object({
@@ -40,18 +35,13 @@ export function OnboardingHealthForm({ isLoading, error, onContinue, onSkip }: O
   const { t } = useTranslation();
   const schema = createHealthDataSchema(t);
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors },
-  } = useForm<HealthDataFormValues>({
+  const { handleSubmit, control } = useForm<HealthDataFormValues>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     resolver: zodResolver(schema),
     defaultValues: {
       emergencyContactName: '',
-      emergencyContactRelative: RELATIVE_OPTIONS[0],
+      emergencyContactRelative: '',
       emergencyContactPhoneCountryCode: '+57',
       emergencyContactPhoneNumber: '',
       eps: '',
@@ -62,69 +52,59 @@ export function OnboardingHealthForm({ isLoading, error, onContinue, onSkip }: O
   return (
     <div className='space-y-6'>
       <form className='space-y-6' onSubmit={handleSubmit(onContinue)}>
-        <div>
-          <h2 className='text-lg font-semibold text-gray-900'>{t('auth:onboarding.healthTitle')}</h2>
-          <p className='mt-1 text-sm text-gray-600'>{t('auth:onboarding.healthSubtitle')}</p>
-        </div>
-
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-          <div className='space-y-2 md:col-span-2'>
-            <Label htmlFor='emergency_contact_name'>{t('auth:onboarding.emergencyContactName')}</Label>
-            <Input
-              id='emergency_contact_name'
-              {...register('emergencyContactName')}
-              placeholder={t('auth:onboarding.emergencyContactNamePlaceholder')}
-            />
-            {errors.emergencyContactName ? (
-              <p className='text-sm text-alert-600'>{errors.emergencyContactName.message}</p>
-            ) : null}
-          </div>
+        <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-start'>
+          <TextField
+            control={control}
+            name='emergencyContactName'
+            label={t('auth:onboarding.fields.emergencyContactName.label')}
+            placeholder={t('auth:onboarding.fields.emergencyContactName.placeholder')}
+          />
 
           <SelectField
             control={control}
             name='emergencyContactRelative'
-            label={t('auth:onboarding.relative')}
-            options={RELATIVE_SELECT_OPTIONS}
-            placeholder={t('auth:onboarding.relativePlaceholder')}
+            label={t('auth:onboarding.fields.relative.label')}
+            options={RELATIVE_OPTIONS.map(option => ({
+              ...option,
+              label: t(option.label),
+            }))}
+            placeholder={t('auth:onboarding.fields.relative.placeholder')}
           />
+        </div>
 
+        <div className='grid grid-cols-1 gap-4 lg:grid-cols-[auto_1fr] items-start'>
           <SelectField
             control={control}
             name='emergencyContactPhoneCountryCode'
-            label={t('auth:onboarding.emergencyPhoneCode')}
+            label={t('auth:onboarding.fields.emergencyPhoneCode.label')}
             options={COUNTRY_CODE_OPTIONS}
-            placeholder='+57'
+            placeholder={t('auth:onboarding.fields.emergencyPhoneCode.placeholder')}
           />
 
-          <div className='space-y-2'>
-            <Label htmlFor='emergency_contact_phone_number'>{t('auth:onboarding.emergencyPhoneNumber')}</Label>
-            <Input
-              id='emergency_contact_phone_number'
-              type='number'
-              inputMode='numeric'
-              {...register('emergencyContactPhoneNumber')}
-              placeholder={t('auth:onboarding.emergencyPhoneNumberPlaceholder')}
-            />
-            {errors.emergencyContactPhoneNumber ? (
-              <p className='text-sm text-alert-600'>{errors.emergencyContactPhoneNumber.message}</p>
-            ) : null}
-          </div>
+          <TextField
+            type='number'
+            inputMode='numeric'
+            control={control}
+            name='emergencyContactPhoneNumber'
+            label={t('auth:onboarding.fields.emergencyPhoneNumber.label')}
+            placeholder={t('auth:onboarding.fields.emergencyPhoneNumber.placeholder')}
+          />
+        </div>
 
-          <div className='space-y-2 md:col-span-2'>
-            <Label htmlFor='eps'>{t('auth:onboarding.eps')}</Label>
-            <Input id='eps' {...register('eps')} placeholder={t('auth:onboarding.epsPlaceholder')} />
-            {errors.eps ? <p className='text-sm text-alert-600'>{errors.eps.message}</p> : null}
-          </div>
+        <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-start'>
+          <TextField
+            control={control}
+            name='eps'
+            label={t('auth:onboarding.fields.eps.label')}
+            placeholder={t('auth:onboarding.fields.eps.placeholder')}
+          />
 
-          <div className='space-y-2 md:col-span-2'>
-            <Label htmlFor='existing_medical_conditions'>{t('auth:onboarding.medicalConditions')}</Label>
-            <Textarea
-              id='existing_medical_conditions'
-              {...register('existingMedicalConditions')}
-              placeholder={t('auth:onboarding.medicalConditionsPlaceholder')}
-              className='min-h-30'
-            />
-          </div>
+          <TextareaField
+            control={control}
+            name='existingMedicalConditions'
+            label={t('auth:onboarding.fields.medicalConditions.label')}
+            placeholder={t('auth:onboarding.fields.medicalConditions.placeholder')}
+          />
         </div>
 
         {error ? <p className='text-sm text-alert-600'>{error}</p> : null}

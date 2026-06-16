@@ -1,14 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TFunction } from 'i18next';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { LuCalendar } from 'react-icons/lu';
+import { LuBuilding, LuCalendar, LuHouse, LuIdCard, LuUser } from 'react-icons/lu';
 import { z } from 'zod';
 
-import { SelectField } from '@components/form-fields';
-import { Button, Calendar, Input, Label, Popover, PopoverContent, PopoverTrigger } from '@components/ui';
+import { DateField, SelectField, TextField } from '@components/form-fields';
+import { Button } from '@components/ui';
 import { COUNTRY_CODE_OPTIONS, DOCUMENT_TYPE_OPTIONS } from '@core/constants';
-import { cn } from '@helpers';
 
 export const createStudentProfileSchema = (t: TFunction) => {
   const tenYearsAgo = new Date();
@@ -17,18 +16,12 @@ export const createStudentProfileSchema = (t: TFunction) => {
   return z.object({
     fullName: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
     birthDate: z
-      .date()
-      .max(tenYearsAgo, { message: t('auth:onboarding.validationMinAge10') })
-      .optional()
-      .or(z.literal(undefined)),
-    phoneCountryCode: z.string().optional(),
-    phoneNumber: z
-      .string()
-      .regex(/^\d{10}$/, { message: t('auth:onboarding.validationPhoneLength') })
-      .optional()
-      .or(z.literal('')),
-    documentType: z.string().optional(),
-    documentValue: z.string().optional(),
+      .date(t('auth:onboarding.validationRequired'))
+      .max(tenYearsAgo, { message: t('auth:onboarding.validationMinAge10') }),
+    phoneCountryCode: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
+    phoneNumber: z.string().regex(/^\d{10}$/, { message: t('auth:onboarding.validationPhoneLength') }),
+    documentType: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
+    documentValue: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
     city: z.string().optional(),
     address: z.string().optional(),
   });
@@ -46,12 +39,7 @@ export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: Onb
   const { t } = useTranslation();
   const schema = createStudentProfileSchema(t);
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors },
-  } = useForm<StudentProfileFormValues>({
+  const { handleSubmit, control } = useForm<StudentProfileFormValues>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     resolver: zodResolver(schema),
@@ -60,7 +48,7 @@ export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: Onb
       birthDate: undefined,
       phoneCountryCode: '+57',
       phoneNumber: '',
-      documentType: 'CC',
+      documentType: '',
       documentValue: '',
       city: '',
       address: '',
@@ -70,92 +58,88 @@ export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: Onb
   return (
     <div className='space-y-6'>
       <form className='space-y-4' onSubmit={handleSubmit(onSubmit)}>
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+        <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-start'>
           <div className='space-y-2'>
-            <Label htmlFor='full_name'>{t('auth:onboarding.fullName')} *</Label>
-            <Input id='full_name' {...register('fullName')} placeholder={t('auth:onboarding.fullNamePlaceholder')} />
-            {errors.fullName ? <p className='text-sm text-alert-600'>{errors.fullName.message}</p> : null}
+            <TextField
+              control={control}
+              label={t('auth:onboarding.fields.fullName.label')}
+              name='fullName'
+              placeholder={t('auth:onboarding.fields.fullName.placeholder')}
+              icon={<LuUser className='mr-2 h-4 w-4' />}
+            />
           </div>
 
           <div className='space-y-2'>
-            <Label>{t('auth:onboarding.birthDate')}</Label>
-            <Controller
+            <DateField
               control={control}
               name='birthDate'
-              render={({ field }) => (
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      type='button'
-                      variant='outline'
-                      className={cn(
-                        'w-full justify-start text-left font-normal',
-                        !field.value && 'text-muted-foreground',
-                      )}
-                    >
-                      <LuCalendar className='mr-2 h-4 w-4' />
-                      {field.value ? (
-                        field.value.toLocaleDateString('en-US', { dateStyle: 'medium' })
-                      ) : (
-                        <span>{t('auth:onboarding.pickDate')}</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-auto p-0' align='start'>
-                    <Calendar
-                      mode='single'
-                      captionLayout='dropdown'
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      autoFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              )}
+              label={t('auth:onboarding.fields.birthDate.label')}
+              icon={<LuCalendar className='mr-2 h-4 w-4' />}
+              placeholder={t('auth:onboarding.fields.birthDate.placeholder')}
             />
           </div>
         </div>
 
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+        <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-start'>
           <SelectField
             control={control}
             name='documentType'
-            label={t('auth:onboarding.documentType')}
-            options={DOCUMENT_TYPE_OPTIONS}
-            placeholder={t('auth:onboarding.selectDocType')}
+            label={t('auth:onboarding.fields.documentType.label')}
+            options={DOCUMENT_TYPE_OPTIONS.map(option => ({
+              ...option,
+              label: t(option.label),
+            }))}
+            placeholder={t('auth:onboarding.fields.documentType.placeholder')}
           />
 
           <div className='space-y-2'>
-            <Label htmlFor='document_value'>{t('auth:onboarding.documentValue')}</Label>
-            <Input id='document_value' {...register('documentValue')} />
+            <TextField
+              control={control}
+              label={t('auth:onboarding.fields.documentValue.label')}
+              name='documentValue'
+              placeholder={t('auth:onboarding.fields.documentValue.placeholder')}
+              icon={<LuIdCard className='mr-2 h-4 w-4' />}
+            />
           </div>
         </div>
 
-        <div className='space-y-2'>
-          <Label htmlFor='phone_number'>{t('auth:onboarding.phoneNumber')}</Label>
-          <div className='flex gap-2'>
-            <div className='w-32.5'>
-              <SelectField
-                control={control}
-                name='phoneCountryCode'
-                label=''
-                options={COUNTRY_CODE_OPTIONS}
-                placeholder='+57'
-              />
-            </div>
-            <Input id='phone_number' className='flex-1' type='tel' {...register('phoneNumber')} />
-          </div>
+        <div className='grid grid-cols-1 gap-4 lg:grid-cols-[auto_1fr] items-start'>
+          <SelectField
+            control={control}
+            name='phoneCountryCode'
+            label={t('auth:onboarding.fields.phoneCode.label')}
+            options={COUNTRY_CODE_OPTIONS}
+            placeholder={t('auth:onboarding.fields.phoneCode.placeholder')}
+          />
+          <TextField
+            control={control}
+            type='tel'
+            label={t('auth:onboarding.fields.phoneNumber.label')}
+            name='phoneNumber'
+            placeholder={t('auth:onboarding.fields.phoneNumber.placeholder')}
+            icon={<LuBuilding className='mr-2 h-4 w-4' />}
+          />
         </div>
 
-        <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+        <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-start'>
           <div className='space-y-2'>
-            <Label htmlFor='city'>{t('auth:onboarding.city')}</Label>
-            <Input id='city' {...register('city')} />
+            <TextField
+              control={control}
+              label={t('auth:onboarding.fields.city.label')}
+              name='city'
+              placeholder={t('auth:onboarding.fields.city.placeholder')}
+              icon={<LuBuilding className='mr-2 h-4 w-4' />}
+            />
           </div>
 
           <div className='space-y-2'>
-            <Label htmlFor='address'>{t('auth:onboarding.address')}</Label>
-            <Input id='address' {...register('address')} />
+            <TextField
+              control={control}
+              label={t('auth:onboarding.fields.address.label')}
+              name='address'
+              placeholder={t('auth:onboarding.fields.address.placeholder')}
+              icon={<LuHouse className='mr-2 h-4 w-4' />}
+            />
           </div>
         </div>
 

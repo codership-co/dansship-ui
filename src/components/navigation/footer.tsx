@@ -9,7 +9,7 @@ export function Footer() {
   const { t } = useTranslation();
 
   return (
-    <footer className='mt-4 rounded-none bg-tertiary text-secondary py-12 shadow-[0_10px_40px_-10px_rgba(88,47,89,0.06)] backdrop-blur-xl'>
+    <footer className='rounded-none bg-tertiary text-secondary py-12 shadow-[0_10px_40px_-10px_rgba(88,47,89,0.06)] backdrop-blur-xl'>
       <PageContainer>
         <Logotype className='h-8' mainColor='var(--color-secondary)' />
         <div className='flex flex-col gap-6 md:flex-row md:items-center md:justify-between'>

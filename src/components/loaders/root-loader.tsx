@@ -1,3 +1,5 @@
+import { Logotype } from '@components/svg';
+
 export const RootLoader = () => {
   return (
     <section className='h-screen relative select-none grid gap-8 place-content-center justify-items-center bg-gradient-primary'>
@@ -13,9 +15,7 @@ export const RootLoader = () => {
           alt='Logo'
         />
       </div>
-      <h1 className='animate-fade-in-down duration-200 opacity-0 [animation-delay:100ms] text-center text-hero text-primary-50 font-brand'>
-        <img src='/assets/images/logotipo.png' alt='Dansship' className='h-22' />
-      </h1>
+      <Logotype className='h-16 animate-fade-in-down duration-200 opacity-0 [animation-delay:100ms]' />
     </section>
   );
 };
