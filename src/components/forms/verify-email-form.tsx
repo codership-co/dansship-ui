@@ -58,7 +58,10 @@ export const VerifyEmailForm = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='grid gap-4'>
-      {(![VerificationStatus.VERIFYING, VerificationStatus.RESENDING_EMAIL].includes(status) || email) && (
+      {(![VerificationStatus.VERIFYING, VerificationStatus.RESENDING_EMAIL, VerificationStatus.VERIFIED].includes(
+        status,
+      ) ||
+        email) && (
         <EmailField
           id='email'
           control={control}
