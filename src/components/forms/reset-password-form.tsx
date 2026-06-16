@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { t } from 'i18next';
+import { TFunction } from 'i18next';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -16,31 +16,33 @@ import { useCountdown } from '@hooks';
 
 import type { ResetPasswordPayload } from '@core/api';
 
-const ResetPasswordFormSchema = z
-  .object({
-    email: z
-      .string()
-      .min(1, { message: t('validation:required') })
-      .email({ message: t('validation:email') }),
-    code: z
-      .string()
-      .min(1, { message: t('validation:required') })
-      .min(6, { message: t('auth:resetPassword.codeInvalid') }),
-    new_password: z
-      .string()
-      .min(1, { message: t('validation:required') })
-      .min(8, { message: t('validation:password.length') }),
-    confirm_password: z.string().min(1, { message: t('validation:required') }),
-  })
-  .refine(data => data.new_password === data.confirm_password, {
-    message: t('validation:password.match'),
-    path: ['confirmPassword'],
-  });
+const createResetPasswordFormSchema = (t: TFunction) =>
+  z
+    .object({
+      email: z
+        .string()
+        .min(1, { message: t('validation:required') })
+        .email({ message: t('validation:email') }),
+      code: z
+        .string()
+        .min(1, { message: t('validation:required') })
+        .min(6, { message: t('auth:resetPassword.codeInvalid') }),
+      new_password: z
+        .string()
+        .min(1, { message: t('validation:required') })
+        .min(8, { message: t('validation:password.length') }),
+      confirm_password: z.string().min(1, { message: t('validation:required') }),
+    })
+    .refine(data => data.new_password === data.confirm_password, {
+      message: t('validation:password.match'),
+      path: ['confirmPassword'],
+    });
 
-export type ResetPasswordFormData = z.infer<typeof ResetPasswordFormSchema>;
+export type ResetPasswordFormData = z.infer<ReturnType<typeof createResetPasswordFormSchema>>;
 
 const useResetPasswordForm = (email: string) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const { forgotPassword, resetPassword } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSendingCode, setIsSendingCode] = useState(false);
@@ -50,7 +52,7 @@ const useResetPasswordForm = (email: string) => {
   const { control, handleSubmit } = useForm<ResetPasswordFormData>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    resolver: zodResolver(ResetPasswordFormSchema),
+    resolver: zodResolver(createResetPasswordFormSchema(t)),
     defaultValues: {
       email: email ?? '',
       code: '',

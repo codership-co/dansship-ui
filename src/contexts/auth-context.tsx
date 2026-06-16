@@ -208,8 +208,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setLocalError(null);
       toast.success(response.data.message);
     } else {
-      setLocalError(t('auth:verifyEmail.failed'));
-      toast.error(t('auth:verifyEmail.failed'));
+      setLocalError(t('auth:verifyEmail.subtitles.verificationFailed'));
+      toast.error(t('auth:verifyEmail.subtitles.verificationFailed'));
     }
 
     return response;
@@ -222,8 +222,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setLocalError(null);
       toast.success(response.data.message);
     } else {
-      setLocalError(t('auth.verifyEmail.resendFailed'));
-      toast.error(t('auth.verifyEmail.resendFailed'));
+      setLocalError(
+        t('auth:verifyEmail.subtitles.verificationResendFailed', {
+          email: payload.email,
+        }),
+      );
+      toast.error(
+        t('auth:verifyEmail.subtitles.verificationResendFailed', {
+          email: payload.email,
+        }),
+      );
     }
 
     return response;

@@ -1,25 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LuArrowLeft, LuArrowRight } from 'react-icons/lu';
-import { Link, useLocation, useSearchParams } from 'react-router';
+import { useLocation, useSearchParams } from 'react-router';
 
+import { VerificationStatus, VerifyEmailForm, VerifyEmailFormData } from '@components/forms';
 import { AuthFormLayout } from '@components/layouts';
-import { Spinner, SpinnerLoader } from '@components/loaders';
-import { Button } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
-import { delayPromise } from '@helpers';
 import { useCountdown } from '@hooks';
-
-enum VerificationStatus {
-  IDLE = 'IDLE',
-  VERIFYING = 'VERIFYING',
-  VERIFIED = 'VERIFIED',
-  VERIFICATION_FAILED = 'VERIFICATION_FAILED',
-  RESENDING_EMAIL = 'RESENDING_EMAIL',
-  RESENDED_EMAIL = 'RESENDED_EMAIL',
-  RESENDED_FAILED = 'RESENDED_FAILED',
-}
 
 function VerifyEmailPage() {
   const { t } = useTranslation();
@@ -32,7 +19,6 @@ function VerifyEmailPage() {
   const email = stateEmail ?? paramEmail ?? '';
 
   const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>(VerificationStatus.IDLE);
-  const [isResending, setIsResending] = useState(false);
   const { isActive, start, reset, formattedTime } = useCountdown(120);
 
   const handleVerification = useCallback(async () => {
@@ -100,20 +86,24 @@ function VerifyEmailPage() {
     return t('auth:verifyEmail.subtitles.idle');
   }, [verificationStatus, t, email]);
 
-  const handleResend = async () => {
-    setIsResending(true);
-    reset();
-    setVerificationStatus(VerificationStatus.RESENDING_EMAIL);
-    try {
-      await delayPromise(resendVerification({ email }), 5000);
-      setVerificationStatus(VerificationStatus.RESENDED_EMAIL);
-      start();
-    } catch {
-    } finally {
-      setVerificationStatus(VerificationStatus.RESENDED_FAILED);
-      setIsResending(false);
-    }
-  };
+  const onSubmit = useCallback(
+    async ({ email }: VerifyEmailFormData) => {
+      reset();
+      setVerificationStatus(VerificationStatus.RESENDING_EMAIL);
+      try {
+        const { data } = await resendVerification({ email });
+
+        if (data?.verification_sent) {
+          setVerificationStatus(VerificationStatus.RESENDED_EMAIL);
+          start();
+        }
+      } catch {
+      } finally {
+        setVerificationStatus(VerificationStatus.RESENDED_FAILED);
+      }
+    },
+    [resendVerification, reset, start],
+  );
 
   return (
     <AuthFormLayout
@@ -121,35 +111,13 @@ function VerifyEmailPage() {
       title={statusTitle}
       subtitle={statusSubTitle}
     >
-      {[VerificationStatus.VERIFYING, VerificationStatus.RESENDING_EMAIL].includes(verificationStatus) && (
-        <SpinnerLoader />
-      )}
-
-      <section className='grid gap-2 mt-4'>
-        {[VerificationStatus.VERIFICATION_FAILED, VerificationStatus.RESENDED_FAILED, VerificationStatus.IDLE].includes(
-          verificationStatus,
-        ) && (
-          <Button className='w-full' onClick={handleResend} disabled={isResending || isActive}>
-            {isResending && <Spinner />}
-            {!isResending && isActive && <span>{formattedTime}</span>}
-            {!isResending && !isActive && <span>{t('auth:verifyEmail.resend')}</span>}
-          </Button>
-        )}
-
-        <Link to={PageURLS.auth.login} viewTransition>
-          {verificationStatus === VerificationStatus.VERIFIED ? (
-            <Button className='w-full'>
-              <LuArrowRight className='w-4 h-4' />
-              {t('auth:verifyEmail.continueToLogin')}
-            </Button>
-          ) : (
-            <Button variant='ghostPrimary' className='w-full'>
-              <LuArrowLeft className='w-4 h-4' />
-              {t('auth:verifyEmail.backToLogin')}
-            </Button>
-          )}
-        </Link>
-      </section>
+      <VerifyEmailForm
+        onSubmit={onSubmit}
+        status={verificationStatus}
+        isCountDownActive={isActive}
+        formattedTime={formattedTime}
+        email={email}
+      />
     </AuthFormLayout>
   );
 }
