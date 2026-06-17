@@ -4,19 +4,21 @@ import { RootLoader } from '@components/loaders';
 import { Footer, Navbar } from '@components/navigation';
 import { SecurityGuard, useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
+import { useScrollToTop } from '@hooks';
 
 const SecurityOutlet = SecurityGuard(Outlet);
 
 export const RootLayout = () => {
   const { pathname } = useLocation();
   const { ready } = useAuth();
+  useScrollToTop();
 
   if (!ready) {
     return <RootLoader />;
   }
 
   return (
-    <section className='min-h-screen grid grid-rows-[1fr_auto]'>
+    <section className='relative min-h-screen grid grid-rows-[1fr_auto]'>
       {pathname !== PageURLS.home && (
         <img
           src='/assets/images/bg-girl.png'

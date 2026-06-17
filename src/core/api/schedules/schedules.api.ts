@@ -8,7 +8,7 @@ export class SchedulesAPI {
   async getPublishedClassesByRange(startAt: string, endAt: string) {
     return this.httpClient.call<Array<PublishedClass>>({
       path: '/schedules/classes',
-      method: 'DELETE',
+      method: 'GET',
       params: {
         start_at: startAt,
         end_at: endAt,

@@ -26,6 +26,7 @@
   --scale-700: calc(var(--scale-step) * 3.5);
   --scale-800: calc(var(--scale-step) * 2.5);
   --scale-900: calc(var(--scale-step) * 1.5);
+  --uplift: 10vh;
 }
 
 @theme {
@@ -268,6 +269,7 @@
   --background-image-gradient-plan-selector: linear-gradient(to bottom, var(--color-secondary-200), var(--color-secondary-600));
   --background-image-gradient-plan-card: linear-gradient(to bottom, var(--color-secondary-400), var(--color-secondary-100));
   --background-image-gradient-auth: linear-gradient(-135deg, #4e4bff, #9700a3);
+  --background-image-gradient-onboarding: linear-gradient(to bottom right, var(--color-secondary) 40%, hsl(from var(--color-primary) h s 70%));
 
   --background-image-gradient-hero: linear-gradient(to bottom, var(--color-tertiary-200), var(--color-secondary-200));
   --background-image-gradient-primary: linear-gradient(135deg, var(--color-primary-100), var(--color-primary-400));

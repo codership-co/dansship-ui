@@ -50,6 +50,10 @@
   "updating": "Actualizando...",
   "noPermissionTitle": "Acceso denegado",
   "noPermissionDescription": "No tienes permisos para ver esta pagina.",
+  "step": "Paso {{step}}",
+  "pending": "Pendiente",
+  "complete": "Completado",
+  "inProgress": "En Progreso",
   "placeholder": {
     "email": "correo@mail.com",
     "password": "contraseña"

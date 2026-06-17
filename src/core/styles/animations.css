@@ -23,3 +23,14 @@
     transform: translateY(4rem);
   }
 }
+
+@keyframes float-up {
+  0% {
+    top: 50%;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    top: calc(var(--uplift, 10vh) * -1);
+    transform: translate(-50%, -50%) scale(0);
+  }
+}
