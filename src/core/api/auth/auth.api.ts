@@ -58,7 +58,7 @@ export class AuthAPI {
     return this.httpClient.call<RegisterResponse, ResendVerificationPayload>({
       path: '/auth/resend-verification',
       method: 'POST',
-      params: payload,
+      data: payload,
     });
   }
 
