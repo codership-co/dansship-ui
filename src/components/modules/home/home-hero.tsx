@@ -16,7 +16,7 @@ export const HomeHero = () => {
     <Section compact className='bg-gradient-hero'>
       <div className='relative gap-10 xl:gap-20 home-hero transition-[all_300ms_ease] pb-7 pt-20 sm:pt-40 lg:pb-10'>
         <div className='grid gap-4 content-center max-w-xl' style={{ gridArea: 'text' }}>
-          <h1 className='text-primary-200 hero leading-none m-0'>
+          <h1 className='text-accent hero leading-none m-0'>
             <span className='block'>{t('home:stitch.hero.kicker1')}</span>
             <span className='block'>
               {t('home:stitch.hero.kicker2')} <Logotype className='h-[0.65em] sm:h-[0.75em] inline-block' />
@@ -39,7 +39,7 @@ export const HomeHero = () => {
           </div>
         </div>
 
-        <section className='relative size-60 lg:size-100 bg-primary-200/50 rounded-full' style={{ gridArea: 'image' }}>
+        <section className='relative size-60 lg:size-100 bg-accent rounded-full' style={{ gridArea: 'image' }}>
           <img
             src='/assets/images/home/MujerSS.png'
             alt='Dansship'

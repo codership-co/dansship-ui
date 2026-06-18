@@ -6,15 +6,15 @@ import { cn } from '@helpers';
 
 const buttonVariants = cva(
   // eslint-disable-next-line quotes
-  "inline-flex transition cursor-pointer shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "inline-flex transition cursor-pointer shrink-0 items-center justify-center gap-2 rounded-md text-sm font-medium whitespace-nowrap transition-all outline-none focus-visible:border-primary focus-visible:primary-[3px] focus-visible:primary-primary/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:primary-destructive/20 dark:aria-invalid:primary-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary-400',
         destructive:
-          'bg-alert text-white hover:bg-alert/90 focus-visible:ring-alert/20 dark:bg-alert/60 dark:focus-visible:ring-alert/40',
+          'bg-alert text-white hover:bg-alert/90 focus-visible:primary-alert/20 dark:bg-alert/60 dark:focus-visible:primary-alert/40',
         outline:
-          'border shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50',
+          'border shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-accent dark:bg-accent/30 dark:hover:bg-accent/50',
         outlinePrimary: 'text-primary border border-primary shadow-xs hover:bg-primary-50',
         outlineTertiary: 'text-tertiary border border-tertiary shadow-xs hover:bg-tertiary-50',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary-600',

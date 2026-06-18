@@ -302,7 +302,7 @@ export function CheckoutModal({ isOpen, onClose, selectedPlan }: CheckoutModalPr
               <span>{t('subscriptions:totalDue')}</span>
               <span>{formatPrice(finalPrice, selectedPlan.currency)}</span>
             </div>
-            {isPreviewLoading ? <p className='mt-2 text-xs text-gray-500'>{t('common.loading')}</p> : null}
+            {isPreviewLoading ? <p className='mt-2 text-xs text-gray-500'>{t('common:loading')}</p> : null}
           </div>
         </div>
       );
@@ -350,7 +350,7 @@ export function CheckoutModal({ isOpen, onClose, selectedPlan }: CheckoutModalPr
             <div className='space-y-2 rounded-md border border-dashed border-gray-300 p-3'>
               <p className='text-sm font-medium text-gray-900'>{t('payments:proofUploadInCheckoutTitle')}</p>
               <p className='text-xs text-gray-600'>{t('payments:proofUploadInCheckoutDesc')}</p>
-              <label className='inline-flex cursor-pointer items-center gap-2 rounded-md border border-input bg-background px-3 py-2 text-xs font-medium shadow-sm hover:bg-accent hover:text-accent-foreground'>
+              <label className='inline-flex cursor-pointer items-center gap-2 rounded-md border border-accent bg-background px-3 py-2 text-xs font-medium shadow-sm hover:bg-accent hover:text-accent-foreground'>
                 {selectedProofFile ? t('payments:replaceProof') : t('payments:uploadProof')}
                 <input
                   type='file'
@@ -424,17 +424,17 @@ export function CheckoutModal({ isOpen, onClose, selectedPlan }: CheckoutModalPr
           <div className='flex justify-end gap-2 border-t pt-4'>
             {step === 4 ? (
               <Button type='button' onClick={onClose}>
-                {t('common.close')}
+                {t('common:close')}
               </Button>
             ) : (
               <>
                 {showBack ? (
                   <Button type='button' variant='outline' onClick={() => setStep(prev => Math.max(1, prev - 1))}>
-                    {t('common.back')}
+                    {t('common:back')}
                   </Button>
                 ) : (
                   <Button type='button' variant='outline' onClick={onClose}>
-                    {t('common.cancel')}
+                    {t('common:cancel')}
                   </Button>
                 )}
 
@@ -444,7 +444,7 @@ export function CheckoutModal({ isOpen, onClose, selectedPlan }: CheckoutModalPr
                     disabled={step === 1 && !canProceed}
                     onClick={() => setStep(prev => Math.min(3, prev + 1))}
                   >
-                    {t('common.next')}
+                    {t('common:next')}
                   </Button>
                 ) : null}
 

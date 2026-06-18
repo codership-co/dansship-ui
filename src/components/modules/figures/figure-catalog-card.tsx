@@ -33,11 +33,11 @@ export const FigureCatalogCard = ({ figure }: FigureCatalogCardProps) => {
   const imageUrl = figure.image_url || figure.image || '';
   const difficultyLevel = figure.difficulty as 'basic' | 'intermediate' | 'intermediate-advance' | 'advance';
   const displayDifficulty = mapDifficultyToDisplay(figure.difficulty);
-  const description = figure.description?.trim() ? figure.description : t('browse.catalog.cardDescriptionFallback');
+  const description = figure.description?.trim() ? figure.description : t('browse:catalog.cardDescriptionFallback');
 
   return (
     <Link to={PageURLS.figuresById(figure.id)} className='block h-full'>
-      <article className='group flex h-full flex-col overflow-hidden rounded-xl border border-[hsl(var(--outline-variant)/0.2)] bg-[hsl(var(--surface-container-lowest))] shadow-[0_8px_30px_-12px_rgba(88,47,89,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(88,47,89,0.16)]'>
+      <article className='group flex h-full flex-col overflow-hidden rounded-xl border border-accent/20 bg-[hsl(var(--surface-container-lowest))] shadow-[0_8px_30px_-12px_rgba(88,47,89,0.08)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_-15px_rgba(88,47,89,0.16)]'>
         <div className='relative aspect-4/5 overflow-hidden bg-[hsl(var(--surface-container-low))]'>
           {imageUrl ? (
             <img

@@ -115,7 +115,7 @@ export function getUserFacingError(
       return explicitMessage;
     }
 
-    return t('errors.codes.BAD_REQUEST_GENERIC');
+    return t('errors:codes.BAD_REQUEST_GENERIC');
   })();
 
   return {

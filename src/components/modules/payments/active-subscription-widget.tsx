@@ -131,7 +131,7 @@ export function ActiveSubscriptionWidget() {
           const isFutureStart = isFuture(new Date(sub.start_date));
 
           return (
-            <Card key={sub.id} className='relative overflow-hidden border-input shadow-sm'>
+            <Card key={sub.id} className='relative overflow-hidden border-accent shadow-sm'>
               <CardHeader>
                 <CardTitle className='text-lg'>{sub.plan_name_snapshot}</CardTitle>
 

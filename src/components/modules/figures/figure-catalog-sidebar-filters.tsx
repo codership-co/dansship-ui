@@ -26,7 +26,7 @@ export const catalogDesktopCheckboxVariants = cva(
     variants: {
       checked: {
         true: 'border-primary bg-primary text-on-primary',
-        false: 'border-outline-variant bg-surface-container-lowest text-transparent',
+        false: 'border-accent bg-surface-container-lowest text-transparent',
       },
     },
     defaultVariants: {

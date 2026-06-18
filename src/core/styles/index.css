@@ -14,8 +14,8 @@
   /* ================================================
    * CONFIG VARIABLES
    * ================================================ */
-  --light-base: #fff;
-  --dark-base: #000;
+  --light-base: #ffffff;
+  --dark-base: #000000;
   --scale-step: 20%;
   --scale-50: calc(var(--scale-step) * 1);
   --scale-100: calc(var(--scale-step) * 1.5);
@@ -32,11 +32,8 @@
 @theme {
   --animate-fade-in-down: fade-in-down 300ms ease-out forwards;
   --animate-glitch: glitch 1s linear infinite;
-  --animate-gradients-float-1: float 7s ease infinite alternate;
-  --animate-gradients-float-2: float 6s ease infinite alternate;
-  --animate-gradients-float-3: float 8s ease infinite alternate;
-  --animate-gradients-float-4: float 5s ease infinite alternate;
-  --animate-gradients-float-5: float 4s ease infinite alternate;
+  --animate-gradients-floatA: floatA 3s ease infinite alternate;
+  --animate-gradients-floatB: floatB 3s ease infinite alternate;
 
   /* ================================================
    * COLORS
@@ -45,12 +42,13 @@
   --color-alert: hsl(359 90% 62%);
   --color-warning: hsl(38 100% 50%);
   --color-info: hsl(210 100% 51%);
-  --color-primary: hsl(299 31% 27%);
-  --color-secondary: hsl(32 100% 93%);
-  --color-tertiary: hsl(9 100% 66%);
-  --color-highlight: hsl(347 94% 82%);
-  --color-white: hsl(0 0 100%);
-  --color-black: hsl(0 0 0%);
+  --color-primary: hsl(270 64% 26%);
+  --color-secondary: hsl(37 93% 88%);
+  --color-tertiary: hsl(347 94% 82%);
+  --color-highlight: hsl(205 100% 68%);
+  --color-accent: hsl(285 26% 70%);
+  --color-white: hsl(0 0% 100%);
+  --color-black: hsl(0 0% 0%);
 
   /* ================================================
    * ACTIVE
@@ -186,7 +184,22 @@
   --color-highlight-700: color-mix(in hsl, var(--color-highlight) var(--scale-700), var(--dark-base));
   --color-highlight-800: color-mix(in hsl, var(--color-highlight) var(--scale-800), var(--dark-base));
   --color-highlight-900: color-mix(in hsl, var(--color-highlight) var(--scale-900), var(--dark-base));
-  --color-highlight-foreground: var(--color-highlight-50);
+  --color-highlight-foreground: var(--color-highlight-900);
+
+  /* ================================================
+   * ACCESS
+   * ================================================ */
+  --color-accent-50: color-mix(in hsl, var(--color-accent) var(--scale-50), var(--light-base));
+  --color-accent-100: color-mix(in hsl, var(--color-accent) var(--scale-100), var(--light-base));
+  --color-accent-200: color-mix(in hsl, var(--color-accent) var(--scale-200), var(--light-base));
+  --color-accent-300: color-mix(in hsl, var(--color-accent) var(--scale-300), var(--light-base));
+  --color-accent-400: color-mix(in hsl, var(--color-accent) var(--scale-400), var(--light-base));
+  --color-accent-500: var(--color-accent);
+  --color-accent-600: color-mix(in hsl, var(--color-accent) var(--scale-600), var(--dark-base));
+  --color-accent-700: color-mix(in hsl, var(--color-accent) var(--scale-700), var(--dark-base));
+  --color-accent-800: color-mix(in hsl, var(--color-accent) var(--scale-800), var(--dark-base));
+  --color-accent-900: color-mix(in hsl, var(--color-accent) var(--scale-900), var(--dark-base));
+  --color-accent-foreground: var(--color-accent-800);
 
   /* ================================================
    * STATES
@@ -197,13 +210,8 @@
   --color-foreground: hsl(32 54% 13%);
   --color-foreground-disabled: var(--color-neutral-900);
   --color-border: hsl(300 18% 79%);
-  --color-input: hsl(300 18% 79%);
-  --color-outline-variant: hsl(300 16% 63%);
-  --color-ring: hsl(299 31% 27%);
   --color-primary-container: var(--color-primary);
   --color-primary-fixed-dim: var(--color-primary-300);
-  --color-accent: hsl(34 66% 87%);
-  --color-accent-foreground: hsl(32 54% 13%);
   --color-destructive: hsl(10 77% 48%);
   --color-destructive-foreground: hsl(34 66% 95%);
   --color-error-container: hsl(12 100% 92%);
@@ -268,10 +276,10 @@
   --background-image-gradient-plan-recommended: radial-gradient(circle at bottom center, var(--color-primary-300), var(--color-primary-600));
   --background-image-gradient-plan-selector: linear-gradient(to bottom, var(--color-secondary-200), var(--color-secondary-600));
   --background-image-gradient-plan-card: linear-gradient(to bottom, var(--color-secondary-400), var(--color-secondary-100));
-  --background-image-gradient-auth: linear-gradient(-135deg, #4e4bff, #9700a3);
+  --background-image-gradient-auth: linear-gradient(-135deg, var(--color-highlight), var(--color-primary));
   --background-image-gradient-onboarding: linear-gradient(to bottom right, var(--color-secondary) 40%, hsl(from var(--color-primary) h s 70%));
 
-  --background-image-gradient-hero: linear-gradient(to bottom, var(--color-tertiary-200), var(--color-secondary-200));
+  --background-image-gradient-hero: linear-gradient(to bottom, var(--color-accent-300), var(--color-secondary-200));
   --background-image-gradient-primary: linear-gradient(135deg, var(--color-primary-100), var(--color-primary-400));
   --background-image-gradient-primary-transparent: linear-gradient(135deg, hsl(from var(--color-primary-100) h s l / 90%), hsl(from var(--color-primary-400) h s l / 90%));
   --background-image-gradient-secondary: linear-gradient(135deg, var(--color-secondary-100), var(--color-secondary-400));

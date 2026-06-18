@@ -18,9 +18,15 @@
   100% { transform: translate(0) }
 }
 
-@keyframes float {
+@keyframes floatA {
   to {
-    transform: translateY(4rem);
+    transform: translate(1rem, 1rem);
+  }
+}
+
+@keyframes floatB {
+  to {
+    transform: translate(-1rem, -1rem);
   }
 }
 

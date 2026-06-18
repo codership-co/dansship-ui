@@ -146,7 +146,7 @@ export const FigureCatalogMobileFilters = ({ filters, setFilters }: FigureCatalo
       ) : null}
 
       {isPanelOpen ? (
-        <div className='rounded-xl border border-outline-variant/45 bg-surface-container-lowest p-4 shadow-sm'>
+        <div className='rounded-xl border border-accent/45 bg-surface-container-lowest p-4 shadow-sm'>
           <p className='mb-3 mt-6 font-label text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground'>
             {t('browse:filters.difficulty', { defaultValue: 'Difficulty' })}
           </p>
@@ -193,7 +193,7 @@ export const FigureCatalogMobileFilters = ({ filters, setFilters }: FigureCatalo
             {t('browse:catalog.sortByLabel', { defaultValue: 'Sort by' })}
           </p>
           <select
-            className='rounded-lg border border-outline-variant/60 bg-transparent px-3 py-1.5 text-sm font-medium text-primary outline-none focus:border-primary focus:ring-0'
+            className='rounded-lg border border-accent/60 bg-transparent px-3 py-1.5 text-sm font-medium text-primary outline-none focus:border-primary focus:ring-0'
             value={filters.sortBy}
             onChange={event =>
               setFilters(p => ({

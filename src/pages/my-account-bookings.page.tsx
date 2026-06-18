@@ -98,7 +98,7 @@ function MyAccountBookingsPage() {
                     </p>
                     {booking.plan_name && (
                       <p className='text-xs text-primary font-medium mt-1'>
-                        {t('subscriptions.planUsed', { name: booking.plan_name })}
+                        {t('subscriptions:planUsed', { name: booking.plan_name })}
                       </p>
                     )}
                   </div>

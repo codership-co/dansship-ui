@@ -69,7 +69,7 @@ export const FigureCatalogResults = ({
             {t('browse:catalog.sortByLabel')}
           </span>
           <select
-            className='rounded-lg border border-[hsl(var(--outline-variant)/0.6)] bg-transparent px-3 py-1.5 text-sm font-medium text-primary outline-none focus:border-primary focus:ring-0'
+            className='rounded-lg border border-accent/60 bg-transparent px-3 py-1.5 text-sm font-medium text-primary outline-none focus:border-primary focus:ring-0'
             value={filters.sortBy}
             onChange={event => {
               setFilters(previous => ({
@@ -95,7 +95,7 @@ export const FigureCatalogResults = ({
       ) : null}
 
       {figures.length === 0 && !isLoading ? (
-        <div className='rounded-xl border border-dashed border-[hsl(var(--outline-variant)/0.5)] bg-[hsl(var(--surface-container-lowest))] p-10 text-center text-muted-foreground'>
+        <div className='rounded-xl border border-dashed border-accent/50 p-10 text-center text-muted-foreground'>
           {t('browse:noResults')}
         </div>
       ) : null}

@@ -166,7 +166,7 @@ export const HomeAdminDashboard = () => {
             <Link
               key={card.id}
               to={card.to}
-              className='rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+              className='rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ringprimary focus-visible:ring-offset-2'
             >
               <Card className='border-secondary/50 bg-surface-container-low shadow-sm transition-colors duration-200 hover:bg-surface-container'>
                 <CardHeader>
