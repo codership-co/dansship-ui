@@ -103,8 +103,8 @@ export const Fluids1 = ({ className, style }: FluidsProps) => (
       <path
         className='animate-gradients-floatB'
         d='M491.386 -10.4702C491.386 -10.4702 465.646 176.139 449.689 228.294C433.732 280.449 392.381 317.231 360.492 335.263C328.603 353.294 313.258 287.34 335.737 232.754C358.216 178.167 425.351 162.745 447.995 125.971C470.64 89.1967 449.227 -8.18184 449.227 -8.18184L473.886 -8.18184L491.386 -10.4702Z'
-        fill='var(--color-primary)'
-        fillOpacity='0.1'
+        fill='white'
+        fillOpacity='0.2'
       />
     </g>
     <defs>

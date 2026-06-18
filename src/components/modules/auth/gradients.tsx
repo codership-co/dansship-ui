@@ -11,7 +11,7 @@ interface GradientsProps {
 export const Gradients = ({ className, flipped, img, styles }: GradientsProps) => {
   return (
     <section
-      className={cn('pointer-events-none select-none relative bg-gradient-auth overflow-hidden', className)}
+      className={cn('pointer-events-none select-none relative bg-primary overflow-hidden', className)}
       style={{
         ...styles,
         viewTransitionName: 'gradients',
