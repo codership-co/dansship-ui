@@ -15,7 +15,6 @@ export const Gradients = ({ className, flipped, img, styles }: GradientsProps) =
       style={{
         ...styles,
         viewTransitionName: 'gradients',
-        contain: 'paint',
       }}
     >
       <img
@@ -28,6 +27,8 @@ export const Gradients = ({ className, flipped, img, styles }: GradientsProps) =
             : 'right-0 drop-shadow-[-1px_1px_white,-2px_2px_white]',
         )}
       />
+
+      {/* <img src='/assets/images/girl-in-pool-1.svg' alt='pole' className='absolute bottom-0 right-2/10 h-full'/> */}
 
       <Fluids1
         className={cn('absolute min-w-100 w-full max-w-120 top-0', flipped ? 'right-0 rotate-y-180' : 'left-0')}

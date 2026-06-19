@@ -27,7 +27,7 @@ function OnboardingPage() {
 
   if (!status.required) {
     return (
-      <div className='min-h-screen flex items-center justify-center'>
+      <div className='min-h-dvh flex items-center justify-center'>
         <p>{t('auth:onboarding.notRequired')}</p>
       </div>
     );

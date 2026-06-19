@@ -1,3 +1,4 @@
+@import "polpo/components.css";
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "./animations.css";
@@ -210,13 +211,12 @@
   --color-foreground: hsl(32 54% 13%);
   --color-foreground-disabled: var(--color-neutral-900);
   --color-border: hsl(300 18% 79%);
-  --color-primary-container: var(--color-primary);
-  --color-primary-fixed-dim: var(--color-primary-300);
-  --color-destructive: hsl(10 77% 48%);
-  --color-destructive-foreground: hsl(34 66% 95%);
-  --color-error-container: hsl(12 100% 92%);
-  --color-tertiary-container: hsl(343 44% 28%);
-  --color-on-tertiary-container: hsl(347 66% 74%);
+
+  /* ================================================
+   * DIMENSIONS
+   * ================================================ */
+  --spacing: 0.25rem;
+  --radius: 0.25rem;
 
   /* ================================================
    * TYPOGRAPHY
@@ -264,14 +264,15 @@
   /* ================================================
    * BREAKPOINTS
    * ================================================ */
-  --breakpoint-xs: 450px;
+  --breakpoint-2xs: 360px;
+  --breakpoint-xs: 480px;
   --breakpoint-sm: 640px;
   --breakpoint-md: 768px;
   --breakpoint-lg: 1024px;
   --breakpoint-xl: 1280px;
-  --breakpoint-2xl: 1536px;
-  --spacing: 0.25rem;
-  --radius: 0.25rem;
+  --breakpoint-2xl: 1440px;
+  --breakpoint-3xl: 1920px;
+  --breakpoint-4xl: 2560px;
 
   --background-image-gradient-plan-recommended: radial-gradient(circle at bottom center, var(--color-primary-300), var(--color-primary-600));
   --background-image-gradient-plan-selector: linear-gradient(to bottom, var(--color-secondary-200), var(--color-secondary-600));
@@ -296,6 +297,13 @@
   --color-surface-container-low: hsl(34 93% 94%);
   --color-surface-container: hsl(35 96% 91%);
   --color-surface-container-highest: hsl(35 58% 86%);
+  --color-primary-container: var(--color-primary);
+  --color-primary-fixed-dim: var(--color-primary-300);
+  --color-destructive: hsl(10 77% 48%);
+  --color-destructive-foreground: hsl(34 66% 95%);
+  --color-error-container: hsl(12 100% 92%);
+  --color-tertiary-container: hsl(343 44% 28%);
+  --color-on-tertiary-container: hsl(347 66% 74%);
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -333,7 +341,7 @@
   }
 
   :root {
-    @apply bg-background text-foreground font-main text-body min-h-screen;
+    @apply bg-background text-foreground font-main text-body min-h-dvh;
     color-scheme: light dark;
     font-synthesis: none;
     text-rendering: optimizeLegibility;

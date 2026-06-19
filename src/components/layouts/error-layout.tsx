@@ -9,7 +9,7 @@ interface ErrorLayoutProps {
 
 export const ErrorLayout = ({ hero, image, title, description, actions, footer }: ErrorLayoutProps) => {
   return (
-    <main className='flex items-center justify-center px-6 pt-20 min-h-screen'>
+    <main className='flex items-center justify-center px-6 pt-20 min-h-dvh'>
       <section className='relative mx-auto w-xl group mb-60'>
         <div className='bg-primary/40 absolute -z-10 left-[-25%] top-[-5%] h-96 w-96 rounded-full animate-pulse duration-4000' />
         <div className='bg-secondary/80 absolute -z-10 right-[-20%] top-[5%] h-56 w-56 rounded-full animate-pulse duration-8000' />

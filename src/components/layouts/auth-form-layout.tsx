@@ -39,7 +39,7 @@ export const AuthFormLayout = ({ isFlipped, gradientsImage, title, subtitle, chi
             }}
           >
             <div className='text-center mb-4'>
-              <Isotype className='w-15 m-auto' mainColor={isFlipped ? 'var(--color-tertiary)' : undefined} />
+              <Isotype className='w-15 m-auto' />
               <h4 className='text-primary'>{title}</h4>
               <label>{subtitle}</label>
             </div>

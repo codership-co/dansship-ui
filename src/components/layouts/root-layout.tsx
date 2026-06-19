@@ -18,7 +18,7 @@ export const RootLayout = () => {
   }
 
   return (
-    <section className='relative min-h-screen grid grid-rows-[1fr_auto]'>
+    <section className='relative min-h-dvh grid grid-rows-[1fr_auto]'>
       {pathname !== PageURLS.home && (
         <img
           src='/assets/images/bg-girl.png'
