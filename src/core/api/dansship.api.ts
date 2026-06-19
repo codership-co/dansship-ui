@@ -4,7 +4,6 @@ import { AuthAPI } from './auth/auth.api';
 import { BillingAdminAPI } from './billing/billing.admin.api';
 import { BookingsAdminAPI } from './bookings/bookings.admin.api';
 import { BookingsAPI } from './bookings/bookings.api';
-import { getResponseError } from './dansship.get-error';
 import { FiguresAdminAPI } from './figures/figures.admin.api';
 import { FiguresAPI } from './figures/figures.api';
 import { InstructorsAdminAPI } from './instructors/instructors.admin.api';
@@ -23,6 +22,8 @@ import { StudioRentalAdminAPI } from './studio-rental/studio-rental.admin.api';
 import { StudioRentalAPI } from './studio-rental/studio-rental.api';
 import { SubscriptionsAPI } from './subscriptions/subscriptions.api';
 import { UsersAdminAPI } from './users/users.admin.api';
+
+import { getResponseError } from '@core/api/dansship.error';
 
 export class DansshipAPI {
   static getLogger() {
@@ -45,7 +46,7 @@ export class DansshipAPI {
     mode: 'cors',
     cache: 'no-cache',
     getLogger: () => this.getLogger(),
-    getResponseError,
+    getResponseError: getResponseError,
     credentials: 'include',
     headers: {
       accept: 'application/json',

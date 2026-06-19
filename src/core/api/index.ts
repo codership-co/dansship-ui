@@ -1,7 +1,5 @@
 export * from './dansship.api';
 export * from './dansship.error';
-export * from './dansship.get-error';
-
 export * from './auth/auth.models';
 export * from './billing/billing.models';
 export * from './bookings/bookings.models';

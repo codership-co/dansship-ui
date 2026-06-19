@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 
 import { useCallablePromise } from '../use-callable-promise';
 
-import { BookClassPayload, DansshipAPI, DansshipAPIError } from '@core/api';
+import { BookClassPayload, DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError } from '@core/api';
 
 export const useMyBookings = () => {
   const { t } = useTranslation();
@@ -27,11 +27,13 @@ export const useMyBookings = () => {
 
       if (error) {
         if (error instanceof DansshipAPIError) {
-          const normalized = error.normalizedError;
+          const normalized = error.body;
 
-          if (normalized.errorCode === 'BOOKING_CLASS_FULL' || normalized.errorCode === 'CLASS_FULL') {
+          if (
+            [DANSSHIP_ERROR_CODE.BOOKING_CLASS_FULL, DANSSHIP_ERROR_CODE.CLASS_FULL].includes(normalized.error_code)
+          ) {
             toast.error(t('bookings:classFullDesc'));
-          } else if (normalized.errorCode === 'BOOKING_TIME_OVERLAP') {
+          } else if (normalized.error_code === DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP) {
             toast.error(t('bookings:timeOverlapDesc'));
           } else {
             toast.error(t('bookings:bookingFailed'));
@@ -65,9 +67,9 @@ export const useMyBookings = () => {
 
       if (error) {
         if (error instanceof DansshipAPIError) {
-          const normalized = error.normalizedError;
+          const normalized = error.body;
 
-          if (normalized.errorCode === 'BOOKING_TIME_OVERLAP') {
+          if (normalized.error_code === DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP) {
             toast.error(t('bookings:timeOverlapDesc'));
           } else {
             toast.error(t('bookings:waitlistFailed'));

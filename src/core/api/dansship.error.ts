@@ -1,70 +1,48 @@
 import { HttpClientError } from 'polpo-http-client';
 
-export type DansshipAPIErrorCategory =
-  | 'AUTH'
-  | 'PERMISSION'
-  | 'VALIDATION'
-  | 'CONFLICT'
-  | 'NOT_FOUND'
-  | 'SERVER'
-  | 'UNKNOWN'
-  | (string & {});
-
-export interface DansshipAPIResponseError {
-  type: string;
-  code: string;
-  message?: string;
-  error?: Partial<{
-    detail: string;
-    error_code: string;
-    message: string;
-    code: string;
-    category: DansshipAPIErrorCategory;
-    path: string;
-    timestamp: string;
-    details: string;
-  }>;
-  detail?: string;
+export enum DANSSHIP_ERROR_CATEGORY {
+  AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR',
 }
 
-export interface NormalizedError {
-  status: number;
+export enum DANSSHIP_ERROR_CODE {
+  EMAIL_NOT_VERIFIED = 'EMAIL_NOT_VERIFIED',
+  BOOKING_CLASS_FULL = 'BOOKING_CLASS_FULL',
+  CLASS_FULL = 'CLASS_FULL',
+  BOOKING_TIME_OVERLAP = 'BOOKING_TIME_OVERLAP',
+}
+
+export interface DansshipResponseError {
+  category: DANSSHIP_ERROR_CATEGORY;
+  error_code: DANSSHIP_ERROR_CODE;
   message: string;
-  errorCode?: string;
-  category?: DansshipAPIErrorCategory;
-  details?: string;
-  legacyDetail?: string;
-  detail?: string;
-  path?: string;
-  timestamp?: string;
+  status: number;
+  timestamp: string;
+  path: string;
+  details: {
+    next_action: string;
+    resend_verification_endpoint: string;
+  };
+  request_id: string | null;
+  trace_id: string | null;
 }
 
-export class DansshipAPIError extends HttpClientError<DansshipAPIResponseError> {
-  normalizedError: NormalizedError;
-
+export class DansshipAPIError extends HttpClientError<DansshipResponseError> {
   constructor(
-    readonly body: DansshipAPIResponseError,
+    readonly body: DansshipResponseError,
     readonly status: number,
     readonly message: string = 'Unexpected error occurred',
     readonly error?: unknown,
   ) {
     super(body, status, `[DansshipAPIError]: ${message}`, error);
-    this.normalizedError = {
-      category: undefined,
-      detail: '',
-      details: '',
-      errorCode: '',
-      legacyDetail: '',
-      message: '',
-      path: '',
-      status: 0,
-      timestamp: '',
-    };
 
     if (error instanceof Error) {
       this.stack = error.stack ?? '';
-    } else if (typeof error === 'object') {
-      this.normalizedError = error as NormalizedError;
     }
   }
+}
+
+export async function getResponseError(response: Response, message: string) {
+  const body = (await response.json()) as DansshipResponseError;
+
+  return new DansshipAPIError(body, response.status, body.message ?? message);
 }

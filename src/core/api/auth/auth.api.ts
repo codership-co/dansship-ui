@@ -1,5 +1,6 @@
 import { HttpClient } from 'polpo-http-client';
 
+import { DansshipResponseError } from '@core/api';
 import { mapAuthUserToUser } from '@core/api/auth/auth.helpers';
 
 import type {
@@ -28,7 +29,7 @@ export class AuthAPI {
   }
 
   async login(payload: LoginPayload) {
-    return this.httpClient.call<AuthUser, LoginPayload, User>(
+    return this.httpClient.call<AuthUser, LoginPayload, User, DansshipResponseError>(
       {
         path: '/auth/signin',
         method: 'POST',

@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router';
 import { LoginForm, type LoginFormData } from '@components/forms';
 import { AuthFormLayout } from '@components/layouts';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
+import { DANSSHIP_ERROR_CODE } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { getRedirectPathByRole } from '@helpers';
 
@@ -44,7 +45,11 @@ function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await login({ email, password });
+      const { errorData } = await login({ email, password });
+
+      if (errorData?.error_code === DANSSHIP_ERROR_CODE.EMAIL_NOT_VERIFIED) {
+        navigate(PageURLS.auth.verifyEmail, { replace: true, state: { email } });
+      }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Login failed:', error);
