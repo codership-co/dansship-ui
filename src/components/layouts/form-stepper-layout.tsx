@@ -42,14 +42,14 @@ export const FormStepperLayout = <T extends string>({
                 'grid content-start md:content-center md:grid-cols-[auto_1fr] md:gap-4',
                 index < stepIndex && 'text-active-600',
                 index === stepIndex && 'text-tertiary',
-                index > stepIndex && 'text-neutral-400',
+                index > stepIndex && 'text-gray-400',
               )}
             >
               {index < stepIndex && <LuCircleCheck className='size-8 md:size-12 md:mt-2' />}
               {index === stepIndex && <Icon className='size-8 md:size-12 md:mt-2 animate-pulse' />}
               {index > stepIndex && <Icon className='size-8 md:size-12 md:mt-2' />}
               <section className='relative hidden xs:block'>
-                <small className='hidden md:block text-neutral-400 m-0'>{t('common:step', { step: index + 1 })}</small>
+                <small className='hidden md:block text-gray-400 m-0'>{t('common:step', { step: index + 1 })}</small>
                 <h4 className='hidden md:block m-0'>{title}</h4>
                 <label className='block md:hidden font-bold m-0'>{title}</label>
                 {index < stepIndex && (
