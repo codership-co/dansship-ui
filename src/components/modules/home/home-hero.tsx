@@ -43,7 +43,7 @@ export const HomeHero = () => {
           <img
             src='/assets/images/home/MujerSS.png'
             alt='Dansship'
-            className='absolute left-1/2 top-1/2 max-w-[initial] w-70 lg:w-130 -translate-1/2 block'
+            className='absolute left-1/2 top-1/2 max-w-[initial] w-52 lg:w-92 -translate-1/2 block'
           />
         </section>
       </div>
