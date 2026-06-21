@@ -5,12 +5,10 @@ import { useLocation, useNavigate } from 'react-router';
 
 import { CheckoutModal } from './checkout-modal';
 
-import { SpinnerLoader } from '@components/loaders';
 import { Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui';
 import { useAuth } from '@contexts';
-import { DansshipAPI, type PublicPlan } from '@core/api';
+import { type PublicPlan } from '@core/api';
 import { cn, consumePendingPlanCheckoutIntent, setPendingPlanCheckoutIntent } from '@helpers';
-import { usePromise } from '@hooks';
 
 const orderPlansForDisplay = (plans: Array<PublicPlan>): Array<PublicPlan> => {
   const recommendedPlans = plans.filter(plan => plan.is_recommended === true);
@@ -26,19 +24,20 @@ const orderPlansForDisplay = (plans: Array<PublicPlan>): Array<PublicPlan> => {
   return [...remainingPlans.slice(0, middleIndex), featuredPlan, ...remainingPlans.slice(middleIndex)];
 };
 
-export function PlanSelector() {
+interface PlanSelectorProps {
+  publicPlans: Array<PublicPlan>;
+}
+
+export function PlanSelector({ publicPlans }: PlanSelectorProps) {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { response: publicPlans, isLoading: isLoadingPublicPlans } = usePromise(() =>
-    DansshipAPI.subscriptions.getPublicPlans(),
-  );
 
   const [selectedPlan, setSelectedPlan] = useState<PublicPlan | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const plans = useMemo(() => publicPlans?.data ?? [], [publicPlans?.data]);
+  const plans = useMemo(() => publicPlans, [publicPlans]);
 
   const displayPlans = useMemo(() => orderPlansForDisplay(plans), [plans]);
 
@@ -80,10 +79,6 @@ export function PlanSelector() {
 
     return Number.isFinite(parsed) ? parsed : 0;
   };
-
-  if (isLoadingPublicPlans) {
-    return <SpinnerLoader />;
-  }
 
   if (displayPlans.length === 0) {
     return (

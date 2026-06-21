@@ -20,13 +20,13 @@
 
 @keyframes floatA {
   to {
-    transform: translate(1rem, 1rem);
+    transform: translate(2rem, 2rem);
   }
 }
 
 @keyframes floatB {
   to {
-    transform: translate(-1rem, -1rem);
+    transform: translate(-2rem, -2rem);
   }
 }
 
@@ -38,5 +38,11 @@
   100% {
     top: calc(var(--uplift, 10vh) * -1);
     transform: translate(-50%, -50%) scale(0);
+  }
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
   }
 }

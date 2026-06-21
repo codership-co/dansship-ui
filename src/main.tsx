@@ -4,6 +4,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { ErrorBoundary } from 'react-error-boundary';
 
+import { Error404 } from '@components/svg';
 import { Toaster } from '@components/ui';
 import { AuthProvider, FeatureFlagsProvider } from '@contexts';
 import '@core/i18n';
@@ -13,14 +14,14 @@ import '@core/styles';
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
-      <ErrorBoundary fallback={<span>Error</span>}>
-        <FeatureFlagsProvider>
+      <FeatureFlagsProvider>
+        <ErrorBoundary fallback={<Error404 />}>
           <Router />
-          <Toaster />
-          <Analytics />
-          <SpeedInsights />
-        </FeatureFlagsProvider>
-      </ErrorBoundary>
+        </ErrorBoundary>
+        <Toaster />
+        <Analytics />
+        <SpeedInsights />
+      </FeatureFlagsProvider>
     </AuthProvider>
   </StrictMode>,
 );

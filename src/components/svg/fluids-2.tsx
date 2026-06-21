@@ -5,341 +5,120 @@ interface FluidsProps {
 }
 
 export const Fluids2 = ({ className, style }: FluidsProps) => (
-  <svg className={className} style={style} viewBox='0 0 588 497' fill='none' xmlns='http://www.w3.org/2000/svg'>
+  <svg className={className} style={style} viewBox='0 0 589 528' fill='none' xmlns='http://www.w3.org/2000/svg'>
     <g clipPath='url(#clip0_69_15902)'>
-      <mask
-        id='mask0_69_15902'
-        style={{ maskType: 'luminance' }}
-        maskUnits='userSpaceOnUse'
-        x='95'
-        y='-178'
-        width='494'
-        height='675'
-      >
+      <path
+        className='animate-gradients-floatA delay-100'
+        d='M521.879 378.5C572.394 354.5 593 231.5 593 231.5C586.5 242.5 578 258.874 562.121 255.801C546.243 252.728 536.364 215.5 513.031 212.167C489.698 208.833 480.364 260.167 459.031 255.5C437.698 250.833 442.364 208.833 459.031 180.833C475.697 152.833 519.364 127.5 553.364 81.5C587.364 35.5 599.031 -39 599.031 -39H625V540.5H119.364C119.364 540.5 111.364 444.5 170.364 424.533C229.364 404.566 243.364 455.5 261.364 488.959C279.364 522.418 308.364 528.5 324.364 505.5C340.364 482.5 337.364 459.5 337.364 424.533C337.364 389.566 337.364 353.5 372.637 345.5C407.91 337.5 471.364 402.5 521.879 378.5Z'
+        fill='var(--color-highlight)'
+      />
+      <path
+        className='animate-gradients-floatA delay-200'
+        d='M565.426 94.5159C589.5 68.5 599.5 20 604 11H628.51V569H140.01C126.009 513.5 150.507 447.542 185.06 443.704C228.167 438.651 243.675 519.573 239.411 535.823C235.146 552.073 329.509 560.5 342.911 541.323C342.911 541.323 379.426 498.515 368.093 450.515C356.759 402.515 376.093 381.182 407.426 386.515C438.759 391.849 463.01 423.5 526.759 403.182C590.509 382.864 602.333 230.166 597.426 211.85C585.426 235.85 548.759 232.517 539.773 206.517C530.787 180.517 510.093 192.517 495.426 197.379C480.76 202.241 470.093 197.85 486.093 173.183C502.093 148.516 541.353 120.532 565.426 94.5159Z'
+        opacity='0.1'
+        fill='black'
+      />
+      <g className='animate-gradients-floatA delay-300'>
         <path
-          className='animate-gradients-floatA delay-[100ms]'
-          d='M95 -178L95 496.646L588.228 496.646V-178H95Z'
-          fill='white'
-        />
-      </mask>
-      <g mask='url(#mask0_69_15902)'>
-        <path
-          className='animate-gradients-floatA delay-[200ms]'
-          d='M588.227 275.683C588.227 275.683 570.878 353.683 520.363 377.683C469.848 401.683 406.394 336.683 371.121 344.683C335.848 352.683 335.848 388.749 335.848 423.716C335.848 458.683 338.848 481.683 322.848 504.683C306.848 527.683 277.848 521.601 259.848 488.142C241.848 454.683 227.848 403.749 168.848 423.716C109.848 443.683 117.848 539.683 117.848 539.683H588.227V275.683Z'
-          fill='url(#paint0_linear_69_15902)'
-        />
-      </g>
-      <mask
-        id='mask1_69_15902'
-        style={{ maskType: 'luminance' }}
-        maskUnits='userSpaceOnUse'
-        x='95'
-        y='-178'
-        width='494'
-        height='675'
-      >
-        <path
-          className='animate-gradients-floatA delay-[300ms]'
-          d='M95 -178L95 496.646L588.228 496.646V-178H95Z'
-          fill='white'
-        />
-      </mask>
-      <g mask='url(#mask1_69_15902)'>
-        <path
-          className='animate-gradients-floatA delay-[400ms]'
-          d='M597.516 -42.3171C597.516 -42.3171 585.849 34.6829 551.849 80.6829C517.849 126.683 474.182 152.016 457.516 180.016C440.849 208.016 436.183 250.016 457.516 254.683C478.849 259.35 488.183 208.016 511.516 211.35C534.849 214.683 541.488 251.284 560.606 254.984C579.724 258.684 595.516 246.017 595.516 246.017L597.516 -42.3171Z'
+          d='M598.516 46.3499C598.516 46.3499 582.516 98.3499 558.516 122.35C534.516 146.35 516.516 166.35 528.516 183.017C540.516 199.684 598.516 168.35 598.516 168.35V46.3499Z'
           fill='url(#paint1_linear_69_15902)'
         />
-      </g>
-      <mask
-        id='mask2_69_15902'
-        style={{ maskType: 'luminance' }}
-        maskUnits='userSpaceOnUse'
-        x='95'
-        y='-178'
-        width='494'
-        height='675'
-      >
         <path
-          className='animate-gradients-floatA delay-[500ms]'
-          d='M95 -178L95 496.646L588.228 496.646V-178H95Z'
-          fill='white'
-        />
-      </mask>
-      <g mask='url(#mask2_69_15902)'>
-        <path
-          className='animate-gradients-floatA delay-[600ms]'
-          opacity='0.2'
-          d='M601.516 6.01587C601.516 6.01587 595.516 52.0159 565.516 92.0159C542.871 122.209 502.183 146.016 486.183 170.683C470.183 195.35 480.85 199.741 495.516 194.879C510.183 190.017 530.877 178.017 539.863 204.017C548.849 230.017 585.516 233.35 597.516 209.35C609.516 185.35 601.516 6.01587 601.516 6.01587Z'
-          fill='#4B3594'
-        />
-      </g>
-      <mask
-        id='mask3_69_15902'
-        style={{ maskType: 'luminance' }}
-        maskUnits='userSpaceOnUse'
-        x='95'
-        y='-178'
-        width='494'
-        height='675'
-      >
-        <path
-          className='animate-gradients-floatA delay-[700ms]'
-          d='M95 -178L95 496.646L588.228 496.646V-178H95Z'
-          fill='white'
-        />
-      </mask>
-      <g mask='url(#mask3_69_15902)'>
-        <path
-          className='animate-gradients-floatA delay-[800ms]'
-          d='M597.516 45.3499C597.516 45.3499 581.516 97.3499 557.516 121.35C533.516 145.35 515.516 165.35 527.516 182.017C539.516 198.684 597.516 167.35 597.516 167.35V45.3499Z'
+          d='M596.516 330.349C596.516 330.349 583.183 387.016 539.183 410.349C495.183 433.682 466.611 408.349 430.897 416.349C395.183 424.349 375.727 469.958 408.5 506.323C444.995 546.818 582.377 544.095 596.516 541.323V330.349Z'
           fill='url(#paint2_linear_69_15902)'
         />
-      </g>
-      <mask
-        id='mask4_69_15902'
-        style={{ maskType: 'luminance' }}
-        maskUnits='userSpaceOnUse'
-        x='95'
-        y='-178'
-        width='494'
-        height='675'
-      >
         <path
-          className='animate-gradients-floatA delay-[900ms]'
-          d='M95 -178L95 496.646L588.228 496.646V-178H95Z'
-          fill='white'
-        />
-      </mask>
-      <g mask='url(#mask4_69_15902)'>
-        <path
-          className='animate-gradients-floatA delay-[1000ms]'
-          opacity='0.2'
-          d='M600.849 295.349C600.849 295.349 576.182 378.682 526.849 400.682C477.516 422.682 438.849 389.349 407.516 384.015C376.183 378.682 356.849 400.015 368.183 448.015C379.516 496.015 358.183 516.015 358.183 516.015H595.516L600.849 295.349Z'
-          fill='#4B3594'
-        />
-      </g>
-      <mask
-        id='mask5_69_15902'
-        style={{ maskType: 'luminance' }}
-        maskUnits='userSpaceOnUse'
-        x='95'
-        y='-178'
-        width='494'
-        height='675'
-      >
-        <path
-          className='animate-gradients-floatA delay-[1100ms]'
-          d='M95 -178L95 496.646L588.228 496.646V-178H95Z'
-          fill='white'
-        />
-      </mask>
-      <g mask='url(#mask5_69_15902)'>
-        <path
-          className='animate-gradients-floatA delay-[1200ms]'
-          d='M595.516 329.349C595.516 329.349 582.183 386.016 538.183 409.349C494.183 432.682 465.611 407.349 429.897 415.349C394.183 423.349 365.516 478.016 408.183 502.016C450.85 526.016 595.516 516.016 595.516 516.016V329.349Z'
+          d='M219.5 532.823C219.5 528.323 218.879 460.734 189.348 455.183C168.348 450.683 150.5 514.323 150 532.823C164.5 532.823 219.5 532.823 219.5 532.823Z'
           fill='url(#paint3_linear_69_15902)'
         />
       </g>
-      <mask
-        id='mask6_69_15902'
-        style={{ maskType: 'luminance' }}
-        maskUnits='userSpaceOnUse'
-        x='95'
-        y='-178'
-        width='494'
-        height='675'
-      >
+      <g className='animate-gradients-floatA delay-400'>
         <path
-          className='animate-gradients-floatA delay-[1300ms]'
-          d='M95 -178L95 496.646L588.228 496.646V-178H95Z'
-          fill='white'
-        />
-      </mask>
-      <g mask='url(#mask6_69_15902)'>
-        <path
-          className='animate-gradients-floatA delay-[1400ms]'
-          opacity='0.2'
-          d='M240.299 520.183C240.299 520.183 221.349 437.183 185.15 441.204C150.597 445.042 140.183 481.35 130.849 512.683C121.516 544.016 240.299 520.183 240.299 520.183Z'
-          fill='#4B3594'
-        />
-      </g>
-      <mask
-        id='mask7_69_15902'
-        style={{ maskType: 'luminance' }}
-        maskUnits='userSpaceOnUse'
-        x='95'
-        y='-178'
-        width='494'
-        height='675'
-      >
-        <path
-          className='animate-gradients-floatA delay-[1500ms]'
-          d='M95 -178L95 496.646L588.228 496.646V-178H95Z'
-          fill='white'
-        />
-      </mask>
-      <g mask='url(#mask7_69_15902)'>
-        <path
-          className='animate-gradients-floatA delay-[1600ms]'
-          d='M212.349 518.082C212.349 518.082 209.349 458.683 188.349 454.183C167.349 449.683 150.349 487.683 149.849 506.183C149.349 524.683 212.349 518.082 212.349 518.082Z'
-          fill='url(#paint4_linear_69_15902)'
-        />
-      </g>
-      <mask
-        id='mask8_69_15902'
-        style={{ maskType: 'luminance' }}
-        maskUnits='userSpaceOnUse'
-        x='95'
-        y='-178'
-        width='494'
-        height='675'
-      >
-        <path
-          className='animate-gradients-floatA delay-[1700ms]'
-          d='M95 -178L95 496.646L588.228 496.646V-178H95Z'
-          fill='white'
-        />
-      </mask>
-      <g mask='url(#mask8_69_15902)'>
-        <path
-          className='animate-gradients-floatA delay-[1800ms]'
+          d='M628.516 346.35C628.516 346.35 595.849 426.35 543.183 436.35C490.516 446.35 469.183 432.35 439.183 441.017C409.183 449.684 400 501.489 458 518.823C518 539.823 628.516 554.823 628.516 554.823L628.516 346.35Z'
           opacity='0.1'
-          d='M627.516 345.35C627.516 345.35 594.849 425.35 542.183 435.35C489.516 445.35 468.183 431.35 438.183 440.017C408.183 448.684 400.183 489.35 458.183 506.684C516.183 524.017 627.516 529.351 627.516 529.351V345.35Z'
           fill='white'
         />
-      </g>
-      <mask
-        id='mask9_69_15902'
-        style={{ maskType: 'luminance' }}
-        maskUnits='userSpaceOnUse'
-        x='95'
-        y='-178'
-        width='494'
-        height='675'
-      >
         <path
-          className='animate-gradients-floatA delay-[1900ms]'
-          d='M95 -178L95 496.646L588.228 496.646V-178H95Z'
-          fill='white'
-        />
-      </mask>
-      <g mask='url(#mask9_69_15902)'>
-        <path
-          className='animate-gradients-floatA delay-[2000ms]'
+          d='M611.678 58.1528C611.678 58.1528 589.182 106.017 573.182 125.35C557.182 144.683 539.515 156.683 542.182 168.35C544.849 180.017 609.949 148.017 617.733 131.017C625.516 114.016 611.678 58.1528 611.678 58.1528Z'
           opacity='0.1'
-          d='M645.849 412.561C645.849 412.561 603.349 439.683 569.349 451.183C535.349 462.683 480.349 458.683 467.349 466.683C454.349 474.683 438.349 495.683 467.349 518.683C496.349 541.683 645.849 534.683 645.849 534.683V412.561Z'
-          fill='white'
-        />
-      </g>
-      <mask
-        id='mask10_69_15902'
-        style={{ maskType: 'luminance' }}
-        maskUnits='userSpaceOnUse'
-        x='95'
-        y='-178'
-        width='494'
-        height='675'
-      >
-        <path
-          className='animate-gradients-floatA delay-[2100ms]'
-          d='M95 -178L95 496.646L588.228 496.646V-178H95Z'
-          fill='white'
-        />
-      </mask>
-      <g mask='url(#mask10_69_15902)'>
-        <path
-          className='animate-gradients-floatA delay-[2200ms]'
-          opacity='0.1'
-          d='M610.678 57.1528C610.678 57.1528 588.182 105.017 572.182 124.35C556.182 143.683 538.515 155.683 541.182 167.35C543.849 179.017 608.949 147.017 616.733 130.017C624.516 113.016 610.678 57.1528 610.678 57.1528Z'
           fill='white'
         />
       </g>
       <path
-        className='animate-gradients-floatA'
-        d='M461 282.79C511 261.491 492 236.088 512 259.088C532 282.088 534 327.088 489 344.088C444 361.088 404 327.088 366 331.088C328 335.088 318 360.087 311 409.966C304 459.845 285 460.088 267 444.088C249 428.088 212.999 381.089 157.869 405.088C102.739 429.088 66.9999 545.088 66.9999 545.088H60.9999C60.9999 545.088 8.66985 566.874 3.88609 545.088C-23.6138 419.854 94.9998 291.088 134 275.088C173 259.088 217 255.088 267 267.088C317 279.088 411 304.089 461 282.79Z'
+        className='animate-gradients-floatA delay-500'
+        d='M644.786 406.823C644.786 406.823 602.286 433.945 568.286 445.445C534.286 456.945 479.286 452.945 466.286 460.945C453.286 468.945 437.286 489.945 466.286 512.945C495.286 535.945 644.786 528.945 644.786 528.945V406.823Z'
+        opacity='0.1'
         fill='white'
-        fillOpacity='0.2'
+      />
+      <path
+        className='animate-gradients-floatA'
+        d='M462 283.79C512 262.491 493 237.088 513 260.088C533 283.088 535 328.088 490 345.088C445 362.088 405 328.088 367 332.088C329 336.088 319 361.087 312 410.966C305 460.845 286 461.088 268 445.088C250 429.088 213.999 382.089 158.869 406.088C90.3412 425.997 88.5161 545.115 104.5 550L61.9999 546.088C61.9999 546.088 9.66985 567.874 4.88609 546.088C-22.6138 420.854 95.9998 292.088 135 276.088C174 260.088 218 256.088 268 268.088C318 280.088 412 305.089 462 283.79Z'
+        opacity='0.1'
+        fill='var(--color-highlight)'
       />
     </g>
     <defs>
       <linearGradient
         id='paint0_linear_69_15902'
-        x1='448.235'
-        y1='685.523'
-        x2='306.992'
-        y2='273.291'
+        x1='476'
+        y1='666.5'
+        x2='242.779'
+        y2='414.874'
         gradientUnits='userSpaceOnUse'
       >
-        <stop stopColor='var(--color-highlight-700)' />
-        <stop offset='0.116' stopColor='var(--color-highlight-600)' />
-        <stop offset='0.2875' stopColor='var(--color-highlight-500)' />
-        <stop offset='0.4936' stopColor='var(--color-highlight-400)' />
-        <stop offset='0.7264' stopColor='var(--color-highlight-300)' />
-        <stop offset='0.9787' stopColor='var(--color-highlight-200)' />
-        <stop offset='1' stopColor='var(--color-highlight-100)' />
+        <stop stopColor='#5564AE' />
+        <stop offset='0.116' stopColor='#5468B0' />
+        <stop offset='0.2875' stopColor='#5472B7' />
+        <stop offset='0.4936' stopColor='#5384C3' />
+        <stop offset='0.7264' stopColor='#509FD5' />
+        <stop offset='0.9787' stopColor='#4CC3ED' />
+        <stop offset='1' stopColor='#49C8F1' />
       </linearGradient>
       <linearGradient
         id='paint1_linear_69_15902'
-        x1='713.774'
-        y1='-76.1692'
-        x2='433.249'
-        y2='349.719'
+        x1='706.49'
+        y1='7.49405'
+        x2='507'
+        y2='191.984'
         gradientUnits='userSpaceOnUse'
       >
-        <stop stopColor='var(--color-highlight-700)' />
-        <stop offset='0.116' stopColor='var(--color-highlight-600)' />
-        <stop offset='0.2875' stopColor='var(--color-highlight-500)' />
-        <stop offset='0.4936' stopColor='var(--color-highlight-400)' />
-        <stop offset='0.7264' stopColor='var(--color-highlight-300)' />
-        <stop offset='0.9787' stopColor='var(--color-highlight-200)' />
-        <stop offset='1' stopColor='var(--color-highlight-100)' />
+        <stop stopColor='#F89C68' />
+        <stop offset='0.4348' stopColor='#F4878A' />
+        <stop offset='0.8184' stopColor='#F175A0' />
+        <stop offset='1' stopColor='#F06EA9' />
       </linearGradient>
       <linearGradient
         id='paint2_linear_69_15902'
-        x1='705.49'
-        y1='6.49405'
-        x2='506'
-        y2='190.984'
+        x1='597.326'
+        y1='594.107'
+        x2='501.356'
+        y2='421.112'
         gradientUnits='userSpaceOnUse'
       >
-        <stop stopColor='var(--color-primary-500)' />
-        <stop offset='0.4348' stopColor='var(--color-primary-400)' />
-        <stop offset='0.8184' stopColor='var(--color-primary-300)' />
-        <stop offset='1' stopColor='var(--color-primary-200)' />
+        <stop stopColor='#F89C68' />
+        <stop offset='0.1886' stopColor='#F6917B' />
+        <stop offset='0.4581' stopColor='#F38390' />
+        <stop offset='0.6931' stopColor='#F2789D' />
+        <stop offset='0.8815' stopColor='#F170A5' />
+        <stop offset='1' stopColor='#F06EA9' />
       </linearGradient>
       <linearGradient
         id='paint3_linear_69_15902'
-        x1='596.326'
-        y1='593.107'
-        x2='500.356'
-        y2='420.112'
+        x1='169.018'
+        y1='625.57'
+        x2='190.017'
+        y2='444.079'
         gradientUnits='userSpaceOnUse'
       >
-        <stop stopColor='var(--color-primary-700)' />
-        <stop offset='0.1886' stopColor='var(--color-primary-600)' />
-        <stop offset='0.4581' stopColor='var(--color-primary-500)' />
-        <stop offset='0.6931' stopColor='var(--color-primary-400)' />
-        <stop offset='0.8815' stopColor='var(--color-primary-300)' />
-        <stop offset='1' stopColor='var(--color-primary-200)' />
-      </linearGradient>
-      <linearGradient
-        id='paint4_linear_69_15902'
-        x1='168.018'
-        y1='624.57'
-        x2='189.017'
-        y2='443.079'
-        gradientUnits='userSpaceOnUse'
-      >
-        <stop stopColor='var(--color-primary-700)' />
-        <stop offset='0.121' stopColor='var(--color-primary-600)' />
-        <stop offset='0.3284' stopColor='var(--color-primary-500)' />
-        <stop offset='0.5969' stopColor='var(--color-primary-400)' />
-        <stop offset='0.9131' stopColor='var(--color-primary-300)' />
-        <stop offset='1' stopColor='var(--color-primary-200)' />
+        <stop stopColor='#F89C68' />
+        <stop offset='0.121' stopColor='#F7996D' />
+        <stop offset='0.3284' stopColor='#F6927A' />
+        <stop offset='0.5969' stopColor='#F4868D' />
+        <stop offset='0.9131' stopColor='#F173A2' />
+        <stop offset='1' stopColor='#F06EA9' />
       </linearGradient>
       <clipPath id='clip0_69_15902'>
-        <rect width='588' height='497' fill='white' />
+        <rect width='589' height='528' fill='white' />
       </clipPath>
     </defs>
   </svg>

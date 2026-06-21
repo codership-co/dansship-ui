@@ -65,12 +65,8 @@ function VerifyEmailPage() {
       [VerificationStatus.VERIFIED]: t('auth:verifyEmail.subtitles.verified'),
       [VerificationStatus.VERIFICATION_FAILED]: t('auth:verifyEmail.subtitles.verificationFailed'),
       [VerificationStatus.RESENDING_EMAIL]: t('auth:verifyEmail.subtitles.resendingVerificationEmail'),
-      [VerificationStatus.RESENDED_EMAIL]: t('auth:verifyEmail.subtitles.verificationResended', {
-        email,
-      }),
-      [VerificationStatus.RESENDED_FAILED]: t('auth:verifyEmail.subtitles.verificationResendFailed', {
-        email,
-      }),
+      [VerificationStatus.RESENDED_EMAIL]: t('auth:verifyEmail.subtitles.verificationResended'),
+      [VerificationStatus.RESENDED_FAILED]: t('auth:verifyEmail.subtitles.verificationResendFailed'),
     };
 
     if (verificationStatus in subtitles) {
@@ -78,9 +74,7 @@ function VerifyEmailPage() {
     }
 
     if (email) {
-      return t('auth:verifyEmail.subtitles.idleEmail', {
-        email: email,
-      });
+      return t('auth:verifyEmail.subtitles.idleEmail');
     }
 
     return t('auth:verifyEmail.subtitles.idle');
@@ -106,11 +100,7 @@ function VerifyEmailPage() {
   );
 
   return (
-    <AuthFormLayout
-      gradientsImage='/assets/images/auth/dancing-girl-3.png'
-      title={statusTitle}
-      subtitle={statusSubTitle}
-    >
+    <AuthFormLayout title={statusTitle} subtitle={statusSubTitle}>
       <VerifyEmailForm
         onSubmit={onSubmit}
         status={verificationStatus}

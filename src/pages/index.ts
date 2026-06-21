@@ -2,7 +2,7 @@ export * from './auth';
 export * from './admin';
 export * from './error';
 export * from './home.page';
-export * from './user.page';
+export * from './ui.page';
 export * from './classes.page';
 export * from './figures.page';
 export * from './profile.page';

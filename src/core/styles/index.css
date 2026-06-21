@@ -32,8 +32,8 @@
 @theme {
   --animate-fade-in-down: fade-in-down 300ms ease-out forwards;
   --animate-glitch: glitch 1s linear infinite;
-  --animate-gradients-floatA: floatA 3s ease infinite alternate;
-  --animate-gradients-floatB: floatB 3s ease infinite alternate;
+  --animate-gradients-floatA: floatA 2s ease infinite alternate;
+  --animate-gradients-floatB: floatB 2s ease infinite alternate;
 
   /* ================================================
    * COLORS
@@ -42,13 +42,11 @@
   --color-alert: hsl(359 90% 62%);
   --color-warning: hsl(38 100% 50%);
   --color-info: hsl(210 100% 51%);
-  --color-primary: hsl(270 64% 26%);
+  --color-primary: hsl(268 56% 30%);
   --color-secondary: hsl(37 93% 88%);
   --color-tertiary: hsl(347 94% 82%);
   --color-highlight: hsl(205 100% 68%);
   --color-accent: hsl(285 26% 70%);
-  --color-white: hsl(0 0% 100%);
-  --color-black: hsl(0 0% 0%);
 
   /* ================================================
    * ACTIVE
@@ -109,22 +107,6 @@
   --color-info-800: color-mix(in hsl, var(--color-info) var(--scale-800), var(--dark-base));
   --color-info-900: color-mix(in hsl, var(--color-info) var(--scale-900), var(--dark-base));
   --color-info-foreground: var(--color-info-50);
-
-  /* ================================================
-   * NEUTRAL
-   * ================================================ */
-  --color-neutral: hsl(0 0 53%);
-  --color-neutral-50: color-mix(in hsl, var(--color-neutral) var(--scale-50), var(--light-base));
-  --color-neutral-100: color-mix(in hsl, var(--color-neutral) var(--scale-100), var(--light-base));
-  --color-neutral-200: color-mix(in hsl, var(--color-neutral) var(--scale-200), var(--light-base));
-  --color-neutral-300: color-mix(in hsl, var(--color-neutral) var(--scale-300), var(--light-base));
-  --color-neutral-400: color-mix(in hsl, var(--color-neutral) var(--scale-400), var(--light-base));
-  --color-neutral-500: var(--color-neutral);
-  --color-neutral-600: color-mix(in hsl, var(--color-neutral) var(--scale-600), var(--dark-base));
-  --color-neutral-700: color-mix(in hsl, var(--color-neutral) var(--scale-700), var(--dark-base));
-  --color-neutral-800: color-mix(in hsl, var(--color-neutral) var(--scale-800), var(--dark-base));
-  --color-neutral-900: color-mix(in hsl, var(--color-neutral) var(--scale-900), var(--dark-base));
-  --color-neutral-foreground: var(--color-neutral-50);
 
   /* ================================================
    * PRIMARY
@@ -205,10 +187,10 @@
    * STATES
    * ================================================ */
   --color-background: var(--color-secondary-200);
-  --color-background-paper: var(--color-neutral-50);
-  --color-background-disabled: var(--color-neutral-100);
+  --color-background-paper: var(--color-gray-50);
+  --color-background-disabled: var(--color-gray-100);
   --color-foreground: hsl(32 54% 13%);
-  --color-foreground-disabled: var(--color-neutral-900);
+  --color-foreground-disabled: var(--color-gray-900);
   --color-border: hsl(300 18% 79%);
 
   /* ================================================
@@ -279,7 +261,7 @@
   --background-image-gradient-auth: linear-gradient(-135deg, var(--color-highlight), var(--color-primary));
   --background-image-gradient-onboarding: linear-gradient(to bottom right, var(--color-secondary) 40%, hsl(from var(--color-primary) h s 70%));
 
-  --background-image-gradient-hero: linear-gradient(to bottom, var(--color-accent-300), var(--color-secondary-200));
+  --background-image-gradient-hero: linear-gradient(to bottom, var(--color-accent-300), transparent);
   --background-image-gradient-primary: linear-gradient(135deg, var(--color-primary-100), var(--color-primary-400));
   --background-image-gradient-primary-transparent: linear-gradient(135deg, hsl(from var(--color-primary-100) h s l / 90%), hsl(from var(--color-primary-400) h s l / 90%));
   --background-image-gradient-secondary: linear-gradient(135deg, var(--color-secondary-100), var(--color-secondary-400));
@@ -310,7 +292,7 @@
 @layer base {
   /* width */
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 10px;
     height: 0;
   }
 

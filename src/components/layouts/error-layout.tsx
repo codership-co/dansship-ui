@@ -9,8 +9,8 @@ interface ErrorLayoutProps {
 
 export const ErrorLayout = ({ hero, image, title, description, actions, footer }: ErrorLayoutProps) => {
   return (
-    <main className='flex items-center justify-center px-6 pt-20 min-h-dvh'>
-      <section className='relative mx-auto w-xl group mb-60'>
+    <main className='flex items-center justify-center content-center px-6 py-20 min-h-dvh'>
+      <section className='relative w-xl group'>
         <div className='bg-primary/40 absolute -z-10 left-[-25%] top-[-5%] h-96 w-96 rounded-full animate-pulse duration-4000' />
         <div className='bg-secondary/80 absolute -z-10 right-[-20%] top-[5%] h-56 w-56 rounded-full animate-pulse duration-8000' />
         <div className='bg-tertiary/40 absolute -z-10 bottom-[-10%] right-[-10%] h-75 w-75 rounded-full animate-pulse duration-12000' />

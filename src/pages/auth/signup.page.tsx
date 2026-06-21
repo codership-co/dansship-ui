@@ -33,12 +33,7 @@ function SignupPage() {
   };
 
   return (
-    <AuthFormLayout
-      gradientsImage='/assets/images/auth/dancing-girl.png'
-      title={t('auth:signup.title')}
-      subtitle={t('auth:signup.subtitle')}
-      isFlipped
-    >
+    <AuthFormLayout title={t('auth:signup.title')} subtitle={t('auth:signup.subtitle')} isFlipped>
       <SignUpForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
     </AuthFormLayout>
   );

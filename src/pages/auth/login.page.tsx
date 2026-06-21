@@ -59,11 +59,7 @@ function LoginPage() {
   };
 
   return (
-    <AuthFormLayout
-      gradientsImage='/assets/images/auth/dancing-boy.png'
-      title={t('auth:login.title')}
-      subtitle={t('auth:login.subtitle')}
-    >
+    <AuthFormLayout title={t('auth:login.title')} subtitle={t('auth:login.subtitle')}>
       <LoginForm onSubmit={handleSubmit} isSubmitting={isSubmitting} />
     </AuthFormLayout>
   );

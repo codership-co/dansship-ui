@@ -1,37 +1,8 @@
-import { type LoaderFunctionArgs, useLoaderData } from 'react-router';
-
 import { Section } from '@components/containers';
-import { delayPromise } from '@helpers';
 
-const fetchData = async (name: string) => {
-  const url = `https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`;
-
-  try {
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      throw new Error(`Pokémon not found (Status: ${response.status})`);
-    }
-
-    return await response.json();
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  } catch (_error) {
-    return null;
-  }
-};
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function UserLoader({ params }: LoaderFunctionArgs): any {
-  return delayPromise(fetchData(params.id ?? ''), 2000);
-}
-
-export function UserPage() {
-  const data = useLoaderData<typeof UserLoader>();
-
+export function UiPage() {
   return (
     <Section>
-      <img src={data.sprites.front_default} alt='pokemon' className='w-50' />
-
       <h1 className='hero'>hero. Welcome to Dansship</h1>
       <h1>h1. Welcome to Dansship</h1>
       <h2>h2. Welcome to Dansship</h2>
@@ -205,6 +176,36 @@ export function UserPage() {
           <small>800</small>
         </section>
         <section className='w-full aspect-square pl-2 bg-highlight-900'>
+          <small>900</small>
+        </section>
+        <section className='w-full aspect-square pl-2 bg-accent-50'>
+          <small>50</small>
+        </section>
+        <section className='w-full aspect-square pl-2 bg-accent-100'>
+          <small>100</small>
+        </section>
+        <section className='w-full aspect-square pl-2 bg-accent-200'>
+          <small>200</small>
+        </section>
+        <section className='w-full aspect-square pl-2 bg-accent-300'>
+          <small>300</small>
+        </section>
+        <section className='w-full aspect-square pl-2 bg-accent-400'>
+          <small>400</small>
+        </section>
+        <section className='w-full aspect-square pl-2 bg-accent-500 scale-110'>
+          <small>500</small>
+        </section>
+        <section className='w-full aspect-square pl-2 bg-accent-600'>
+          <small>600</small>
+        </section>
+        <section className='w-full aspect-square pl-2 bg-accent-700'>
+          <small>700</small>
+        </section>
+        <section className='w-full aspect-square pl-2 bg-accent-800'>
+          <small>800</small>
+        </section>
+        <section className='w-full aspect-square pl-2 bg-accent-900'>
           <small>900</small>
         </section>
         <section className='w-full aspect-square pl-2 bg-active-50'>

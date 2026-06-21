@@ -30,7 +30,6 @@ export function ForgotPasswordPage() {
 
   return (
     <AuthFormLayout
-      gradientsImage='/assets/images/auth/dancing-girl-2.png'
       title={t('auth:forgotPassword.title')}
       subtitle={
         isSubmitted ? (

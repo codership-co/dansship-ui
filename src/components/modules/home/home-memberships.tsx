@@ -1,14 +1,16 @@
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Link, useLoaderData } from 'react-router';
 
 import { Section, SectionHeading } from '@components/containers';
 import { PlanSelector } from '@components/modules';
 import { useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
+import { HomeLoaderData } from '@pages';
 
 export const HomeMemberships = () => {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
+  const { publicPlans } = useLoaderData<HomeLoaderData>();
 
   const plansPath = isAuthenticated ? PageURLS.myAccountSubscription : PageURLS.auth.login;
 
@@ -25,7 +27,7 @@ export const HomeMemberships = () => {
       />
 
       <div className='mx-auto mt-8 max-w-6xl'>
-        <PlanSelector />
+        <PlanSelector publicPlans={publicPlans} />
       </div>
 
       <p className='text-center mx-auto mt-8 max-w-2xl text-[0.92rem] text-muted-foreground'>

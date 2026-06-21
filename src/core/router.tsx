@@ -2,7 +2,7 @@ import { createBrowserRouter, RouteObject, RouterProvider } from 'react-router';
 
 import { loggingMiddleware } from './middleware';
 
-import { RootLayout } from '@components/layouts';
+import { AuthLayout, RootLayout } from '@components/layouts';
 import { RootLoader } from '@components/loaders';
 import {
   Error404Page,
@@ -38,20 +38,18 @@ import {
   SecureStudioRentalBrowsePage,
   SecureStudioRentalRequestsPage,
   SecureVerifyEmailPage,
-  UserLoader,
-  UserPage,
+  UiPage,
+  HomeLoader,
 } from '@pages';
 
 /* eslint-disable line-comment-position */ // This is temporal meanwhile I can finish the migration of all pages
 const routes: Array<RouteObject> = [
   {
     path: '/',
-    Component: RootLayout,
+    Component: AuthLayout,
     middleware: [loggingMiddleware],
     hydrateFallbackElement: <RootLoader />,
     children: [
-      { index: true, Component: HomePage },
-
       {
         path: 'auth',
         children: [
@@ -63,62 +61,70 @@ const routes: Array<RouteObject> = [
           { path: 'onboarding', Component: SecureOnboardingPage },
         ],
       },
-
-      { path: 'user/:id', Component: UserPage, loader: UserLoader },
-      { path: 'figures', Component: SecureFiguresPage },
-      { path: 'figures/:id', Component: SecureFiguresDetailsPage },
-      { path: 'classes', Component: SecureClassesPage },
-      { path: 'instructor/dashboard', Component: SecureInstructorDashboardPage }, // WIP
-
       {
-        path: 'profile',
+        Component: RootLayout,
         children: [
-          { index: true, Component: SecureProfilePage }, // WIP
-          { path: 'edit', Component: SecureProfileEditPage }, // WIP
+          { path: 'ui', Component: UiPage },
+          { index: true, Component: HomePage, loader: HomeLoader },
+
+          { path: 'figures', Component: SecureFiguresPage },
+          { path: 'figures/:id', Component: SecureFiguresDetailsPage },
+          { path: 'classes', Component: SecureClassesPage },
+          { path: 'instructor/dashboard', Component: SecureInstructorDashboardPage }, // WIP
+
+          {
+            path: 'profile',
+            children: [
+              { index: true, Component: SecureProfilePage }, // WIP
+              { path: 'edit', Component: SecureProfileEditPage }, // WIP
+            ],
+          },
+
+          {
+            path: 'figure',
+            children: [
+              { path: 'completed', Component: SecureFigureCompletedPage }, // WIP
+              { path: 'saved', Component: SecureFigureSavedPage }, // WIP
+            ],
+          },
+
+          {
+            path: 'my-account',
+            children: [
+              { path: 'subscription', Component: SecureMyAccountSubscriptionPage }, // WIP
+              { path: 'bookings', Component: SecureMyAccountBookingsPage },
+            ],
+          },
+
+          {
+            path: 'studio-rental',
+            children: [
+              { path: 'browse', Component: SecureStudioRentalBrowsePage },
+              { path: 'requests', Component: SecureStudioRentalRequestsPage },
+            ],
+          },
+
+          {
+            path: 'admin',
+            children: [
+              { index: true, Component: SecureAdminPage }, // WIP
+              { path: 'agenda', Component: SecureAdminAgendaPage }, // WIP
+              { path: 'agenda/conflicts', Component: SecureAdminAgendaConflictsPage }, // WIP
+              { path: 'inventory', Component: SecureAdminInventoryPage }, // WIP
+              { path: 'schedule-builder', Component: SecureAdminScheduleBuilderPage }, // WIP
+              { path: 'reports', Component: SecureAdminReportsPage }, // WIP
+              { path: 'bookings', Component: SecureAdminBookingsPage }, // WIP
+              { path: 'payments', Component: SecureAdminPaymentsPage }, // WIP
+              { path: 'merch', Component: SecureAdminMerchPage }, // WIP
+              { path: 'merch/pos', Component: SecureAdminMerchPosPage }, // WIP
+              { path: 'figures', Component: SecureAdminFiguresPage }, // WIP
+              { path: 'access', Component: SecureAdminAccessPage }, // WIP
+              { path: 'studio-rental', Component: SecureAdminStudioRentalPage }, // WIP
+            ],
+          },
         ],
       },
 
-      {
-        path: 'figure',
-        children: [
-          { path: 'completed', Component: SecureFigureCompletedPage }, // WIP
-          { path: 'saved', Component: SecureFigureSavedPage }, // WIP
-        ],
-      },
-
-      {
-        path: 'my-account',
-        children: [
-          { path: 'subscription', Component: SecureMyAccountSubscriptionPage }, // WIP
-          { path: 'bookings', Component: SecureMyAccountBookingsPage },
-        ],
-      },
-
-      {
-        path: 'studio-rental',
-        children: [
-          { path: 'browse', Component: SecureStudioRentalBrowsePage },
-          { path: 'requests', Component: SecureStudioRentalRequestsPage },
-        ],
-      },
-      {
-        path: 'admin',
-        children: [
-          { index: true, Component: SecureAdminPage }, // WIP
-          { path: 'agenda', Component: SecureAdminAgendaPage }, // WIP
-          { path: 'agenda/conflicts', Component: SecureAdminAgendaConflictsPage }, // WIP
-          { path: 'inventory', Component: SecureAdminInventoryPage }, // WIP
-          { path: 'schedule-builder', Component: SecureAdminScheduleBuilderPage }, // WIP
-          { path: 'reports', Component: SecureAdminReportsPage }, // WIP
-          { path: 'bookings', Component: SecureAdminBookingsPage }, // WIP
-          { path: 'payments', Component: SecureAdminPaymentsPage }, // WIP
-          { path: 'merch', Component: SecureAdminMerchPage }, // WIP
-          { path: 'merch/pos', Component: SecureAdminMerchPosPage }, // WIP
-          { path: 'figures', Component: SecureAdminFiguresPage }, // WIP
-          { path: 'access', Component: SecureAdminAccessPage }, // WIP
-          { path: 'studio-rental', Component: SecureAdminStudioRentalPage }, // WIP
-        ],
-      },
       { path: '*', Component: Error404Page },
     ],
   },

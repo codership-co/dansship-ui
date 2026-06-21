@@ -24,6 +24,7 @@ function MyAccountSubscriptionPage() {
   const { t } = useTranslation();
   const locale = useDateLocale();
   const { response: mySubscriptionsResponse } = usePromise(() => DansshipAPI.subscriptions.getMySubscriptions());
+  const { response: publicPlans } = usePromise(() => DansshipAPI.subscriptions.getPublicPlans());
   const [showSubscriptionHistory, setShowSubscriptionHistory] = useState(false);
   const [showInProgressPayments, setShowInProgressPayments] = useState(true);
   const [showHistoricalPayments, setShowHistoricalPayments] = useState(false);
@@ -54,7 +55,7 @@ function MyAccountSubscriptionPage() {
 
       <div className='mt-12 pt-8 border-t border-gray-200'>
         <h2 className='text-2xl font-bold text-gray-900 mb-6'>{t('subscriptions:store.availablePlans')}</h2>
-        <PlanSelector />
+        <PlanSelector publicPlans={publicPlans?.data ?? []} />
       </div>
 
       <div className='mt-12 border-t border-gray-200 pt-8'>

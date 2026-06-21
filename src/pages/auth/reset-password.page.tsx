@@ -13,7 +13,6 @@ function ResetPasswordPage() {
 
   return (
     <AuthFormLayout
-      gradientsImage='/assets/images/auth/dancing-boy-2.png'
       title={t('auth:resetPassword.title')}
       subtitle={
         <Trans

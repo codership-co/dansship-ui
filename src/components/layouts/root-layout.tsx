@@ -1,19 +1,21 @@
-import { Outlet, useLocation } from 'react-router';
+import { Outlet, useLocation, useNavigation } from 'react-router';
 
 import { RootLoader } from '@components/loaders';
 import { Footer, Navbar } from '@components/navigation';
 import { SecurityGuard, useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
-import { useScrollToTop } from '@hooks';
+import { useRouterLoading, useScrollToTop } from '@hooks';
 
 const SecurityOutlet = SecurityGuard(Outlet);
 
 export const RootLayout = () => {
   const { pathname } = useLocation();
   const { ready } = useAuth();
+  const { location } = useNavigation();
+  const isRouterLoading = useRouterLoading();
   useScrollToTop();
 
-  if (!ready) {
+  if ((!ready || isRouterLoading) && !location?.pathname.startsWith('/auth')) {
     return <RootLoader />;
   }
 
