@@ -49,8 +49,8 @@ export const Gradients = ({ className, flipped, styles }: GradientsProps) => {
       </svg>
 
       <svg
-        width='30%'
-        className='absolute top-1/2 left-1/2 -translate-1/2'
+        height='10%'
+        className='absolute top-1/2 left-1/2 -translate-1/2 max-h-40'
         viewBox='0 0 552 251'
         fill='none'
         xmlns='http://www.w3.org/2000/svg'
