@@ -17,17 +17,17 @@ import {
 import type { ScheduledClass } from '../schedules/schedules.models';
 
 export class InstructorsAPI {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
 
   async getProfile() {
-    return this.httpClient.call<InstructorProfile>({
+    return this.httpClient.callNoError<InstructorProfile>({
       path: '/instructors/profile',
       method: 'GET',
     });
   }
 
   async createProfile(payload: CreateInstructorProfilePayload) {
-    return this.httpClient.call<InstructorProfile>({
+    return this.httpClient.callNoError<InstructorProfile>({
       path: '/instructors/profile',
       method: 'POST',
       data: payload,
@@ -35,7 +35,7 @@ export class InstructorsAPI {
   }
 
   async updateProfile(payload: UpdateInstructorProfilePayload) {
-    return this.httpClient.call<InstructorProfile>({
+    return this.httpClient.callNoError<InstructorProfile>({
       path: '/instructors/profile',
       method: 'PUT',
       data: payload,
@@ -43,7 +43,7 @@ export class InstructorsAPI {
   }
 
   async getAvailability(week: string) {
-    return this.httpClient.call<Array<AvailabilityApiItem>, object, AvailabilityWeek>(
+    return this.httpClient.callNoError<Array<AvailabilityApiItem>, object, AvailabilityWeek>(
       {
         path: '/instructors/availability',
         method: 'GET',
@@ -61,7 +61,7 @@ export class InstructorsAPI {
   }
 
   async updateAvailability(payload: UpdateAvailabilityPayload) {
-    return this.httpClient.call<Array<AvailabilityApiItem>, object, AvailabilityWeek>(
+    return this.httpClient.callNoError<Array<AvailabilityApiItem>, object, AvailabilityWeek>(
       {
         path: '/instructors/availability',
         method: 'POST',
@@ -86,7 +86,7 @@ export class InstructorsAPI {
   }
 
   async searchUsersByEmail(email: string) {
-    return this.httpClient.call<Array<InstructorUserSearchResult>>({
+    return this.httpClient.callNoError<Array<InstructorUserSearchResult>>({
       path: '/instructors/users/search',
       method: 'GET',
       params: { email },
@@ -94,14 +94,14 @@ export class InstructorsAPI {
   }
 
   async getClassRoster(classId: string) {
-    return this.httpClient.call<ClassRosterResponse>({
+    return this.httpClient.callNoError<ClassRosterResponse>({
       path: `/instructors/classes/${classId}/roster`,
       method: 'GET',
     });
   }
 
   async manualAddStudent(classId: string, payload: ManualAddStudentPayload) {
-    return this.httpClient.call<void, ManualAddStudentPayload>({
+    return this.httpClient.callNoError<void, ManualAddStudentPayload>({
       path: `/instructors/classes/${classId}/roster`,
       method: 'POST',
       data: payload,
@@ -109,7 +109,7 @@ export class InstructorsAPI {
   }
 
   async getInstructorWeeklySchedule(weekStartDate: string) {
-    return this.httpClient.call<Array<ScheduledClass>>({
+    return this.httpClient.callNoError<Array<ScheduledClass>>({
       path: `/instructors/schedules/weeks/${weekStartDate}/classes`,
       method: 'GET',
     });

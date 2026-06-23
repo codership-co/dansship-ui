@@ -14,7 +14,7 @@ import type {
 } from './studio-rental.models';
 
 export class StudioRentalAdminAPI {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
 
   async adminListRequests(payload?: AdminListRequestsPayload) {
     return this.httpClient.call<Array<RentalRequest>>({
@@ -88,7 +88,7 @@ export class StudioRentalAdminAPI {
   }
 
   async deleteRule(id: string) {
-    return this.httpClient.call({
+    return this.httpClient.callNoError({
       path: `/admin/studio-rentals/rules/${id}`,
       method: 'DELETE',
     });

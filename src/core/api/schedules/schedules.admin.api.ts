@@ -15,10 +15,10 @@ import type {
 } from './schedules.models';
 
 export class SchedulesAdminAPI {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
 
   async getWeeks(payload: GetWeeksPayload) {
-    return this.httpClient.call<Array<ScheduleWeek>>({
+    return this.httpClient.callNoError<Array<ScheduleWeek>>({
       path: '/admin/schedules/weeks',
       method: 'GET',
       params: payload,
@@ -26,14 +26,14 @@ export class SchedulesAdminAPI {
   }
 
   async getWeekDetail(id: string) {
-    return this.httpClient.call<ScheduleWeek>({
+    return this.httpClient.callNoError<ScheduleWeek>({
       path: `/admin/schedules/weeks/${id}`,
       method: 'GET',
     });
   }
 
   async getAgendaEvents(payload: GetAgendaEventsPayload) {
-    return this.httpClient.call<Array<AgendaEvent>>({
+    return this.httpClient.callNoError<Array<AgendaEvent>>({
       path: '/admin/agenda/events',
       method: 'GET',
       params: payload,
@@ -41,7 +41,7 @@ export class SchedulesAdminAPI {
   }
 
   async createWeek(payload: CreateWeekPayload) {
-    return this.httpClient.call<ScheduleWeek, CreateWeekPayload>({
+    return this.httpClient.callNoError<ScheduleWeek, CreateWeekPayload>({
       path: '/admin/schedules/weeks',
       method: 'POST',
       data: payload,
@@ -49,21 +49,21 @@ export class SchedulesAdminAPI {
   }
 
   async publishWeek(weekId: string) {
-    return this.httpClient.call<ScheduleWeek>({
+    return this.httpClient.callNoError<ScheduleWeek>({
       path: `/admin/schedules/weeks/${weekId}/publish`,
       method: 'POST',
     });
   }
 
   async archiveWeek(weekId: string) {
-    return this.httpClient.call<ScheduleWeek>({
+    return this.httpClient.callNoError<ScheduleWeek>({
       path: `/admin/schedules/weeks/${weekId}/archive`,
       method: 'POST',
     });
   }
 
   async addClass(payload: AddClassPayload) {
-    return this.httpClient.call<ScheduledClass, AddClassPayload>({
+    return this.httpClient.callNoError<ScheduledClass, AddClassPayload>({
       path: '/admin/schedules/classes',
       method: 'POST',
       data: payload,
@@ -71,7 +71,7 @@ export class SchedulesAdminAPI {
   }
 
   async updateClass(weekId: string, classId: string, payload: UpdateClassPayload) {
-    return this.httpClient.call<ScheduledClass, UpdateClassPayload>({
+    return this.httpClient.callNoError<ScheduledClass, UpdateClassPayload>({
       path: `/admin/schedules/weeks/${weekId}/classes/${classId}`,
       method: 'PUT',
       data: payload,
@@ -79,7 +79,7 @@ export class SchedulesAdminAPI {
   }
 
   async updateWaitlistConfig(classId: string, payload: UpdateWaitlistConfigPayload) {
-    return this.httpClient.call<ScheduledClass, UpdateWaitlistConfigPayload>({
+    return this.httpClient.callNoError<ScheduledClass, UpdateWaitlistConfigPayload>({
       path: `/admin/schedules/classes/${classId}/waitlist-config`,
       method: 'PUT',
       data: payload,
@@ -87,21 +87,21 @@ export class SchedulesAdminAPI {
   }
 
   async getWaitlistDefault() {
-    return this.httpClient.call<GetWaitlistDefaultResponse>({
+    return this.httpClient.callNoError<GetWaitlistDefaultResponse>({
       path: '/admin/settings/waitlist-default',
       method: 'GET',
     });
   }
 
   async removeClass(weekId: string, classId: string) {
-    return this.httpClient.call({
+    return this.httpClient.callNoError({
       path: `/admin/schedules/weeks/${weekId}/classes/${classId}`,
       method: 'DELETE',
     });
   }
 
   async editPublishedClass(weekId: string, classId: string, payload: EditPublishedClassPayload) {
-    return this.httpClient.call<ScheduledClass, EditPublishedClassPayload>({
+    return this.httpClient.callNoError<ScheduledClass, EditPublishedClassPayload>({
       path: `/admin/schedules/weeks/${weekId}/classes/${classId}/published-edit`,
       method: 'PUT',
       data: payload,
@@ -109,7 +109,7 @@ export class SchedulesAdminAPI {
   }
 
   async cancelPublishedClass(weekId: string, classId: string) {
-    return this.httpClient.call({
+    return this.httpClient.callNoError({
       path: `/admin/schedules/weeks/${weekId}/classes/${classId}/published-cancel`,
       method: 'DELETE',
     });

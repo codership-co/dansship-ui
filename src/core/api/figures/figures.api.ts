@@ -23,10 +23,10 @@ import type {
 import type { OffsetPaginatedResponse } from '../common/common.models';
 
 export class FiguresAPI {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
 
   async getFigures(payload?: GetFiguresParams) {
-    return this.httpClient.call<OffsetPaginatedResponse<Figure>, object, GetFiguresResponse>(
+    return this.httpClient.callNoError<OffsetPaginatedResponse<Figure>, object, GetFiguresResponse>(
       {
         path: '/figures',
         method: 'GET',
@@ -86,7 +86,7 @@ export class FiguresAPI {
   }
 
   async deleteFigureProgress(figureId: TFigureId, progressId: string) {
-    return this.httpClient.call({
+    return this.httpClient.callNoError({
       path: `/figures/${figureId}/progress/${progressId}`,
       method: 'DELETE',
     });
@@ -122,7 +122,7 @@ export class FiguresAPI {
   }
 
   async unsaveFigure(figureId: TFigureId) {
-    return this.httpClient.call({
+    return this.httpClient.callNoError({
       path: `/saved-figures/${figureId}`,
       method: 'DELETE',
     });

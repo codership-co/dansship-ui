@@ -4,6 +4,7 @@ import { AuthAPI } from './auth/auth.api';
 import { BillingAdminAPI } from './billing/billing.admin.api';
 import { BookingsAdminAPI } from './bookings/bookings.admin.api';
 import { BookingsAPI } from './bookings/bookings.api';
+import { DansshipResponseError, getResponseError } from './dansship.error';
 import { FiguresAdminAPI } from './figures/figures.admin.api';
 import { FiguresAPI } from './figures/figures.api';
 import { InstructorsAdminAPI } from './instructors/instructors.admin.api';
@@ -23,16 +24,12 @@ import { StudioRentalAPI } from './studio-rental/studio-rental.api';
 import { SubscriptionsAPI } from './subscriptions/subscriptions.api';
 import { UsersAdminAPI } from './users/users.admin.api';
 
-import { getResponseError } from '@core/api/dansship.error';
-
 export class DansshipAPI {
-  static getLogger() {
-    return async ({ state, response }: LoggerParams) => {
-      if (state === RequestState.REJECTED) {
-        // eslint-disable-next-line no-console
-        console.error(response);
-      }
-    };
+  static async logger({ state, response }: LoggerParams) {
+    if (state === RequestState.REJECTED) {
+      // eslint-disable-next-line no-console
+      console.error(response);
+    }
   }
 
   private static notifySessionExpired(): void {
@@ -40,12 +37,12 @@ export class DansshipAPI {
     window.dispatchEvent(new CustomEvent('auth:session-expired'));
   }
 
-  static readonly httpClient = new HttpClient({
+  static readonly httpClient = new HttpClient<DansshipResponseError>({
     apiName: 'DANSSHIP',
     baseURL: `${import.meta.env.VITE_DANSSHIP_API_URL}`,
     mode: 'cors',
     cache: 'no-cache',
-    getLogger: () => this.getLogger(),
+    logger: this.logger,
     getResponseError: getResponseError,
     credentials: 'include',
     headers: {
@@ -59,9 +56,7 @@ export class DansshipAPI {
       this.notifySessionExpired();
       // eslint-disable-next-line no-console
       console.log({ request, response });
-
-      return response;
-    }) as OnErrorCallback);
+    }) as OnErrorCallback<DansshipResponseError>);
   }
 
   static auth = new AuthAPI(this.httpClient);

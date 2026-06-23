@@ -3,17 +3,17 @@ import { HttpClient } from 'polpo-http-client';
 import type { BookClassPayload, Booking, MarkAttendancePayload, MyBooking } from './bookings.models';
 
 export class BookingsAPI {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
 
   async getMyBookings() {
-    return this.httpClient.call<Array<MyBooking>>({
+    return this.httpClient.callNoError<Array<MyBooking>>({
       path: '/bookings/me',
       method: 'GET',
     });
   }
 
   async bookClass(payload: BookClassPayload) {
-    return this.httpClient.call<Booking, BookClassPayload>({
+    return this.httpClient.callNoError<Booking, BookClassPayload>({
       path: '/bookings',
       method: 'POST',
       data: payload,
@@ -21,14 +21,14 @@ export class BookingsAPI {
   }
 
   async cancelBooking(id: string) {
-    return this.httpClient.call<Booking>({
+    return this.httpClient.callNoError<Booking>({
       path: `/bookings/${id}/cancel`,
       method: 'PUT',
     });
   }
 
   async joinWaitlist(payload: BookClassPayload) {
-    return this.httpClient.call<Booking, BookClassPayload>({
+    return this.httpClient.callNoError<Booking, BookClassPayload>({
       path: '/bookings/waitlist',
       method: 'POST',
       data: payload,
@@ -36,14 +36,14 @@ export class BookingsAPI {
   }
 
   async cancelWaitlist(id: string) {
-    return this.httpClient.call({
+    return this.httpClient.callNoError({
       path: `/bookings/waitlist/${id}`,
       method: 'DELETE',
     });
   }
 
   async markAttendance(bookingId: string, payload: MarkAttendancePayload) {
-    return this.httpClient.call({
+    return this.httpClient.callNoError({
       path: `/bookings/${bookingId}/attendance`,
       method: 'PUT',
       data: payload,

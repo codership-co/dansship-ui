@@ -8,10 +8,10 @@ import type {
 } from './reports.models';
 
 export class ReportsAdminAPI {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
 
   async getOccupancyReport(startDate?: string, endDate?: string) {
-    return this.httpClient.call<ClassOccupancyReport>({
+    return this.httpClient.callNoError<ClassOccupancyReport>({
       path: '/admin/reports/class-occupancy',
       method: 'GET',
       params: {
@@ -22,7 +22,7 @@ export class ReportsAdminAPI {
   }
 
   async getAttendanceReport(startDate?: string, endDate?: string) {
-    return this.httpClient.call<AttendanceReport>({
+    return this.httpClient.callNoError<AttendanceReport>({
       path: '/admin/reports/attendance',
       method: 'GET',
       params: {
@@ -33,7 +33,7 @@ export class ReportsAdminAPI {
   }
 
   async getInstructorPerformanceReport(startDate?: string, endDate?: string) {
-    return this.httpClient.call<InstructorPerformanceReport>({
+    return this.httpClient.callNoError<InstructorPerformanceReport>({
       path: '/admin/reports/instructor-performance',
       method: 'GET',
       params: {
@@ -44,7 +44,7 @@ export class ReportsAdminAPI {
   }
 
   async getRevenueReport(startDate?: string, endDate?: string) {
-    return this.httpClient.call<RevenueIndicatorsReport>({
+    return this.httpClient.callNoError<RevenueIndicatorsReport>({
       path: '/admin/reports/revenue-indicators',
       method: 'GET',
       params: {

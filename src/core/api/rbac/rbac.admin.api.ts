@@ -12,24 +12,24 @@ import type {
 } from './rbac.models';
 
 export class RbacAdminApi {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
 
   async getRoles() {
-    return this.httpClient.call<Array<RoleResponse>>({
+    return this.httpClient.callNoError<Array<RoleResponse>>({
       path: '/admin/rbac/roles',
       method: 'GET',
     });
   }
 
   async getRoleDetail(roleId: string) {
-    return this.httpClient.call<RoleDetailResponse>({
+    return this.httpClient.callNoError<RoleDetailResponse>({
       path: `/admin/rbac/roles/${roleId}`,
       method: 'GET',
     });
   }
 
   async assignPolicyToRole(roleId: string, payload: AssignPolicyToRolePayload) {
-    return this.httpClient.call<RoleDetailResponse, AssignPolicyToRolePayload>({
+    return this.httpClient.callNoError<RoleDetailResponse, AssignPolicyToRolePayload>({
       path: `/admin/rbac/roles/${roleId}/policies`,
       method: 'POST',
       data: payload,
@@ -37,14 +37,14 @@ export class RbacAdminApi {
   }
 
   async revokePolicyFromRole(roleId: string, policyId: string) {
-    return this.httpClient.call<RoleDetailResponse>({
+    return this.httpClient.callNoError<RoleDetailResponse>({
       path: `/admin/rbac/roles/${roleId}/policies/${policyId}`,
       method: 'DELETE',
     });
   }
 
   async getPolicies() {
-    return this.httpClient.call<Array<PolicyResponse>>({
+    return this.httpClient.callNoError<Array<PolicyResponse>>({
       path: '/admin/rbac/policies',
       method: 'GET',
     });
@@ -74,7 +74,7 @@ export class RbacAdminApi {
   }
 
   async deletePolicy(policyId: string) {
-    return this.httpClient.call({
+    return this.httpClient.callNoError({
       path: `/admin/rbac/policies/${policyId}`,
       method: 'DELETE',
     });

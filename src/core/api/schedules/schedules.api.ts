@@ -3,10 +3,10 @@ import { HttpClient } from 'polpo-http-client';
 import type { PublishedClass } from '../bookings/bookings.models';
 
 export class SchedulesAPI {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
 
   async getPublishedClassesByRange(startAt: string, endAt: string) {
-    return this.httpClient.call<Array<PublishedClass>>({
+    return this.httpClient.callNoError<Array<PublishedClass>>({
       path: '/schedules/classes',
       method: 'GET',
       params: {

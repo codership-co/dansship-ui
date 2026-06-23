@@ -18,10 +18,10 @@ import type {
 } from './merch.models';
 
 export class MerchAdminApi {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
 
   async getProducts(payload?: GetProductsParams) {
-    return this.httpClient.call<ProductListResponse, object, Array<Product>>(
+    return this.httpClient.callNoError<ProductListResponse, object, Array<Product>>(
       {
         path: '/admin/merch/products',
         method: 'GET',
@@ -32,7 +32,7 @@ export class MerchAdminApi {
   }
 
   async getProduct(id: string) {
-    return this.httpClient.call<Product>(
+    return this.httpClient.callNoError<Product>(
       {
         path: `/admin/merch/products/${id}`,
         method: 'GET',
@@ -42,7 +42,7 @@ export class MerchAdminApi {
   }
 
   async createProduct(payload: CreateProductPayload) {
-    return this.httpClient.call<Product, CreateProductPayload>(
+    return this.httpClient.callNoError<Product, CreateProductPayload>(
       {
         path: '/admin/merch/products',
         method: 'POST',
@@ -53,7 +53,7 @@ export class MerchAdminApi {
   }
 
   async updateProduct(id: string, payload: UpdateProductPayload) {
-    return this.httpClient.call<Product, UpdateProductPayload>(
+    return this.httpClient.callNoError<Product, UpdateProductPayload>(
       {
         path: `/admin/merch/products/${id}`,
         method: 'PATCH',
@@ -64,7 +64,7 @@ export class MerchAdminApi {
   }
 
   async deactivateProduct(id: string) {
-    return this.httpClient.call<Product>(
+    return this.httpClient.callNoError<Product>(
       {
         path: `/admin/merch/products/${id}/deactivate`,
         method: 'POST',
@@ -74,7 +74,7 @@ export class MerchAdminApi {
   }
 
   async reactivateProduct(id: string) {
-    return this.httpClient.call<Product>(
+    return this.httpClient.callNoError<Product>(
       {
         path: `/admin/merch/products/${id}/reactivate`,
         method: 'POST',
@@ -84,7 +84,7 @@ export class MerchAdminApi {
   }
 
   async getProductImageUploadUrl(id: string, payload: ProductImageUploadRequest) {
-    return this.httpClient.call<ProductImageUploadResponse, ProductImageUploadRequest>({
+    return this.httpClient.callNoError<ProductImageUploadResponse, ProductImageUploadRequest>({
       path: `/admin/merch/products/${id}/image/upload-url`,
       method: 'POST',
       data: payload,
@@ -92,7 +92,7 @@ export class MerchAdminApi {
   }
 
   async confirmProductImageUpload(id: string, payload: ProductImageConfirmRequest) {
-    return this.httpClient.call<Product, ProductImageConfirmRequest>(
+    return this.httpClient.callNoError<Product, ProductImageConfirmRequest>(
       {
         path: `/admin/merch/products/${id}/image/confirm`,
         method: 'POST',
@@ -103,7 +103,7 @@ export class MerchAdminApi {
   }
 
   async getOrders(payload?: GetOrdersParams) {
-    return this.httpClient.call<OrderListResponse, object, Array<Order>>(
+    return this.httpClient.callNoError<OrderListResponse, object, Array<Order>>(
       {
         path: '/admin/merch/orders',
         method: 'GET',
@@ -114,7 +114,7 @@ export class MerchAdminApi {
   }
 
   async getOrder(id: string) {
-    return this.httpClient.call<Order>(
+    return this.httpClient.callNoError<Order>(
       {
         path: `/admin/merch/orders/${id}`,
         method: 'GET',
@@ -124,7 +124,7 @@ export class MerchAdminApi {
   }
 
   async createOrder(payload: CreateOrderPayload) {
-    return this.httpClient.call<Order, CreateOrderPayload>(
+    return this.httpClient.callNoError<Order, CreateOrderPayload>(
       {
         path: '/admin/merch/orders',
         method: 'POST',
@@ -135,7 +135,7 @@ export class MerchAdminApi {
   }
 
   async cancelOrder(id: string) {
-    return this.httpClient.call<Order>(
+    return this.httpClient.callNoError<Order>(
       {
         path: `/admin/merch/orders/${id}/cancel`,
         method: 'POST',

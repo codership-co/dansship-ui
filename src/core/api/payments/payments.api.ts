@@ -13,10 +13,10 @@ import type {
 } from './payments.models';
 
 export class PaymentsAPI {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
 
   async createIntent(payload: CreatePaymentIntentPayload) {
-    return this.httpClient.call<PaymentIntent, CreatePaymentIntentPayload>(
+    return this.httpClient.callNoError<PaymentIntent, CreatePaymentIntentPayload>(
       {
         path: '/payments/intents',
         method: 'POST',
@@ -27,7 +27,7 @@ export class PaymentsAPI {
   }
 
   async getMyIntents() {
-    return this.httpClient.call<Array<PaymentIntent>>(
+    return this.httpClient.callNoError<Array<PaymentIntent>>(
       {
         path: '/payments/intents/me',
         method: 'GET',
@@ -37,7 +37,7 @@ export class PaymentsAPI {
   }
 
   async getIntent(id: string) {
-    return this.httpClient.call<PaymentIntentDetail>(
+    return this.httpClient.callNoError<PaymentIntentDetail>(
       {
         path: `/payments/intents/${id}`,
         method: 'GET',
@@ -47,7 +47,7 @@ export class PaymentsAPI {
   }
 
   async cancelIntent(id: string) {
-    return this.httpClient.call<PaymentIntent>(
+    return this.httpClient.callNoError<PaymentIntent>(
       {
         path: `/payments/intents/${id}/cancel`,
         method: 'POST',
@@ -57,7 +57,7 @@ export class PaymentsAPI {
   }
 
   async getProofUploadUrl(id: string, payload: PaymentProofUploadRequest) {
-    return this.httpClient.call<PresignedUrlResponse, PaymentProofUploadRequest>({
+    return this.httpClient.callNoError<PresignedUrlResponse, PaymentProofUploadRequest>({
       path: `/payments/intents/${id}/proof/upload-url`,
       method: 'POST',
       data: payload,
@@ -65,7 +65,7 @@ export class PaymentsAPI {
   }
 
   async confirmProofUpload(id: string, payload: ConfirmPaymentProofPayload) {
-    return this.httpClient.call<PaymentIntent, ConfirmPaymentProofPayload>(
+    return this.httpClient.callNoError<PaymentIntent, ConfirmPaymentProofPayload>(
       {
         path: `/payments/intents/${id}/proof/confirm`,
         method: 'POST',

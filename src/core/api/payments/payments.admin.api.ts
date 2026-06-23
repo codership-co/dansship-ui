@@ -15,10 +15,10 @@ import type {
 } from './payments.models';
 
 export class PaymentsAdminAPI {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
 
   async getAdminPayments(payload?: GetAdminPaymentsParams) {
-    return this.httpClient.call<AdminPaymentListResponse>(
+    return this.httpClient.callNoError<AdminPaymentListResponse>(
       {
         path: '/admin/payments',
         method: 'GET',
@@ -29,7 +29,7 @@ export class PaymentsAdminAPI {
   }
 
   async getAdminPaymentDetail(id: string) {
-    return this.httpClient.call<PaymentIntentDetail>(
+    return this.httpClient.callNoError<PaymentIntentDetail>(
       {
         path: `/admin/payments/${id}`,
         method: 'GET',
@@ -39,14 +39,14 @@ export class PaymentsAdminAPI {
   }
 
   async getAdminPaymentProofViewUrl(id: string) {
-    return this.httpClient.call<ProofViewUrlResponse>({
+    return this.httpClient.callNoError<ProofViewUrlResponse>({
       path: `/admin/payments/${id}/proof/view-url`,
       method: 'GET',
     });
   }
 
   async getAdminProofUploadUrl(id: string, payload: PaymentProofUploadRequest) {
-    return this.httpClient.call<PresignedUrlResponse, PaymentProofUploadRequest>({
+    return this.httpClient.callNoError<PresignedUrlResponse, PaymentProofUploadRequest>({
       path: `/admin/payments/${id}/proof/upload-url`,
       method: 'POST',
       data: payload,
@@ -54,7 +54,7 @@ export class PaymentsAdminAPI {
   }
 
   async confirmAdminProofUpload(id: string, payload: ConfirmPaymentProofPayload) {
-    return this.httpClient.call<PaymentIntent, ConfirmPaymentProofPayload>(
+    return this.httpClient.callNoError<PaymentIntent, ConfirmPaymentProofPayload>(
       {
         path: `/admin/payments/${id}/proof/confirm`,
         method: 'POST',
@@ -65,7 +65,7 @@ export class PaymentsAdminAPI {
   }
 
   async reviewPayment(id: string, payload: AdminPaymentReviewPayload) {
-    return this.httpClient.call<PaymentIntent, AdminPaymentReviewPayload>(
+    return this.httpClient.callNoError<PaymentIntent, AdminPaymentReviewPayload>(
       {
         path: `/admin/payments/${id}/review`,
         method: 'POST',

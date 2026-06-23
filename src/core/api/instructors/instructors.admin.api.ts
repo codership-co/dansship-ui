@@ -8,17 +8,17 @@ import {
 } from './instructors.models';
 
 export class InstructorsAdminAPI {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
 
   async getInstructors() {
-    return this.httpClient.call<Array<AdminInstructorListItem>>({
+    return this.httpClient.callNoError<Array<AdminInstructorListItem>>({
       path: '/admin/instructors',
       method: 'GET',
     });
   }
 
   async getAdminAvailability(id: string, week: string) {
-    return this.httpClient.call<Array<AvailabilityApiItem>, object, AvailabilityWeek>(
+    return this.httpClient.callNoError<Array<AvailabilityApiItem>, object, AvailabilityWeek>(
       {
         path: `/admin/instructors/${id}/availability`,
         method: 'GET',

@@ -12,10 +12,10 @@ import type {
 } from './billing.models';
 
 export class BillingAdminAPI {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
 
   async getPlans(payload?: GetPlansParams) {
-    return this.httpClient.call<Array<Plan>>({
+    return this.httpClient.callNoError<Array<Plan>>({
       path: '/admin/plans',
       method: 'GET',
       params: payload,
@@ -23,7 +23,7 @@ export class BillingAdminAPI {
   }
 
   async createPlan(payload: CreatePlanPayload) {
-    return this.httpClient.call<Plan, CreatePlanPayload>({
+    return this.httpClient.callNoError<Plan, CreatePlanPayload>({
       path: '/admin/plans',
       method: 'POST',
       data: payload,
@@ -31,7 +31,7 @@ export class BillingAdminAPI {
   }
 
   async updatePlan(id: string, payload: UpdatePlanPayload) {
-    return this.httpClient.call<Plan, UpdatePlanPayload>({
+    return this.httpClient.callNoError<Plan, UpdatePlanPayload>({
       path: `/admin/plans/${id}`,
       method: 'PATCH',
       data: payload,
@@ -39,21 +39,21 @@ export class BillingAdminAPI {
   }
 
   async deletePlan(id: string) {
-    return this.httpClient.call({
+    return this.httpClient.callNoError({
       path: `/admin/plans/${id}/deactivate`,
       method: 'POST',
     });
   }
 
   async reactivatePlan(id: string) {
-    return this.httpClient.call<Plan>({
+    return this.httpClient.callNoError<Plan>({
       path: `/admin/plans/${id}/reactivate`,
       method: 'POST',
     });
   }
 
   async getDiscounts(payload?: GetDiscountsParams) {
-    return this.httpClient.call<Array<Discount>>({
+    return this.httpClient.callNoError<Array<Discount>>({
       path: '/admin/discounts',
       method: 'GET',
       params: payload,
@@ -61,7 +61,7 @@ export class BillingAdminAPI {
   }
 
   async createDiscount(payload: CreateDiscountPayload) {
-    return this.httpClient.call<Discount, CreateDiscountPayload>({
+    return this.httpClient.callNoError<Discount, CreateDiscountPayload>({
       path: '/admin/discounts',
       method: 'POST',
       data: payload,
@@ -69,7 +69,7 @@ export class BillingAdminAPI {
   }
 
   async updateDiscount(id: string, payload: UpdateDiscountPayload) {
-    return this.httpClient.call<Discount, UpdateDiscountPayload>({
+    return this.httpClient.callNoError<Discount, UpdateDiscountPayload>({
       path: `/admin/discounts/${id}`,
       method: 'PATCH',
       data: payload,
@@ -77,14 +77,14 @@ export class BillingAdminAPI {
   }
 
   async deleteDiscount(id: string) {
-    return this.httpClient.call({
+    return this.httpClient.callNoError({
       path: `/admin/discounts/${id}/deactivate`,
       method: 'POST',
     });
   }
 
   async reactivateDiscount(id: string) {
-    return this.httpClient.call<Discount>({
+    return this.httpClient.callNoError<Discount>({
       path: `/admin/discounts/${id}/reactivate`,
       method: 'POST',
     });

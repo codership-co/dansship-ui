@@ -26,13 +26,13 @@ import { Error404Page, UnauthorizedPage, UnavailablePage } from '@pages';
 interface CommonAuthContextState {
   ready: boolean;
   error: string | null;
-  login: typeof DansshipAPI.auth.login;
-  signUp: typeof DansshipAPI.auth.register;
-  updateProfile: typeof DansshipAPI.auth.updateProfile;
-  forgotPassword: typeof DansshipAPI.auth.forgotPassword;
-  resetPassword: typeof DansshipAPI.auth.resetPassword;
-  verifyEmail: typeof DansshipAPI.auth.verifyEmail;
-  resendVerification: typeof DansshipAPI.auth.resendVerification;
+  login: (data: LoginPayload) => void;
+  signUp: (data: RegisterPayload) => void;
+  updateProfile: (data: UpdateProfilePayload) => void;
+  forgotPassword: (data: ForgotPasswordPayload) => void;
+  resetPassword: (data: ResetPasswordPayload) => void;
+  verifyEmail: (data: VerifyEmailPayload) => void;
+  resendVerification: (data: ResendVerificationPayload) => void;
   getProfile: () => Promise<User | null>;
   logout: () => Promise<void>;
   requireOnboarding: boolean;
@@ -111,27 +111,25 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }
 
   async function login(payload: LoginPayload) {
-    const response = await DansshipAPI.auth.login(payload);
+    const { data, ok } = await DansshipAPI.auth.login(payload);
 
-    if (response.data) {
+    if (ok) {
       setLocalError(null);
-      localStorage.setItem(AUTH_SESSION_KEY, '1');
-      setUser(response.data);
+      setUser(data);
       toast.success(t('auth:loginSuccess'));
+      localStorage.setItem(AUTH_SESSION_KEY, '1');
     } else {
       setLocalError(t('auth:loginFailed'));
       toast.error(t('auth:loginFailed'));
     }
-
-    return response;
   }
 
   async function signUp(payload: RegisterPayload) {
     const lang = payload.preferred_language || navigator.language.split('-')[0];
 
-    const response = await DansshipAPI.auth.register({ ...payload, preferred_language: lang });
+    const { ok } = await DansshipAPI.auth.register({ ...payload, preferred_language: lang });
 
-    if (response.status === 201) {
+    if (ok) {
       setLocalError(null);
       clearSessionArtifacts();
       setUser(null);
@@ -140,23 +138,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setLocalError(t('auth:registerFailed'));
       toast.error(t('auth:registerFailed'));
     }
-
-    return response;
   }
 
   async function updateProfile(payload: UpdateProfilePayload) {
-    const response = await DansshipAPI.auth.updateProfile(payload);
+    const { data, ok } = await DansshipAPI.auth.updateProfile(payload);
 
-    if (response.data) {
+    if (ok) {
       setLocalError(null);
-      setUser(response.data);
+      setUser(data);
       toast.success(t('auth:profileUpdateSuccess'));
     } else {
       setLocalError(t('auth:profileUpdateFailed'));
       toast.error(t('auth:profileUpdateFailed'));
     }
-
-    return response;
   }
 
   async function logout() {
@@ -170,9 +164,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }
 
   async function forgotPassword(payload: ForgotPasswordPayload) {
-    const response = await DansshipAPI.auth.forgotPassword(payload);
+    const { ok } = await DansshipAPI.auth.forgotPassword(payload);
 
-    if (response.status === 200) {
+    if (ok) {
       setLocalError(null);
       toast.success(
         t('auth:forgotPasswordSuccess', {
@@ -183,44 +177,38 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setLocalError(t('auth:forgotPasswordFailed'));
       toast.error(t('auth:forgotPasswordFailed'));
     }
-
-    return response;
   }
 
   async function resetPassword(payload: ResetPasswordPayload) {
-    const response = await DansshipAPI.auth.resetPassword(payload);
+    const { ok } = await DansshipAPI.auth.resetPassword(payload);
 
-    if (response.status === 200) {
+    if (ok) {
       setLocalError(null);
       toast.success(t('auth:resetPasswordSuccess'));
     } else {
       setLocalError(t('auth:resetPasswordFailed'));
       toast.error(t('auth:resetPasswordFailed'));
     }
-
-    return response;
   }
 
   async function verifyEmail(payload: VerifyEmailPayload) {
-    const response = await DansshipAPI.auth.verifyEmail(payload);
+    const { ok, data } = await DansshipAPI.auth.verifyEmail(payload);
 
-    if (response.data?.verified) {
+    if (ok && data.verified) {
       setLocalError(null);
-      toast.success(response.data.message);
+      toast.success(data.message);
     } else {
       setLocalError(t('auth:verifyEmail.subtitles.verificationFailed'));
       toast.error(t('auth:verifyEmail.subtitles.verificationFailed'));
     }
-
-    return response;
   }
 
   async function resendVerification(payload: ResendVerificationPayload) {
-    const response = await DansshipAPI.auth.resendVerification(payload);
+    const { data, ok } = await DansshipAPI.auth.resendVerification(payload);
 
-    if (response.data?.verification_sent) {
+    if (ok && data.verification_sent) {
       setLocalError(null);
-      toast.success(response.data.message);
+      toast.success(data.message);
     } else {
       setLocalError(
         t('auth:verifyEmail.subtitles.verificationResendFailed', {
@@ -233,8 +221,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }),
       );
     }
-
-    return response;
   }
 
   useEffect(() => {

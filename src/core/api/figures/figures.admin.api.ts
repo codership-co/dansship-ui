@@ -16,10 +16,10 @@ import type {
 } from './figures.models';
 
 export class FiguresAdminAPI {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
 
   async getAdminFigures(payload?: GetAdminFiguresParams) {
-    return this.httpClient.call<FigureAdminListResponse>(
+    return this.httpClient.callNoError<FigureAdminListResponse>(
       {
         path: '/admin/figures',
         method: 'GET',
@@ -33,7 +33,7 @@ export class FiguresAdminAPI {
   }
 
   async getAdminFigure(id: TFigureId) {
-    return this.httpClient.call<AdminFigure>(
+    return this.httpClient.callNoError<AdminFigure>(
       {
         path: `/admin/figures/${id}`,
         method: 'GET',
@@ -43,7 +43,7 @@ export class FiguresAdminAPI {
   }
 
   async createAdminFigure(payload: FigureAdminCreatePayload) {
-    return this.httpClient.call<AdminFigure, FigureAdminCreatePayload>(
+    return this.httpClient.callNoError<AdminFigure, FigureAdminCreatePayload>(
       {
         path: '/admin/figures',
         method: 'POST',
@@ -54,7 +54,7 @@ export class FiguresAdminAPI {
   }
 
   async updateAdminFigure(id: TFigureId, payload: FigureAdminUpdatePayload) {
-    return this.httpClient.call<AdminFigure, FigureAdminUpdatePayload>(
+    return this.httpClient.callNoError<AdminFigure, FigureAdminUpdatePayload>(
       {
         path: `/admin/figures/${id}`,
         method: 'PATCH',
@@ -65,14 +65,14 @@ export class FiguresAdminAPI {
   }
 
   async deleteAdminFigure(id: TFigureId) {
-    return this.httpClient.call({
+    return this.httpClient.callNoError({
       path: `/admin/figures/${id}`,
       method: 'DELETE',
     });
   }
 
   async approveAdminFigure(id: TFigureId) {
-    return this.httpClient.call<AdminFigure>(
+    return this.httpClient.callNoError<AdminFigure>(
       {
         path: `/admin/figures/${id}/approve`,
         method: 'POST',
@@ -82,7 +82,7 @@ export class FiguresAdminAPI {
   }
 
   async getAdminFigureImageUploadUrl(id: TFigureId, payload: FigureImageUploadUrlRequest) {
-    return this.httpClient.call<FigureImageUploadUrlResponse, FigureImageUploadUrlRequest>({
+    return this.httpClient.callNoError<FigureImageUploadUrlResponse, FigureImageUploadUrlRequest>({
       path: `/admin/figures/${id}/images/upload-url`,
       method: 'POST',
       data: payload,
@@ -90,7 +90,7 @@ export class FiguresAdminAPI {
   }
 
   async confirmAdminFigureImage(id: TFigureId, payload: ConfirmAdminFigureImagePayload) {
-    return this.httpClient.call<AdminFigure, ConfirmAdminFigureImagePayload>(
+    return this.httpClient.callNoError<AdminFigure, ConfirmAdminFigureImagePayload>(
       {
         path: `/admin/figures/${id}/images/confirm`,
         method: 'POST',
@@ -107,7 +107,7 @@ export class FiguresAdminAPI {
 
     if (response.data) {
       const { upload_url, file_key } = response.data;
-      const uploadResponse = await this.httpClient.call({
+      const uploadResponse = await this.httpClient.callNoError({
         url: upload_url,
         method: 'PUT',
         data: file,
@@ -123,7 +123,7 @@ export class FiguresAdminAPI {
   }
 
   async deleteAdminFigureImage(id: TFigureId, fileKey: string) {
-    return this.httpClient.call<AdminFigure>(
+    return this.httpClient.callNoError<AdminFigure>(
       {
         path: `/admin/figures/${id}/images/${encodeURIComponent(fileKey)}`,
         method: 'DELETE',
@@ -136,7 +136,7 @@ export class FiguresAdminAPI {
     const formData = new FormData();
     formData.append('file', file);
 
-    return this.httpClient.call<FigureBulkImportResponse, FormData>({
+    return this.httpClient.callNoError<FigureBulkImportResponse, FormData>({
       path: '/admin/figures/import',
       method: 'POST',
       data: formData,

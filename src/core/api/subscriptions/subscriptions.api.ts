@@ -13,10 +13,10 @@ import type {
 } from './subscriptions.models';
 
 export class SubscriptionsAPI {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
 
   async getPublicPlans() {
-    return this.httpClient.call<Array<PublicPlan>>(
+    return this.httpClient.callNoError<Array<PublicPlan>>(
       {
         path: '/landing/plans/top',
         method: 'GET',
@@ -26,7 +26,7 @@ export class SubscriptionsAPI {
   }
 
   async purchaseSubscription(payload: PurchaseSubscriptionPayload) {
-    return this.httpClient.call<ActiveSubscription, PurchaseSubscriptionPayload>({
+    return this.httpClient.callNoError<ActiveSubscription, PurchaseSubscriptionPayload>({
       path: '/subscriptions',
       method: 'POST',
       data: payload,
@@ -34,7 +34,7 @@ export class SubscriptionsAPI {
   }
 
   async previewDiscount(payload: DiscountPreviewRequest) {
-    return this.httpClient.call<DiscountPreviewResponse, DiscountPreviewRequest>(
+    return this.httpClient.callNoError<DiscountPreviewResponse, DiscountPreviewRequest>(
       {
         path: '/discounts/preview',
         method: 'POST',
@@ -53,7 +53,7 @@ export class SubscriptionsAPI {
   }
 
   async getMySubscriptions() {
-    return this.httpClient.call<MySubscriptionsResponse>(
+    return this.httpClient.callNoError<MySubscriptionsResponse>(
       {
         path: '/subscriptions/me',
         method: 'GET',
@@ -66,7 +66,7 @@ export class SubscriptionsAPI {
   }
 
   async getSubscriptionSummary() {
-    return this.httpClient.call<SubscriptionSummary>({
+    return this.httpClient.callNoError<SubscriptionSummary>({
       path: '/subscriptions/me/summary',
       method: 'GET',
     });

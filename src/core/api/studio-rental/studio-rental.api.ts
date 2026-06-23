@@ -10,17 +10,17 @@ import type {
 } from './studio-rental.models';
 
 export class StudioRentalAPI {
-  constructor(private readonly httpClient: HttpClient) {}
+  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
 
   async getRooms() {
-    return this.httpClient.call<Array<StudioRentalRoomOption>>({
+    return this.httpClient.callNoError<Array<StudioRentalRoomOption>>({
       path: '/studio-rentals/rooms',
       method: 'GET',
     });
   }
 
   async getAvailability(payload: GetAvailabilityParams) {
-    return this.httpClient.call<Array<StudioRentalAvailabilitySlot>>({
+    return this.httpClient.callNoError<Array<StudioRentalAvailabilitySlot>>({
       path: '/studio-rentals/availability',
       method: 'GET',
       params: payload,
