@@ -8,5 +8,7 @@ export * from './button';
 export * from './popover';
 export * from './dialog';
 export * from './sonner';
+export * from './table';
+export * from './tabs';
 export * from './calendar';
 export * from './textarea';

@@ -1,3 +1,4 @@
+export * from './admin-access';
 export * from './auth';
 export * from './classes';
 export * from './figure-details';

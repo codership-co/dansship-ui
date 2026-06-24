@@ -1,10 +1,10 @@
-import { HttpClient, LoggerParams, type OnErrorCallback, RequestState } from 'polpo-http-client';
+import { HttpClient } from 'polpo-http-client';
 
 import { AuthAPI } from './auth/auth.api';
 import { BillingAdminAPI } from './billing/billing.admin.api';
 import { BookingsAdminAPI } from './bookings/bookings.admin.api';
 import { BookingsAPI } from './bookings/bookings.api';
-import { DansshipResponseError, getResponseError } from './dansship.error';
+import { DansshipAPIError, getResponseError, logger } from './dansship.error';
 import { FiguresAdminAPI } from './figures/figures.admin.api';
 import { FiguresAPI } from './figures/figures.api';
 import { InstructorsAdminAPI } from './instructors/instructors.admin.api';
@@ -25,25 +25,13 @@ import { SubscriptionsAPI } from './subscriptions/subscriptions.api';
 import { UsersAdminAPI } from './users/users.admin.api';
 
 export class DansshipAPI {
-  static async logger({ state, response }: LoggerParams) {
-    if (state === RequestState.REJECTED) {
-      // eslint-disable-next-line no-console
-      console.error(response);
-    }
-  }
-
-  private static notifySessionExpired(): void {
-    localStorage.removeItem('auth_session');
-    window.dispatchEvent(new CustomEvent('auth:session-expired'));
-  }
-
-  static readonly httpClient = new HttpClient<DansshipResponseError>({
+  static readonly httpClient = new HttpClient<DansshipAPIError>({
     apiName: 'DANSSHIP',
     baseURL: `${import.meta.env.VITE_DANSSHIP_API_URL}`,
     mode: 'cors',
     cache: 'no-cache',
-    logger: this.logger,
-    getResponseError: getResponseError,
+    logger,
+    getResponseError,
     credentials: 'include',
     headers: {
       accept: 'application/json',
@@ -52,11 +40,11 @@ export class DansshipAPI {
   });
 
   static {
-    this.httpClient.setOnErrorInterceptor((async (request, response) => {
-      this.notifySessionExpired();
+    this.httpClient.setOnErrorInterceptor(async (request, response) => {
+      window.dispatchEvent(new CustomEvent('auth:session-expired'));
       // eslint-disable-next-line no-console
       console.log({ request, response });
-    }) as OnErrorCallback<DansshipResponseError>);
+    });
   }
 
   static auth = new AuthAPI(this.httpClient);

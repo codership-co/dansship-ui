@@ -1,12 +1,13 @@
 import i18next from 'i18next';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation } from 'react-router';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
 import { FEATURE_FLAG, useEnabledFeatureFlag } from './feature-flags.context';
 
 import {
+  DANSSHIP_ERROR_CODE,
   DansshipAPI,
   type ForgotPasswordPayload,
   type LoginPayload,
@@ -26,13 +27,13 @@ import { Error404Page, UnauthorizedPage, UnavailablePage } from '@pages';
 interface CommonAuthContextState {
   ready: boolean;
   error: string | null;
-  login: (data: LoginPayload) => void;
-  signUp: (data: RegisterPayload) => void;
-  updateProfile: (data: UpdateProfilePayload) => void;
-  forgotPassword: (data: ForgotPasswordPayload) => void;
-  resetPassword: (data: ResetPasswordPayload) => void;
-  verifyEmail: (data: VerifyEmailPayload) => void;
-  resendVerification: (data: ResendVerificationPayload) => void;
+  login: (data: LoginPayload) => Promise<void>;
+  signUp: (data: RegisterPayload) => Promise<void>;
+  updateProfile: (data: UpdateProfilePayload) => Promise<void>;
+  forgotPassword: (data: ForgotPasswordPayload) => Promise<void>;
+  resetPassword: (data: ResetPasswordPayload) => Promise<void>;
+  verifyEmail: (data: VerifyEmailPayload) => Promise<void>;
+  resendVerification: (data: ResendVerificationPayload) => Promise<void>;
   getProfile: () => Promise<User | null>;
   logout: () => Promise<void>;
   requireOnboarding: boolean;
@@ -82,6 +83,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [ready, setReady] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
+  const navigate = useNavigate();
 
   useEventListener('auth:session-expired' as keyof WindowEventMap, () => {
     clearSessionArtifacts();
@@ -111,7 +113,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }
 
   async function login(payload: LoginPayload) {
-    const { data, ok } = await DansshipAPI.auth.login(payload);
+    const { data, ok, error } = await DansshipAPI.auth.login(payload);
 
     if (ok) {
       setLocalError(null);
@@ -121,6 +123,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } else {
       setLocalError(t('auth:loginFailed'));
       toast.error(t('auth:loginFailed'));
+
+      if (error.body.error_code === DANSSHIP_ERROR_CODE.EMAIL_NOT_VERIFIED) {
+        navigate(PageURLS.auth.verifyEmail, { replace: true, state: { email: payload.email } });
+      }
     }
   }
 

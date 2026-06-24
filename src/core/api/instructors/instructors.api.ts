@@ -14,10 +14,12 @@ import {
   type UpdateInstructorProfilePayload,
 } from './instructors.models';
 
+import { DansshipAPIError } from '@core/api';
+
 import type { ScheduledClass } from '../schedules/schedules.models';
 
 export class InstructorsAPI {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async getProfile() {
     return this.httpClient.callNoError<InstructorProfile>({

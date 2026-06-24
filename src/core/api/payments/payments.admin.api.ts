@@ -2,6 +2,8 @@ import { HttpClient } from 'polpo-http-client';
 
 import { normalizeAdminList, normalizeIntent } from './payments.helpers';
 
+import { DansshipAPIError } from '@core/api';
+
 import type {
   AdminPaymentListResponse,
   AdminPaymentReviewPayload,
@@ -15,7 +17,7 @@ import type {
 } from './payments.models';
 
 export class PaymentsAdminAPI {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async getAdminPayments(payload?: GetAdminPaymentsParams) {
     return this.httpClient.callNoError<AdminPaymentListResponse>(

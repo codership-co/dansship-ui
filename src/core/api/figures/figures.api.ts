@@ -2,6 +2,8 @@ import { HttpClient } from 'polpo-http-client';
 
 import { transformFigure } from './figures.helpers';
 
+import { DansshipAPIError } from '@core/api';
+
 import type {
   DetailedFigure,
   FavoriteFigureResponse,
@@ -23,7 +25,7 @@ import type {
 import type { OffsetPaginatedResponse } from '../common/common.models';
 
 export class FiguresAPI {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async getFigures(payload?: GetFiguresParams) {
     return this.httpClient.callNoError<OffsetPaginatedResponse<Figure>, object, GetFiguresResponse>(
@@ -40,7 +42,7 @@ export class FiguresAPI {
   }
 
   async getFigureById(id: TFigureId, payload?: GetFigureByIdParams) {
-    return this.httpClient.call<Figure, object, DetailedFigure>(
+    return this.httpClient.callNoError<Figure, object, DetailedFigure>(
       {
         path: `/figures/${id}`,
         method: 'GET',
@@ -58,7 +60,7 @@ export class FiguresAPI {
   }
 
   async getFigureProgress(id: TFigureId, payload?: GetFigureProgressParams) {
-    return this.httpClient.call<FigureProgressListResponse>({
+    return this.httpClient.callNoError<FigureProgressListResponse>({
       path: `/figures/${id}/progress`,
       method: 'GET',
       params: {
@@ -70,7 +72,7 @@ export class FiguresAPI {
   }
 
   async createFigureProgress(id: TFigureId, payload: FigureProgressCreateRequest) {
-    return this.httpClient.call<FigureProgress, FigureProgressCreateRequest>({
+    return this.httpClient.callNoError<FigureProgress, FigureProgressCreateRequest>({
       path: `/figures/${id}/progress`,
       method: 'POST',
       data: payload,
@@ -78,7 +80,7 @@ export class FiguresAPI {
   }
 
   async updateFigureProgress(figureId: TFigureId, progressId: string, payload: FigureProgressUpdateRequest) {
-    return this.httpClient.call<FigureProgress, FigureProgressUpdateRequest>({
+    return this.httpClient.callNoError<FigureProgress, FigureProgressUpdateRequest>({
       path: `/figures/${figureId}/progress/${progressId}`,
       method: 'PUT',
       data: payload,
@@ -93,7 +95,7 @@ export class FiguresAPI {
   }
 
   async getSavedFigures(payload?: GetSavedFiguresParams) {
-    return this.httpClient.call<SavedFiguresResponse, object, Array<Figure>>(
+    return this.httpClient.callNoError<SavedFiguresResponse, object, Array<Figure>>(
       {
         path: '/saved-figures',
         method: 'GET',
@@ -114,7 +116,7 @@ export class FiguresAPI {
   }
 
   async saveFigure(payload: SaveFigurePayload) {
-    return this.httpClient.call<FavoriteFigureResponse, SaveFigurePayload>({
+    return this.httpClient.callNoError<FavoriteFigureResponse, SaveFigurePayload>({
       path: '/saved-figures',
       method: 'POST',
       data: payload,
@@ -131,7 +133,7 @@ export class FiguresAPI {
   async checkIfSaved(figureId: TFigureId) {
     const response = await this.getSavedFigures({ limit: 100 });
 
-    if (response.data) {
+    if (response.ok) {
       return response.data.some(item => item.id === figureId);
     }
 
@@ -139,7 +141,7 @@ export class FiguresAPI {
   }
 
   async updateProgress(figureId: TFigureId, payload: UpdateProgressPayload) {
-    return this.httpClient.call<FigureProgress>({
+    return this.httpClient.callNoError<FigureProgress>({
       path: `/figures/${figureId}/progress`,
       method: 'PUT',
       data: payload,
@@ -147,7 +149,7 @@ export class FiguresAPI {
   }
 
   async getProgress(figureId: TFigureId) {
-    return this.httpClient.call<FigureProgress>({
+    return this.httpClient.callNoError<FigureProgress>({
       path: `/figures/${figureId}/progress`,
       method: 'GET',
     });

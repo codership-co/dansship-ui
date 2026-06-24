@@ -1,6 +1,6 @@
 import { HttpClient } from 'polpo-http-client';
 
-import { DansshipResponseError } from '@core/api';
+import { DansshipAPIError } from '@core/api';
 import { mapAuthUserToUser } from '@core/api/auth/auth.helpers';
 
 import type {
@@ -19,7 +19,7 @@ import type {
 } from './auth.models';
 
 export class AuthAPI {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async refreshToken() {
     return this.httpClient.callNoError<void>({

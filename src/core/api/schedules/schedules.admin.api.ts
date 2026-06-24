@@ -1,5 +1,7 @@
 import { HttpClient } from 'polpo-http-client';
 
+import { DansshipAPIError } from '@core/api';
+
 import type {
   AddClassPayload,
   AgendaEvent,
@@ -15,7 +17,7 @@ import type {
 } from './schedules.models';
 
 export class SchedulesAdminAPI {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async getWeeks(payload: GetWeeksPayload) {
     return this.httpClient.callNoError<Array<ScheduleWeek>>({

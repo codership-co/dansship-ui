@@ -2,6 +2,8 @@ import { HttpClient } from 'polpo-http-client';
 
 import { transformAdminFigure } from './figures.helpers';
 
+import { DansshipAPIError } from '@core/api';
+
 import type {
   AdminFigure,
   ConfirmAdminFigureImagePayload,
@@ -16,7 +18,7 @@ import type {
 } from './figures.models';
 
 export class FiguresAdminAPI {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async getAdminFigures(payload?: GetAdminFiguresParams) {
     return this.httpClient.callNoError<FigureAdminListResponse>(

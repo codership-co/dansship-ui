@@ -48,8 +48,8 @@ importers:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       polpo-http-client:
-        specifier: ^1.0.17
-        version: 1.0.17
+        specifier: ^1.0.18
+        version: 1.0.18
       radix-ui:
         specifier: ^1.4.3
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -3610,8 +3610,8 @@ packages:
   polpo-eslint-config@1.0.1:
     resolution: {integrity: sha512-1921grUEI1EONatE7akgtJ6fwYTQiNfhjQZ4KpVdg9WaGri+o/VEghJxALAjDVw+vL3Zt0vovZg7o/16olDmmQ==}
 
-  polpo-http-client@1.0.17:
-    resolution: {integrity: sha512-YTXMOCBt9lphLZTgSgWatglmXitHPv43IkL0LlIoUfQmXOniPKOzATyG/CfSlFcPwiwopTb+k2gY8G9SqxeYYw==}
+  polpo-http-client@1.0.18:
+    resolution: {integrity: sha512-GkqSLc16hrg9xA0noF5MVVTpERX++ox/D6/bmXpUn0RPDHFHLvI8VvjEbqd+Sy/J1j0AIfPUv7F+knKZjKc5zg==}
 
   polpo-typescript-config@1.0.0:
     resolution: {integrity: sha512-fkec8Iaux2JlOBUvrIKQb3ZInD+dl3KJEt2l4TONXmTmbsOJq+VWv4o6yV/xkKh4I/yABUuf7KDrkutsxq0QAw==}
@@ -7875,7 +7875,7 @@ snapshots:
       - storybook
       - supports-color
 
-  polpo-http-client@1.0.17: {}
+  polpo-http-client@1.0.18: {}
 
   polpo-typescript-config@1.0.0: {}
 

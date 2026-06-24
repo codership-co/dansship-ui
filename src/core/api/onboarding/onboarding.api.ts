@@ -2,8 +2,10 @@ import { HttpClient } from 'polpo-http-client';
 
 import { CompleteStepPayload, OnboardingStatus } from './onboarding.models';
 
+import { DansshipAPIError } from '@core/api';
+
 export class OnboardingAPI {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async getStatus() {
     return this.httpClient.callNoError<OnboardingStatus>({

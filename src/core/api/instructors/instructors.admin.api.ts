@@ -7,8 +7,10 @@ import {
   DAY_TO_INDEX,
 } from './instructors.models';
 
+import { DansshipAPIError } from '@core/api';
+
 export class InstructorsAdminAPI {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async getInstructors() {
     return this.httpClient.callNoError<Array<AdminInstructorListItem>>({

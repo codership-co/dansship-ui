@@ -59,7 +59,7 @@ export const FigureCatalogCard = ({ figure }: FigureCatalogCardProps) => {
               {t(`difficulty:${displayDifficulty.toLowerCase()}`)}
             </span>
             <span className='rounded-full border border-white/10 bg-black/35 px-2.5 py-1 text-[10px] font-medium uppercase tracking-widest text-white/95'>
-              {t(`figureTypes.${figure.type.toLowerCase()}`)}
+              {t(`figureTypes:${figure.type.toLowerCase()}`)}
             </span>
           </div>
         </div>

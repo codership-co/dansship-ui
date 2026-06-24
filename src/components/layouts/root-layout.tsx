@@ -1,15 +1,15 @@
-import { Outlet, useLocation, useNavigation } from 'react-router';
+import { Outlet, useNavigation } from 'react-router';
 
 import { RootLoader } from '@components/loaders';
-import { Footer, Navbar } from '@components/navigation';
-import { SecurityGuard, useAuth } from '@contexts';
-import { PageURLS } from '@core/constants';
+import { Toaster } from '@components/ui';
+import { AuthProvider, FeatureFlagsProvider, SecurityGuard, useAuth } from '@contexts';
 import { useRouterLoading, useScrollToTop } from '@hooks';
 
-const SecurityOutlet = SecurityGuard(Outlet);
+interface LayoutProps {
+  children: React.ReactNode;
+}
 
-export const RootLayout = () => {
-  const { pathname } = useLocation();
+const Layout = ({ children }: LayoutProps) => {
   const { ready } = useAuth();
   const { location } = useNavigation();
   const isRouterLoading = useRouterLoading();
@@ -20,19 +20,23 @@ export const RootLayout = () => {
   }
 
   return (
-    <section className='relative min-h-dvh grid grid-rows-[1fr_auto]'>
-      {pathname !== PageURLS.home && (
-        <img
-          src='/assets/images/bg-girl.png'
-          alt='Dansship'
-          className='pointer-events-none select-none fixed bottom-0 right-0 m-8 w-[15vw] min-w-40 max-w-70 hidden lg:block -z-1'
-        />
-      )}
-      <Navbar />
-      <section className={`h-full ${pathname !== PageURLS.home ? 'pt-20' : ''}`}>
-        <SecurityOutlet />
-      </section>
-      <Footer />
-    </section>
+    <>
+      {children}
+      <Toaster />
+    </>
+  );
+};
+
+const SecurityOutlet = SecurityGuard(Outlet);
+
+export const RootLayout = () => {
+  return (
+    <AuthProvider>
+      <FeatureFlagsProvider>
+        <Layout>
+          <SecurityOutlet />
+        </Layout>
+      </FeatureFlagsProvider>
+    </AuthProvider>
   );
 };

@@ -329,7 +329,7 @@ export function CheckoutModal({ isOpen, onClose, selectedPlan }: CheckoutModalPr
           <div className='rounded-md border border-gray-200 bg-gray-50 p-4 text-sm'>
             <p className='font-medium text-gray-900'>{selectedPlan.name}</p>
             <p className='mt-1 text-gray-600'>
-              {t('payments:selectedMethod')}: {t(`payments.method.${paymentMethod}`)}
+              {t('payments:selectedMethod')}: {t(`payments:method.${paymentMethod}`)}
             </p>
             <p className='text-gray-600'>
               {t('payments:total')}: {formatPrice(finalPrice, selectedPlan.currency)}
@@ -342,8 +342,8 @@ export function CheckoutModal({ isOpen, onClose, selectedPlan }: CheckoutModalPr
           </div>
 
           <div className='rounded-md border border-primary/20 bg-primary/5 p-3 text-sm text-gray-700'>
-            <p className='font-semibold text-primary'>{t(`payments.instructions.${paymentMethod}.title`)}</p>
-            <p className='mt-1'>{t(`payments.instructions.${paymentMethod}.description`)}</p>
+            <p className='font-semibold text-primary'>{t(`payments:instructions.${paymentMethod}.title`)}</p>
+            <p className='mt-1'>{t(`payments:instructions.${paymentMethod}.description`)}</p>
           </div>
 
           {requiresProof ? (

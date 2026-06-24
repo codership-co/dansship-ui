@@ -1,5 +1,7 @@
 import { HttpClient } from 'polpo-http-client';
 
+import { DansshipAPIError } from '@core/api';
+
 import type {
   CreateDiscountPayload,
   CreatePlanPayload,
@@ -12,7 +14,7 @@ import type {
 } from './billing.models';
 
 export class BillingAdminAPI {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async getPlans(payload?: GetPlansParams) {
     return this.httpClient.callNoError<Array<Plan>>({

@@ -2,6 +2,8 @@ import { HttpClient } from 'polpo-http-client';
 
 import { normalizePlan, normalizeSubscription, toNumber } from './subscriptions.helpers';
 
+import { DansshipAPIError } from '@core/api';
+
 import type {
   ActiveSubscription,
   DiscountPreviewRequest,
@@ -13,7 +15,7 @@ import type {
 } from './subscriptions.models';
 
 export class SubscriptionsAPI {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async getPublicPlans() {
     return this.httpClient.callNoError<Array<PublicPlan>>(

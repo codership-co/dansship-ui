@@ -2,7 +2,7 @@ import { createBrowserRouter, RouteObject, RouterProvider } from 'react-router';
 
 import { loggingMiddleware } from './middleware';
 
-import { AuthLayout, RootLayout } from '@components/layouts';
+import { AuthLayout, PageLayout, RootLayout } from '@components/layouts';
 import { RootLoader } from '@components/loaders';
 import {
   Error404Page,
@@ -46,12 +46,13 @@ import {
 const routes: Array<RouteObject> = [
   {
     path: '/',
-    Component: AuthLayout,
+    Component: RootLayout,
     middleware: [loggingMiddleware],
     hydrateFallbackElement: <RootLoader />,
     children: [
       {
         path: 'auth',
+        Component: AuthLayout,
         children: [
           { path: 'login', Component: SecureLoginPage },
           { path: 'signup', Component: SecureSignupPage },
@@ -62,7 +63,7 @@ const routes: Array<RouteObject> = [
         ],
       },
       {
-        Component: RootLayout,
+        Component: PageLayout,
         children: [
           { path: 'ui', Component: UiPage },
           { index: true, Component: HomePage, loader: HomeLoader },

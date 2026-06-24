@@ -1,5 +1,7 @@
 import { HttpClient } from 'polpo-http-client';
 
+import { DansshipAPIError } from '@core/api';
+
 import type {
   AssignPolicyToRolePayload,
   AssignRoleToUserPayload,
@@ -12,7 +14,7 @@ import type {
 } from './rbac.models';
 
 export class RbacAdminApi {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async getRoles() {
     return this.httpClient.callNoError<Array<RoleResponse>>({
@@ -51,14 +53,14 @@ export class RbacAdminApi {
   }
 
   async getPolicyDetail(policyId: string) {
-    return this.httpClient.call<PolicyResponse>({
+    return this.httpClient.callNoError<PolicyResponse>({
       path: `/admin/rbac/policies/${policyId}`,
       method: 'GET',
     });
   }
 
   async createPolicy(payload: PolicyCreatePayload) {
-    return this.httpClient.call<PolicyResponse, PolicyCreatePayload>({
+    return this.httpClient.callNoError<PolicyResponse, PolicyCreatePayload>({
       path: '/admin/rbac/policies',
       method: 'POST',
       data: payload,
@@ -66,7 +68,7 @@ export class RbacAdminApi {
   }
 
   async updatePolicy(policyId: string, payload: PolicyUpdatePayload) {
-    return this.httpClient.call<PolicyResponse, PolicyUpdatePayload>({
+    return this.httpClient.callNoError<PolicyResponse, PolicyUpdatePayload>({
       path: `/admin/rbac/policies/${policyId}`,
       method: 'PATCH',
       data: payload,
@@ -81,14 +83,14 @@ export class RbacAdminApi {
   }
 
   async getUserRoles(userId: string) {
-    return this.httpClient.call<UserWithRolesResponse>({
+    return this.httpClient.callNoError<UserWithRolesResponse>({
       path: `/admin/rbac/users/${userId}/roles`,
       method: 'GET',
     });
   }
 
   async assignRoleToUser(userId: string, payload: AssignRoleToUserPayload) {
-    return this.httpClient.call<UserWithRolesResponse, AssignRoleToUserPayload>({
+    return this.httpClient.callNoError<UserWithRolesResponse, AssignRoleToUserPayload>({
       path: `/admin/rbac/users/${userId}/roles`,
       method: 'POST',
       data: payload,
@@ -96,7 +98,7 @@ export class RbacAdminApi {
   }
 
   async revokeRoleFromUser(userId: string, roleId: string) {
-    return this.httpClient.call<UserWithRolesResponse>({
+    return this.httpClient.callNoError<UserWithRolesResponse>({
       path: `/admin/rbac/users/${userId}/roles/${roleId}`,
       method: 'DELETE',
     });

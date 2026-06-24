@@ -1,5 +1,7 @@
 import { HttpClient } from 'polpo-http-client';
 
+import { DansshipAPIError } from '@core/api';
+
 import type {
   AdminCancelInternalReservedUsePayload,
   AdminListInternalReservedUsesParams,
@@ -14,10 +16,10 @@ import type {
 } from './studio-rental.models';
 
 export class StudioRentalAdminAPI {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async adminListRequests(payload?: AdminListRequestsPayload) {
-    return this.httpClient.call<Array<RentalRequest>>({
+    return this.httpClient.callNoError<Array<RentalRequest>>({
       path: '/admin/studio-rentals/requests',
       method: 'GET',
       params: payload,
@@ -25,14 +27,14 @@ export class StudioRentalAdminAPI {
   }
 
   async adminApproveRequest(id: string) {
-    return this.httpClient.call<RentalRequest>({
+    return this.httpClient.callNoError<RentalRequest>({
       path: `/admin/studio-rentals/requests/${id}/approve`,
       method: 'POST',
     });
   }
 
   async adminRejectRequest(id: string, payload: AdminRejectPayload) {
-    return this.httpClient.call<RentalRequest, AdminRejectPayload>({
+    return this.httpClient.callNoError<RentalRequest, AdminRejectPayload>({
       path: `/admin/studio-rentals/requests/${id}/reject`,
       method: 'POST',
       data: payload,
@@ -40,7 +42,7 @@ export class StudioRentalAdminAPI {
   }
 
   async adminListInternalReservedUses(payload?: AdminListInternalReservedUsesParams) {
-    return this.httpClient.call<Array<RentalRequest>>({
+    return this.httpClient.callNoError<Array<RentalRequest>>({
       path: '/admin/studio-rentals/internal-reserved-uses',
       method: 'GET',
       params: payload,
@@ -48,7 +50,7 @@ export class StudioRentalAdminAPI {
   }
 
   async adminCreateInternalReservedUse(payload: InternalReservedUseCreatePayload) {
-    return this.httpClient.call<RentalRequest, InternalReservedUseCreatePayload>({
+    return this.httpClient.callNoError<RentalRequest, InternalReservedUseCreatePayload>({
       path: '/admin/studio-rentals/internal-reserved-uses',
       method: 'POST',
       data: payload,
@@ -56,7 +58,7 @@ export class StudioRentalAdminAPI {
   }
 
   async adminCancelInternalReservedUse(id: string, payload?: AdminCancelInternalReservedUsePayload) {
-    return this.httpClient.call<RentalRequest, AdminCancelInternalReservedUsePayload>({
+    return this.httpClient.callNoError<RentalRequest, AdminCancelInternalReservedUsePayload>({
       path: `/admin/studio-rentals/internal-reserved-uses/${id}/cancel`,
       method: 'POST',
       data: payload,
@@ -64,7 +66,7 @@ export class StudioRentalAdminAPI {
   }
 
   async listRules(payload: ListRulesParams) {
-    return this.httpClient.call<Array<AvailabilityRule>>({
+    return this.httpClient.callNoError<Array<AvailabilityRule>>({
       path: '/admin/studio-rentals/rules',
       method: 'GET',
       params: payload,
@@ -72,7 +74,7 @@ export class StudioRentalAdminAPI {
   }
 
   async createRule(payload: AvailabilityRulePayload) {
-    return this.httpClient.call<AvailabilityRule, AvailabilityRulePayload>({
+    return this.httpClient.callNoError<AvailabilityRule, AvailabilityRulePayload>({
       path: '/admin/studio-rentals/rules',
       method: 'POST',
       data: payload,
@@ -80,7 +82,7 @@ export class StudioRentalAdminAPI {
   }
 
   async updateRule(id: string, payload: UpdateRulePayload) {
-    return this.httpClient.call<AvailabilityRule, UpdateRulePayload>({
+    return this.httpClient.callNoError<AvailabilityRule, UpdateRulePayload>({
       path: `/admin/studio-rentals/rules/${id}`,
       method: 'PUT',
       data: payload,

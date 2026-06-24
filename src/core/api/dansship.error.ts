@@ -1,4 +1,4 @@
-import { HttpClientError } from 'polpo-http-client';
+import { HttpClientError, LoggerParams, RequestState } from 'polpo-http-client';
 
 export enum DANSSHIP_ERROR_CATEGORY {
   AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR',
@@ -45,4 +45,11 @@ export async function getResponseError(response: Response, message: string) {
   const body = (await response.json()) as DansshipResponseError;
 
   return new DansshipAPIError(body, response.status, body.message ?? message);
+}
+
+export async function logger({ state, response }: LoggerParams) {
+  if (state === RequestState.REJECTED) {
+    // eslint-disable-next-line no-console
+    console.error(response);
+  }
 }

@@ -1,9 +1,11 @@
 import { HttpClient } from 'polpo-http-client';
 
+import { DansshipAPIError } from '@core/api';
+
 import type { AdminBookClassPayload, AdminBookingUser, Booking } from './bookings.models';
 
 export class BookingsAdminAPI {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async adminBookClass(payload: AdminBookClassPayload) {
     return this.httpClient.callNoError<Booking, AdminBookClassPayload>({

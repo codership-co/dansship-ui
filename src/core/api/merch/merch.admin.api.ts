@@ -2,6 +2,8 @@ import { HttpClient } from 'polpo-http-client';
 
 import { getEnvelopeItems, normalizeOrder, normalizeProduct } from './merch.helpers';
 
+import { DansshipAPIError } from '@core/api';
+
 import type {
   CreateOrderPayload,
   CreateProductPayload,
@@ -18,7 +20,7 @@ import type {
 } from './merch.models';
 
 export class MerchAdminApi {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async getProducts(payload?: GetProductsParams) {
     return this.httpClient.callNoError<ProductListResponse, object, Array<Product>>(

@@ -1,5 +1,7 @@
 import { HttpClient } from 'polpo-http-client';
 
+import { DansshipAPIError } from '@core/api';
+
 import type {
   ClassDefinition,
   CreateClassDefinitionPayload,
@@ -12,7 +14,7 @@ import type {
 } from './inventory.models';
 
 export class InventoryAdminApi {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async getRooms(payload?: GetRoomsParams) {
     return this.httpClient.callNoError<Array<Room>>({

@@ -17,7 +17,7 @@ export function PaymentStatusBadge({ status }: { status: PaymentStatus }) {
 
   return (
     <Badge variant={STATUS_VARIANT[status]} className='capitalize'>
-      {t(`payments.status.${status}`)}
+      {t(`payments:status.${status}`)}
     </Badge>
   );
 }

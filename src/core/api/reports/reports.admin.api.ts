@@ -1,5 +1,7 @@
 import { HttpClient } from 'polpo-http-client';
 
+import { DansshipAPIError } from '@core/api';
+
 import type {
   AttendanceReport,
   ClassOccupancyReport,
@@ -8,7 +10,7 @@ import type {
 } from './reports.models';
 
 export class ReportsAdminAPI {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async getOccupancyReport(startDate?: string, endDate?: string) {
     return this.httpClient.callNoError<ClassOccupancyReport>({

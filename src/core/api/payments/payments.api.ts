@@ -2,6 +2,8 @@ import { HttpClient } from 'polpo-http-client';
 
 import { normalizeIntent } from './payments.helpers';
 
+import { DansshipAPIError } from '@core/api';
+
 import type {
   ConfirmPaymentProofPayload,
   CreatePaymentIntentPayload,
@@ -13,7 +15,7 @@ import type {
 } from './payments.models';
 
 export class PaymentsAPI {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async createIntent(payload: CreatePaymentIntentPayload) {
     return this.httpClient.callNoError<PaymentIntent, CreatePaymentIntentPayload>(
@@ -76,7 +78,7 @@ export class PaymentsAPI {
   }
 
   async getProofViewUrl(id: string) {
-    return this.httpClient.call<ProofViewUrlResponse>({
+    return this.httpClient.callNoError<ProofViewUrlResponse>({
       path: `/payments/intents/${id}/proof/view-url`,
       method: 'GET',
     });

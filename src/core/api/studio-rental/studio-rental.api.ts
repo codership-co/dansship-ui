@@ -1,5 +1,7 @@
 import { HttpClient } from 'polpo-http-client';
 
+import { DansshipAPIError } from '@core/api';
+
 import type {
   StudioRentalAvailabilitySlot,
   CancelRequestPayload,
@@ -10,7 +12,7 @@ import type {
 } from './studio-rental.models';
 
 export class StudioRentalAPI {
-  constructor(private readonly httpClient: HttpClient<DansshipResponseError>) {}
+  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async getRooms() {
     return this.httpClient.callNoError<Array<StudioRentalRoomOption>>({
@@ -28,7 +30,7 @@ export class StudioRentalAPI {
   }
 
   async createRequest(payload: CreateRentalRequestPayload) {
-    return this.httpClient.call<RentalRequest, CreateRentalRequestPayload>({
+    return this.httpClient.callNoError<RentalRequest, CreateRentalRequestPayload>({
       path: '/studio-rentals/requests',
       method: 'POST',
       data: payload,
@@ -36,28 +38,28 @@ export class StudioRentalAPI {
   }
 
   async getMyRequests() {
-    return this.httpClient.call<Array<RentalRequest>>({
+    return this.httpClient.callNoError<Array<RentalRequest>>({
       path: '/studio-rentals/requests/me',
       method: 'GET',
     });
   }
 
   async getRequestDetail(id: string) {
-    return this.httpClient.call<RentalRequest>({
+    return this.httpClient.callNoError<RentalRequest>({
       path: `/studio-rentals/requests/${id}`,
       method: 'GET',
     });
   }
 
   async confirmRequest(id: string) {
-    return this.httpClient.call<RentalRequest>({
+    return this.httpClient.callNoError<RentalRequest>({
       path: `/studio-rentals/requests/${id}/confirm`,
       method: 'POST',
     });
   }
 
   async cancelRequest(id: string, payload?: CancelRequestPayload) {
-    return this.httpClient.call<RentalRequest, CancelRequestPayload>({
+    return this.httpClient.callNoError<RentalRequest, CancelRequestPayload>({
       path: `/studio-rentals/requests/${id}/cancel`,
       method: 'POST',
       data: payload,
