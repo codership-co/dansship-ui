@@ -27,11 +27,17 @@ export const usePaymentIntents = () => {
   const { call: getProofUploadUrlPromise, isLoading: isGettingProofUploadUrl } = useCallablePromise(
     (id: string, payload: PaymentProofUploadRequest) => DansshipAPI.payments.getProofUploadUrl(id, payload),
   );
+  const { call: getAdminProofUploadUrlPromise, isLoading: isGettingAdminProofUploadUrl } = useCallablePromise(
+    (id: string, payload: PaymentProofUploadRequest) => DansshipAPI.paymentsAdmin.getAdminProofUploadUrl(id, payload),
+  );
   const { call: getProofViewUrlPromise, isLoading: isGettingProofViewUrl } = useCallablePromise((id: string) =>
     DansshipAPI.payments.getProofViewUrl(id),
   );
   const { call: confirmProofUploadPromise } = useCallablePromise((id: string, payload: ConfirmPaymentProofPayload) =>
     DansshipAPI.payments.confirmProofUpload(id, payload),
+  );
+  const { call: confirmAdminProofUploadPromise } = useCallablePromise(
+    (id: string, payload: ConfirmPaymentProofPayload) => DansshipAPI.paymentsAdmin.confirmAdminProofUpload(id, payload),
   );
 
   const createIntent = useCallback(
@@ -73,6 +79,19 @@ export const usePaymentIntents = () => {
     [confirmProofUploadPromise, t],
   );
 
+  const confirmAdminProofUpload = useCallback(
+    async (id: string, payload: ConfirmPaymentProofPayload) => {
+      const { error } = await confirmAdminProofUploadPromise(id, payload);
+
+      if (error) {
+        toast.error(t('payments:proofUploadFailedDesc'));
+      } else {
+        toast.success(t('payments:proofUploadSuccess'));
+      }
+    },
+    [confirmAdminProofUploadPromise, t],
+  );
+
   const getProofUploadUrl = useCallback(
     async (id: string, file: File) => {
       try {
@@ -104,6 +123,37 @@ export const usePaymentIntents = () => {
     [confirmProofUpload, getProofUploadUrlPromise, t],
   );
 
+  const getAdminProofUploadUrl = useCallback(
+    async (id: string, file: File) => {
+      try {
+        const { data } = await getAdminProofUploadUrlPromise(id, {
+          content_type: file.type as PaymentProofContentType,
+        });
+
+        if (data) {
+          const { upload_url, file_key } = data;
+
+          const uploadResponse = await fetch(upload_url, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': file.type,
+            },
+            body: file,
+          });
+
+          if (!uploadResponse.ok) {
+            toast.error(t('payments:proofUploadFailedDesc'));
+          }
+
+          await confirmAdminProofUpload(id, { file_key });
+        }
+      } catch {
+        toast.error(t('payments:proofUploadFailedDesc'));
+      }
+    },
+    [confirmAdminProofUpload, getAdminProofUploadUrlPromise, t],
+  );
+
   const getProofViewUrl = useCallback(
     async (id: string) => {
       const { data, error } = await getProofViewUrlPromise(id);
@@ -124,10 +174,12 @@ export const usePaymentIntents = () => {
     createIntent,
     cancelIntent,
     getProofUploadUrl,
+    getAdminProofUploadUrl,
     getProofViewUrl,
     isCreatingIntent,
     isCancellingIntent,
     isGettingProofUploadUrl,
+    isGettingAdminProofUploadUrl,
     isGettingProofViewUrl,
   };
 };

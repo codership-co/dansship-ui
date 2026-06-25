@@ -1,6 +1,7 @@
 export * from './checkout-intent';
 export * from './cn';
 export * from './date';
+export * from './merch';
 export * from './delay-promise';
 export * from './figure-mappers';
 export * from './figure-utils';
