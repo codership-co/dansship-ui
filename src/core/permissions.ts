@@ -49,6 +49,9 @@ export enum PERMISSION {
   // REPORT
   REPORT_READ = 'read:report',
 
+  // FINANCIAL REPORT
+  FINANCIAL_REPORT_READ = 'read:financial_report',
+
   // ROLE
   ROLE_MANAGE = 'manage:role',
 

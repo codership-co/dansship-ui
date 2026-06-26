@@ -10,5 +10,6 @@ export * from './dialog';
 export * from './sonner';
 export * from './table';
 export * from './tabs';
+export * from './switch';
 export * from './calendar';
 export * from './textarea';
