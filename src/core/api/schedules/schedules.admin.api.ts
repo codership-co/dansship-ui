@@ -19,7 +19,7 @@ import type {
 export class SchedulesAdminAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
-  async getWeeks(payload: GetWeeksPayload) {
+  async getWeeks(payload: GetWeeksPayload = {}) {
     return this.httpClient.callNoError<Array<ScheduleWeek>>({
       path: '/admin/schedules/weeks',
       method: 'GET',
