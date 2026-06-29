@@ -20,11 +20,9 @@ const statusKey: Record<RentalRequestStatus, string> = {
 
 function StudioRentalRequestsPage() {
   const { t } = useTranslation();
-  const {
-    response: studioRental,
-    isLoading: isLoadingStudioRental,
-    error,
-  } = usePromise(() => DansshipAPI.studioRental.getMyRequests());
+  const { response: studioRental, isLoading: isLoadingStudioRental } = usePromise(() =>
+    DansshipAPI.studioRental.getMyRequests(),
+  );
   const { call: cancelRequest, isLoading: isLoadingCanceling } = useCallablePromise(
     (id: string, payload?: CancelRequestPayload) => DansshipAPI.studioRental.cancelRequest(id, payload),
   );
@@ -56,7 +54,7 @@ function StudioRentalRequestsPage() {
       <div className='bg-white border border-gray-100 rounded-lg shadow-sm p-4'>
         {isLoadingStudioRental ? (
           <SpinnerLoader message={t('studioRental:myRequests.loading')} />
-        ) : error || studioRental?.errorMessage ? (
+        ) : !studioRental?.ok ? (
           <p className='text-sm text-alert-600'>{t('studioRental:myRequests.loadError')}</p>
         ) : (studioRental?.data ?? []).length === 0 ? (
           <p className='text-sm text-gray-500'>{t('studioRental:myRequests.empty')}</p>

@@ -5,6 +5,7 @@ export * from './admin-merch';
 export * from './admin-payments';
 export * from './admin-reports';
 export * from './auth';
+export * from './admin-studio-rentals';
 export * from './instructor';
 export * from './classes';
 export * from './figure-details';

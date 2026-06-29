@@ -12,6 +12,18 @@ type Particle = {
 
 const random = (min: number, max: number) => min + Math.random() * (max - min);
 
+const isSafariBrowser = () => {
+  const ua = navigator.userAgent.toLowerCase();
+
+  // 1. Must contain 'safari' and 'applewebkit'
+  const hasSafariKeywords = ua.includes('safari') && ua.includes('applewebkit');
+
+  // 2. Must NOT contain 'chrome', 'chromium', or 'edg' (which also use webkit strings)
+  const isNotChromium = !ua.includes('chrome') && !ua.includes('chromium') && !ua.includes('edg');
+
+  return hasSafariKeywords && isNotChromium;
+};
+
 const PARTICLE_MAX_SIZE = 8;
 
 interface GroovyLayoutProps {
@@ -30,9 +42,10 @@ export function GroovyLayout({
   minDistance = 10,
   maxDistance = 25,
   className,
-  marginTop,
+  marginTop = `${maxDistance * 0.75}vh`,
   background = 'var(--color-primary)',
 }: GroovyLayoutProps) {
+  const isSafari = useMemo(isSafariBrowser, []);
   const particles = useMemo<Array<Particle>>(() => {
     return Array.from({ length: particlesCount }, () => ({
       size: random(5, PARTICLE_MAX_SIZE),
@@ -44,79 +57,74 @@ export function GroovyLayout({
   }, [maxDistance, minDistance, particlesCount]);
 
   return (
-    <section>
+    <section
+      className={cn('relative w-full', className)}
+      style={{
+        background,
+        marginTop: isSafari ? 0 : marginTop,
+      }}
+    >
+      <svg className='h-px w-px pointer-events-none opacity-0 absolute' xmlns='http://www.w3.org/2000/svg'>
+        <defs>
+          <filter id='gooey-footer' colorInterpolationFilters='sRGB'>
+            <feGaussianBlur in='SourceGraphic' stdDeviation='15' result='blur' />
+            <feColorMatrix
+              in='blur'
+              mode='matrix'
+              values='1 0 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 25 -8'
+              result='gooey-footer'
+            />
+            <feBlend in='SourceGraphic' in2='gooey-footer' />
+          </filter>
+        </defs>
+      </svg>
+
       <section
-        className={cn('relative w-full', className)}
+        className={cn(
+          'pointer-events-none absolute w-full z-0 left-0 bottom-1/2 flex bg-red overflow-hidden',
+          isSafari && 'hidden',
+        )}
         style={{
-          background,
-          marginTop: marginTop ?? `calc(${PARTICLE_MAX_SIZE}rem + ${maxDistance}vh)`,
+          height: `calc(${PARTICLE_MAX_SIZE * 0.4}rem + ${maxDistance}vh)`,
         }}
       >
-        <section
-          className='pointer-events-none absolute w-full z-0 left-0 bottom-[95%] flex bg-red overflow-hidden'
+        <div
+          className='w-full mt-auto relative'
           style={{
-            height: `calc(${PARTICLE_MAX_SIZE}rem + ${maxDistance}vh)`,
+            height: `${PARTICLE_MAX_SIZE * 1.1}rem`,
+            filter: 'url(#gooey-footer)',
+            background,
           }}
         >
-          <div
-            className='w-full mt-auto'
-            style={{
-              height: `${PARTICLE_MAX_SIZE}rem`,
-              background,
-              filter: 'url(#gooey-footer)',
-            }}
-          >
-            {particles.map((particle, index) => (
-              <span
-                key={index}
-                style={
-                  {
-                    '--dim': `${particle.size}rem`,
-                    '--uplift': `${particle.distance}vh`,
-                    '--pos-x': `${particle.position}%`,
-                    '--dur': `${particle.duration}s`,
-                    '--delay': `${particle.delay}s`,
+          {particles.map((particle, index) => (
+            <span
+              key={index}
+              style={
+                {
+                  '--dim': `${particle.size}rem`,
+                  '--uplift': `${particle.distance}vh`,
+                  '--pos-x': `${particle.position}%`,
+                  '--dur': `${particle.duration}s`,
+                  '--delay': `${particle.delay}s`,
 
-                    position: 'absolute',
-                    background,
-                    borderRadius: '50%',
-                    top: '50%',
-                    left: 'var(--pos-x, 50%)',
-                    width: 'var(--dim, 5rem)',
-                    height: 'var(--dim, 5rem)',
-                    transform: 'translate(-50%, -50%)',
-                    animation: 'float-up var(--dur, 4s) ease-in infinite',
-                    animationDelay: 'var(--delay, 0s)',
-                  } as React.CSSProperties
-                }
-              />
-            ))}
-          </div>
-        </section>
-
-        <div className='relative z-10'>{children}</div>
-
-        <svg className='h-0 w-0 overflow-hidden' xmlns='http://www.w3.org/2000/svg'>
-          <defs>
-            <filter id='gooey-footer'>
-              <feGaussianBlur in='SourceGraphic' stdDeviation='15' result='blur' />
-
-              <feColorMatrix
-                in='blur'
-                mode='matrix'
-                values='
-                  1 0 0 0 0
-                  0 1 0 0 0
-                  0 0 1 0 0
-                  0 0 0 25 -8
-                '
-                result='goo'
-              />
-              <feBlend in='SourceGraphic' in2='goo' />
-            </filter>
-          </defs>
-        </svg>
+                  position: 'absolute',
+                  background,
+                  borderRadius: '50%',
+                  bottom: 0,
+                  left: 'var(--pos-x, 50%)',
+                  width: 'var(--dim, 5rem)',
+                  height: 'var(--dim, 5rem)',
+                  transform: 'translate(-50%)',
+                  animation: 'float-up var(--dur, 4s) ease-in infinite',
+                  animationDelay: 'var(--delay, 0s)',
+                } as React.CSSProperties
+              }
+            />
+          ))}
+        </div>
       </section>
+
+      <div className='relative z-10'>{children}</div>
     </section>
   );
 }

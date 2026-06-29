@@ -32,12 +32,12 @@
 
 @keyframes float-up {
   0% {
-    top: 50%;
-    transform: translate(-50%, -50%) scale(1);
+    bottom: 0;
+    transform: translate(-50%) scale(1);
   }
   100% {
-    top: calc(var(--uplift, 10vh) * -1);
-    transform: translate(-50%, -50%) scale(0);
+    bottom: calc(var(--uplift, 10vh));
+    transform: translate(-50%) scale(0);
   }
 }
 
