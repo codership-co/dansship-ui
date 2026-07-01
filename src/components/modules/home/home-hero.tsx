@@ -16,11 +16,17 @@ export const HomeHero = () => {
     <Section compact className='bg-gradient-hero'>
       <div className='relative gap-10 xl:gap-20 home-hero transition-[all_300ms_ease] pb-7 pt-20 sm:pt-40 lg:pb-10'>
         <div className='grid gap-4 content-center max-w-xl' style={{ gridArea: 'text' }}>
-          <h1 className='text-accent hero leading-none m-0'>
-            <span className='block'>{t('home:stitch.hero.kicker1')}</span>
-            <span className='block'>
-              {t('home:stitch.hero.kicker2')} <Logotype className='h-[0.65em] sm:h-[0.75em] inline-block' />
-            </span>
+          <h5 className='text-accent hero leading-none m-0'>
+            <Logotype className='h-[0.25em] sm:h-[0.35em] inline-block' />
+          </h5>
+
+          <h1 className='text-accent leading-none m-0'>
+            Dale a tu cuerpo una 
+
+            <span className='text-primary'>{' '}segunda oportunidad</span>
+            {` y `}
+            <span className='block font-brand'>mueve</span>
+            <span className='text-primary'>{' '} el alma</span>
           </h1>
 
           <p className='m-0'>{t('home:stitch.hero.description')}</p>
