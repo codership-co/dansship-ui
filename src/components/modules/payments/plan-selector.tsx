@@ -8,7 +8,11 @@ import { PlanCard } from '@components/modules';
 import { useAuth } from '@contexts';
 import { type PublicPlan } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { consumePendingPlanCheckoutIntent, setPendingPlanCheckoutIntent } from '@helpers';
+import {
+  clearPendingPlanCheckoutIntent,
+  consumePendingPlanCheckoutIntent,
+  setPendingPlanCheckoutIntent,
+} from '@helpers';
 
 const orderPlansForDisplay = (plans: Array<PublicPlan>): Array<PublicPlan> => {
   const recommendedPlans = plans.filter(plan => plan.is_recommended === true);
@@ -25,19 +29,16 @@ const orderPlansForDisplay = (plans: Array<PublicPlan>): Array<PublicPlan> => {
 };
 
 interface PlanSelectorProps {
-  publicPlans: Array<PublicPlan>;
+  plans: Array<PublicPlan>;
 }
 
-export function PlanSelector({ publicPlans }: PlanSelectorProps) {
+export function PlanSelector({ plans }: PlanSelectorProps) {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const [selectedPlan, setSelectedPlan] = useState<PublicPlan | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const plans = useMemo(() => publicPlans, [publicPlans]);
 
   const displayPlans = useMemo(() => orderPlansForDisplay(plans), [plans]);
 
@@ -50,7 +51,6 @@ export function PlanSelector({ publicPlans }: PlanSelectorProps) {
     }
 
     setSelectedPlan(plan);
-    setIsModalOpen(true);
   };
 
   useEffect(() => {
@@ -71,7 +71,6 @@ export function PlanSelector({ publicPlans }: PlanSelectorProps) {
     }
 
     setSelectedPlan(pendingPlan);
-    setIsModalOpen(true);
   }, [isAuthenticated, plans]);
 
   if (displayPlans.length === 0) {
@@ -97,9 +96,13 @@ export function PlanSelector({ publicPlans }: PlanSelectorProps) {
         ))}
       </div>
 
-      {selectedPlan && (
-        <CheckoutModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} selectedPlan={selectedPlan} />
-      )}
+      <CheckoutModal
+        plan={selectedPlan}
+        onClose={() => {
+          setSelectedPlan(null);
+          clearPendingPlanCheckoutIntent();
+        }}
+      />
     </div>
   );
 }

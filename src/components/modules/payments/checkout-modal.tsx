@@ -24,12 +24,24 @@ export enum CheckoutStep {
 }
 
 interface CheckoutModalProps {
-  isOpen: boolean;
   onClose: () => void;
-  selectedPlan: PublicPlan;
+  plan: PublicPlan | null;
 }
 
-export function CheckoutModal({ isOpen, onClose, selectedPlan }: CheckoutModalProps) {
+export function CheckoutModal({ onClose, plan }: CheckoutModalProps) {
+  return (
+    <Dialog open={plan !== null} onOpenChange={open => !open && onClose()}>
+      {plan && <ModalContent onClose={onClose} plan={plan} />}
+    </Dialog>
+  );
+}
+
+interface ModalContentProps {
+  onClose: () => void;
+  plan: PublicPlan;
+}
+
+function ModalContent({ onClose, plan }: ModalContentProps) {
   const { t } = useTranslation();
 
   const [step, setStep] = useState<CheckoutStep>(CheckoutStep.REVIEW);
@@ -42,7 +54,7 @@ export function CheckoutModal({ isOpen, onClose, selectedPlan }: CheckoutModalPr
   });
   const [discountData, setDiscountData] = useState<DiscountData>({
     ...DefaultDiscountData,
-    finalPrice: selectedPlan.price,
+    finalPrice: plan.price,
   });
 
   const handleSubmit = useCallback(async (data: CheckoutFormValues, discountData: DiscountData) => {
@@ -52,102 +64,100 @@ export function CheckoutModal({ isOpen, onClose, selectedPlan }: CheckoutModalPr
   }, []);
 
   return (
-    <Dialog open={isOpen} onOpenChange={open => !open && onClose()}>
-      <DialogContent
-        className='bg-transparent border-0 h-full w-full max-w-none p-0'
-        onInteractOutside={event => event.preventDefault()}
-      >
-        <div className='mx-auto w-full max-w-7xl p-2 sm:px-4 md:px-8 grid gap-8 my-auto max-h-screen sm:max-h-[80dvh] overflow-y-auto'>
-          <FormStepperLayout
-            steps={[
-              {
-                title: t('payments:checkoutTitle'),
-                subtitle: '',
-                step: CheckoutStep.REVIEW,
-                Icon: LuList,
-                form: (
-                  <section className='grid lg:grid-cols-[280px_1fr] items-start gap-8'>
-                    <PlanCard plan={selectedPlan} className='border-none' asIndividual />
-                    <CheckoutReviewPlanFormInput
-                      plan={selectedPlan}
-                      onCancel={onClose}
-                      onSubmit={handleSubmit}
-                      defaultFormValues={checkoutData}
-                    />
-                  </section>
-                ),
-              },
-              {
-                title: t('payments:selectMethod'),
-                subtitle: '',
-                step: CheckoutStep.METHOD,
-                Icon: LuCreditCard,
-                form: (
-                  <section>
-                    <PaymentMethodSelector
-                      value={paymentMethod}
-                      onChange={setPaymentMethod}
-                      availableMethods={['transfer', 'cash', 'nequi', 'daviplata']}
-                    />
-
-                    <div className='flex justify-end gap-2 pt-4'>
-                      <Button type='button' variant='outline' onClick={() => setStep(CheckoutStep.REVIEW)}>
-                        {t('common:back')}
-                      </Button>
-
-                      <Button type='button' onClick={() => setStep(CheckoutStep.CONFIRM)}>
-                        {t('common:next')}
-                      </Button>
-                    </div>
-                  </section>
-                ),
-              },
-              {
-                title: t('payments:confirmationTitle'),
-                subtitle: '',
-                step: CheckoutStep.CONFIRM,
-                Icon: LuReceipt,
-                form: (
-                  <CheckoutPaymentProofForm
-                    plan={selectedPlan}
-                    checkoutData={checkoutData}
-                    paymentMethod={paymentMethod}
-                    finalPrice={discountData.finalPrice}
-                    requiresProof={requiresProof}
-                    onBack={() => setStep(CheckoutStep.METHOD)}
-                    onSubmit={(intentId: string) => {
-                      setStep(CheckoutStep.CONFIRMATION);
-                      setCreatedIntentId(intentId);
-                    }}
+    <DialogContent
+      className='bg-transparent border-0 h-full w-full max-w-none p-0'
+      onInteractOutside={event => event.preventDefault()}
+    >
+      <div className='mx-auto w-full max-w-7xl p-2 sm:px-4 md:px-8 grid gap-8 my-auto max-h-screen sm:max-h-[80dvh] overflow-y-auto'>
+        <FormStepperLayout
+          steps={[
+            {
+              title: t('payments:checkoutTitle'),
+              subtitle: '',
+              step: CheckoutStep.REVIEW,
+              Icon: LuList,
+              form: (
+                <section className='grid lg:grid-cols-[280px_1fr] items-start gap-8'>
+                  <PlanCard plan={plan} className='border-none' asIndividual />
+                  <CheckoutReviewPlanFormInput
+                    plan={plan}
+                    onCancel={onClose}
+                    onSubmit={handleSubmit}
+                    defaultFormValues={checkoutData}
                   />
-                ),
-              },
-              {
-                title: t('payments:intentCreatedTitle'),
-                subtitle: t('payments:intentCreatedDesc'),
-                step: CheckoutStep.CONFIRMATION,
-                Icon: LuCheck,
-                form: (
-                  <div className='space-y-3 text-center'>
-                    {createdIntentId ? (
-                      <p className='text-xs text-gray-500'>
-                        {t('payments:reference')}: {createdIntentId}
-                      </p>
-                    ) : null}
-                    <div className='flex justify-end gap-2 pt-4'>
-                      <Button type='button' onClick={onClose}>
-                        {t('common:close')}
-                      </Button>
-                    </div>
+                </section>
+              ),
+            },
+            {
+              title: t('payments:selectMethod'),
+              subtitle: '',
+              step: CheckoutStep.METHOD,
+              Icon: LuCreditCard,
+              form: (
+                <section>
+                  <PaymentMethodSelector
+                    value={paymentMethod}
+                    onChange={setPaymentMethod}
+                    availableMethods={['transfer', 'cash', 'nequi', 'daviplata']}
+                  />
+
+                  <div className='flex justify-end gap-2 pt-4'>
+                    <Button type='button' variant='outline' onClick={() => setStep(CheckoutStep.REVIEW)}>
+                      {t('common:back')}
+                    </Button>
+
+                    <Button type='button' onClick={() => setStep(CheckoutStep.CONFIRM)}>
+                      {t('common:next')}
+                    </Button>
                   </div>
-                ),
-              },
-            ]}
-            currentStep={step}
-            noAvailableStepMessage={':D'}
-          />
-        </div>
-      </DialogContent>
-    </Dialog>
+                </section>
+              ),
+            },
+            {
+              title: t('payments:confirmationTitle'),
+              subtitle: '',
+              step: CheckoutStep.CONFIRM,
+              Icon: LuReceipt,
+              form: (
+                <CheckoutPaymentProofForm
+                  plan={plan}
+                  checkoutData={checkoutData}
+                  paymentMethod={paymentMethod}
+                  finalPrice={discountData.finalPrice}
+                  requiresProof={requiresProof}
+                  onBack={() => setStep(CheckoutStep.METHOD)}
+                  onSubmit={(intentId: string) => {
+                    setStep(CheckoutStep.CONFIRMATION);
+                    setCreatedIntentId(intentId);
+                  }}
+                />
+              ),
+            },
+            {
+              title: t('payments:intentCreatedTitle'),
+              subtitle: t('payments:intentCreatedDesc'),
+              step: CheckoutStep.CONFIRMATION,
+              Icon: LuCheck,
+              form: (
+                <div className='space-y-3 text-center'>
+                  {createdIntentId ? (
+                    <p className='text-xs text-gray-500'>
+                      {t('payments:reference')}: {createdIntentId}
+                    </p>
+                  ) : null}
+                  <div className='flex justify-end gap-2 pt-4'>
+                    <Button type='button' onClick={onClose}>
+                      {t('common:close')}
+                    </Button>
+                  </div>
+                </div>
+              ),
+            },
+          ]}
+          currentStep={step}
+          noAvailableStepMessage={':D'}
+        />
+      </div>
+    </DialogContent>
   );
 }

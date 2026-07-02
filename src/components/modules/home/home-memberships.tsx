@@ -27,7 +27,7 @@ export const HomeMemberships = () => {
       />
 
       <div className='mx-auto mt-8 max-w-6xl'>
-        <PlanSelector publicPlans={publicPlans} />
+        <PlanSelector plans={publicPlans} />
       </div>
 
       <p className='text-center mx-auto mt-8 max-w-2xl text-[0.92rem] text-muted-foreground'>
