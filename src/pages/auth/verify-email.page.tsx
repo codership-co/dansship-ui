@@ -27,7 +27,7 @@ function VerifyEmailPage() {
     setVerificationStatus(VerificationStatus.VERIFYING);
 
     try {
-      const { data } = await verifyEmail({ token });
+      const data = await verifyEmail({ token });
       setVerificationStatus(data?.verified ? VerificationStatus.VERIFIED : VerificationStatus.VERIFICATION_FAILED);
     } catch {
       setVerificationStatus(VerificationStatus.VERIFICATION_FAILED);
@@ -85,7 +85,7 @@ function VerifyEmailPage() {
       reset();
       setVerificationStatus(VerificationStatus.RESENDING_EMAIL);
       try {
-        const { data } = await resendVerification({ email });
+        const data = await resendVerification({ email });
 
         if (data?.verification_sent) {
           setVerificationStatus(VerificationStatus.RESENDED_EMAIL);

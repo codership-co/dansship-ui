@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { MdMenu } from 'react-icons/md';
 import { NavLink, NavLinkProps } from 'react-router';
 
-import { LanguageSelector } from './language-selector';
 import { MobileMenu } from './mobile-menu';
 
 import { Isotype } from '@components/svg';
@@ -97,7 +96,7 @@ export const Navbar = () => {
           </div>
 
           <div className='ml-auto flex items-center justify-end gap-1.5 sm:gap-2'>
-            <LanguageSelector variant='dropdown' />
+            {/*<LanguageSelector variant='dropdown' />*/}
             {!isAuthenticated && isLoginPageEnabled && (
               <Button asChild>
                 <NavLink to={PageURLS.auth.login}>{t('nav:signIn')}</NavLink>

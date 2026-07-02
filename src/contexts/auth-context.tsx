@@ -12,11 +12,13 @@ import {
   type ForgotPasswordPayload,
   type LoginPayload,
   type RegisterPayload,
+  RegisterResponse,
   type ResendVerificationPayload,
   type ResetPasswordPayload,
   type UpdateProfilePayload,
   type User,
   type VerifyEmailPayload,
+  VerifyEmailResponse,
 } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { type PERMISSION } from '@core/permissions';
@@ -32,8 +34,8 @@ interface CommonAuthContextState {
   updateProfile: (data: UpdateProfilePayload) => Promise<void>;
   forgotPassword: (data: ForgotPasswordPayload) => Promise<void>;
   resetPassword: (data: ResetPasswordPayload) => Promise<void>;
-  verifyEmail: (data: VerifyEmailPayload) => Promise<void>;
-  resendVerification: (data: ResendVerificationPayload) => Promise<void>;
+  verifyEmail: (data: VerifyEmailPayload) => Promise<VerifyEmailResponse | null>;
+  resendVerification: (data: ResendVerificationPayload) => Promise<RegisterResponse | null>;
   getProfile: () => Promise<User | null>;
   logout: () => Promise<void>;
   requireOnboarding: boolean;
@@ -207,6 +209,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       setLocalError(t('auth:verifyEmail.subtitles.verificationFailed'));
       toast.error(t('auth:verifyEmail.subtitles.verificationFailed'));
     }
+
+    return data;
   }
 
   async function resendVerification(payload: ResendVerificationPayload) {
@@ -227,6 +231,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }),
       );
     }
+
+    return data;
   }
 
   useEffect(() => {

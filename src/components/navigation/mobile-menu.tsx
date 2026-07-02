@@ -12,7 +12,6 @@ import {
 } from 'react-icons/lu';
 import { useNavigate } from 'react-router';
 
-import { LanguageSelector } from './language-selector';
 import { MenuItem, NavItem } from './navbar';
 
 import { Button } from '@components/ui';
@@ -193,9 +192,9 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             </div>
           </nav>
 
-          <div className='mt-auto space-y-3 pt-4'>
+          {/*<div className='mt-auto space-y-3 pt-4'>
             <LanguageSelector variant='buttons' />
-          </div>
+          </div>*/}
         </div>
 
         <div className='p-4 grid border-t'>
