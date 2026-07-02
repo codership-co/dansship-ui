@@ -47,7 +47,7 @@ export const HomeOfferings = () => {
           return (
             <Link key={card.titleKey} to={PageURLS.classes} className='block rounded-lg'>
               <Card
-                className={`group relative min-h-100 overflow-hidden border-secondary/50 shadow-none ${
+                className={`group relative min-h-100 overflow-hidden border-secondary/50 shadow-none h-full ${
                   isFeatured ? 'bg-primary-600 text-accent-200' : 'bg-tertiary-200 text-primary'
                 }`}
               >
