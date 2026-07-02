@@ -34,8 +34,8 @@ export function PlanSelector({ publicPlans }: PlanSelectorProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [selectedPlan, setSelectedPlan] = useState<PublicPlan | null>(publicPlans[0]);
-  const [isModalOpen, setIsModalOpen] = useState(true);
+  const [selectedPlan, setSelectedPlan] = useState<PublicPlan | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const plans = useMemo(() => publicPlans, [publicPlans]);
 
