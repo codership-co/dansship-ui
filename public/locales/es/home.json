@@ -54,9 +54,7 @@
   "stitch": {
     "hero": {
       "imageAlt": "Bailarina de pole en movimiento",
-      "kicker1": "Bienvenidos",
-      "kicker2": "a",
-      "kicker3": "Dansship",
+      "kicker": "Dale a tu cuerpo una \n<Primary>segunda oportunidad</Primary> y <Brand>mueve</Brand> <Primary>el alma</Primary>",
       "titleLine1": "Donde el cuerpo encuentra su ritmo",
       "titleLine2": "y el alma se eleva",
       "description": "Pole dance, baile, artes aéreas y clases complementarias en un espacio donde descubrirás de lo que eres capaz.",

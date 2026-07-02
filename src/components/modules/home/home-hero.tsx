@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { LuArrowRight } from 'react-icons/lu';
 import { Link } from 'react-router';
 
@@ -16,17 +16,16 @@ export const HomeHero = () => {
     <Section compact className='bg-gradient-hero'>
       <div className='relative gap-10 xl:gap-20 home-hero transition-[all_300ms_ease] pb-7 pt-20 sm:pt-40 lg:pb-10'>
         <div className='grid gap-4 content-center max-w-xl' style={{ gridArea: 'text' }}>
-          <h5 className='text-accent hero leading-none m-0'>
-            <Logotype className='h-[0.25em] sm:h-[0.35em] inline-block' />
-          </h5>
+          <Logotype className='h-8 inline-block mb-8' />
 
           <h1 className='text-accent leading-none m-0'>
-            Dale a tu cuerpo una 
-
-            <span className='text-primary'>{' '}segunda oportunidad</span>
-            {` y `}
-            <span className='block font-brand'>mueve</span>
-            <span className='text-primary'>{' '} el alma</span>
+            <Trans
+              i18nKey='home:stitch.hero.kicker'
+              components={{
+                Primary: <span className='text-primary' />,
+                Brand: <span className='font-brand text-[0.7em]' />,
+              }}
+            />
           </h1>
 
           <p className='m-0'>{t('home:stitch.hero.description')}</p>
