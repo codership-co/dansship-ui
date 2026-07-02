@@ -79,9 +79,13 @@ export const Gradients = ({ className, flipped, styles }: GradientsProps) => {
 
       <Fluids1
         className={cn('absolute min-w-100 w-full max-w-[30vw] top-0', flipped ? 'right-0 rotate-y-180' : 'left-0')}
+        color1='highlight'
+        color2='tertiary'
       />
       <Fluids2
         className={cn('absolute min-w-120 w-full max-w-[35vw] bottom-0', flipped ? 'left-0 rotate-y-180' : 'right-0')}
+        color1='highlight'
+        color2='tertiary'
       />
     </section>
   );

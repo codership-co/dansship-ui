@@ -2,15 +2,17 @@ interface FluidsProps {
   className?: string;
   mainColor?: string;
   style?: React.CSSProperties;
+  color1: string;
+  color2: string;
 }
 
-export const Fluids1 = ({ className, style }: FluidsProps) => (
+export const Fluids1 = ({ className, style, color1, color2 }: FluidsProps) => (
   <svg className={className} style={style} viewBox='0 0 491 440' fill='none' xmlns='http://www.w3.org/2000/svg'>
     <g>
       <path
         className='animate-gradients-floatB delay-100'
         d='M411.931 -52.3151C411.931 -52.3151 465.502 56.0639 444.175 113.635C422.849 171.206 338.106 160.6 314.849 240.206C291.591 319.813 353.182 394.206 282.849 433.206C254.712 448.808 203.698 432.206 125.849 419.206C47.9997 406.206 -11.0483 442.233 -11.0483 442.233L-9.54834 -52.3151H411.931Z'
-        fill='var(--color-highlight)'
+        fill={`var(--color-${color1})`}
       />
       <path
         className='animate-gradients-floatB delay-200'
@@ -39,7 +41,7 @@ export const Fluids1 = ({ className, style }: FluidsProps) => (
         className='animate-gradients-floatB'
         d='M491.386 -10.4702C491.386 -10.4702 465.646 176.139 449.689 228.294C433.732 280.449 392.381 317.231 360.492 335.263C328.603 353.294 313.258 287.34 335.737 232.754C358.216 178.167 425.351 162.745 447.995 125.971C470.64 89.1967 449.227 -8.18184 449.227 -8.18184L473.886 -8.18184L491.386 -10.4702Z'
         opacity='0.1'
-        fill='var(--color-highlight)'
+        fill={`var(--color-${color1})`}
       />
     </g>
     <defs>
@@ -51,12 +53,12 @@ export const Fluids1 = ({ className, style }: FluidsProps) => (
         y2='321.237'
         gradientUnits='userSpaceOnUse'
       >
-        <stop stopColor='var(--color-tertiary-900)' />
-        <stop offset='0.0993' stopColor='var(--color-tertiary-800)' />
-        <stop offset='0.2695' stopColor='var(--color-tertiary-700)' />
-        <stop offset='0.49' stopColor='var(--color-tertiary-700)' />
-        <stop offset='0.7492' stopColor='var(--color-tertiary-600)' />
-        <stop offset='1' stopColor='var(--color-tertiary-500)' />
+        <stop stopColor={`var(--color-${color2}-900)`} />
+        <stop offset='0.0993' stopColor={`var(--color-${color2}-800)`} />
+        <stop offset='0.2695' stopColor={`var(--color-${color2}-700)`} />
+        <stop offset='0.49' stopColor={`var(--color-${color2}-700)`} />
+        <stop offset='0.7492' stopColor={`var(--color-${color2}-600)`} />
+        <stop offset='1' stopColor={`var(--color-${color2}-500)`} />
       </linearGradient>
     </defs>
   </svg>

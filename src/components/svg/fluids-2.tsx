@@ -2,15 +2,17 @@ interface FluidsProps {
   className?: string;
   mainColor?: string;
   style?: React.CSSProperties;
+  color1: string;
+  color2: string;
 }
 
-export const Fluids2 = ({ className, style }: FluidsProps) => (
+export const Fluids2 = ({ className, style, color1, color2 }: FluidsProps) => (
   <svg className={className} style={style} viewBox='0 0 589 528' fill='none' xmlns='http://www.w3.org/2000/svg'>
     <g clipPath='url(#clip0_69_15902)'>
       <path
         className='animate-gradients-floatA delay-100'
         d='M521.879 378.5C572.394 354.5 593 231.5 593 231.5C586.5 242.5 578 258.874 562.121 255.801C546.243 252.728 536.364 215.5 513.031 212.167C489.698 208.833 480.364 260.167 459.031 255.5C437.698 250.833 442.364 208.833 459.031 180.833C475.697 152.833 519.364 127.5 553.364 81.5C587.364 35.5 599.031 -39 599.031 -39H625V540.5H119.364C119.364 540.5 111.364 444.5 170.364 424.533C229.364 404.566 243.364 455.5 261.364 488.959C279.364 522.418 308.364 528.5 324.364 505.5C340.364 482.5 337.364 459.5 337.364 424.533C337.364 389.566 337.364 353.5 372.637 345.5C407.91 337.5 471.364 402.5 521.879 378.5Z'
-        fill='var(--color-highlight)'
+        fill={`var(--color-${color1})`}
       />
       <path
         className='animate-gradients-floatA delay-200'
@@ -54,7 +56,7 @@ export const Fluids2 = ({ className, style }: FluidsProps) => (
         className='animate-gradients-floatA'
         d='M462 283.79C512 262.491 493 237.088 513 260.088C533 283.088 535 328.088 490 345.088C445 362.088 405 328.088 367 332.088C329 336.088 319 361.087 312 410.966C305 460.845 286 461.088 268 445.088C250 429.088 213.999 382.089 158.869 406.088C90.3412 425.997 88.5161 545.115 104.5 550L61.9999 546.088C61.9999 546.088 9.66985 567.874 4.88609 546.088C-22.6138 420.854 95.9998 292.088 135 276.088C174 260.088 218 256.088 268 268.088C318 280.088 412 305.089 462 283.79Z'
         opacity='0.1'
-        fill='var(--color-highlight)'
+        fill={`var(--color-${color1})`}
       />
     </g>
     <defs>
@@ -66,13 +68,13 @@ export const Fluids2 = ({ className, style }: FluidsProps) => (
         y2='414.874'
         gradientUnits='userSpaceOnUse'
       >
-        <stop stopColor='var(--color-tertiary-900)' />
-        <stop offset='0.116' stopColor='var(--color-tertiary-800)' />
-        <stop offset='0.2875' stopColor='var(--color-tertiary-700)' />
-        <stop offset='0.4936' stopColor='var(--color-tertiary-600)' />
-        <stop offset='0.7264' stopColor='var(--color-tertiary-500)' />
-        <stop offset='0.9787' stopColor='var(--color-tertiary-400)' />
-        <stop offset='1' stopColor='var(--color-tertiary-300)' />
+        <stop stopColor={`var(--color-${color2}-900)`} />
+        <stop offset='0.116' stopColor={`var(--color-${color2}-800)`} />
+        <stop offset='0.2875' stopColor={`var(--color-${color2}-700)`} />
+        <stop offset='0.4936' stopColor={`var(--color-${color2}-600)`} />
+        <stop offset='0.7264' stopColor={`var(--color-${color2}-500)`} />
+        <stop offset='0.9787' stopColor={`var(--color-${color2}-400)`} />
+        <stop offset='1' stopColor={`var(--color-${color2}-300)`} />
       </linearGradient>
       <linearGradient
         id='paint1_linear_69_15902'
@@ -82,10 +84,10 @@ export const Fluids2 = ({ className, style }: FluidsProps) => (
         y2='191.984'
         gradientUnits='userSpaceOnUse'
       >
-        <stop stopColor='var(--color-tertiary-700)' />
-        <stop offset='0.4348' stopColor='var(--color-tertiary-600)' />
-        <stop offset='0.8184' stopColor='var(--color-tertiary-500)' />
-        <stop offset='1' stopColor='var(--color-tertiary-400)' />
+        <stop stopColor={`var(--color-${color2}-700)`} />
+        <stop offset='0.4348' stopColor={`var(--color-${color2}-600)`} />
+        <stop offset='0.8184' stopColor={`var(--color-${color2}-500)`} />
+        <stop offset='1' stopColor={`var(--color-${color2}-400)`} />
       </linearGradient>
       <linearGradient
         id='paint2_linear_69_15902'
@@ -95,12 +97,12 @@ export const Fluids2 = ({ className, style }: FluidsProps) => (
         y2='421.112'
         gradientUnits='userSpaceOnUse'
       >
-        <stop stopColor='var(--color-tertiary-900)' />
-        <stop offset='0.1886' stopColor='var(--color-tertiary-800)' />
-        <stop offset='0.4581' stopColor='var(--color-tertiary-700)' />
-        <stop offset='0.6931' stopColor='var(--color-tertiary-600)' />
-        <stop offset='0.8815' stopColor='var(--color-tertiary-500)' />
-        <stop offset='1' stopColor='var(--color-tertiary-400)' />
+        <stop stopColor={`var(--color-${color2}-900)`} />
+        <stop offset='0.1886' stopColor={`var(--color-${color2}-800)`} />
+        <stop offset='0.4581' stopColor={`var(--color-${color2}-700)`} />
+        <stop offset='0.6931' stopColor={`var(--color-${color2}-600)`} />
+        <stop offset='0.8815' stopColor={`var(--color-${color2}-500)`} />
+        <stop offset='1' stopColor={`var(--color-${color2}-400)`} />
       </linearGradient>
       <linearGradient
         id='paint3_linear_69_15902'
@@ -110,12 +112,12 @@ export const Fluids2 = ({ className, style }: FluidsProps) => (
         y2='444.079'
         gradientUnits='userSpaceOnUse'
       >
-        <stop stopColor='var(--color-tertiary-900)' />
-        <stop offset='0.121' stopColor='var(--color-tertiary-800)' />
-        <stop offset='0.3284' stopColor='var(--color-tertiary-700)' />
-        <stop offset='0.5969' stopColor='var(--color-tertiary-600)' />
-        <stop offset='0.9131' stopColor='var(--color-tertiary-500)' />
-        <stop offset='1' stopColor='var(--color-tertiary-400)' />
+        <stop stopColor={`var(--color-${color2}-900)`} />
+        <stop offset='0.121' stopColor={`var(--color-${color2}-800)`} />
+        <stop offset='0.3284' stopColor={`var(--color-${color2}-700)`} />
+        <stop offset='0.5969' stopColor={`var(--color-${color2}-600)`} />
+        <stop offset='0.9131' stopColor={`var(--color-${color2}-500)`} />
+        <stop offset='1' stopColor={`var(--color-${color2}-400)`} />
       </linearGradient>
       <clipPath id='clip0_69_15902'>
         <rect width='589' height='528' fill='white' />
