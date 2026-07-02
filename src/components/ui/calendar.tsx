@@ -1,5 +1,5 @@
 import React from 'react';
-import { DayPicker, getDefaultClassNames, type DayButton } from 'react-day-picker';
+import { DayPicker, getDefaultClassNames, type DayButton, DayPickerProps } from 'react-day-picker';
 import { LuChevronDown, LuChevronLeft, LuChevronRight } from 'react-icons/lu';
 
 import { Button, buttonVariants } from '@components/ui/button';
@@ -14,13 +14,15 @@ function Calendar({
   formatters,
   components,
   ...props
-}: React.ComponentProps<typeof DayPicker> & {
-  buttonVariant?: React.ComponentProps<typeof Button>['variant'];
-}) {
+}: React.ComponentProps<typeof DayPicker> &
+  DayPickerProps & {
+    buttonVariant?: React.ComponentProps<typeof Button>['variant'];
+  }) {
   const defaultClassNames = getDefaultClassNames();
 
   return (
     <DayPicker
+      animate
       showOutsideDays={showOutsideDays}
       className={cn(
         'group/calendar bg-background p-3 [--cell-size:--spacing(8)] in-data-[slot=card-content]:bg-transparent in-data-[slot=popover-content]:bg-transparent',

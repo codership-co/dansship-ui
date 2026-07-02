@@ -1,4 +1,5 @@
 import { type ReactNode } from 'react';
+import { DateBefore } from 'react-day-picker';
 import { type Control, Controller, type FieldValues, type Path } from 'react-hook-form';
 import { LuCircleAlert } from 'react-icons/lu';
 
@@ -19,6 +20,9 @@ interface DateFieldProps<T extends FieldValues = Record<string, unknown>> {
   pattern?: string;
   maxLength?: number;
   disabled?: boolean;
+  min?: Date;
+  max?: Date;
+  helperText?: string;
 }
 
 export function DateField<T extends FieldValues = Record<string, unknown>>({
@@ -35,6 +39,9 @@ export function DateField<T extends FieldValues = Record<string, unknown>>({
   pattern,
   maxLength,
   disabled,
+  min,
+  max,
+  helperText,
 }: DateFieldProps<T>) {
   const hasLeftIcon = Boolean(icon);
   const hasRightElement = Boolean(rightElement);
@@ -77,6 +84,7 @@ export function DateField<T extends FieldValues = Record<string, unknown>>({
                   captionLayout='dropdown'
                   selected={field.value}
                   onSelect={field.onChange}
+                  disabled={{ before: min, after: max } as DateBefore}
                   autoFocus
                 />
               </PopoverContent>
@@ -91,6 +99,11 @@ export function DateField<T extends FieldValues = Record<string, unknown>>({
           {error && (
             <label htmlFor={fieldId} className='m-0 text-small text-alert-600'>
               {error.message}
+            </label>
+          )}
+          {helperText && (
+            <label htmlFor={fieldId} className='m-0 text-small'>
+              {helperText}
             </label>
           )}
         </div>

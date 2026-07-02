@@ -35,16 +35,16 @@ export function PaymentMethodSelector({ value, onChange, availableMethods }: Pay
             key={method}
             type='button'
             className={cn(
-              'w-full rounded-lg border p-3 text-left transition-colors',
+              'w-full rounded-lg border px-8 py-4 text-left transition-colors',
               isSelected ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300',
             )}
             onClick={() => onChange(method)}
           >
-            <div className='flex items-center gap-3'>
-              <Icon className='h-4 w-4 text-primary' />
+            <div className='flex items-center gap-6'>
+              <Icon className='h-4 w-4 text-primary shrink-0' />
               <div>
-                <p className='font-medium text-gray-900'>{t(`payments:method.${method}`)}</p>
-                <p className='text-xs text-gray-500'>{t(`payments:methodDesc.${method}`)}</p>
+                <p className='m-0'>{t(`payments:method.${method}`)}</p>
+                <label className='text-gray-500'>{t(`payments:methodDesc.${method}`)}</label>
               </div>
             </div>
           </button>

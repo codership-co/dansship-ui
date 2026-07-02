@@ -1,3 +1,4 @@
+export * from './plan-card';
 export * from './plan-selector';
 export * from './checkout-modal';
 export * from './payment-proof-upload';

@@ -259,7 +259,7 @@
   --background-image-gradient-plan-selector: linear-gradient(to bottom, var(--color-secondary-200), var(--color-secondary-600));
   --background-image-gradient-plan-card: linear-gradient(to bottom, var(--color-secondary-400), var(--color-secondary-100));
   --background-image-gradient-auth: linear-gradient(-135deg, var(--color-highlight), var(--color-primary));
-  --background-image-gradient-onboarding: linear-gradient(to bottom right, var(--color-secondary) 40%, hsl(from var(--color-primary) h s 70%));
+  --background-image-gradient-onboarding: linear-gradient(to bottom, var(--color-secondary-300) 50%, hsl(from var(--color-primary) h s 90%));
 
   --background-image-gradient-hero: linear-gradient(to bottom, var(--color-accent-300), transparent);
   --background-image-gradient-primary: linear-gradient(135deg, var(--color-primary-100), var(--color-primary-400));
@@ -273,8 +273,6 @@
   --color-popover-foreground: var(--color-secondary-800);
   --color-muted: hsl(35 88% 95%);
   --color-muted-foreground: hsl(334 7% 29%);
-  --color-surface: hsl(33 100% 98%);
-  --color-surface-dim: hsl(37 100% 93%);
   --color-surface-container-low: hsl(34 93% 94%);
   --color-surface-container: hsl(35 96% 91%);
   --color-surface-container-highest: hsl(35 58% 86%);

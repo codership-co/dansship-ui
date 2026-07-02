@@ -190,10 +190,7 @@ export function InternalReservedUsePanel() {
             const roomName = firstSlot ? (roomNameById[firstSlot.room_id] ?? firstSlot.room_id) : '-';
 
             return (
-              <div
-                key={request.id}
-                className='rounded-(--radius) bg-[hsl(var(--surface-container-highest))] px-4 py-3 shadow-sm'
-              >
+              <div key={request.id} className='rounded-(--radius) bg-secondary-100 px-4 py-3 shadow-sm'>
                 <div className='flex flex-col gap-2 md:flex-row md:items-center md:justify-between'>
                   <div>
                     <p className='text-sm font-semibold text-foreground'>#{request.id.slice(0, 8)}</p>

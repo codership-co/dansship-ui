@@ -34,7 +34,7 @@ export const FormStepperLayout = <T extends string>({
   return (
     <section className='shadow-2xl rounded-xl md:rounded-2xl'>
       <section className='grid md:grid-cols-[auto_1fr] bg-white rounded-xl md:rounded-2xl overflow-hidden'>
-        <section className='px-8 py-6 md:py-16 md:pl-8 md:pr-16 bg-gradient-onboarding grid grid-flow-col md:grid-flow-row gap-6 md:gap-8 justify-start content-start select-none'>
+        <section className='px-8 py-6 md:py-16 md:pl-8 md:pr-12 bg-gradient-onboarding grid grid-flow-col md:grid-flow-row gap-6 md:gap-8 justify-start content-start select-none'>
           {steps.map(({ title, step, Icon }, index) => (
             <section
               key={step}
@@ -45,37 +45,37 @@ export const FormStepperLayout = <T extends string>({
                 index > stepIndex && 'text-gray-400',
               )}
             >
-              {index < stepIndex && <LuCircleCheck className='size-8 md:size-12 md:mt-2' />}
-              {index === stepIndex && <Icon className='size-8 md:size-12 md:mt-2 animate-pulse' />}
-              {index > stepIndex && <Icon className='size-8 md:size-12 md:mt-2' />}
+              {index < stepIndex && <LuCircleCheck className='size-6 md:size-8 md:mt-4' />}
+              {index === stepIndex && <Icon className='size-6 md:size-8 md:mt-4 animate-pulse' />}
+              {index > stepIndex && <Icon className='size-6 md:size-8 md:mt-4' />}
               <section className='relative hidden xs:block'>
                 <small className='hidden md:block text-gray-400 m-0'>{t('common:step', { step: index + 1 })}</small>
-                <h4 className='hidden md:block m-0'>{title}</h4>
-                <label className='block md:hidden font-bold m-0'>{title}</label>
+                <p className='hidden md:block m-0 font-bold'>{title}</p>
+                <small className='hidden sm:block md:hidden font-bold m-0 mt-2'>{title}</small>
                 {index < stepIndex && (
-                  <Badge variant='outlineActive' size='small'>
+                  <Badge variant='outlineActive' size='small' className='hidden md:block'>
                     {t('common:complete')}
                   </Badge>
                 )}
                 {index === stepIndex && (
-                  <Badge variant='outlineTertiary' size='small'>
+                  <Badge variant='outlineTertiary' size='small' className='hidden md:block'>
                     {t('common:inProgress')}
                   </Badge>
                 )}
                 {index > stepIndex && (
-                  <Badge variant='outlineNeutral' size='small'>
+                  <Badge variant='outlineNeutral' size='small' className='hidden md:block'>
                     {t('common:pending')}
                   </Badge>
                 )}
 
                 {index === stepIndex && (
-                  <LuCircleArrowRight className='hidden md:block absolute top-3 -right-21 size-10 p-2 bg-white rounded-full' />
+                  <LuCircleArrowRight className='hidden md:block absolute top-3 -right-17 size-10 p-2 bg-white rounded-full' />
                 )}
               </section>
             </section>
           ))}
         </section>
-        <section className='px-8 py-16'>
+        <section className='px-8 py-6 md:py-16 md:pr-8 md:pl-12'>
           <section className='mb-10'>
             <h4 className='m-0 text-primary'>{steps[stepIndex].title}</h4>
             <label>{steps[stepIndex].subtitle}</label>

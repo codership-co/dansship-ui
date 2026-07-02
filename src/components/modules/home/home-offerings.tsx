@@ -48,59 +48,42 @@ export const HomeOfferings = () => {
             <Link key={card.titleKey} to={PageURLS.classes} className='block rounded-lg'>
               <Card
                 className={`group relative min-h-100 overflow-hidden border-secondary/50 shadow-none ${
-                  isFeatured ? 'bg-primary-container text-primary-foreground' : 'bg-surface-container-low text-accent'
+                  isFeatured ? 'bg-primary-600 text-accent-200' : 'bg-tertiary-200 text-primary'
                 }`}
               >
                 <img
                   src={card.image}
                   alt={t(card.titleKey)}
-                  className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 ${
-                    isFeatured ? 'opacity-[0.52]' : 'opacity-[0.3]'
-                  }`}
+                  className='pointer-events-none absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105 opacity-[0.3]'
                   loading='lazy'
                 />
 
-                <div
-                  className={`pointer-events-none absolute inset-0 ${isFeatured ? 'bg-primary/70' : 'bg-secondary/10'}`}
-                />
-
-                {/* header */}
                 <CardHeader className='relative z-10 px-5'>
                   <CardTitle>
                     <div className='flex flex-col gap-4 pt-42.5'>
-                      <span
-                        className={`inline-flex h-9 w-9 items-center justify-center rounded-xl ${
-                          isFeatured
-                            ? 'text-primary-foreground bg-on-tertiary-container/20'
-                            : 'text-primary bg-primary/10'
-                        }`}
-                      >
+                      <span className='inline-flex h-9 w-9 items-center justify-center rounded-xl text-primary backdrop-blur-sm bg-tertiary-200/40'>
                         <Icon className='h-4 w-4' />
                       </span>
 
-                      <h3 className={isFeatured ? 'text-primary-foreground' : 'text-primary'}>{t(card.titleKey)}</h3>
+                      <h3>{t(card.titleKey)}</h3>
                     </div>
                   </CardTitle>
 
-                  <CardDescription
-                    className={`pt-1 text-[0.9rem] leading-relaxed ${
-                      isFeatured ? 'text-primary-foreground/90' : 'text-foreground/85'
-                    }`}
-                  >
-                    {t(card.descriptionKey)}
+                  <CardDescription className='text-body'>
+                    <span className='text-body'>{t(card.descriptionKey)}</span>
                   </CardDescription>
                 </CardHeader>
 
-                {/* footer */}
-                <CardFooter className='relative z-10 mt-auto px-5'>
-                  <span
-                    className={`inline-flex items-center gap-2 text-[0.84rem] font-semibold uppercase tracking-[0.08em] ${
-                      isFeatured ? 'text-primary-foreground' : 'text-primary'
+                <CardFooter className='relative z-10 px-5'>
+                  <Button
+                    variant='ghostPrimary'
+                    className={`inline-flex items-center gap-2 uppercase ${
+                      isFeatured ? 'text-primary-foreground hover:bg-primary/30' : 'text-primary hover:bg-primary/20'
                     }`}
                   >
                     {t('home:stitch.offerings.learnMore')}
                     <LuArrowRight className='h-3.5 w-3.5' />
-                  </span>
+                  </Button>
                 </CardFooter>
               </Card>
             </Link>
@@ -109,7 +92,7 @@ export const HomeOfferings = () => {
       </div>
 
       <div className='mt-8 flex flex-col items-center gap-3 text-center'>
-        <p className='text-sm text-muted-foreground'>{t('home:stitch.offerings.scheduleCtaMessage')}</p>
+        <p>{t('home:stitch.offerings.scheduleCtaMessage')}</p>
 
         <Button asChild>
           <Link to={PageURLS.classes}>{t('home:stitch.offerings.scheduleCtaAction')}</Link>

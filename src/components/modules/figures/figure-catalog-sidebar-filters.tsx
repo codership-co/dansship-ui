@@ -26,7 +26,7 @@ export const catalogDesktopCheckboxVariants = cva(
     variants: {
       checked: {
         true: 'border-primary bg-primary text-on-primary',
-        false: 'border-accent bg-surface-container-lowest text-transparent',
+        false: 'border-accent text-transparent',
       },
     },
     defaultVariants: {
@@ -49,7 +49,7 @@ export const FigureCatalogSidebarFilters = ({ filters, setFilters }: FigureCatal
 
   return (
     <aside className='hidden lg:block lg:w-72 lg:shrink-0'>
-      <div className='sticky top-28 rounded-xl bg-surface-container-lowest p-6 shadow-[0_10px_30px_-10px_rgba(88,47,89,0.06)]'>
+      <div className='sticky top-28 rounded-xl p-6 shadow-[0_10px_30px_-10px_rgba(88,47,89,0.06)]'>
         <h3 className='font-headline text-lg font-bold tracking-tight text-primary'>
           {t('browse:catalog.filterTitle')}
         </h3>
@@ -65,7 +65,7 @@ export const FigureCatalogSidebarFilters = ({ filters, setFilters }: FigureCatal
             type='text'
             value={filters.search}
             onChange={event => setFilters(p => ({ ...p, search: event.target.value }))}
-            className='w-full rounded-lg border border-transparent bg-surface-container-low px-4 py-3 pl-10 text-sm text-foreground outline-none transition-all focus:border-primary focus:bg-surface-container-lowest focus:shadow-sm focus:ring-0'
+            className='w-full rounded-lg border border-transparent bg-secondary-100 px-4 py-3 pl-10 text-sm text-foreground outline-none transition-all focus:border-primary focus:bg-surface-container-lowest focus:shadow-sm focus:ring-0'
             placeholder={t('browse:catalog.searchPlaceholderDesktop')}
           />
         </div>
@@ -81,7 +81,7 @@ export const FigureCatalogSidebarFilters = ({ filters, setFilters }: FigureCatal
               <button
                 key={option.value}
                 type='button'
-                className='group flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-surface-container-low'
+                className='group flex w-full items-center gap-3 rounded-lg px-2 py-1.5 text-left transition-colors hover:bg-secondary-100'
                 onClick={() =>
                   setFilters(p => ({
                     ...p,

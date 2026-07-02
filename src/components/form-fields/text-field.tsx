@@ -19,6 +19,9 @@ interface TextFieldProps<T extends FieldValues = Record<string, unknown>> {
   pattern?: string;
   maxLength?: number;
   disabled?: boolean;
+  helperText?: string;
+  inputClassName?: string;
+  errorMessage?: string;
 }
 
 export function TextField<T extends FieldValues = Record<string, unknown>>({
@@ -35,6 +38,9 @@ export function TextField<T extends FieldValues = Record<string, unknown>>({
   pattern,
   maxLength,
   disabled,
+  helperText,
+  inputClassName,
+  errorMessage,
 }: TextFieldProps<T>) {
   const hasLeftIcon = Boolean(icon);
   const hasRightElement = Boolean(rightElement);
@@ -61,22 +67,28 @@ export function TextField<T extends FieldValues = Record<string, unknown>>({
               className={cn(
                 'pr-8',
                 hasLeftIcon && 'pl-10',
-                hasRightElement && !error && 'pr-10',
-                hasRightElement && error && 'pr-16',
-                error && 'outline-alert-600 focus-visible:ring-alert-600',
+                hasRightElement && !error && !errorMessage && 'pr-10',
+                hasRightElement && (error || errorMessage) && 'pr-16',
+                (error || errorMessage) && 'outline-alert-600 focus-visible:ring-alert-600',
+                inputClassName,
               )}
               {...field}
             />
-            {(hasRightElement || error) && (
+            {(hasRightElement || error || errorMessage) && (
               <div className='absolute top-0 right-0 h-full z-10 pr-3 flex items-center gap-2'>
-                {error && <LuCircleAlert className='h-4 w-4 text-alert-600' />}
+                {(error || errorMessage) && <LuCircleAlert className='h-4 w-4 text-alert-600' />}
                 {rightElement}
               </div>
             )}
           </div>
-          {error && (
+          {(error || errorMessage) && (
             <label htmlFor={fieldId} className='m-0 text-small text-alert-600'>
-              {error.message}
+              {error ? error.message : errorMessage}
+            </label>
+          )}
+          {helperText && (
+            <label htmlFor={fieldId} className='m-0 text-small'>
+              {helperText}
             </label>
           )}
         </div>
