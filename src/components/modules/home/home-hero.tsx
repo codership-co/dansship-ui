@@ -16,9 +16,9 @@ export const HomeHero = () => {
     <Section compact className='bg-gradient-hero'>
       <div className='relative gap-10 xl:gap-20 home-hero transition-[all_300ms_ease] pb-7 pt-20 sm:pt-40 lg:pb-10'>
         <div className='grid gap-4 content-center max-w-xl' style={{ gridArea: 'text' }}>
-          <Logotype className='h-8 inline-block mb-8' />
+          <Logotype className='h-8 hidden sm:inline-block' />
 
-          <h1 className='text-accent leading-none m-0'>
+          <h1 className='text-accent leading-none m-0 mt-8'>
             <Trans
               i18nKey='home:stitch.hero.kicker'
               components={{
@@ -30,7 +30,7 @@ export const HomeHero = () => {
 
           <p className='m-0'>{t('home:stitch.hero.description')}</p>
 
-          <div className='mt-4 flex flex-row gap-2.5 sm:max-w-90'>
+          <div className='mt-4 flex flex-col xs:flex-row gap-2.5 sm:max-w-90'>
             <Link to={isAuthenticated ? PageURLS.profile : PageURLS.auth.signup}>
               <Button>
                 {t('home:stitch.hero.bookClass')}
