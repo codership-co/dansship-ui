@@ -65,7 +65,7 @@ export const HomeOfferings = () => {
                         <Icon className='h-4 w-4' />
                       </span>
 
-                      <h3>{t(card.titleKey)}</h3>
+                      <h3 className='whitespace-pre-line'>{t(card.titleKey)}</h3>
                     </div>
                   </CardTitle>
 
