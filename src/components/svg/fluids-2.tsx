@@ -66,13 +66,13 @@ export const Fluids2 = ({ className, style }: FluidsProps) => (
         y2='414.874'
         gradientUnits='userSpaceOnUse'
       >
-        <stop stopColor='#5564AE' />
-        <stop offset='0.116' stopColor='#5468B0' />
-        <stop offset='0.2875' stopColor='#5472B7' />
-        <stop offset='0.4936' stopColor='#5384C3' />
-        <stop offset='0.7264' stopColor='#509FD5' />
-        <stop offset='0.9787' stopColor='#4CC3ED' />
-        <stop offset='1' stopColor='#49C8F1' />
+        <stop stopColor='var(--color-tertiary-900)' />
+        <stop offset='0.116' stopColor='var(--color-tertiary-800)' />
+        <stop offset='0.2875' stopColor='var(--color-tertiary-700)' />
+        <stop offset='0.4936' stopColor='var(--color-tertiary-600)' />
+        <stop offset='0.7264' stopColor='var(--color-tertiary-500)' />
+        <stop offset='0.9787' stopColor='var(--color-tertiary-400)' />
+        <stop offset='1' stopColor='var(--color-tertiary-300)' />
       </linearGradient>
       <linearGradient
         id='paint1_linear_69_15902'
@@ -82,10 +82,10 @@ export const Fluids2 = ({ className, style }: FluidsProps) => (
         y2='191.984'
         gradientUnits='userSpaceOnUse'
       >
-        <stop stopColor='#F89C68' />
-        <stop offset='0.4348' stopColor='#F4878A' />
-        <stop offset='0.8184' stopColor='#F175A0' />
-        <stop offset='1' stopColor='#F06EA9' />
+        <stop stopColor='var(--color-tertiary-700)' />
+        <stop offset='0.4348' stopColor='var(--color-tertiary-600)' />
+        <stop offset='0.8184' stopColor='var(--color-tertiary-500)' />
+        <stop offset='1' stopColor='var(--color-tertiary-400)' />
       </linearGradient>
       <linearGradient
         id='paint2_linear_69_15902'
@@ -95,12 +95,12 @@ export const Fluids2 = ({ className, style }: FluidsProps) => (
         y2='421.112'
         gradientUnits='userSpaceOnUse'
       >
-        <stop stopColor='#F89C68' />
-        <stop offset='0.1886' stopColor='#F6917B' />
-        <stop offset='0.4581' stopColor='#F38390' />
-        <stop offset='0.6931' stopColor='#F2789D' />
-        <stop offset='0.8815' stopColor='#F170A5' />
-        <stop offset='1' stopColor='#F06EA9' />
+        <stop stopColor='var(--color-tertiary-900)' />
+        <stop offset='0.1886' stopColor='var(--color-tertiary-800)' />
+        <stop offset='0.4581' stopColor='var(--color-tertiary-700)' />
+        <stop offset='0.6931' stopColor='var(--color-tertiary-600)' />
+        <stop offset='0.8815' stopColor='var(--color-tertiary-500)' />
+        <stop offset='1' stopColor='var(--color-tertiary-400)' />
       </linearGradient>
       <linearGradient
         id='paint3_linear_69_15902'
@@ -110,12 +110,12 @@ export const Fluids2 = ({ className, style }: FluidsProps) => (
         y2='444.079'
         gradientUnits='userSpaceOnUse'
       >
-        <stop stopColor='#F89C68' />
-        <stop offset='0.121' stopColor='#F7996D' />
-        <stop offset='0.3284' stopColor='#F6927A' />
-        <stop offset='0.5969' stopColor='#F4868D' />
-        <stop offset='0.9131' stopColor='#F173A2' />
-        <stop offset='1' stopColor='#F06EA9' />
+        <stop stopColor='var(--color-tertiary-900)' />
+        <stop offset='0.121' stopColor='var(--color-tertiary-800)' />
+        <stop offset='0.3284' stopColor='var(--color-tertiary-700)' />
+        <stop offset='0.5969' stopColor='var(--color-tertiary-600)' />
+        <stop offset='0.9131' stopColor='var(--color-tertiary-500)' />
+        <stop offset='1' stopColor='var(--color-tertiary-400)' />
       </linearGradient>
       <clipPath id='clip0_69_15902'>
         <rect width='589' height='528' fill='white' />
