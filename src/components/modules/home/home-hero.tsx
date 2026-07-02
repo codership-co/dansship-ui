@@ -46,7 +46,7 @@ export const HomeHero = () => {
 
         <section className='relative size-60 lg:size-100 bg-accent rounded-full' style={{ gridArea: 'image' }}>
           <img
-            src='/assets/images/home/MujerSS.png'
+            src='/assets/images/bailarina1.png'
             alt='Dansship'
             className='absolute left-1/2 top-1/2 max-w-[initial] w-52 lg:w-92 -translate-1/2 block'
           />
