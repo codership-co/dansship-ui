@@ -69,15 +69,15 @@
       "scheduleCtaAction": "Ver horarios",
       "learnMore": "Ver clases",
       "dance": {
-        "title": "Clases de Baile",
+        "title": "Clases de\nBaile",
         "description": "Exprésate, conecta contigo y disfruta cada movimiento"
       },
       "poleSport": {
-        "title": "Clases de Pole Dance",
+        "title": "Clases de\nPole Dance",
         "description": "Desarrolla fuerza, técnica y confianza mientras superas tus propios límites"
       },
       "complementary": {
-        "title": "Clases Complementarias",
+        "title": "Clases\nComplementarias",
         "description": "Flexibilidad, acondicionamiento y entrenamiento para impulsar tu progreso"
       }
     },
