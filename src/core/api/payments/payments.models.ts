@@ -17,6 +17,23 @@ export interface CreatePaymentIntentPayload {
   start_date?: string;
 }
 
+export interface BoldCheckoutConfig {
+  order_id: string;
+  currency: string;
+  amount: string;
+  api_key: string;
+  integrity_signature: string;
+  description: string;
+  redirection_url: string;
+  render_mode: 'embedded';
+  customer_data?: string | null;
+}
+
+export interface BoldCheckoutBootstrapResponse {
+  intent: PaymentIntent;
+  checkout: BoldCheckoutConfig;
+}
+
 export interface PaymentProofUploadRequest {
   content_type: PaymentProofContentType;
 }

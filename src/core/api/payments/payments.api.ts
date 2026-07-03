@@ -5,6 +5,7 @@ import { normalizeIntent } from './payments.helpers';
 import { DansshipAPIError } from '@core/api';
 
 import type {
+  BoldCheckoutBootstrapResponse,
   ConfirmPaymentProofPayload,
   CreatePaymentIntentPayload,
   PaymentIntent,
@@ -25,6 +26,20 @@ export class PaymentsAPI {
         data: payload,
       },
       normalizeIntent,
+    );
+  }
+
+  async createBoldCheckout(payload: CreatePaymentIntentPayload) {
+    return this.httpClient.callNoError<BoldCheckoutBootstrapResponse, CreatePaymentIntentPayload>(
+      {
+        path: '/payments/intents/bold/checkout',
+        method: 'POST',
+        data: payload,
+      },
+      data => ({
+        ...data,
+        intent: normalizeIntent(data.intent),
+      }),
     );
   }
 

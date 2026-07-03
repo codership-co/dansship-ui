@@ -125,6 +125,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
                   paymentMethod={paymentMethod}
                   finalPrice={discountData.finalPrice}
                   requiresProof={requiresProof}
+                  onClose={onClose}
                   onBack={() => setStep(CheckoutStep.METHOD)}
                   onSubmit={(intentId: string) => {
                     setStep(CheckoutStep.CONFIRMATION);

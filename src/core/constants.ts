@@ -86,6 +86,7 @@ export const PageURLS = {
   figureSaved: '/figure/saved',
   myAccountSubscription: '/my-account/subscription',
   myAccountBookings: '/my-account/bookings',
+  paymentsResult: '/payments/result',
   studioRentalBrowse: '/studio-rental/browse',
   studioRentalRequests: '/studio-rental/requests',
   admin: {
