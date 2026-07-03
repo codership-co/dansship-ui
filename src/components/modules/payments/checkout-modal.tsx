@@ -72,10 +72,10 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
       <FormStepperLayout
         className={cn(
           'm-auto overflow-auto rounded-none sm:rounded-xl',
-          'w-screen max-w-screen overflow-y-auto',
-          'h-screen md:h-[80dvh]',
-          'max-h-screen sm:max-h-[96dvh]',
-          'max-w-screen sm:max-w-[96dvw] xl:max-w-7xl',
+          'w-dvw max-w-dvw overflow-y-auto',
+          'h-dvh md:h-[80dvh]',
+          'max-h-dvh sm:max-h-[96dvh]',
+          'max-w-dvw sm:max-w-[96dvw] xl:max-w-7xl',
         )}
         steps={[
           {
