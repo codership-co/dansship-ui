@@ -48,18 +48,20 @@ export function PlanCard({ plan, onSelectPlan, isFeatured, hoverable, className,
           </div>
         )}
 
-        <CardHeader className='pb-4 pt-5 sm:pb-5 sm:pt-6 gap-0'>
-          <CardTitle className='text-[1.8rem] font-semibold font-title sm:text-[2.1rem]'>{plan.name}</CardTitle>
+        {!asIndividual && (
+          <CardHeader className='pb-4 pt-5 sm:pb-5 sm:pt-6 gap-0'>
+            <CardTitle className='text-[1.8rem] font-semibold font-title sm:text-[2.1rem]'>{plan.name}</CardTitle>
 
-          <CardDescription className='text-label'>
-            {plan.description ||
-              t('subscriptions:planDescFallback', {
-                count: plan.classes_included,
-              })}
-          </CardDescription>
-        </CardHeader>
+            <CardDescription className='text-label'>
+              {plan.description ||
+                t('subscriptions:planDescFallback', {
+                  count: plan.classes_included,
+                })}
+            </CardDescription>
+          </CardHeader>
+        )}
 
-        <CardContent className='flex grow flex-col pt-0 pb-4 sm:pb-6'>
+        <CardContent className='flex grow flex-col pt-0'>
           {!asIndividual && (
             <div className='mb-5 flex items-end gap-1.5 sm:mb-7 sm:gap-2'>
               <h3 className='font-main m-0'>
@@ -82,7 +84,9 @@ export function PlanCard({ plan, onSelectPlan, isFeatured, hoverable, className,
               t('subscriptions:accessAllClasses'),
             ].map((item, i) => (
               <li key={i} className='flex items-start gap-2.5 sm:gap-3'>
-                <FaCheckCircle className='mt-1 shrink-0 h-4 w-4' />
+                <FaCheckCircle
+                  className={cn('mt-1 shrink-0 h-4 w-4', isFeatured ? 'text-primary-foreground' : 'text-primary')}
+                />
                 <span>{item}</span>
               </li>
             ))}
@@ -90,7 +94,7 @@ export function PlanCard({ plan, onSelectPlan, isFeatured, hoverable, className,
         </CardContent>
 
         {onSelectPlan && (
-          <CardFooter>
+          <CardFooter className='pt-4 sm:pt-6'>
             <Button className='w-full' variant={isFeatured ? 'default' : 'outlinePrimary'} onClick={onSelectPlan}>
               {t('subscriptions:choosePlan', { name: plan.name })}
             </Button>

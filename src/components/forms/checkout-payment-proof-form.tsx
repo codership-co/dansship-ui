@@ -1,6 +1,8 @@
 import { format } from 'date-fns';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LuArrowLeft } from 'react-icons/lu';
+import { MdOutlinePayments } from 'react-icons/md';
 import { toast } from 'sonner';
 
 import { CheckoutFormValues } from '@components/forms/checkout-review-plan-form';
@@ -58,6 +60,7 @@ export function CheckoutPaymentProofForm({
   const isCardMethod = paymentMethod === 'card';
   const isBusy = isCreating || isCreatingBoldCheckout || isUploadingProof;
   const [selectedProofFile, setSelectedProofFile] = useState<File | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const onConfirm = async () => {
     if (requiresProof && !selectedProofFile) {
@@ -133,70 +136,93 @@ export function CheckoutPaymentProofForm({
     }
   };
 
+  const handleInputFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+
+    if (!file) return;
+
+    const isValidType = ['image/jpeg', 'image/png', 'image/webp'].includes(file.type);
+
+    if (!isValidType) {
+      toast.error(t('payments:proofInvalidTypeTitle'));
+      event.currentTarget.value = '';
+
+      return;
+    }
+
+    setImageUrl(URL.createObjectURL(file));
+    setSelectedProofFile(file);
+    event.currentTarget.value = '';
+  };
+
   return (
-    <div className='space-y-4'>
-      <div className='rounded-md border border-secondary bg-secondary-400/40 p-4'>
-        <label className='block'>{plan.name}</label>
-        <label className='block'>
-          {t('payments:selectedMethod')}: {t(`payments:method.${paymentMethod}`)}
-        </label>
-        <label className='block'>
-          {t('payments:total')}: {formatPrice(finalPrice, plan.currency)}
-        </label>
-        <label className='block'>
-          {t('payments:startDate')}: {format(checkoutData.start_date, 'yyyy-MM-dd')}
-        </label>
-      </div>
+    <div className='grid grid-rows-[1fr_auto] h-full'>
+      <section className='grid gap-8 content-start'>
+        <section className='grid lg:grid-cols-2 gap-8'>
+          <div className='rounded-md border border-secondary bg-secondary-400/40 py-2 px-4'>
+            <label className='block'>{plan.name}</label>
+            <label className='block'>
+              {t('payments:total')}: {formatPrice(finalPrice, plan.currency)}
+            </label>
+            <label className='block'>
+              {t('payments:startDate')}: {format(checkoutData.start_date, 'yyyy-MM-dd')}
+            </label>
+          </div>
 
-      <div className='rounded-md border border-primary/20 bg-primary/5 p-3 text-sm text-gray-700'>
-        <p className='font-semibold text-primary'>{t(`payments:instructions.${paymentMethod}.title`)}</p>
-        <p className='mt-1'>{t(`payments:instructions.${paymentMethod}.description`)}</p>
-      </div>
+          <div className='rounded-md border border-primary/20 bg-primary/5 p-3 text-sm text-gray-700'>
+            <p className='font-semibold text-primary'>{t(`payments:instructions.${paymentMethod}.title`)}</p>
+            <p className='mt-1'>{t(`payments:instructions.${paymentMethod}.description`)}</p>
+          </div>
+        </section>
 
-      {requiresProof ? (
-        <div className='space-y-2 rounded-md border border-dashed border-gray-300 p-3'>
-          <p className='text-sm font-medium text-gray-900'>{t('payments:proofUploadInCheckoutTitle')}</p>
-          <p className='text-xs text-gray-600'>{t('payments:proofUploadInCheckoutDesc')}</p>
-          <label className='inline-flex cursor-pointer items-center gap-2 rounded-md border border-accent bg-background px-3 py-2 text-xs font-medium shadow-sm hover:bg-accent hover:text-accent-foreground'>
-            {selectedProofFile ? t('payments:replaceProof') : t('payments:uploadProof')}
-            <input
-              type='file'
-              className='hidden'
-              accept={fileAccept}
-              onChange={event => {
-                const file = event.target.files?.[0] ?? null;
-
-                if (!file) return;
-
-                const isValidType = ['image/jpeg', 'image/png', 'image/webp'].includes(file.type);
-
-                if (!isValidType) {
-                  toast.error(t('payments:proofInvalidTypeTitle'));
-                  event.currentTarget.value = '';
-
-                  return;
-                }
-
-                setSelectedProofFile(file);
-                event.currentTarget.value = '';
-              }}
-            />
-          </label>
-          {selectedProofFile ? (
-            <p className='text-xs text-gray-600'>{selectedProofFile.name}</p>
-          ) : (
-            <p className='text-xs text-alert-600'>{t('payments:proofRequiredInline')}</p>
-          )}
-        </div>
-      ) : null}
+        {requiresProof ? (
+          <div className='grid lg:grid-cols-2 gap-8 rounded-md border border-dashed border-gray-300 p-3'>
+            <section>
+              <p className='text-sm font-medium text-gray-900'>{t('payments:proofUploadInCheckoutTitle')}</p>
+              <p className='text-xs text-gray-600'>{t('payments:proofUploadInCheckoutDesc')}</p>
+              <label className='inline-flex cursor-pointer items-center gap-2 rounded-md border border-accent bg-background px-3 py-2 text-xs font-medium shadow-sm hover:bg-accent hover:text-accent-foreground'>
+                {selectedProofFile ? t('payments:replaceProof') : t('payments:uploadProof')}
+                <input type='file' className='hidden' accept={fileAccept} onChange={handleInputFileUpload} />
+              </label>
+            </section>
+            <section>
+              {selectedProofFile && <p className='text-xs text-gray-600'>{selectedProofFile.name}</p>}
+              <section className='relative w-full max-w-md aspect-square bg-gray-300/50 border border-dashed border-gray-300 rounded-xl grid place-content-center overflow-hidden'>
+                {imageUrl ? (
+                  <img
+                    src={imageUrl}
+                    alt='proof preview'
+                    className='w-full aspect-square inline-block object-contain '
+                  />
+                ) : (
+                  <label className='p-8 text-center'>{t('payments:proofRequiredInline')}</label>
+                )}
+                <input
+                  type='file'
+                  className='absolute w-full h-full cursor-pointer opacity-0'
+                  accept={fileAccept}
+                  onChange={handleInputFileUpload}
+                />
+              </section>
+            </section>
+          </div>
+        ) : null}
+      </section>
 
       <div className='flex justify-end gap-2 pt-4'>
-        <Button type='button' variant='outline' onClick={onBack}>
+        <Button type='button' className='flex items-center' variant='outline' onClick={onBack}>
+          <LuArrowLeft />
           {t('common:back')}
         </Button>
 
-        <Button type='submit' disabled={isBusy || (requiresProof && !selectedProofFile)} onClick={() => onConfirm()}>
+        <Button
+          type='submit'
+          disabled={isBusy || (requiresProof && !selectedProofFile)}
+          onClick={() => onConfirm()}
+          className='flex items-center'
+        >
           {isBusy ? t('subscriptions:processing') : t('payments:confirmPurchase')}
+          <MdOutlinePayments />
         </Button>
       </div>
     </div>
