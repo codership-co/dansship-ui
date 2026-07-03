@@ -105,7 +105,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
                 <PaymentMethodSelector
                   value={paymentMethod}
                   onChange={setPaymentMethod}
-                  availableMethods={['transfer', 'cash', 'nequi', 'daviplata']}
+                  availableMethods={['transfer', 'cash', 'nequi', 'daviplata', 'card']}
                 />
 
                 <div className='flex justify-end gap-2 pt-4'>
@@ -139,6 +139,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
                 paymentMethod={paymentMethod}
                 finalPrice={discountData.finalPrice}
                 requiresProof={requiresProof}
+                onClose={onClose}
                 onBack={() => setStep(CheckoutStep.METHOD)}
                 onSubmit={(intentId: string) => {
                   setStep(CheckoutStep.CONFIRMATION);

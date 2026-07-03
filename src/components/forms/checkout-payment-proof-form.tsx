@@ -15,6 +15,7 @@ import {
   PaymentProofContentType,
   type PaymentProofUploadRequest,
   PublicPlan,
+  openBoldEmbeddedCheckout,
 } from '@core/api';
 import { formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
@@ -26,6 +27,7 @@ interface CheckoutPaymentProofFormProps {
   paymentMethod: PaymentMethodType;
   finalPrice: number;
   requiresProof: boolean;
+  onClose: () => void;
   onBack: () => void;
   checkoutData: CheckoutFormValues;
   onSubmit: (intentId: string) => void;
@@ -36,6 +38,7 @@ export function CheckoutPaymentProofForm({
   paymentMethod,
   finalPrice,
   requiresProof,
+  onClose,
   onBack,
   checkoutData,
   onSubmit,
@@ -44,6 +47,9 @@ export function CheckoutPaymentProofForm({
   const { call: createIntent, isLoading: isCreating } = useCallablePromise((payload: CreatePaymentIntentPayload) =>
     DansshipAPI.payments.createIntent(payload),
   );
+  const { call: createBoldCheckout, isLoading: isCreatingBoldCheckout } = useCallablePromise(
+    (payload: CreatePaymentIntentPayload) => DansshipAPI.payments.createBoldCheckout(payload),
+  );
   const { call: getProofUploadUrl, isLoading: isGettingProofUploadUrl } = useCallablePromise(
     (id: string, payload: PaymentProofUploadRequest) => DansshipAPI.payments.getProofUploadUrl(id, payload),
   );
@@ -51,6 +57,8 @@ export function CheckoutPaymentProofForm({
     (id: string, payload: ConfirmPaymentProofPayload) => DansshipAPI.payments.confirmProofUpload(id, payload),
   );
   const isUploadingProof = isGettingProofUploadUrl || isConfirmingProofUpload;
+  const isCardMethod = paymentMethod === 'card';
+  const isBusy = isCreating || isCreatingBoldCheckout || isUploadingProof;
   const [selectedProofFile, setSelectedProofFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
@@ -63,12 +71,39 @@ export function CheckoutPaymentProofForm({
 
     const { start_date, discount_code } = checkoutData;
 
-    const { data: intent, ok } = await createIntent({
+    const payload: CreatePaymentIntentPayload = {
       plan_id: plan.id,
       payment_method_type: paymentMethod,
       discount_code: discount_code.trim() ? discount_code.trim() : undefined,
       start_date: start_date.toISOString(),
-    });
+    };
+
+    if (isCardMethod) {
+      const { data, ok } = await createBoldCheckout(payload);
+
+      if (!ok) {
+        toast.error(t('payments:createFailedDesc'));
+
+        return;
+      }
+
+      try {
+        onClose();
+
+        // Allow the dialog to unmount first so Bold modal is not blocked by another layer.
+        setTimeout(() => {
+          void openBoldEmbeddedCheckout(data.checkout).catch(() => {
+            toast.error(t('payments:boldLoadFailed'));
+          });
+        }, 0);
+      } catch {
+        toast.error(t('payments:boldLoadFailed'));
+      }
+
+      return;
+    }
+
+    const { data: intent, ok } = await createIntent(payload);
 
     if (ok) {
       if (requiresProof && selectedProofFile) {
@@ -182,11 +217,11 @@ export function CheckoutPaymentProofForm({
 
         <Button
           type='submit'
-          disabled={isCreating || isUploadingProof || (requiresProof && !selectedProofFile)}
+          disabled={isBusy || (requiresProof && !selectedProofFile)}
           onClick={() => onConfirm()}
           className='flex items-center'
         >
-          {isCreating || isUploadingProof ? t('subscriptions:processing') : t('payments:confirmPurchase')}
+          {isBusy ? t('subscriptions:processing') : t('payments:confirmPurchase')}
           <MdOutlinePayments />
         </Button>
       </div>

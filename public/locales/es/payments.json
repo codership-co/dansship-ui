@@ -21,6 +21,7 @@
   "proofUploading": "Subiendo comprobante...",
   "proofUploadSuccess": "Comprobante subido exitosamente",
   "proofUploadFailed": "Error al subir comprobante",
+  "boldLoadFailed": "No se pudo abrir la pasarela de pago. Intenta de nuevo.",
   "proofUploadFailedDesc": "No se pudo subir tu comprobante de pago.",
   "viewProof": "Ver comprobante subido",
   "proofViewFailed": "No se pudo abrir el comprobante",
@@ -40,6 +41,11 @@
   "createFailed": "Error en la compra",
   "createFailedDesc": "No se pudo crear el intento de pago.",
   "myPayments": "Mis Pagos",
+  "result": {
+    "title": "Resultado del pago",
+    "description": "Estamos validando el estado final de tu pago con Bold. Este resumen puede tardar unos segundos en actualizarse.",
+    "historyTitle": "Estado de tu compra"
+  },
   "inProgressEmptyState": "No tienes pagos en proceso.",
   "historicalEmptyState": "Aun no tienes pagos historicos.",
   "emptyState": "Aun no tienes pagos.",
@@ -59,7 +65,8 @@
     "transfer": "Transfiere a nuestra cuenta bancaria y sube el recibo.",
     "cash": "Paga directamente en recepcion del estudio.",
     "nequi": "Envia el pago a nuestro numero Nequi.",
-    "daviplata": "Envia el pago a nuestro numero Daviplata."
+    "daviplata": "Envia el pago a nuestro numero Daviplata.",
+    "card": "Paga con tarjeta debito o credito mediante Bold."
   },
   "purchaseType": {
     "plan": "Plan",
@@ -85,6 +92,10 @@
     "daviplata": {
       "title": "Instrucciones de pago Daviplata",
       "description": "Envia el pago a la cuenta Daviplata configurada y sube la captura."
+    },
+    "card": {
+      "title": "Pago con tarjeta (Bold)",
+      "description": "Al confirmar se abrira el checkout embebido de Bold para completar tu pago con seguridad."
     }
   },
   "status": {

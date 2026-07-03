@@ -15,3 +15,4 @@ export * from './instructor-dashboard.page';
 export * from './studio-rental-browse.page';
 export * from './studio-rental-requests.page';
 export * from './my-account-subscription.page';
+export * from './payments-result.page';

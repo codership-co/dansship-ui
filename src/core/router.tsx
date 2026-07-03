@@ -33,6 +33,7 @@ import {
   SecureOnboardingPage,
   SecureProfileEditPage,
   SecureProfilePage,
+  SecurePaymentsResultPage,
   SecureResetPasswordPage,
   SecureSignupPage,
   SecureStudioRentalBrowsePage,
@@ -96,6 +97,8 @@ const routes: Array<RouteObject> = [
               { path: 'bookings', Component: SecureMyAccountBookingsPage },
             ],
           },
+
+          { path: 'payments/result', Component: SecurePaymentsResultPage },
 
           {
             path: 'studio-rental',
