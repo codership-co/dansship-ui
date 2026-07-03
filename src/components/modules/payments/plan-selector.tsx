@@ -38,7 +38,7 @@ export function PlanSelector({ plans }: PlanSelectorProps) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [selectedPlan, setSelectedPlan] = useState<PublicPlan | null>(null);
+  const [selectedPlan, setSelectedPlan] = useState<PublicPlan | null>(plans[1]);
 
   const displayPlans = useMemo(() => orderPlansForDisplay(plans), [plans]);
 

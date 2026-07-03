@@ -3,6 +3,7 @@ import { TFunction } from 'i18next';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { LuArrowRight, LuX } from 'react-icons/lu';
 import { z } from 'zod';
 
 import { DateField, TextField } from '@components/form-fields';
@@ -80,7 +81,10 @@ export const CheckoutReviewPlanFormInput = ({
   const handleInternalSubmit = useCallback(
     async (formData: CheckoutFormValues) => {
       const { discount_code } = formData;
-      let discountData = DefaultDiscountData;
+      let discountData = {
+        ...DefaultDiscountData,
+        finalPrice: plan.price,
+      };
 
       if (!discount_code) {
         await onSubmit(formData, discountData);
@@ -123,8 +127,8 @@ export const CheckoutReviewPlanFormInput = ({
   );
 
   return (
-    <form onSubmit={handleSubmit(handleInternalSubmit)} className='space-y-6'>
-      <div className='grid gap-8'>
+    <form onSubmit={handleSubmit(handleInternalSubmit)} className='grid grid-rows-[1fr_auto] h-full'>
+      <div className='grid gap-8 content-start'>
         <DateField control={control} name='start_date' min={new Date()} label={t('subscriptions:startDate')} />
 
         <TextField
@@ -142,7 +146,9 @@ export const CheckoutReviewPlanFormInput = ({
               : undefined
           }
         />
+      </div>
 
+      <section className='grid gap-8'>
         <div className='pt-20'>
           <div className='mb-2 flex items-center justify-between'>
             <span className='text-gray-500'>{t('subscriptions:subtotal')}</span>
@@ -166,13 +172,17 @@ export const CheckoutReviewPlanFormInput = ({
         </div>
 
         <div className='flex justify-end gap-2 pt-4'>
-          <Button type='button' variant='outline' onClick={onCancel}>
+          <Button type='button' className='flex items-center' variant='outline' onClick={onCancel}>
+            <LuX />
             {t('common:cancel')}
           </Button>
 
-          <Button disabled={isLoading}>{t('common:next')}</Button>
+          <Button disabled={isLoading} className='flex items-center'>
+            {t('common:next')}
+            <LuArrowRight />
+          </Button>
         </div>
-      </div>
+      </section>
     </form>
   );
 };
