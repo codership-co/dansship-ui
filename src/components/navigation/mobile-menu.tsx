@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router';
 
 import { MenuItem, NavItem } from './navbar';
 
+import { Isotype, Logotype } from '@components/svg';
 import { Button } from '@components/ui';
 import { FEATURE_FLAG, useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
@@ -170,8 +171,10 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       <div className='fixed inset-y-0 left-0 w-64 bg-white shadow-xl flex flex-col'>
         <div className='p-4 flex items-center justify-between border-b'>
           <div className='flex items-center gap-2'>
-            <img src='/assets/images/logo.png' alt='Danssip' className='h-6 w-auto' />
-            <img src='/assets/images/logotipo.png' alt='Dansship' className='h-5 w-auto' />
+            <span className='size-8 rounded-full grid place-content-center bg-primary'>
+              <Isotype className='w-2/3 mx-auto' mainColor='var(--color-accent)' />
+            </span>
+            <Logotype className='h-5' />
           </div>
           <button onClick={onClose} className='text-gray-500 hover:text-gray-700'>
             <LuX className='w-6 h-6' />
