@@ -71,66 +71,66 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
       <div className='mx-auto w-full max-w-7xl p-2 sm:px-4 md:px-8 grid gap-8 my-auto max-h-screen sm:max-h-[80dvh] overflow-y-auto'>
         <FormStepperLayout
           steps={[
-              {
-                title: t('payments:checkoutTitle'),
-                subtitle: '',
-                step: CheckoutStep.REVIEW,
-                Icon: LuList,
-                form: (
-                  <section className='grid lg:grid-cols-[280px_1fr] items-start gap-8'>
-                    <PlanCard plan={plan} className='border-none' asIndividual />
-                    <CheckoutReviewPlanFormInput
-                      plan={plan}
-                      onCancel={onClose}
-                      onSubmit={handleSubmit}
-                      defaultFormValues={checkoutData}
-                    />
-                  </section>
-                ),
-              },
-              {
-                title: t('payments:selectMethod'),
-                subtitle: '',
-                step: CheckoutStep.METHOD,
-                Icon: LuCreditCard,
-                form: (
-                  <section>
-                    <PaymentMethodSelector
-                      value={paymentMethod}
-                      onChange={setPaymentMethod}
-                      availableMethods={['transfer', 'cash', 'nequi', 'daviplata', 'card']}
-                    />
-
-                    <div className='flex justify-end gap-2 pt-4'>
-                      <Button type='button' variant='outline' onClick={() => setStep(CheckoutStep.REVIEW)}>
-                        {t('common:back')}
-                      </Button>
-
-                      <Button type='button' onClick={() => setStep(CheckoutStep.CONFIRM)}>
-                        {t('common:next')}
-                      </Button>
-                    </div>
-                  </section>
-                ),
-              },
-              {
-                title: t('payments:confirmationTitle'),
-                subtitle: '',
-                step: CheckoutStep.CONFIRM,
-                Icon: LuReceipt,
-                form: (
-                  <CheckoutPaymentProofForm
+            {
+              title: t('payments:checkoutTitle'),
+              subtitle: '',
+              step: CheckoutStep.REVIEW,
+              Icon: LuList,
+              form: (
+                <section className='grid lg:grid-cols-[280px_1fr] items-start gap-8'>
+                  <PlanCard plan={plan} className='border-none' asIndividual />
+                  <CheckoutReviewPlanFormInput
                     plan={plan}
-                    checkoutData={checkoutData}
-                    paymentMethod={paymentMethod}
-                    finalPrice={discountData.finalPrice}
-                    requiresProof={requiresProof}
-                    onClose={onClose}
-                    onBack={() => setStep(CheckoutStep.METHOD)}
-                    onSubmit={(intentId: string) => {
-                      setStep(CheckoutStep.CONFIRMATION);
-                      setCreatedIntentId(intentId);
-                    }}
+                    onCancel={onClose}
+                    onSubmit={handleSubmit}
+                    defaultFormValues={checkoutData}
+                  />
+                </section>
+              ),
+            },
+            {
+              title: t('payments:selectMethod'),
+              subtitle: '',
+              step: CheckoutStep.METHOD,
+              Icon: LuCreditCard,
+              form: (
+                <section>
+                  <PaymentMethodSelector
+                    value={paymentMethod}
+                    onChange={setPaymentMethod}
+                    availableMethods={['transfer', 'cash', 'nequi', 'daviplata', 'card']}
+                  />
+
+                  <div className='flex justify-end gap-2 pt-4'>
+                    <Button type='button' variant='outline' onClick={() => setStep(CheckoutStep.REVIEW)}>
+                      {t('common:back')}
+                    </Button>
+
+                    <Button type='button' onClick={() => setStep(CheckoutStep.CONFIRM)}>
+                      {t('common:next')}
+                    </Button>
+                  </div>
+                </section>
+              ),
+            },
+            {
+              title: t('payments:confirmationTitle'),
+              subtitle: '',
+              step: CheckoutStep.CONFIRM,
+              Icon: LuReceipt,
+              form: (
+                <CheckoutPaymentProofForm
+                  plan={plan}
+                  checkoutData={checkoutData}
+                  paymentMethod={paymentMethod}
+                  finalPrice={discountData.finalPrice}
+                  requiresProof={requiresProof}
+                  onClose={onClose}
+                  onBack={() => setStep(CheckoutStep.METHOD)}
+                  onSubmit={(intentId: string) => {
+                    setStep(CheckoutStep.CONFIRMATION);
+                    setCreatedIntentId(intentId);
+                  }}
                 />
               ),
             },

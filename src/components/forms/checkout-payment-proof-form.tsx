@@ -13,8 +13,9 @@ import {
   PaymentProofContentType,
   type PaymentProofUploadRequest,
   PublicPlan,
+  openBoldEmbeddedCheckout,
 } from '@core/api';
-import { formatPrice, openBoldEmbeddedCheckout } from '@helpers';
+import { formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
 
 const fileAccept = `${PaymentProofContentType.JPEG},${PaymentProofContentType.PNG},${PaymentProofContentType.WEBP}`;
@@ -75,9 +76,9 @@ export function CheckoutPaymentProofForm({
     };
 
     if (isCardMethod) {
-      const { data, ok, error } = await createBoldCheckout(payload);
+      const { data, ok } = await createBoldCheckout(payload);
 
-      if (!ok || !data || error) {
+      if (!ok) {
         toast.error(t('payments:createFailedDesc'));
 
         return;

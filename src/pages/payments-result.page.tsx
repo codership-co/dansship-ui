@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router';
 
 import { PaymentStatusBadge, UserPaymentHistory } from '@components/modules';
 import { Card, CardContent, CardHeader, CardTitle } from '@components/ui';
+import { SecurityGuard } from '@contexts';
 import { type PaymentStatus } from '@core/api';
 
 const statusMap: Record<string, PaymentStatus> = {
@@ -48,4 +49,6 @@ function PaymentsResultPage() {
   );
 }
 
-export const SecurePaymentsResultPage = PaymentsResultPage;
+export const SecurePaymentsResultPage = SecurityGuard(PaymentsResultPage, {
+  featureFlags: [],
+});
