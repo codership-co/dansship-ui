@@ -17,11 +17,10 @@ export interface PaymentsResultsLoaderData {
 }
 
 export async function PaymentsResultsLoader({ url }: LoaderFunctionArgs): Promise<PaymentsResultsLoaderData> {
-  const intentIdState = window.history.state.usr?.intentId;
   const intentIdParam = url.searchParams.get('intentId');
   const boldIntentIdParam = url.searchParams.get('bold-order-id');
   const boldStatusParam = url.searchParams.get('bold-tx-status') || '';
-  const intentId = intentIdState || intentIdParam || boldIntentIdParam || '';
+  const intentId = intentIdParam || boldIntentIdParam || '';
 
   const { data } = await DansshipAPI.payments.getIntent(intentId);
 

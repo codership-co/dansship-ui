@@ -144,11 +144,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
                 onClose={onClose}
                 onBack={() => setStep(CheckoutStep.METHOD)}
                 onSubmit={(intentId: string) => {
-                  navigate(PageURLS.paymentsResult, {
-                    state: {
-                      intentId,
-                    },
-                  });
+                  navigate(`${PageURLS.paymentsResult}?intentId=${intentId}`);
                 }}
               />
             ),
