@@ -71,8 +71,8 @@
   },
   "methodDesc": {
     "transfer": "Transfiere a nuestra cuenta bancaria y sube el recibo.",
-    "cash": "Paga directamente en recepcion del estudio.",
-    "card": "Paga con tarjeta debito, credito ó con PSE mediante Bold"
+    "cash": "Paga directamente en la recepción de Dansship antes de tu clase.",
+    "card": "Paga con tarjeta de debito, credito ó con PSE mediante Bold"
   },
   "methodHelper": {
     "transfer": "Nequi, Daviplata, Bre-B ó cuenta bancaria.",
