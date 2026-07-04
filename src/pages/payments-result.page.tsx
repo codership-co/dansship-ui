@@ -90,7 +90,7 @@ function PaymentsResultPage() {
                 <PaymentStatusBadge status={intent.status} />
               </section>
 
-              <section className='border border-gray-200 rounded-2xl overflow-hidden'>
+              <section className='border py-4 border-gray-200 rounded-2xl overflow-hidden'>
                 {[
                   {
                     label: t('payments:createdAt'),

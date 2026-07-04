@@ -67,6 +67,8 @@
   "method": {
     "transfer": "Transferencia bancaria",
     "cash": "Efectivo",
+    "nequi": "Nequi",
+    "daviplata": "Daviplata",
     "card": "Tarjeta de credito/debito ó PSE"
   },
   "methodDesc": {
