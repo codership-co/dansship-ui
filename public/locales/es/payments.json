@@ -23,6 +23,7 @@
   "planLabel": "Plan",
   "planFallback": "Plan",
   "userLabel": "Usuario",
+
   "proofLabel": "Comprobante",
   "uploadProof": "Subir comprobante",
   "replaceProof": "Reemplazar comprobante",
@@ -66,16 +67,17 @@
   "method": {
     "transfer": "Transferencia bancaria",
     "cash": "Efectivo",
-    "nequi": "Nequi",
-    "daviplata": "Daviplata",
     "card": "Tarjeta de credito/debito ó PSE"
   },
   "methodDesc": {
     "transfer": "Transfiere a nuestra cuenta bancaria y sube el recibo.",
     "cash": "Paga directamente en recepcion del estudio.",
-    "nequi": "Envia el pago a nuestro numero Nequi.",
-    "daviplata": "Envia el pago a nuestro numero Daviplata.",
-    "card": "Paga con tarjeta debito, credito ó con PSE mediante Bold."
+    "card": "Paga con tarjeta debito, credito ó con PSE mediante Bold"
+  },
+  "methodHelper": {
+    "transfer": "Nequi, Daviplata, Bre-B ó cuenta bancaria.",
+    "cash": "",
+    "card": "Tarjeta debito/credito, PSE."
   },
   "purchaseType": {
     "plan": "Plan",

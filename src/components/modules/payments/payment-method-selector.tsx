@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { LuBuilding2, LuCircleDollarSign, LuCreditCard, LuLandmark, LuSmartphone } from 'react-icons/lu';
+import { LuCircleDollarSign, LuCreditCard, LuLandmark } from 'react-icons/lu';
 
 import { PaymentMethod } from '@core/api';
 import { cn } from '@helpers';
@@ -14,26 +14,19 @@ const PaymentMethods = {
     Icon: LuCreditCard,
     title: 'payments:method.card',
     description: 'payments:methodDesc.card',
-  },
-  [PaymentMethod.NEQUI]: {
-    Icon: LuSmartphone,
-    title: 'payments:method.nequi',
-    description: 'payments:methodDesc.nequi',
-  },
-  [PaymentMethod.DAVIPLATA]: {
-    Icon: LuBuilding2,
-    title: 'payments:method.daviplata',
-    description: 'payments:methodDesc.daviplata',
+    helperText: 'payments:methodHelper.card',
   },
   [PaymentMethod.TRANSFER]: {
     Icon: LuLandmark,
     title: 'payments:method.transfer',
     description: 'payments:methodDesc.transfer',
+    helperText: 'payments:methodHelper.transfer',
   },
   [PaymentMethod.CASH]: {
     Icon: LuCircleDollarSign,
     title: 'payments:method.cash',
     description: 'payments:methodDesc.cash',
+    helperText: 'payments:methodHelper.cash',
   },
 };
 
@@ -42,7 +35,7 @@ export function PaymentMethodSelector({ value, onChange }: PaymentMethodSelector
 
   return (
     <div className='space-y-2'>
-      {Object.entries(PaymentMethods).map(([method, { Icon, title, description }]) => {
+      {Object.entries(PaymentMethods).map(([method, { Icon, title, description, helperText }]) => {
         const isSelected = value === method;
 
         return (
@@ -58,8 +51,9 @@ export function PaymentMethodSelector({ value, onChange }: PaymentMethodSelector
             <div className='flex items-center gap-6'>
               <Icon className='size-8 text-primary shrink-0' />
               <div>
-                <p className='m-0'>{t(title)}</p>
-                <label className='text-gray-500'>{t(description)}</label>
+                <p className='m-0 mb-2'>{t(title)}</p>
+                <label className='block my-1'>{t(description)}</label>
+                <small className='block m-0'>{t(helperText)}</small>
               </div>
             </div>
           </button>

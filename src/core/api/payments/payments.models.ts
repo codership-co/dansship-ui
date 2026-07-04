@@ -1,8 +1,6 @@
 export enum PaymentMethod {
   TRANSFER = 'transfer',
   CASH = 'cash',
-  NEQUI = 'nequi',
-  DAVIPLATA = 'daviplata',
   CARD = 'card',
 }
 
