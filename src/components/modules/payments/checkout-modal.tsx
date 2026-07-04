@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LuArrowLeft, LuArrowRight, LuCheck, LuCreditCard, LuList, LuReceipt } from 'react-icons/lu';
+import { LuArrowLeft, LuArrowRight, LuCreditCard, LuList, LuReceipt } from 'react-icons/lu';
 import { useNavigate } from 'react-router';
 
 import { PaymentMethodSelector } from './payment-method-selector';
@@ -23,7 +23,6 @@ export enum CheckoutStep {
   REVIEW = 'REVIEW',
   METHOD = 'METHOD',
   CONFIRM = 'CONFIRM',
-  CONFIRMATION = 'CONFIRMATION',
 }
 
 interface CheckoutModalProps {
@@ -50,7 +49,6 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
   const navigate = useNavigate();
   const [step, setStep] = useState<CheckoutStep>(CheckoutStep.REVIEW);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
-  const [createdIntentId, setCreatedIntentId] = useState<string>('');
   const requiresProof = paymentMethod === 'transfer' || paymentMethod === 'nequi' || paymentMethod === 'daviplata';
   const [checkoutData, setCheckoutData] = useState<CheckoutFormValues>({
     start_date: new Date(),
@@ -146,8 +144,6 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
                 onClose={onClose}
                 onBack={() => setStep(CheckoutStep.METHOD)}
                 onSubmit={(intentId: string) => {
-                  setStep(CheckoutStep.CONFIRMATION);
-                  setCreatedIntentId(intentId);
                   navigate(PageURLS.paymentsResult, {
                     state: {
                       intentId,
@@ -155,26 +151,6 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
                   });
                 }}
               />
-            ),
-          },
-          {
-            title: t('payments:intentCreatedTitle'),
-            subtitle: t('payments:intentCreatedDesc'),
-            step: CheckoutStep.CONFIRMATION,
-            Icon: LuCheck,
-            form: (
-              <div className='space-y-3 text-center'>
-                {createdIntentId ? (
-                  <p className='text-xs text-gray-500'>
-                    {t('payments:reference')}: {createdIntentId}
-                  </p>
-                ) : null}
-                <div className='flex justify-end gap-2 pt-4'>
-                  <Button type='button' onClick={onClose}>
-                    {t('common:close')}
-                  </Button>
-                </div>
-              </div>
             ),
           },
         ]}
