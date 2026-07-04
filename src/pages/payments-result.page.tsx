@@ -66,13 +66,20 @@ function PaymentsResultPage() {
   );
 
   return (
-    <div className='px-8 pt-8 max-w-7xl mx-auto grid gap-8'>
+    <div className='px-2 sm:px-4 md:px-8 pt-8 max-w-7xl mx-auto grid gap-8'>
       <h3>{t('payments:result.title')}</h3>
 
       {intent && (
         <section className='rounded-2xl shadow-2xl'>
-          <section className='bg-white p-8 rounded-2xl grid grid-cols-[1fr_1fr] gap-8 overflow-hidden'>
-            <section className='grid content-center gap-4 py-14'>
+          <section className='bg-white p-8 rounded-2xl grid md:grid-cols-[1fr_1fr] gap-8 overflow-hidden'>
+            <section className='relative min-h-70 bg-primary text-primary-foreground px-8 py-16 rounded-lg shadow-lg'>
+              <img
+                src='/assets/images/bailarina.png'
+                alt='Dansship'
+                className='absolute w-40 xs:w-50 sm:w-60 md:w-50/100 bottom-1/2 right-1/2 translate-1/2'
+              />
+            </section>
+            <section className='grid content-center gap-4 py-14 relative bg-white'>
               <h4 className='m-0 text-center'>{intent.purchase_reference?.human_identifier}</h4>
               {intent.payment_method_type === PaymentMethod.CARD ? (
                 <p className='m-0 text-center'>{t('payments:result.description')}</p>
@@ -141,13 +148,6 @@ function PaymentsResultPage() {
                   </Button>
                 )}
               </section>
-            </section>
-            <section className='relative bg-primary text-primary-foreground px-8 py-16 rounded-lg shadow-lg'>
-              <img
-                src='/assets/images/bailarina.png'
-                alt='Dansship'
-                className='absolute w-4/10 bottom-1/2 right-1/2 translate-1/2'
-              />
             </section>
           </section>
         </section>
