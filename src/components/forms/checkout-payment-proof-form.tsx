@@ -11,11 +11,11 @@ import {
   type ConfirmPaymentProofPayload,
   type CreatePaymentIntentPayload,
   DansshipAPI,
+  openBoldEmbeddedCheckout,
+  PaymentMethod,
   PaymentProofContentType,
   type PaymentProofUploadRequest,
   PublicPlan,
-  openBoldEmbeddedCheckout,
-  PaymentMethod,
 } from '@core/api';
 import { formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
@@ -26,7 +26,6 @@ interface CheckoutPaymentProofFormProps {
   plan: PublicPlan;
   paymentMethod: PaymentMethod;
   finalPrice: number;
-  requiresProof: boolean;
   onClose: () => void;
   onBack: () => void;
   checkoutData: CheckoutFormValues;
@@ -37,7 +36,6 @@ export function CheckoutPaymentProofForm({
   plan,
   paymentMethod,
   finalPrice,
-  requiresProof,
   onClose,
   onBack,
   checkoutData,
@@ -57,7 +55,8 @@ export function CheckoutPaymentProofForm({
     (id: string, payload: ConfirmPaymentProofPayload) => DansshipAPI.payments.confirmProofUpload(id, payload),
   );
   const isUploadingProof = isGettingProofUploadUrl || isConfirmingProofUpload;
-  const isCardMethod = paymentMethod === 'card';
+  const isCardMethod = paymentMethod === PaymentMethod.CARD;
+  const requiresProof = paymentMethod === PaymentMethod.TRANSFER;
   const isBusy = isCreating || isCreatingBoldCheckout || isUploadingProof;
   const [selectedProofFile, setSelectedProofFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);

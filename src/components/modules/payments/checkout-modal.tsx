@@ -49,7 +49,6 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
   const navigate = useNavigate();
   const [step, setStep] = useState<CheckoutStep>(CheckoutStep.REVIEW);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
-  const requiresProof = paymentMethod === 'transfer' || paymentMethod === 'nequi' || paymentMethod === 'daviplata';
   const [checkoutData, setCheckoutData] = useState<CheckoutFormValues>({
     start_date: new Date(),
     discount_code: '',
@@ -140,7 +139,6 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
                 checkoutData={checkoutData}
                 paymentMethod={paymentMethod ?? PaymentMethod.CARD}
                 finalPrice={discountData.finalPrice}
-                requiresProof={requiresProof}
                 onClose={onClose}
                 onBack={() => setStep(CheckoutStep.METHOD)}
                 onSubmit={(intentId: string) => {
