@@ -174,7 +174,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             <span className='size-8 rounded-full grid place-content-center bg-primary'>
               <Isotype className='w-2/3 mx-auto' mainColor='var(--color-accent)' />
             </span>
-            <Logotype className='h-5' />
+            <Logotype className='h-5 text-primary' />
           </div>
           <button onClick={onClose} className='text-gray-500 hover:text-gray-700'>
             <LuX className='w-6 h-6' />

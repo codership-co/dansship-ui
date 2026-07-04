@@ -13,7 +13,7 @@ export const RootLoader = () => {
           <Isotype mainColor='var(--color-primary-foreground)' className='w-2/3' />
         </section>
       </div>
-      <Logotype className='h-13 animate-fade-in-down duration-200 opacity-0 [animation-delay:100ms]' />
+      <Logotype className='text-primary h-13 animate-fade-in-down duration-200 opacity-0 [animation-delay:100ms]' />
     </section>
   );
 };

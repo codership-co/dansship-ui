@@ -2,10 +2,6 @@ import { formatDistance } from 'date-fns';
 
 import { getDateLocale } from '@hooks';
 
-/**
- * Format a date as "Month Year" respecting the given language.
- * @param lang - i18n language code (e.g. 'en', 'es'). Defaults to 'en'.
- */
 export const formatDate = (date: string | Date, lang = 'en'): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 
@@ -15,10 +11,20 @@ export const formatDate = (date: string | Date, lang = 'en'): string => {
   }).format(dateObj);
 };
 
-/**
- * Return a human-readable relative time string using date-fns (locale-aware).
- * @param lang - i18n language code (e.g. 'en', 'es'). Defaults to 'en'.
- */
+export const formatDateTime = (date: string | Date, lang = 'en'): string => {
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+
+  return new Intl.DateTimeFormat(lang === 'es' ? 'es-ES' : 'en-US', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  }).format(dateObj);
+};
+
 export const getRelativeTime = (date: string | Date, lang = 'en'): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 

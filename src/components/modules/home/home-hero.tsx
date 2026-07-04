@@ -16,7 +16,7 @@ export const HomeHero = () => {
     <Section compact className='bg-gradient-hero'>
       <div className='relative gap-10 xl:gap-20 home-hero transition-[all_300ms_ease] pb-7 pt-20 md:pt-30 lg:pt-40 lg:pb-10'>
         <div className='grid gap-4 content-center max-w-xl' style={{ gridArea: 'text' }}>
-          <Logotype className='h-8' />
+          <Logotype className='h-8 text-primary' />
 
           <h1 className='text-accent leading-none m-0 mt-6'>
             <Trans

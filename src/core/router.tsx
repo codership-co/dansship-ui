@@ -41,6 +41,7 @@ import {
   SecureVerifyEmailPage,
   UiPage,
   HomeLoader,
+  PaymentsResultsLoader,
 } from '@pages';
 
 /* eslint-disable line-comment-position */ // This is temporal meanwhile I can finish the migration of all pages
@@ -98,7 +99,7 @@ const routes: Array<RouteObject> = [
             ],
           },
 
-          { path: 'payments/result', Component: SecurePaymentsResultPage },
+          { path: 'payments/result', Component: SecurePaymentsResultPage, loader: PaymentsResultsLoader },
 
           {
             path: 'studio-rental',

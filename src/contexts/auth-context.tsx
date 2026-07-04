@@ -341,7 +341,7 @@ export function SecurityGuard(
       const { pathname } = location;
 
       if ((requiresAuth && !isAuthenticated) || (requiresNoAuth && isAuthenticated)) {
-        return redirect ? <Navigate to={redirect} state={{ from: location }} replace /> : <Error404Page />;
+        return redirect ? <Navigate to={redirect} state={{ from: location }} /> : <Error404Page />;
       }
 
       if (!validFeatureFlags) {
@@ -353,11 +353,11 @@ export function SecurityGuard(
       }
 
       if (isAuthenticated && requireOnboarding && pathname !== PageURLS.auth.onboarding) {
-        return <Navigate to={PageURLS.auth.onboarding} state={{ from: location }} replace />;
+        return <Navigate to={PageURLS.auth.onboarding} state={{ from: location }} />;
       }
 
       if (isAuthenticated && getPendingPlanCheckoutIntent() && pathname !== PageURLS.home) {
-        return <Navigate to={PageURLS.home} state={{ from: location }} replace />;
+        return <Navigate to={PageURLS.home} state={{ from: location }} />;
       }
 
       return <Component />;

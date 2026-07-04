@@ -41,7 +41,14 @@ export class DansshipAPI {
 
   static {
     this.httpClient.setOnErrorInterceptor(async (request, response) => {
-      window.dispatchEvent(new CustomEvent('auth:session-expired'));
+      if (response.status === 401) {
+        const { ok } = await this.auth.refreshToken();
+
+        if (!ok) {
+          window.dispatchEvent(new CustomEvent('auth:session-expired'));
+        }
+      }
+
       // eslint-disable-next-line no-console
       console.log({ request, response });
     });
