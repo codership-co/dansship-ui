@@ -2,12 +2,12 @@ import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoaderFunctionArgs, useLoaderData, useRevalidator } from 'react-router';
 
-import { UserPaymentHistory } from '@components/modules';
+import { PaymentStatusBadge, UserPaymentHistory } from '@components/modules';
 import { Button } from '@components/ui';
 import { SecurityGuard } from '@contexts';
 import { DansshipAPI, PaymentIntentDetail, PaymentMethod } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { formatDateTime, formatPrice } from '@helpers';
+import { cn, formatDateTime, formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
 
 export interface PaymentsResultsLoaderData {
@@ -35,7 +35,7 @@ export async function PaymentsResultsLoader({ url }: LoaderFunctionArgs): Promis
 function PaymentsResultPage() {
   const { t, i18n } = useTranslation();
   const revalidator = useRevalidator();
-  const { intent } = useLoaderData<PaymentsResultsLoaderData>();
+  const { intent, intentId } = useLoaderData<PaymentsResultsLoaderData>();
   const { call: cancelIntentPromise, isLoading: isCancellingIntent } = useCallablePromise((id: string) =>
     DansshipAPI.payments.cancelIntent(id),
   );
@@ -69,54 +69,74 @@ function PaymentsResultPage() {
     <div className='px-2 sm:px-4 md:px-8 pt-8 max-w-7xl mx-auto grid gap-8'>
       <h3>{t('payments:result.title')}</h3>
 
-      {intent && (
+      {intent ? (
         <section className='rounded-2xl shadow-2xl'>
           <section className='bg-white p-8 rounded-2xl grid md:grid-cols-[1fr_1fr] gap-8 overflow-hidden'>
             <section className='relative min-h-70 bg-primary text-primary-foreground px-8 py-16 rounded-lg shadow-lg'>
               <img
                 src='/assets/images/bailarina.png'
                 alt='Dansship'
-                className='absolute w-40 xs:w-50 sm:w-60 md:w-50/100 bottom-1/2 right-1/2 translate-1/2'
+                className='absolute w-40 xs:w-50 sm:w-60 md:w-60/100 bottom-1/2 right-1/2 translate-1/2'
               />
             </section>
             <section className='grid content-center gap-4 py-14 relative bg-white'>
               <h4 className='m-0 text-center'>{intent.purchase_reference?.human_identifier}</h4>
-              {intent.payment_method_type === PaymentMethod.CARD ? (
-                <p className='m-0 text-center'>{t('payments:result.description')}</p>
-              ) : (
-                <p className='m-0 text-center'>{t('payments:intentCreatedDesc')}</p>
-              )}
+              {intent.payment_method_type === PaymentMethod.CARD &&
+                ['pending', 'pending_manual_review'].includes(intent.status) && (
+                  <p className='m-0 text-center'>{t('payments:result.description')}</p>
+                )}
+
+              <section className='grid place-content-center gap-1 justify-items-center'>
+                <small className='m-0'>{t('payments:intentStatus')}</small>
+                <PaymentStatusBadge status={intent.status} />
+              </section>
 
               <section className='border border-gray-200 rounded-2xl overflow-hidden'>
                 {[
                   {
-                    label: t('payments:ammount'),
-                    value: formatPrice(intent.amount, intent.currency),
+                    label: t('payments:createdAt'),
+                    value: formatDateTime(intent.created_at, i18n.language),
+                  },
+                  {
+                    label: t('payments:referenceId'),
+                    value: <span className='font-code'>{intent.reference_id}</span>,
                   },
                   {
                     label: t('payments:methodLabel'),
                     value: t(`payments:method.${intent.payment_method_type}`),
                   },
                   {
-                    label: t('payments:createdAt'),
-                    value: formatDateTime(intent.created_at, i18n.language),
+                    label: '',
+                    value: '',
                   },
                   {
-                    label: t('payments:intentStatus'),
-                    value: t(`payments:status.${intent.status}`),
+                    label: t('payments:subtotal'),
+                    value: formatPrice(intent.amount * 0.81, intent.currency),
                   },
                   {
-                    label: t('payments:referenceId'),
-                    value: <span className='font-code'>{intent.reference_id}</span>,
+                    label: t('payments:iva'),
+                    value: formatPrice(intent.amount * 0.19, intent.currency),
+                  },
+                  {
+                    label: t('payments:ammount'),
+                    value: formatPrice(intent.amount, intent.currency),
                   },
                 ].map(({ label, value }) => (
                   <section
                     key={label}
-                    className='grid grid-cols-[auto_1fr_auto] justify-between gap-2 items-center px-4 py-2 hover:bg-gray-100'
+                    className={cn(
+                      'grid grid-cols-[auto_1fr_auto] justify-between gap-2 items-center',
+                      label && 'px-4 py-2 hover:bg-gray-100',
+                      !label && 'border-b border-gray-200 my-4',
+                    )}
                   >
-                    <small className='m-0'>{label}</small>
-                    <span className='border-b border-dashed border-gray-300' />
-                    <small className='m-0'>{value}</small>
+                    {label && (
+                      <>
+                        <small className='m-0'>{label}</small>
+                        <span className='border-b border-dashed border-gray-300' />
+                        <small className='m-0'>{value}</small>
+                      </>
+                    )}
                   </section>
                 ))}
               </section>
@@ -126,7 +146,7 @@ function PaymentsResultPage() {
                 <small className='m-0 block font-code px-4 py-2'>{intent.id}</small>
               </section>
 
-              <section className='flex gap-8 items-center'>
+              <section className='flex gap-8 items-center justify-end mt-4'>
                 {intent.proof_url && (
                   <Button
                     size='sm'
@@ -148,6 +168,28 @@ function PaymentsResultPage() {
                   </Button>
                 )}
               </section>
+            </section>
+          </section>
+        </section>
+      ) : (
+        <section className='rounded-2xl shadow-2xl'>
+          <section className='bg-white rounded-2xl grid md:grid-cols-[3fr_2fr] overflow-hidden'>
+            <section className='grid px-8 py-40 place-content-center gap-4 justify-items-center text-center'>
+              <p className='whitespace-pre-line m-0'>{t('payments:intentDetailsNotFound')}</p>
+              <section className='bg-gray-200/60 rounded-2xl flex overflow-hidden'>
+                <small className='m-0 block bg-gray-200 px-4 py-2'>{t('payments:intentId')}</small>
+                <small className='m-0 block font-code px-4 py-2'>{intentId}</small>
+              </section>
+              <Button onClick={() => revalidator.revalidate()} disabled={revalidator.state === 'loading'}>
+                {t('payments:retryIntentDetails')}
+              </Button>
+            </section>
+            <section className='relative bg-accent hidden md:block'>
+              <img
+                src='/assets/images/bailarina.png'
+                alt='Dansship'
+                className='absolute w-60/100 bottom-1/2 right-1/2 translate-1/2'
+              />
             </section>
           </section>
         </section>
