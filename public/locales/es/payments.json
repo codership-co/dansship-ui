@@ -59,14 +59,14 @@
     "cash": "Efectivo",
     "nequi": "Nequi",
     "daviplata": "Daviplata",
-    "card": "Tarjeta de credito/debito"
+    "card": "Tarjeta de credito/debito ó PSE"
   },
   "methodDesc": {
     "transfer": "Transfiere a nuestra cuenta bancaria y sube el recibo.",
     "cash": "Paga directamente en recepcion del estudio.",
     "nequi": "Envia el pago a nuestro numero Nequi.",
     "daviplata": "Envia el pago a nuestro numero Daviplata.",
-    "card": "Paga con tarjeta debito o credito mediante Bold."
+    "card": "Paga con tarjeta debito, credito ó con PSE mediante Bold."
   },
   "purchaseType": {
     "plan": "Plan",

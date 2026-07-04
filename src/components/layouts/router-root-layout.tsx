@@ -29,7 +29,7 @@ const Layout = ({ children }: LayoutProps) => {
 
 const SecurityOutlet = SecurityGuard(Outlet);
 
-export const RootLayout = () => {
+export const RouterRootLayout = () => {
   return (
     <AuthProvider>
       <FeatureFlagsProvider>

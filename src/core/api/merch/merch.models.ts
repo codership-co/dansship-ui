@@ -1,4 +1,4 @@
-import type { PaymentMethodType, PaymentStatus } from '../payments/payments.models';
+import { PaymentMethod, PaymentProofContentType, PaymentStatus } from '../payments/payments.models';
 
 export interface ListEnvelope<T> {
   items: Array<T>;
@@ -64,7 +64,7 @@ export type OrderUserSummary = EntityReference;
 export interface OrderPaymentSummary {
   id: string;
   status: PaymentStatus;
-  payment_method_type: PaymentMethodType;
+  payment_method_type: PaymentMethod;
   proof_url?: string | null;
 }
 
@@ -103,7 +103,7 @@ export interface CreateOrderItemPayload {
 export interface CreateOrderPayload {
   customer_id: string;
   items: Array<CreateOrderItemPayload>;
-  payment_method_type: PaymentMethodType;
+  payment_method_type: PaymentMethod;
 }
 
 export interface CartItem {
@@ -118,7 +118,7 @@ export interface CustomerSearchUser {
 }
 
 export interface ProductImageUploadRequest {
-  content_type: 'image/jpeg' | 'image/png' | 'image/webp';
+  content_type: PaymentProofContentType;
 }
 
 export interface ProductImageUploadResponse {

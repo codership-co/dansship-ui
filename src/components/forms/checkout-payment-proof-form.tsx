@@ -11,11 +11,11 @@ import {
   type ConfirmPaymentProofPayload,
   type CreatePaymentIntentPayload,
   DansshipAPI,
-  type PaymentMethodType,
   PaymentProofContentType,
   type PaymentProofUploadRequest,
   PublicPlan,
   openBoldEmbeddedCheckout,
+  PaymentMethod,
 } from '@core/api';
 import { formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
@@ -24,7 +24,7 @@ const fileAccept = `${PaymentProofContentType.JPEG},${PaymentProofContentType.PN
 
 interface CheckoutPaymentProofFormProps {
   plan: PublicPlan;
-  paymentMethod: PaymentMethodType;
+  paymentMethod: PaymentMethod;
   finalPrice: number;
   requiresProof: boolean;
   onClose: () => void;
@@ -141,7 +141,7 @@ export function CheckoutPaymentProofForm({
 
     if (!file) return;
 
-    const isValidType = ['image/jpeg', 'image/png', 'image/webp'].includes(file.type);
+    const isValidType = Object.values(PaymentProofContentType).includes(file.type as PaymentProofContentType);
 
     if (!isValidType) {
       toast.error(t('payments:proofInvalidTypeTitle'));

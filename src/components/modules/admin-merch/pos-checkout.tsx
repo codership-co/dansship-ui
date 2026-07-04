@@ -7,23 +7,25 @@ import { CustomerSearch } from './customer-search';
 import { PaymentMethodSelector } from '@components/modules';
 import { Button } from '@components/ui';
 import { useOrPermissions } from '@contexts';
-import { type CustomerSearchUser, PaymentMethodType } from '@core/api';
+import {
+  type CustomerSearchUser,
+  PaymentMethod,
+  PaymentProofContentType,
+  PaymentProofContentTypesList,
+} from '@core/api';
 import { PERMISSION } from '@core/permissions';
 import { formatMerchPrice } from '@helpers';
 
 interface POSCheckoutProps {
   selectedCustomer: CustomerSearchUser | null;
   onSelectCustomer: (customer: CustomerSearchUser) => void;
-  selectedPaymentMethod: PaymentMethodType;
-  onSelectPaymentMethod: (method: PaymentMethodType) => void;
+  selectedPaymentMethod: PaymentMethod;
+  onSelectPaymentMethod: (method: PaymentMethod) => void;
   cartTotal: number;
   canSubmit: boolean;
   onSubmit: (proofFile?: File | null, proofUploadMode?: 'owner' | 'admin') => Promise<void>;
   isSubmitting?: boolean;
 }
-
-const AVAILABLE_METHODS: Array<PaymentMethodType> = ['transfer', 'cash', 'nequi', 'daviplata', 'card'];
-const ACCEPTED_PROOF_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
 
 export function POSCheckout({
   selectedCustomer,
@@ -46,7 +48,7 @@ export function POSCheckout({
     PERMISSION.ORDER_CREATE,
   ]);
 
-  const proofAccept = useMemo(() => ACCEPTED_PROOF_TYPES.join(','), []);
+  const proofAccept = useMemo(() => Object.values(PaymentProofContentType).join(','), []);
 
   useEffect(() => {
     if (!selectedProofFile) {
@@ -66,7 +68,7 @@ export function POSCheckout({
   const handleProofFileSelect = (file: File | null) => {
     if (!file) return;
 
-    if (!ACCEPTED_PROOF_TYPES.includes(file.type as (typeof ACCEPTED_PROOF_TYPES)[number])) {
+    if (!PaymentProofContentTypesList.includes(file.type as PaymentProofContentType)) {
       setSelectedProofFile(null);
       setProofValidationError(
         t('payments:proofInvalidTypeDesc', {
@@ -87,11 +89,7 @@ export function POSCheckout({
 
       <div className='space-y-2'>
         <p className='text-sm font-medium text-gray-700'>{t('payments:selectMethod')}</p>
-        <PaymentMethodSelector
-          value={selectedPaymentMethod}
-          onChange={onSelectPaymentMethod}
-          availableMethods={AVAILABLE_METHODS}
-        />
+        <PaymentMethodSelector value={selectedPaymentMethod} onChange={onSelectPaymentMethod} />
       </div>
 
       <div className='flex items-center justify-between border-t pt-3'>

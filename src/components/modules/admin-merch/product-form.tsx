@@ -6,8 +6,13 @@ import { LuImagePlus, LuX } from 'react-icons/lu';
 import { z } from 'zod';
 
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input, Label, Textarea } from '@components/ui';
-
-import type { CreateProductPayload, Product, UpdateProductPayload } from '@core/api';
+import {
+  CreateProductPayload,
+  PaymentProofContentType,
+  PaymentProofContentTypesList,
+  Product,
+  UpdateProductPayload,
+} from '@core/api';
 
 const productSchema = z.object({
   name: z.string().trim().min(1, 'Name is required'),
@@ -20,7 +25,6 @@ const productSchema = z.object({
 
 type ProductFormInput = z.input<typeof productSchema>;
 type ProductFormOutput = z.output<typeof productSchema>;
-const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
 
 interface ProductFormSubmitOptions {
   imageFile?: File | null;
@@ -41,7 +45,7 @@ export function ProductForm({ open, initialData, isLoading = false, onClose, onS
   const [selectedImagePreview, setSelectedImagePreview] = useState<string | null>(null);
   const [removeImage, setRemoveImage] = useState(false);
   const [imageValidationError, setImageValidationError] = useState<string | null>(null);
-  const acceptedImageTypes = useMemo(() => ACCEPTED_IMAGE_TYPES.join(','), []);
+  const acceptedImageTypes = useMemo(() => PaymentProofContentTypesList.join(','), []);
 
   const {
     register,
@@ -113,7 +117,7 @@ export function ProductForm({ open, initialData, isLoading = false, onClose, onS
   const handleImageSelect = (file: File | null) => {
     if (!file) return;
 
-    if (!ACCEPTED_IMAGE_TYPES.includes(file.type as (typeof ACCEPTED_IMAGE_TYPES)[number])) {
+    if (!PaymentProofContentTypesList.includes(file.type as PaymentProofContentType)) {
       setSelectedImageFile(null);
       setImageValidationError(
         t('merch:imageInvalidType', {

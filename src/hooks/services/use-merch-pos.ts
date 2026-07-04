@@ -10,19 +10,19 @@ import {
   CustomerSearchUser,
   DansshipAPI,
   Order,
-  PaymentMethodType,
+  PaymentMethod,
   PaymentProofContentType,
+  PaymentProofContentTypesList,
   Product,
 } from '@core/api';
 
-const DEFAULT_PAYMENT_METHOD: PaymentMethodType = 'cash';
-const ACCEPTED_PROOF_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+const DEFAULT_PAYMENT_METHOD = PaymentMethod.CASH;
 
 export const useMerchPos = () => {
   const { t } = useTranslation();
   const [cart, setCart] = useState<Array<CartItem>>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerSearchUser | null>(null);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethodType>(DEFAULT_PAYMENT_METHOD);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>(DEFAULT_PAYMENT_METHOD);
   const [latestCreatedOrder, setLatestCreatedOrder] = useState<Order | null>(null);
 
   const cartTotal = useMemo(() => cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0), [cart]);
@@ -191,7 +191,7 @@ export const useMerchPos = () => {
 
     if (!proofFile || !createdOrder) return true;
 
-    if (!ACCEPTED_PROOF_TYPES.has(proofFile.type)) {
+    if (!PaymentProofContentTypesList.includes(proofFile.type)) {
       toast.error(t('payments:proofInvalidTypeDesc'));
 
       return false;

@@ -31,16 +31,16 @@ import {
   Textarea,
 } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
-import { PageURLS } from '@core/constants';
-import { AdminPermissions } from '@core/permissions';
-import { useAdminFigures } from '@hooks';
-
-import type {
+import {
   AdminFigure,
   FigureAdminCreatePayload,
   FigureAdminStatusFilter,
   FigureAdminUpdatePayload,
+  PaymentProofContentTypesList,
 } from '@core/api';
+import { PageURLS } from '@core/constants';
+import { AdminPermissions } from '@core/permissions';
+import { useAdminFigures } from '@hooks';
 
 type FigureFormState = {
   name: string;
@@ -583,7 +583,7 @@ function AdminFiguresPage() {
                     </p>
                     <Input
                       type='file'
-                      accept='image/jpeg,image/png,image/webp'
+                      accept={PaymentProofContentTypesList.join(',')}
                       disabled={isUploadingImage || isRemovingImage}
                       onChange={event => {
                         const file = event.target.files?.[0];

@@ -20,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from '@components/ui';
-import { CreateProductPayload, DansshipAPI, Product, UpdateProductPayload } from '@core/api';
+import { CreateProductPayload, DansshipAPI, PaymentProofContentType, Product, UpdateProductPayload } from '@core/api';
 import { formatMerchPrice } from '@helpers';
 import { useProducts, usePromise } from '@hooks';
 
@@ -107,7 +107,7 @@ export function ProductList() {
       setIsUploadingImage(true);
       try {
         const { data: imageUploadURL, ok } = await DansshipAPI.merchAdmin.getProductImageUploadUrl(targetProductId, {
-          content_type: imageFile.type as 'image/jpeg' | 'image/png' | 'image/webp',
+          content_type: imageFile.type as PaymentProofContentType,
         });
 
         if (!ok) {

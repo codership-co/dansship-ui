@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuArrowLeft, LuArrowRight, LuCheck, LuCreditCard, LuList, LuReceipt } from 'react-icons/lu';
+import { useNavigate } from 'react-router';
 
 import { PaymentMethodSelector } from './payment-method-selector';
 
@@ -14,7 +15,8 @@ import {
 import { FormStepperLayout } from '@components/layouts';
 import { PlanCard } from '@components/modules';
 import { Button, Dialog, DialogContent } from '@components/ui';
-import { type PublicPlan, type PaymentMethodType } from '@core/api';
+import { PaymentMethod, type PublicPlan } from '@core/api';
+import { PageURLS } from '@core/constants';
 import { cn } from '@helpers';
 
 export enum CheckoutStep {
@@ -45,8 +47,9 @@ interface ModalContentProps {
 function ModalContent({ onClose, plan }: ModalContentProps) {
   const { t } = useTranslation();
 
+  const navigate = useNavigate();
   const [step, setStep] = useState<CheckoutStep>(CheckoutStep.REVIEW);
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodType>('transfer');
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const [createdIntentId, setCreatedIntentId] = useState<string>('');
   const requiresProof = paymentMethod === 'transfer' || paymentMethod === 'nequi' || paymentMethod === 'daviplata';
   const [checkoutData, setCheckoutData] = useState<CheckoutFormValues>({
@@ -102,11 +105,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
             Icon: LuCreditCard,
             form: (
               <section className='grid grid-rows-[1fr_auto] h-full'>
-                <PaymentMethodSelector
-                  value={paymentMethod}
-                  onChange={setPaymentMethod}
-                  availableMethods={['transfer', 'cash', 'nequi', 'daviplata', 'card']}
-                />
+                <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
 
                 <div className='flex justify-end gap-2 pt-4'>
                   <Button
@@ -119,7 +118,12 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
                     {t('common:back')}
                   </Button>
 
-                  <Button type='button' className='flex items-center' onClick={() => setStep(CheckoutStep.CONFIRM)}>
+                  <Button
+                    type='button'
+                    className='flex items-center'
+                    disabled={!paymentMethod}
+                    onClick={() => setStep(CheckoutStep.CONFIRM)}
+                  >
                     {t('common:next')}
                     <LuArrowRight />
                   </Button>
@@ -136,7 +140,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
               <CheckoutPaymentProofForm
                 plan={plan}
                 checkoutData={checkoutData}
-                paymentMethod={paymentMethod}
+                paymentMethod={paymentMethod ?? PaymentMethod.CARD}
                 finalPrice={discountData.finalPrice}
                 requiresProof={requiresProof}
                 onClose={onClose}
@@ -144,6 +148,11 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
                 onSubmit={(intentId: string) => {
                   setStep(CheckoutStep.CONFIRMATION);
                   setCreatedIntentId(intentId);
+                  navigate(PageURLS.paymentsResult, {
+                    state: {
+                      intentId,
+                    },
+                  });
                 }}
               />
             ),

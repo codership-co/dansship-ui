@@ -1,4 +1,10 @@
-export type PaymentMethodType = 'transfer' | 'cash' | 'nequi' | 'daviplata' | 'card';
+export enum PaymentMethod {
+  TRANSFER = 'transfer',
+  CASH = 'cash',
+  NEQUI = 'nequi',
+  DAVIPLATA = 'daviplata',
+  CARD = 'card',
+}
 
 export type PaymentStatus = 'pending' | 'pending_manual_review' | 'approved' | 'rejected' | 'cancelled' | 'expired';
 
@@ -9,10 +15,11 @@ export enum PaymentProofContentType {
   PNG = 'image/png',
   WEBP = 'image/webp',
 }
+export const PaymentProofContentTypesList = Object.keys(PaymentProofContentType);
 
 export interface CreatePaymentIntentPayload {
   plan_id: string;
-  payment_method_type: PaymentMethodType;
+  payment_method_type: PaymentMethod;
   discount_code?: string;
   start_date?: string;
 }
@@ -60,7 +67,7 @@ export interface PaymentIntent {
   currency: string;
   purchase_type: PurchaseType;
   reference_id: string;
-  payment_method_type: PaymentMethodType;
+  payment_method_type: PaymentMethod;
   status: PaymentStatus;
   gateway_provider: string | null;
   gateway_reference: string | null;

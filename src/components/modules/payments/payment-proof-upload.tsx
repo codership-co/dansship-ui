@@ -4,6 +4,7 @@ import { LuUpload } from 'react-icons/lu';
 import { toast } from 'sonner';
 
 import { Spinner } from '@components/loaders';
+import { PaymentProofContentType, PaymentProofContentTypesList } from '@core/api';
 import { usePaymentIntents } from '@hooks';
 
 type PaymentProofUploadMode = 'owner' | 'admin';
@@ -14,8 +15,6 @@ interface PaymentProofUploadProps {
   onUploaded?: () => void;
   mode?: PaymentProofUploadMode;
 }
-
-const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
 
 function isDisplayableImageUrl(value: string | null): value is string {
   if (!value) return false;
@@ -42,12 +41,12 @@ export function PaymentProofUpload({ intentId, currentProofUrl, onUploaded, mode
 
   const isUploading = isGettingProofUploadUrl || isGettingAdminProofUploadUrl;
 
-  const fileAccept = useMemo(() => ACCEPTED_TYPES.join(','), []);
+  const fileAccept = useMemo(() => PaymentProofContentTypesList.join(','), []);
 
   const handleFileSelected = async (file: File | null) => {
     if (!file) return;
 
-    if (!ACCEPTED_TYPES.includes(file.type as (typeof ACCEPTED_TYPES)[number])) {
+    if (!PaymentProofContentTypesList.includes(file.type as PaymentProofContentType)) {
       toast.error(t('payments:proofInvalidTypeDesc'));
 
       return;

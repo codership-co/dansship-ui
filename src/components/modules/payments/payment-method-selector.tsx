@@ -1,33 +1,48 @@
-import type { ComponentType } from 'react';
-
 import { useTranslation } from 'react-i18next';
 import { LuBuilding2, LuCircleDollarSign, LuCreditCard, LuLandmark, LuSmartphone } from 'react-icons/lu';
 
+import { PaymentMethod } from '@core/api';
 import { cn } from '@helpers';
 
-import type { PaymentMethodType } from '@core/api';
-
 interface PaymentMethodSelectorProps {
-  value: PaymentMethodType;
-  onChange: (method: PaymentMethodType) => void;
-  availableMethods: Array<PaymentMethodType>;
+  value: PaymentMethod | null;
+  onChange: (method: PaymentMethod) => void;
 }
 
-const METHOD_ICON: Record<PaymentMethodType, ComponentType<{ className?: string }>> = {
-  transfer: LuLandmark,
-  cash: LuCircleDollarSign,
-  nequi: LuSmartphone,
-  daviplata: LuBuilding2,
-  card: LuCreditCard,
+const PaymentMethods = {
+  [PaymentMethod.CARD]: {
+    Icon: LuCreditCard,
+    title: 'payments:method.card',
+    description: 'payments:methodDesc.card',
+  },
+  [PaymentMethod.NEQUI]: {
+    Icon: LuSmartphone,
+    title: 'payments:method.nequi',
+    description: 'payments:methodDesc.nequi',
+  },
+  [PaymentMethod.DAVIPLATA]: {
+    Icon: LuBuilding2,
+    title: 'payments:method.daviplata',
+    description: 'payments:methodDesc.daviplata',
+  },
+  [PaymentMethod.TRANSFER]: {
+    Icon: LuLandmark,
+    title: 'payments:method.transfer',
+    description: 'payments:methodDesc.transfer',
+  },
+  [PaymentMethod.CASH]: {
+    Icon: LuCircleDollarSign,
+    title: 'payments:method.cash',
+    description: 'payments:methodDesc.cash',
+  },
 };
 
-export function PaymentMethodSelector({ value, onChange, availableMethods }: PaymentMethodSelectorProps) {
+export function PaymentMethodSelector({ value, onChange }: PaymentMethodSelectorProps) {
   const { t } = useTranslation();
 
   return (
     <div className='space-y-2'>
-      {availableMethods.map(method => {
-        const Icon = METHOD_ICON[method];
+      {Object.entries(PaymentMethods).map(([method, { Icon, title, description }]) => {
         const isSelected = value === method;
 
         return (
@@ -35,16 +50,16 @@ export function PaymentMethodSelector({ value, onChange, availableMethods }: Pay
             key={method}
             type='button'
             className={cn(
-              'w-full rounded-lg border px-8 py-4 text-left transition-colors',
+              'w-full cursor-pointer rounded-lg border px-8 py-4 text-left transition-colors',
               isSelected ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300',
             )}
-            onClick={() => onChange(method)}
+            onClick={() => onChange(method as PaymentMethod)}
           >
             <div className='flex items-center gap-6'>
-              <Icon className='h-4 w-4 text-primary shrink-0' />
+              <Icon className='size-8 text-primary shrink-0' />
               <div>
-                <p className='m-0'>{t(`payments:method.${method}`)}</p>
-                <label className='text-gray-500'>{t(`payments:methodDesc.${method}`)}</label>
+                <p className='m-0'>{t(title)}</p>
+                <label className='text-gray-500'>{t(description)}</label>
               </div>
             </div>
           </button>

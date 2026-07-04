@@ -4,7 +4,7 @@ import { SecurityGuard } from '@contexts';
 
 const SecurityOutlet = SecurityGuard(Outlet);
 
-export const AuthLayout = () => {
+export const RouterAuthLayout = () => {
   return (
     <section className='relative min-h-dvh grid grid-rows-[1fr]'>
       <SecurityOutlet />

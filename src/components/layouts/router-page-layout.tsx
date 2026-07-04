@@ -6,7 +6,7 @@ import { PageURLS } from '@core/constants';
 
 const SecurityOutlet = SecurityGuard(Outlet);
 
-export const PageLayout = () => {
+export const RouterPageLayout = () => {
   const { pathname } = useLocation();
 
   return (

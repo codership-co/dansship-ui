@@ -5,11 +5,9 @@ import { toast } from 'sonner';
 import { SpinnerLoader } from '@components/loaders';
 import { PaymentStatusBadge } from '@components/modules';
 import { Button, Card, CardContent, CardHeader, CardTitle } from '@components/ui';
-import { type PaymentStatus } from '@core/api';
+import { PaymentProofContentType, PaymentProofContentTypesList, type PaymentStatus } from '@core/api';
 import { formatPrice, paymentPurchaseLabel, purchaseTypeLabelKey } from '@helpers';
 import { useDateLocale, usePaymentIntents } from '@hooks';
-
-const ACCEPTED_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
 
 interface UserPaymentHistoryProps {
   title?: string;
@@ -44,14 +42,14 @@ export function UserPaymentHistory({
   const handleUploadProof = (intentId: string) => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = ACCEPTED_TYPES.join(',');
+    input.accept = PaymentProofContentTypesList.join(',');
 
     input.onchange = async () => {
       const file = input.files?.[0] ?? null;
 
       if (!file) return;
 
-      if (!ACCEPTED_TYPES.includes(file.type as (typeof ACCEPTED_TYPES)[number])) {
+      if (!PaymentProofContentTypesList.includes(file.type as PaymentProofContentType)) {
         toast(t('payments:proofInvalidTypeDesc'));
 
         return;
