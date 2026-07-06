@@ -4,7 +4,6 @@ import { Link } from 'react-router';
 
 import { SpinnerLoader } from '@components/loaders';
 import { PaymentStatusBadge } from '@components/modules';
-import { Card } from '@components/ui';
 import { DansshipAPI, type PaymentStatus } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { formatDate, formatDateTime, formatPrice, paymentPurchaseLabel } from '@helpers';
@@ -29,18 +28,22 @@ export function UserPaymentHistory({
 
   if (isLoading) {
     return (
-      <Card>
-        <div className='flex justify-center p-8'>
+      <section className='grid gap-4'>
+        <h4>{title || t('payments:myPayments')}</h4>
+        <div className='px-8 py-16 rounded-3xl bg-white/50 grid place-content-center text-center'>
           <SpinnerLoader />
         </div>
-      </Card>
+      </section>
     );
   }
 
   if (visibleIntents.length === 0) {
     return (
-      <section className='px-8 py-16 rounded-3xl bg-white/50 grid place-content-center text-center'>
-        <p>{t(emptyStateKey)}</p>
+      <section className='grid gap-4'>
+        <h4>{title || t('payments:myPayments')}</h4>
+        <section className='px-8 py-16 rounded-3xl bg-white/50 grid place-content-center text-center'>
+          <p>{t(emptyStateKey)}</p>
+        </section>
       </section>
     );
   }

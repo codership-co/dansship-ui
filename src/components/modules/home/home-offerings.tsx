@@ -1,9 +1,10 @@
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { LuArrowRight, LuDumbbell, LuMusic2, LuSparkles } from 'react-icons/lu';
 import { Link } from 'react-router';
 
 import { Section, SectionHeading } from '@components/containers';
-import { Button, Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui';
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui';
 import { PageURLS } from '@core/constants';
 
 const offeringCards = [
@@ -76,7 +77,8 @@ export const HomeOfferings = () => {
 
                 <CardFooter className='relative z-10 px-5'>
                   <Button
-                    variant='ghostPrimary'
+                    color='primary'
+                    variant='text'
                     className={`inline-flex items-center gap-2 uppercase ${
                       isFeatured ? 'text-primary-foreground hover:bg-primary/30' : 'text-primary hover:bg-primary/20'
                     }`}
@@ -94,9 +96,9 @@ export const HomeOfferings = () => {
       <div className='mt-8 flex flex-col items-center gap-3 text-center'>
         <p>{t('home:stitch.offerings.scheduleCtaMessage')}</p>
 
-        <Button asChild>
-          <Link to={PageURLS.classes}>{t('home:stitch.offerings.scheduleCtaAction')}</Link>
-        </Button>
+        <Link to={PageURLS.classes}>
+          <Button color='primary'>{t('home:stitch.offerings.scheduleCtaAction')}</Button>
+        </Link>
       </div>
     </Section>
   );

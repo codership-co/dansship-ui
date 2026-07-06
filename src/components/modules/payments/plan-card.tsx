@@ -1,7 +1,8 @@
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { FaCheckCircle } from 'react-icons/fa';
 
-import { Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui';
 import { PublicPlan } from '@core/api';
 import { cn } from '@helpers';
 
@@ -95,7 +96,7 @@ export function PlanCard({ plan, onSelectPlan, isFeatured, hoverable, className,
 
         {onSelectPlan && (
           <CardFooter className='pt-4 sm:pt-6'>
-            <Button className='w-full' variant={isFeatured ? 'default' : 'outlinePrimary'} onClick={onSelectPlan}>
+            <Button fullWidth color='primary' variant={isFeatured ? 'solid' : 'outlined'} onClick={onSelectPlan}>
               {t('subscriptions:choosePlan', { name: plan.name })}
             </Button>
           </CardFooter>

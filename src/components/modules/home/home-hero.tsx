@@ -1,10 +1,10 @@
+import { Button } from 'polpo/components';
 import { Trans, useTranslation } from 'react-i18next';
 import { LuArrowRight } from 'react-icons/lu';
 import { Link } from 'react-router';
 
 import { Section } from '@components/containers';
 import { Logotype } from '@components/svg';
-import { Button } from '@components/ui';
 import { useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
 
@@ -23,7 +23,7 @@ export const HomeHero = () => {
               i18nKey='home:stitch.hero.kicker'
               components={{
                 Primary: <span className='text-primary' />,
-                Brand: <span className='font-brand text-[0.7em]' />,
+                Brand: <span className='font-brand text-tertiary text-[0.7em]' />,
               }}
             />
           </h1>
@@ -32,14 +32,16 @@ export const HomeHero = () => {
 
           <div className='mt-4 flex flex-col xs:flex-row gap-2.5 sm:max-w-90'>
             <Link to={isAuthenticated ? PageURLS.profile : PageURLS.auth.signup}>
-              <Button>
+              <Button color='primary'>
                 {t('home:stitch.hero.bookClass')}
                 <LuArrowRight className='h-4 w-4' />
               </Button>
             </Link>
 
             <Link to={PageURLS.figures}>
-              <Button variant='secondary'>{t('home:stitch.hero.trackProgress')}</Button>
+              <Button color='tertiary' variant='outlined'>
+                {t('home:stitch.hero.trackProgress')}
+              </Button>
             </Link>
           </div>
         </div>

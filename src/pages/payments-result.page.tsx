@@ -146,8 +146,8 @@ function PaymentsResultPage() {
   );
 
   return (
-    <div className='px-2 sm:px-4 md:px-8 pt-8 max-w-7xl mx-auto grid gap-8'>
-      {intent ? (
+    <div className='px-2 sm:px-4 md:px-8 pt-20 max-w-7xl mx-auto grid gap-20'>
+      {intent && (
         <section className='rounded-2xl shadow-2xl'>
           <section className='bg-white p-8 rounded-2xl grid md:grid-cols-[1fr_1fr] gap-8 overflow-hidden'>
             <section className='relative min-h-70 bg-primary text-primary-foreground px-8 py-16 rounded-lg shadow-lg'>
@@ -164,9 +164,9 @@ function PaymentsResultPage() {
                   <p className='m-0 text-center'>{t('payments:result.description')}</p>
                 )}
 
-              <section className='grid place-content-center gap-1 justify-items-center'>
-                <small className='m-0'>{t('payments:currentIntentStatus')}</small>
+              <section className='grid place-content-center gap-1 justify-items-center py-4'>
                 <PaymentStatusBadge status={intent.status} />
+                <small className='m-0'>{t('payments:currentIntentStatus')}</small>
               </section>
 
               <section className='border py-4 border-gray-200 rounded-2xl overflow-hidden'>
@@ -263,7 +263,9 @@ function PaymentsResultPage() {
             </section>
           </section>
         </section>
-      ) : (
+      )}
+
+      {!intent && intentId && (
         <section className='rounded-2xl shadow-2xl'>
           <section className='bg-white rounded-2xl grid md:grid-cols-[3fr_2fr] overflow-hidden'>
             <section className='grid px-8 py-40 place-content-center gap-4 justify-items-center text-center'>

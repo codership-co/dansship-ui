@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdMenu } from 'react-icons/md';
@@ -6,7 +7,6 @@ import { NavLink, NavLinkProps } from 'react-router';
 import { MobileMenu } from './mobile-menu';
 
 import { Isotype } from '@components/svg';
-import { Button } from '@components/ui';
 import { FEATURE_FLAG, useAuth, useEnabledFeatureFlag, useFeatureFlags, usePermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -76,7 +76,13 @@ export const Navbar = () => {
         <div className='flex min-h-16 items-center justify-between gap-8 px-4 sm:px-6'>
           <div className='flex items-center gap-2'>
             {isAuthenticated ? (
-              <Button size='icon' variant='ghost' onClick={() => setIsMobileMenuOpen(true)} aria-label={t('nav:menu')}>
+              <Button
+                forIcon
+                size='small'
+                variant='flat'
+                onClick={() => setIsMobileMenuOpen(true)}
+                aria-label={t('nav:menu')}
+              >
                 <MdMenu className='h-6 w-6' />
               </Button>
             ) : null}
@@ -98,19 +104,25 @@ export const Navbar = () => {
           <div className='ml-auto flex items-center justify-end gap-1.5 sm:gap-2'>
             {/*<LanguageSelector variant='dropdown' />*/}
             {!isAuthenticated && isLoginPageEnabled && (
-              <Button asChild>
-                <NavLink to={PageURLS.auth.login}>{t('nav:signIn')}</NavLink>
-              </Button>
+              <NavLink to={PageURLS.auth.login}>
+                <Button color='primary' size='small'>
+                  {t('nav:signIn')}
+                </Button>
+              </NavLink>
             )}
             {isAuthenticated && hasActivePlan && isMyAccountBookingsPageEnabled && (
-              <Button asChild>
-                <NavLink to={PageURLS.myAccountBookings}>{t('nav:myBookings')}</NavLink>
-              </Button>
+              <NavLink to={PageURLS.myAccountBookings}>
+                <Button color='primary' size='small'>
+                  {t('nav:myBookings')}
+                </Button>
+              </NavLink>
             )}
             {isAuthenticated && !hasActivePlan && isMyAccountSubscriptionPageEnabled && (
-              <Button asChild>
-                <NavLink to={PageURLS.myAccountSubscription}>{t('nav:buy')}</NavLink>
-              </Button>
+              <NavLink to={PageURLS.myAccountSubscription}>
+                <Button color='primary' size='small'>
+                  {t('nav:buy')}
+                </Button>
+              </NavLink>
             )}
           </div>
         </div>

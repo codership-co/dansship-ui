@@ -1,9 +1,9 @@
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { LuCalendar, LuHeart, LuSearch } from 'react-icons/lu';
 import { Link } from 'react-router';
 
 import { SectionHeading } from '@components/containers';
-import { Button } from '@components/ui';
 import { PageURLS } from '@core/constants';
 
 const progressFeatures = [
@@ -70,9 +70,9 @@ export const HomeAppFeature = () => {
             </section>
 
             <div className='flex flex-col gap-2.5 sm:max-w-90 sm:flex-row mt-8'>
-              <Button asChild>
-                <Link to={PageURLS.figures}>{t('home:stitch.progress.actions.viewAllFigures')}</Link>
-              </Button>
+              <Link to={PageURLS.figures}>
+                <Button color='primary'>{t('home:stitch.progress.actions.viewAllFigures')}</Button>
+              </Link>
             </div>
           </div>
         </div>
