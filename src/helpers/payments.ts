@@ -7,7 +7,7 @@ export function formatPrice(amount: number, currency: string): string {
 }
 
 export function paymentMethodLabelKey(method: string): string {
-  return `payments.method.${method}`;
+  return `payments:method.${method}`;
 }
 
 function titleCase(value: string): string {
@@ -22,7 +22,7 @@ export function purchaseTypeLabel(type: string): string {
 }
 
 export function purchaseTypeLabelKey(type: string): string {
-  return `payments.purchaseType.${type}`;
+  return `payments:purchaseType.${type}`;
 }
 
 export function paymentPurchaseLabel(intent: {

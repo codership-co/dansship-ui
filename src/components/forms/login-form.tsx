@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from 'polpo/components';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { z } from 'zod';
 
 import { EmailField, PasswordField } from '@components/form-fields';
-import { Button } from '@components/ui';
 import { PageURLS } from '@core/constants';
 
 /*
@@ -72,7 +72,7 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
         </Link>
       </div>
 
-      <Button type='submit' disabled={isSubmitting} className='w-full'>
+      <Button type='submit' isLoading={isSubmitting} color='primary' className='w-full'>
         {isSubmitting ? t('common:loading') : t('auth:login.signIn')}
       </Button>
 

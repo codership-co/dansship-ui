@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "./animations.css";
+@import "polpo-tailwind-config/styles" theme(static);
+@import "polpo/components.css";
 
 @font-face {
   font-family: 'guntertest';
@@ -8,25 +10,6 @@
   font-weight: 400;
   font-style: normal;
   font-display: swap;
-}
-
-:root {
-  /* ================================================
-   * CONFIG VARIABLES
-   * ================================================ */
-  --light-base: #ffffff;
-  --dark-base: #000000;
-  --scale-step: 20%;
-  --scale-50: calc(var(--scale-step) * 1);
-  --scale-100: calc(var(--scale-step) * 1.5);
-  --scale-200: calc(var(--scale-step) * 2.5);
-  --scale-300: calc(var(--scale-step) * 3.5);
-  --scale-400: calc(var(--scale-step) * 4.5);
-  --scale-600: calc(var(--scale-step) * 4.5);
-  --scale-700: calc(var(--scale-step) * 3.5);
-  --scale-800: calc(var(--scale-step) * 2.5);
-  --scale-900: calc(var(--scale-step) * 1.5);
-  --uplift: 10vh;
 }
 
 @theme {
@@ -39,150 +22,24 @@
    * COLORS
    * ================================================ */
   --color-active: hsl(147 100% 35%);
-  --color-alert: hsl(359 90% 62%);
-  --color-warning: hsl(38 100% 50%);
-  --color-info: hsl(210 100% 51%);
-  --color-primary: hsl(268 56% 30%);
-  --color-secondary: hsl(37 93% 88%);
-  --color-tertiary: hsl(347 94% 82%);
-  --color-highlight: hsl(205 100% 68%);
-  --color-highlight: hsl(7 81% 57%);
-  --color-accent: hsl(285 26% 70%);
-
-  /* ================================================
-   * ACTIVE
-   * ================================================ */
-  --color-active-50: color-mix(in hsl, var(--color-active) var(--scale-50), var(--light-base));
-  --color-active-100: color-mix(in hsl, var(--color-active) var(--scale-100), var(--light-base));
-  --color-active-200: color-mix(in hsl, var(--color-active) var(--scale-200), var(--light-base));
-  --color-active-300: color-mix(in hsl, var(--color-active) var(--scale-300), var(--light-base));
-  --color-active-400: color-mix(in hsl, var(--color-active) var(--scale-400), var(--light-base));
-  --color-active-500: var(--color-active);
-  --color-active-600: color-mix(in hsl, var(--color-active) var(--scale-600), var(--dark-base));
-  --color-active-700: color-mix(in hsl, var(--color-active) var(--scale-700), var(--dark-base));
-  --color-active-800: color-mix(in hsl, var(--color-active) var(--scale-800), var(--dark-base));
-  --color-active-900: color-mix(in hsl, var(--color-active) var(--scale-900), var(--dark-base));
   --color-active-foreground: var(--color-active-50);
-
-  /* ================================================
-   * ALERT
-   * ================================================ */
-  --color-alert-50: color-mix(in hsl, var(--color-alert) var(--scale-50), var(--light-base));
-  --color-alert-100: color-mix(in hsl, var(--color-alert) var(--scale-100), var(--light-base));
-  --color-alert-200: color-mix(in hsl, var(--color-alert) var(--scale-200), var(--light-base));
-  --color-alert-300: color-mix(in hsl, var(--color-alert) var(--scale-300), var(--light-base));
-  --color-alert-400: color-mix(in hsl, var(--color-alert) var(--scale-400), var(--light-base));
-  --color-alert-500: var(--color-alert);
-  --color-alert-600: color-mix(in hsl, var(--color-alert) var(--scale-600), var(--dark-base));
-  --color-alert-700: color-mix(in hsl, var(--color-alert) var(--scale-700), var(--dark-base));
-  --color-alert-800: color-mix(in hsl, var(--color-alert) var(--scale-800), var(--dark-base));
-  --color-alert-900: color-mix(in hsl, var(--color-alert) var(--scale-900), var(--dark-base));
+  --color-alert: hsl(359 90% 62%);
   --color-alert-foreground: var(--color-alert-50);
-
-  /* ================================================
-   * WARNING
-   * ================================================ */
-  --color-warning-50: color-mix(in hsl, var(--color-warning) var(--scale-50), var(--light-base));
-  --color-warning-100: color-mix(in hsl, var(--color-warning) var(--scale-100), var(--light-base));
-  --color-warning-200: color-mix(in hsl, var(--color-warning) var(--scale-200), var(--light-base));
-  --color-warning-300: color-mix(in hsl, var(--color-warning) var(--scale-300), var(--light-base));
-  --color-warning-400: color-mix(in hsl, var(--color-warning) var(--scale-400), var(--light-base));
-  --color-warning-500: var(--color-warning);
-  --color-warning-600: color-mix(in hsl, var(--color-warning) var(--scale-600), var(--dark-base));
-  --color-warning-700: color-mix(in hsl, var(--color-warning) var(--scale-700), var(--dark-base));
-  --color-warning-800: color-mix(in hsl, var(--color-warning) var(--scale-800), var(--dark-base));
-  --color-warning-900: color-mix(in hsl, var(--color-warning) var(--scale-900), var(--dark-base));
+  --color-warning: hsl(38 100% 50%);
   --color-warning-foreground: var(--color-warning-50);
-
-  /* ================================================
-   * INFO
-   * ================================================ */
-  --color-info-50: color-mix(in hsl, var(--color-info) var(--scale-50), var(--light-base));
-  --color-info-100: color-mix(in hsl, var(--color-info) var(--scale-100), var(--light-base));
-  --color-info-200: color-mix(in hsl, var(--color-info) var(--scale-200), var(--light-base));
-  --color-info-300: color-mix(in hsl, var(--color-info) var(--scale-300), var(--light-base));
-  --color-info-400: color-mix(in hsl, var(--color-info) var(--scale-400), var(--light-base));
-  --color-info-500: var(--color-info);
-  --color-info-600: color-mix(in hsl, var(--color-info) var(--scale-600), var(--dark-base));
-  --color-info-700: color-mix(in hsl, var(--color-info) var(--scale-700), var(--dark-base));
-  --color-info-800: color-mix(in hsl, var(--color-info) var(--scale-800), var(--dark-base));
-  --color-info-900: color-mix(in hsl, var(--color-info) var(--scale-900), var(--dark-base));
+  --color-info: hsl(210 100% 51%);
   --color-info-foreground: var(--color-info-50);
-
-  /* ================================================
-   * PRIMARY
-   * ================================================ */
-  --color-primary-50: color-mix(in hsl, var(--color-primary) var(--scale-50), var(--light-base));
-  --color-primary-100: color-mix(in hsl, var(--color-primary) var(--scale-100), var(--light-base));
-  --color-primary-200: color-mix(in hsl, var(--color-primary) var(--scale-200), var(--light-base));
-  --color-primary-300: color-mix(in hsl, var(--color-primary) var(--scale-300), var(--light-base));
-  --color-primary-400: color-mix(in hsl, var(--color-primary) var(--scale-400), var(--light-base));
-  --color-primary-500: var(--color-primary);
-  --color-primary-600: color-mix(in hsl, var(--color-primary) var(--scale-600), var(--dark-base));
-  --color-primary-700: color-mix(in hsl, var(--color-primary) var(--scale-700), var(--dark-base));
-  --color-primary-800: color-mix(in hsl, var(--color-primary) var(--scale-800), var(--dark-base));
-  --color-primary-900: color-mix(in hsl, var(--color-primary) var(--scale-900), var(--dark-base));
+  --color-primary: hsl(268 56% 30%);
   --color-primary-foreground: var(--color-primary-50);
-
-  /* ================================================
-   * SECONDARY
-   * ================================================ */
-  --color-secondary-50:color-mix(in hsl, var(--color-secondary) var(--scale-50), var(--light-base));
-  --color-secondary-100: color-mix(in hsl, var(--color-secondary) var(--scale-100), var(--light-base));
-  --color-secondary-200: color-mix(in hsl, var(--color-secondary) var(--scale-200), var(--light-base));
-  --color-secondary-300: color-mix(in hsl, var(--color-secondary) var(--scale-300), var(--light-base));
-  --color-secondary-400: color-mix(in hsl, var(--color-secondary) var(--scale-400), var(--light-base));
-  --color-secondary-500: var(--color-secondary);
-  --color-secondary-600: color-mix(in hsl, var(--color-secondary) var(--scale-600), var(--dark-base));
-  --color-secondary-700: color-mix(in hsl, var(--color-secondary) var(--scale-700), var(--dark-base));
-  --color-secondary-800: color-mix(in hsl, var(--color-secondary) var(--scale-800), var(--dark-base));
-  --color-secondary-900: color-mix(in hsl, var(--color-secondary) var(--scale-900), var(--dark-base));
+  --color-secondary: hsl(37 93% 88%);
   --color-secondary-foreground: var(--color-secondary-900);
-
-  /* ================================================
-   * TERTIARY
-   * ================================================ */
-  --color-tertiary-50: color-mix(in hsl, var(--color-tertiary) var(--scale-50), var(--light-base));
-  --color-tertiary-100: color-mix(in hsl, var(--color-tertiary) var(--scale-100), var(--light-base));
-  --color-tertiary-200: color-mix(in hsl, var(--color-tertiary) var(--scale-200), var(--light-base));
-  --color-tertiary-300: color-mix(in hsl, var(--color-tertiary) var(--scale-300), var(--light-base));
-  --color-tertiary-400: color-mix(in hsl, var(--color-tertiary) var(--scale-400), var(--light-base));
-  --color-tertiary-500: var(--color-tertiary);
-  --color-tertiary-600: color-mix(in hsl, var(--color-tertiary) var(--scale-600), var(--dark-base));
-  --color-tertiary-700: color-mix(in hsl, var(--color-tertiary) var(--scale-700), var(--dark-base));
-  --color-tertiary-800: color-mix(in hsl, var(--color-tertiary) var(--scale-800), var(--dark-base));
-  --color-tertiary-900: color-mix(in hsl, var(--color-tertiary) var(--scale-900), var(--dark-base));
+  --color-tertiary: hsl(347 94% 82%);
   --color-tertiary-foreground: var(--color-tertiary-50);
-
-  /* ================================================
-   * HIGHLIGHT
-   * ================================================ */
-  --color-highlight-50: color-mix(in hsl, var(--color-highlight) var(--scale-50), var(--light-base));
-  --color-highlight-100: color-mix(in hsl, var(--color-highlight) var(--scale-100), var(--light-base));
-  --color-highlight-200: color-mix(in hsl, var(--color-highlight) var(--scale-200), var(--light-base));
-  --color-highlight-300: color-mix(in hsl, var(--color-highlight) var(--scale-300), var(--light-base));
-  --color-highlight-400: color-mix(in hsl, var(--color-highlight) var(--scale-400), var(--light-base));
-  --color-highlight-500: var(--color-highlight);
-  --color-highlight-600: color-mix(in hsl, var(--color-highlight) var(--scale-600), var(--dark-base));
-  --color-highlight-700: color-mix(in hsl, var(--color-highlight) var(--scale-700), var(--dark-base));
-  --color-highlight-800: color-mix(in hsl, var(--color-highlight) var(--scale-800), var(--dark-base));
-  --color-highlight-900: color-mix(in hsl, var(--color-highlight) var(--scale-900), var(--dark-base));
+  --color-highlight: hsl(7 81% 57%);
   --color-highlight-foreground: var(--color-highlight-900);
-
-  /* ================================================
-   * ACCESS
-   * ================================================ */
-  --color-accent-50: color-mix(in hsl, var(--color-accent) var(--scale-50), var(--light-base));
-  --color-accent-100: color-mix(in hsl, var(--color-accent) var(--scale-100), var(--light-base));
-  --color-accent-200: color-mix(in hsl, var(--color-accent) var(--scale-200), var(--light-base));
-  --color-accent-300: color-mix(in hsl, var(--color-accent) var(--scale-300), var(--light-base));
-  --color-accent-400: color-mix(in hsl, var(--color-accent) var(--scale-400), var(--light-base));
-  --color-accent-500: var(--color-accent);
-  --color-accent-600: color-mix(in hsl, var(--color-accent) var(--scale-600), var(--dark-base));
-  --color-accent-700: color-mix(in hsl, var(--color-accent) var(--scale-700), var(--dark-base));
-  --color-accent-800: color-mix(in hsl, var(--color-accent) var(--scale-800), var(--dark-base));
-  --color-accent-900: color-mix(in hsl, var(--color-accent) var(--scale-900), var(--dark-base));
+  --color-accent: hsl(285 26% 70%);
   --color-accent-foreground: var(--color-accent-800);
+
 
   /* ================================================
    * STATES
@@ -289,92 +146,13 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer base {
-  /* width */
   ::-webkit-scrollbar {
     width: 10px;
     height: 0;
   }
 
-  /* Track */
-  ::-webkit-scrollbar-track {
-    background: var(--color-primary-50);
-  }
-
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
-    background: var(--color-primary-200);
-  }
-
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-primary-400);
-  }
-
-  *,
-  *:before,
-  *:after {
-    box-sizing: border-box;
-  }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
   :root {
-    @apply bg-background text-foreground font-main text-body min-h-dvh;
-    color-scheme: light dark;
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-
-  a {
-    @apply no-underline text-inherit;
-  }
-
-  input, textarea {
-    @apply text-label text-current font-[inherit] p-0 m-0 w-full bg-transparent;
-  }
-
-  input {
-    @apply border-0 outline-0 p-0 w-full;
-  }
-
-  .hero, h1, h2, h3, h4, h5, h6 {
-    @apply font-title mb-[0.25em] mt-[0.5em];
-  }
-
-  .hero {
-    @apply text-hero;
-  }
-
-  h1 {
-    @apply text-header1;
-  }
-
-  h2 {
-    @apply text-header2;
-  }
-
-  h3 {
-    @apply text-header3;
-  }
-
-  h4 {
-    @apply text-header4;
-  }
-
-  p, label, small {
-    @apply my-[1em];
-  }
-
-  label {
-    @apply text-label;
-  }
-
-  small {
-    @apply text-small;
+    --uplift: 10vh;
   }
 }
 

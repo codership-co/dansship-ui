@@ -7,6 +7,7 @@ export const formatDate = (date: string | Date, lang = 'en'): string => {
 
   return new Intl.DateTimeFormat(lang === 'es' ? 'es-ES' : 'en-US', {
     month: 'long',
+    day: 'numeric',
     year: 'numeric',
   }).format(dateObj);
 };

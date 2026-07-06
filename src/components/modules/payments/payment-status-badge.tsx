@@ -8,8 +8,8 @@ const STATUS_VARIANT: Record<PaymentStatus, 'default' | 'secondary' | 'destructi
   pending_manual_review: 'secondary',
   approved: 'default',
   rejected: 'destructive',
-  cancelled: 'outline',
-  expired: 'outline',
+  cancelled: 'destructive',
+  expired: 'destructive',
 };
 
 export function PaymentStatusBadge({ status }: { status: PaymentStatus }) {

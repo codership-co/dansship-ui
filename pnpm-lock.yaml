@@ -47,9 +47,15 @@ importers:
       next-themes:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      polpo:
+        specifier: ^0.1.21
+        version: 0.1.21(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwind-merge@3.6.0)(tailwindcss@4.3.0)
       polpo-http-client:
-        specifier: ^1.0.18
-        version: 1.0.18
+        specifier: ^1.0.20
+        version: 1.0.20
+      polpo-tailwind-config:
+        specifier: ^0.1.0
+        version: 0.1.0
       radix-ui:
         specifier: ^1.4.3
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -2178,8 +2184,24 @@ packages:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
     engines: {node: '>=7.0.0'}
 
+  color-convert@3.1.3:
+    resolution: {integrity: sha512-fasDH2ont2GqF5HpyO4w0+BcewlhHEZOFn9c1ckZdHpJ56Qb7MHhH/IcJZbBGgvdtwdwNbLvxiBEdg336iA9Sg==}
+    engines: {node: '>=14.6'}
+
   color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
+
+  color-name@2.1.0:
+    resolution: {integrity: sha512-1bPaDNFm0axzE4MEAzKPuqKWeRaT43U/hyxKPBdqTfmPF+d6n7FSoTFxLVULUJOmiLp01KjhIPPH+HrXZJN4Rg==}
+    engines: {node: '>=12.20'}
+
+  color-string@2.1.4:
+    resolution: {integrity: sha512-Bb6Cq8oq0IjDOe8wJmi4JeNn763Xs9cfrBcaylK1tPypWzyoy2G3l90v9k64kjphl/ZJjPIShFztenRomi8WTg==}
+    engines: {node: '>=18'}
+
+  color@5.0.3:
+    resolution: {integrity: sha512-ezmVcLR3xAVp8kYOm4GS45ZLLgIE6SPAFoduLr6hTDajwb3KZ2F46gulK3XpcwRFb5KKGCSezCBAY4Dw4HsyXA==}
+    engines: {node: '>=18'}
 
   commander@11.1.0:
     resolution: {integrity: sha512-yPVavfyCcRhmorC7rWlkHn15b4wDVgVmBA7kV4QVBsF7kv/9TKJAbAXVTxvTnwP8HHKjRCJDClKbciiYS7p0DQ==}
@@ -3610,11 +3632,22 @@ packages:
   polpo-eslint-config@1.0.1:
     resolution: {integrity: sha512-1921grUEI1EONatE7akgtJ6fwYTQiNfhjQZ4KpVdg9WaGri+o/VEghJxALAjDVw+vL3Zt0vovZg7o/16olDmmQ==}
 
-  polpo-http-client@1.0.18:
-    resolution: {integrity: sha512-GkqSLc16hrg9xA0noF5MVVTpERX++ox/D6/bmXpUn0RPDHFHLvI8VvjEbqd+Sy/J1j0AIfPUv7F+knKZjKc5zg==}
+  polpo-http-client@1.0.20:
+    resolution: {integrity: sha512-/BvVd3vBpShLVd5LZ3/cWOJQSVwD5HBvv8z5LOo/JTkZD/H1t7gjNYwPCgBG4Q/JDO+JN/f9WQfvB+LKFMal9g==}
+
+  polpo-tailwind-config@0.1.0:
+    resolution: {integrity: sha512-VHxvt2dGpwvpsTugOOvMfACoPpYQHXGgkfCnRJSX6yu2+EkLoleBHD1vUooJvy7GFh2Dr+ZBHfvR+9I1HQhXyA==}
 
   polpo-typescript-config@1.0.0:
     resolution: {integrity: sha512-fkec8Iaux2JlOBUvrIKQb3ZInD+dl3KJEt2l4TONXmTmbsOJq+VWv4o6yV/xkKh4I/yABUuf7KDrkutsxq0QAw==}
+
+  polpo@0.1.21:
+    resolution: {integrity: sha512-uyyPZQuuZch4imZewkgvWCwDWYMMw0URtnr3BFg+dhq+CDoXM+e/jaNrAjHxT8WwP3ulDqGu+q5nzpkTtWpldQ==}
+    peerDependencies:
+      react: '*'
+      react-dom: '*'
+      tailwind-merge: ^3.3.1
+      tailwindcss: ^4.1.11
 
   possible-typed-array-names@1.1.0:
     resolution: {integrity: sha512-/+5VFTchJDoVj3bhoqi6UeymcD00DAwb1nJwamzPvHEszJ4FpF6SNNbUbOS8yI56qHzdV8eK0qEfOSiodkTdxg==}
@@ -3696,6 +3729,12 @@ packages:
     resolution: {integrity: sha512-K5zQjDllxWkf7Z5xJdV0/B0WTNqx6vxG70zJE4N0kBs4LovmEYWJzQGxC9bS9RAKu3bgM40lrd5zoLJ12MQ5BA==}
     engines: {node: '>= 0.10'}
 
+  react-colorful@5.7.0:
+    resolution: {integrity: sha512-fuesYIemttah97XmsIHmz4OORDHiSFzyc9HMAIrCHJou2jaRQmL8cFJ76K4zQhhj8jzwOBlOi4BaGTjjOZCfTg==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+
   react-day-picker@10.0.1:
     resolution: {integrity: sha512-eNh6BlwcYInWaJtRv18mXQ06Ys/H6rdTZAnTaSdOYJuTpwP1JMCHNd1FDRadA+gbeinq+psdULN5Xnowy9mV8w==}
     engines: {node: '>=18'}
@@ -3715,6 +3754,12 @@ packages:
     resolution: {integrity: sha512-3DpCr5HVdZ0caUjYE/kIHBEJN0mNP3ZCgf16c48uJ5TbWjorKVp+YG8W3XqlJ7vJAVNw6wNIImyPXmFydwmyng==}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
+
+  react-hook-form@7.75.0:
+    resolution: {integrity: sha512-Ovv94H+0p3sJ7B9B5QxPuCP1u8V/cHuVGyH55cSwodYDtoJwK+fqk3vjfIgSX59I2U/bU4z0nRJ9HMLpNiWEmw==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      react: ^16.8.0 || ^17 || ^18 || ^19
 
   react-hook-form@7.77.0:
     resolution: {integrity: sha512-Sslh9YDYc0GDlWT/lxasnIduNo4v3yyvqRGvmGKUre5AFjDs/HV9/OafHGD8d+sB2yoL4UIL9L8X9i0WlZZebg==}
@@ -4220,6 +4265,11 @@ packages:
     peerDependenciesMeta:
       '@types/react':
         optional: true
+
+  use-eye-dropper@1.8.0:
+    resolution: {integrity: sha512-NgTe57n7E3zbpwXQ9mtiRj+iIvTxsUQd++NMMMHFzRrGTFaVCwu1cE5S7dgojZo9W69eOrapNvedCueuYJAWSw==}
+    peerDependencies:
+      react: ^0.13.0 || ^0.14.0 || >=15
 
   use-sidecar@1.1.3:
     resolution: {integrity: sha512-Fedw0aZvkhynoPYlA5WXrMCAMm+nSWdZt6lzJQ7Ok8S6Q+VsHmHpRWndVRJ8Be0ZbkfPc5LRYH+5XrzXcEeLRQ==}
@@ -6380,7 +6430,22 @@ snapshots:
     dependencies:
       color-name: 1.1.4
 
+  color-convert@3.1.3:
+    dependencies:
+      color-name: 2.1.0
+
   color-name@1.1.4: {}
+
+  color-name@2.1.0: {}
+
+  color-string@2.1.4:
+    dependencies:
+      color-name: 2.1.0
+
+  color@5.0.3:
+    dependencies:
+      color-convert: 3.1.3
+      color-string: 2.1.4
 
   commander@11.1.0: {}
 
@@ -7875,9 +7940,26 @@ snapshots:
       - storybook
       - supports-color
 
-  polpo-http-client@1.0.18: {}
+  polpo-http-client@1.0.20: {}
+
+  polpo-tailwind-config@0.1.0: {}
 
   polpo-typescript-config@1.0.0: {}
+
+  polpo@0.1.21(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwind-merge@3.6.0)(tailwindcss@4.3.0):
+    dependencies:
+      class-variance-authority: 0.7.1
+      clsx: 2.1.1
+      color: 5.0.3
+      polpo-tailwind-config: 0.1.0
+      react: 19.2.6
+      react-colorful: 5.7.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      react-dom: 19.2.6(react@19.2.6)
+      react-hook-form: 7.75.0(react@19.2.6)
+      react-icons: 5.6.0(react@19.2.6)
+      tailwind-merge: 3.6.0
+      tailwindcss: 4.3.0
+      use-eye-dropper: 1.8.0(react@19.2.6)
 
   possible-typed-array-names@1.1.0: {}
 
@@ -8008,6 +8090,11 @@ snapshots:
       iconv-lite: 0.7.2
       unpipe: 1.0.0
 
+  react-colorful@5.7.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+    dependencies:
+      react: 19.2.6
+      react-dom: 19.2.6(react@19.2.6)
+
   react-day-picker@10.0.1(@types/react@19.2.15)(react@19.2.6):
     dependencies:
       '@date-fns/tz': 1.5.0
@@ -8022,6 +8109,10 @@ snapshots:
       scheduler: 0.27.0
 
   react-error-boundary@6.1.2(react@19.2.6):
+    dependencies:
+      react: 19.2.6
+
+  react-hook-form@7.75.0(react@19.2.6):
     dependencies:
       react: 19.2.6
 
@@ -8669,6 +8760,10 @@ snapshots:
       tslib: 2.8.1
     optionalDependencies:
       '@types/react': 19.2.15
+
+  use-eye-dropper@1.8.0(react@19.2.6):
+    dependencies:
+      react: 19.2.6
 
   use-sidecar@1.1.3(@types/react@19.2.15)(react@19.2.6):
     dependencies:

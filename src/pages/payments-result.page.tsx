@@ -1,11 +1,20 @@
+import { Button } from 'polpo/components';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LoaderFunctionArgs, useLoaderData, useRevalidator } from 'react-router';
+import { toast } from 'sonner';
 
 import { PaymentStatusBadge, UserPaymentHistory } from '@components/modules';
-import { Button } from '@components/ui';
 import { SecurityGuard } from '@contexts';
-import { DansshipAPI, PaymentIntentDetail, PaymentMethod } from '@core/api';
+import {
+  type ConfirmPaymentProofPayload,
+  DansshipAPI,
+  PaymentIntentDetail,
+  PaymentMethod,
+  PaymentProofContentType,
+  PaymentProofContentTypesList,
+  type PaymentProofUploadRequest,
+} from '@core/api';
 import { PageURLS } from '@core/constants';
 import { cn, formatDateTime, formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
@@ -41,6 +50,12 @@ function PaymentsResultPage() {
   const { call: getProofViewUrlPromise, isLoading: isGettingProofViewUrl } = useCallablePromise((id: string) =>
     DansshipAPI.payments.getProofViewUrl(id),
   );
+  const { call: getProofUploadUrlPromise, isLoading: isGettingProofUploadUrl } = useCallablePromise(
+    (id: string, payload: PaymentProofUploadRequest) => DansshipAPI.payments.getProofUploadUrl(id, payload),
+  );
+  const { call: confirmProofUploadPromise, isLoading: isConfirmingUpload } = useCallablePromise(
+    (id: string, payload: ConfirmPaymentProofPayload) => DansshipAPI.payments.confirmProofUpload(id, payload),
+  );
 
   const getProofViewUrl = useCallback(
     async (id: string) => {
@@ -52,6 +67,72 @@ function PaymentsResultPage() {
     },
     [getProofViewUrlPromise],
   );
+
+  const confirmProofUpload = useCallback(
+    async (id: string, payload: ConfirmPaymentProofPayload) => {
+      const { error } = await confirmProofUploadPromise(id, payload);
+
+      if (error) {
+        toast.error(t('payments:proofUploadFailedDesc'));
+      } else {
+        toast.success(t('payments:proofUploadSuccess'));
+      }
+    },
+    [confirmProofUploadPromise, t],
+  );
+
+  const getProofUploadUrl = useCallback(
+    async (id: string, file: File) => {
+      try {
+        const { data } = await getProofUploadUrlPromise(id, {
+          content_type: file.type as PaymentProofContentType,
+        });
+
+        if (data) {
+          const { upload_url, file_key } = data;
+
+          const uploadResponse = await fetch(upload_url, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': file.type,
+            },
+            body: file,
+          });
+
+          if (!uploadResponse.ok) {
+            toast.error(t('payments:proofUploadFailedDesc'));
+          }
+
+          await confirmProofUpload(id, { file_key });
+        }
+      } catch {
+        toast.error(t('payments:proofUploadFailedDesc'));
+      }
+    },
+    [confirmProofUpload, getProofUploadUrlPromise, t],
+  );
+
+  const handleUploadProof = (intentId: string) => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = PaymentProofContentTypesList.join(',');
+
+    input.onchange = async () => {
+      const file = input.files?.[0] ?? null;
+
+      if (!file) return;
+
+      if (!PaymentProofContentTypesList.includes(file.type as PaymentProofContentType)) {
+        toast(t('payments:proofInvalidTypeDesc'));
+
+        return;
+      }
+
+      await getProofUploadUrl(intentId, file);
+    };
+
+    input.click();
+  };
 
   const cancelIntent = useCallback(
     async (id: string) => {
@@ -66,8 +147,6 @@ function PaymentsResultPage() {
 
   return (
     <div className='px-2 sm:px-4 md:px-8 pt-8 max-w-7xl mx-auto grid gap-8'>
-      <h3>{t('payments:result.title')}</h3>
-
       {intent ? (
         <section className='rounded-2xl shadow-2xl'>
           <section className='bg-white p-8 rounded-2xl grid md:grid-cols-[1fr_1fr] gap-8 overflow-hidden'>
@@ -86,7 +165,7 @@ function PaymentsResultPage() {
                 )}
 
               <section className='grid place-content-center gap-1 justify-items-center'>
-                <small className='m-0'>{t('payments:intentStatus')}</small>
+                <small className='m-0'>{t('payments:currentIntentStatus')}</small>
                 <PaymentStatusBadge status={intent.status} />
               </section>
 
@@ -145,12 +224,25 @@ function PaymentsResultPage() {
                 <small className='m-0 block font-code px-4 py-2'>{intent.id}</small>
               </section>
 
-              <section className='flex gap-8 items-center justify-end mt-4'>
+              <section className='flex gap-4 items-center justify-end mt-4'>
+                {intent.payment_method_type === PaymentMethod.TRANSFER && (
+                  <Button
+                    size='small'
+                    color='primary'
+                    variant='outlined'
+                    isLoading={isGettingProofUploadUrl || isConfirmingUpload}
+                    onClick={() => void handleUploadProof(intent.id)}
+                  >
+                    {t('payments:uploadProof')}
+                  </Button>
+                )}
+
                 {intent.proof_url && (
                   <Button
-                    size='sm'
-                    variant='outline'
-                    disabled={isGettingProofViewUrl}
+                    size='small'
+                    color='primary'
+                    variant='outlined'
+                    isLoading={isGettingProofViewUrl}
                     onClick={() => void getProofViewUrl(intent.id)}
                   >
                     {t('payments:viewProof')}
@@ -158,9 +250,10 @@ function PaymentsResultPage() {
                 )}
                 {intent.status !== 'cancelled' && (
                   <Button
-                    size='sm'
-                    variant='destructive'
-                    disabled={isCancellingIntent}
+                    size='small'
+                    color='alert'
+                    variant='outlined'
+                    isLoading={isCancellingIntent}
                     onClick={() => void cancelIntent(intent.id)}
                   >
                     {t('payments:cancelIntent')}
@@ -179,7 +272,11 @@ function PaymentsResultPage() {
                 <small className='m-0 block bg-gray-200 px-4 py-2'>{t('payments:intentId')}</small>
                 <small className='m-0 block font-code px-4 py-2'>{intentId}</small>
               </section>
-              <Button onClick={() => revalidator.revalidate()} disabled={revalidator.state === 'loading'}>
+              <Button
+                color='primary'
+                onClick={() => revalidator.revalidate()}
+                isLoading={revalidator.state === 'loading'}
+              >
                 {t('payments:retryIntentDetails')}
               </Button>
             </section>

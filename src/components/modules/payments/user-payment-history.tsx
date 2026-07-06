@@ -1,13 +1,14 @@
-import { format } from 'date-fns';
+import { Button, SmartTable, Tooltip } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'sonner';
+import { Link } from 'react-router';
 
 import { SpinnerLoader } from '@components/loaders';
 import { PaymentStatusBadge } from '@components/modules';
-import { Button, Card, CardContent, CardHeader, CardTitle } from '@components/ui';
-import { PaymentProofContentType, PaymentProofContentTypesList, type PaymentStatus } from '@core/api';
-import { formatPrice, paymentPurchaseLabel, purchaseTypeLabelKey } from '@helpers';
-import { useDateLocale, usePaymentIntents } from '@hooks';
+import { Card } from '@components/ui';
+import { DansshipAPI, type PaymentStatus } from '@core/api';
+import { PageURLS } from '@core/constants';
+import { formatDate, formatDateTime, formatPrice, paymentPurchaseLabel } from '@helpers';
+import { usePromise } from '@hooks';
 
 interface UserPaymentHistoryProps {
   title?: string;
@@ -20,46 +21,11 @@ export function UserPaymentHistory({
   statuses,
   emptyStateKey = 'payments:emptyState',
 }: UserPaymentHistoryProps) {
-  const { t } = useTranslation();
-  const locale = useDateLocale();
-  const {
-    intents,
-    isLoading,
-    cancelIntent,
-    isCancellingIntent,
-    getProofViewUrl,
-    isGettingProofViewUrl,
-    getProofUploadUrl,
-    isGettingProofUploadUrl,
-  } = usePaymentIntents();
+  const { t, i18n } = useTranslation();
+  const { response: intents, isLoading } = usePromise(() => DansshipAPI.payments.getMyIntents());
 
-  const visibleIntents = statuses ? intents.filter(intent => statuses.includes(intent.status)) : intents;
-
-  const handleViewProof = async (intentId: string) => {
-    await getProofViewUrl(intentId);
-  };
-
-  const handleUploadProof = (intentId: string) => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = PaymentProofContentTypesList.join(',');
-
-    input.onchange = async () => {
-      const file = input.files?.[0] ?? null;
-
-      if (!file) return;
-
-      if (!PaymentProofContentTypesList.includes(file.type as PaymentProofContentType)) {
-        toast(t('payments:proofInvalidTypeDesc'));
-
-        return;
-      }
-
-      await getProofUploadUrl(intentId, file);
-    };
-
-    input.click();
-  };
+  const visibleIntents =
+    (statuses ? intents?.data?.filter(intent => statuses.includes(intent.status)) : intents?.data) ?? [];
 
   if (isLoading) {
     return (
@@ -71,86 +37,64 @@ export function UserPaymentHistory({
     );
   }
 
+  if (visibleIntents.length === 0) {
+    return (
+      <section className='px-8 py-16 rounded-3xl bg-white/50 grid place-content-center text-center'>
+        <p>{t(emptyStateKey)}</p>
+      </section>
+    );
+  }
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title ?? t('payments:myPayments')}</CardTitle>
-      </CardHeader>
+    <section className='grid gap-4'>
+      <h4>{title || t('payments:myPayments')}</h4>
 
-      <CardContent className='space-y-3'>
-        {visibleIntents.length === 0 ? (
-          <p className='text-sm text-gray-500'>{t(emptyStateKey)}</p>
-        ) : (
-          visibleIntents.map(intent => {
-            const canAct = intent.status === 'pending_manual_review';
-            const purchaseLabel = paymentPurchaseLabel(intent);
-
-            return (
-              <div key={intent.id} className='rounded-lg border border-gray-200 p-4'>
-                <div className='flex flex-wrap items-start justify-between gap-2'>
-                  <div>
-                    <p className='font-semibold text-gray-900'>{purchaseLabel}</p>
-
-                    <p className='text-sm text-gray-600'>{formatPrice(intent.amount, intent.currency)}</p>
-
-                    <p className='text-xs text-gray-500'>
-                      {t('payments:createdAt')}:{' '}
-                      {format(new Date(intent.created_at), 'MMM d, yyyy', {
-                        locale,
-                      })}
-                    </p>
-
-                    <p className='text-xs text-gray-500'>
-                      {t('common:type')}: {t(purchaseTypeLabelKey(intent.purchase_type))}
-                    </p>
-
-                    <p className='text-xs text-gray-500'>
-                      {t('payments:methodLabel')}: {t(`payments:method.${intent.payment_method_type}`)}
-                    </p>
-                  </div>
-
-                  <PaymentStatusBadge status={intent.status} />
-                </div>
-
-                {canAct && (
-                  <div className='mt-3 space-y-3'>
-                    <div className='flex flex-wrap gap-2'>
-                      <Button
-                        size='sm'
-                        variant='outline'
-                        disabled={isGettingProofUploadUrl}
-                        onClick={() => handleUploadProof(intent.id)}
-                      >
-                        {t('payments:uploadProof')}
-                      </Button>
-
-                      {intent.proof_url && (
-                        <Button
-                          size='sm'
-                          variant='outline'
-                          disabled={isGettingProofViewUrl}
-                          onClick={() => void handleViewProof(intent.id)}
-                        >
-                          {t('payments:viewProof')}
-                        </Button>
-                      )}
-
-                      <Button
-                        size='sm'
-                        variant='destructive'
-                        disabled={isCancellingIntent}
-                        onClick={() => void cancelIntent(intent.id)}
-                      >
-                        {t('payments:cancelIntent')}
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            );
-          })
-        )}
-      </CardContent>
-    </Card>
+      <SmartTable
+        rowId='id'
+        columns={[
+          {
+            header: t('payments:createdAt'),
+            render: row => (
+              <Tooltip content={formatDateTime(row.created_at, i18n.language)}>
+                <small>{formatDate(row.created_at, i18n.language)}</small>
+              </Tooltip>
+            ),
+            sortBy: 'created_at',
+          },
+          {
+            header: t('payments:name'),
+            render: row => <label>{paymentPurchaseLabel(row)}</label>,
+          },
+          {
+            header: t('payments:methodLabel'),
+            render: row => <label>{t(`payments:method.${row.payment_method_type}`)}</label>,
+            sortBy: 'payment_method_type',
+          },
+          {
+            header: t('payments:ammount'),
+            render: row => <label>{formatPrice(row.amount, row.currency)}</label>,
+            sortBy: 'amount',
+          },
+          {
+            header: t('payments:intentStatus'),
+            render: row => <PaymentStatusBadge status={row.status} />,
+            sortBy: 'status',
+          },
+          {
+            header: '',
+            render: row => (
+              <Link to={`${PageURLS.paymentsResult}?intentId=${row.id}`}>
+                <Button color='primary' size='small' variant='flat' className='whitespace-nowrap'>
+                  {t('payments:moreDetails')}
+                </Button>
+              </Link>
+            ),
+          },
+        ]}
+        data={visibleIntents}
+        className='rounded-3xl'
+        tableClassName='bg-white/50'
+      />
+    </section>
   );
 }
