@@ -40,7 +40,7 @@ function MyAccountSubscriptionPage() {
   );
 
   return (
-    <div className='max-w-6xl mx-auto py-10 px-4'>
+    <div className='max-w-7xl mx-auto py-10 px-4'>
       <div className='mb-10'>
         <h4>{t('subscriptions:store.title')}</h4>
         <p>{t('subscriptions:store.subtitle')}</p>
