@@ -1,7 +1,15 @@
+nodeLinker: hoisted
+ignoreScripts: true
+autoInstallPeers: true
+strictPeerDependencies: false
+registries:
+  default: https://registry.npmjs.org/
+
 allowBuilds:
   esbuild: false
   msw: false
   unrs-resolver: false
+
 minimumReleaseAgeExclude:
   - polpo-http-client@1.0.20
   - polpo-tailwind-config@0.1.0
