@@ -22,21 +22,21 @@
    * COLORS
    * ================================================ */
   --color-active: hsl(147 100% 35%);
-  --color-active-foreground: var(--color-active-50);
+  --color-active-foreground: var(--color-active-800);
   --color-alert: hsl(359 90% 62%);
-  --color-alert-foreground: var(--color-alert-50);
+  --color-alert-foreground: var(--color-alert-800);
   --color-warning: hsl(38 100% 50%);
-  --color-warning-foreground: var(--color-warning-50);
+  --color-warning-foreground: var(--color-warning-800);
   --color-info: hsl(210 100% 51%);
-  --color-info-foreground: var(--color-info-50);
+  --color-info-foreground: var(--color-info-800);
   --color-primary: hsl(268 56% 30%);
   --color-primary-foreground: var(--color-primary-50);
   --color-secondary: hsl(37 93% 88%);
-  --color-secondary-foreground: var(--color-secondary-900);
+  --color-secondary-foreground: var(--color-secondary-800);
   --color-tertiary: hsl(347 94% 82%);
-  --color-tertiary-foreground: var(--color-tertiary-50);
+  --color-tertiary-foreground: var(--color-tertiary-800);
   --color-highlight: hsl(7 81% 57%);
-  --color-highlight-foreground: var(--color-highlight-900);
+  --color-highlight-foreground: var(--color-highlight-800);
   --color-accent: hsl(285 26% 70%);
   --color-accent-foreground: var(--color-accent-800);
 

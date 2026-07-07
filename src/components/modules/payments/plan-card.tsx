@@ -32,7 +32,7 @@ export function PlanCard({ plan, onSelectPlan, isFeatured, hoverable, className,
           'relative flex h-auto flex-col',
           isFeatured
             ? 'bg-gradient-plan-recommended text-primary-foreground shadow-[0_2rem_2rem_-1rem_var(--color-primary)] transition-all w-[calc(100%+48px)] -left-6 lg:left-0 lg:w-auto md:-translate-y-8 duration-300 lg:h-full border-0'
-            : 'bg-transparent text-secondary-foreground border-0 shadow-none transition-all',
+            : 'bg-transparent text-secondary-900 border-0 shadow-none transition-all',
           isFeatured &&
             hoverable &&
             'group-hover:shadow-[0_3rem_2.5rem_-2rem_var(--color-primary)] md:group-hover:-translate-y-10',
@@ -44,7 +44,7 @@ export function PlanCard({ plan, onSelectPlan, isFeatured, hoverable, className,
         )}
       >
         {isFeatured && (
-          <div className='pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-highlight px-4 py-1 text-xs font-semibold uppercase text-highlight-foreground'>
+          <div className='pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-highlight px-4 py-1 text-xs font-semibold uppercase text-highlight-100'>
             {t('subscriptions:bestValue')}
           </div>
         )}
@@ -85,9 +85,7 @@ export function PlanCard({ plan, onSelectPlan, isFeatured, hoverable, className,
               t('subscriptions:accessAllClasses'),
             ].map((item, i) => (
               <li key={i} className='flex items-start gap-2.5 sm:gap-3'>
-                <FaCheckCircle
-                  className={cn('mt-1 shrink-0 h-4 w-4', isFeatured ? 'text-primary-foreground' : 'text-primary')}
-                />
+                <FaCheckCircle className='mt-1 shrink-0 h-4 w-4' />
                 <span>{item}</span>
               </li>
             ))}
@@ -96,7 +94,12 @@ export function PlanCard({ plan, onSelectPlan, isFeatured, hoverable, className,
 
         {onSelectPlan && (
           <CardFooter className='pt-4 sm:pt-6'>
-            <Button fullWidth color='primary' variant={isFeatured ? 'solid' : 'outlined'} onClick={onSelectPlan}>
+            <Button
+              fullWidth
+              color={isFeatured ? 'primary' : 'tertiary'}
+              variant={isFeatured ? 'solid' : 'outlined'}
+              onClick={onSelectPlan}
+            >
               {t('subscriptions:choosePlan', { name: plan.name })}
             </Button>
           </CardFooter>

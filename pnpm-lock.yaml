@@ -48,14 +48,14 @@ importers:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       polpo:
-        specifier: ^0.1.21
-        version: 0.1.21(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwind-merge@3.6.0)(tailwindcss@4.3.0)
+        specifier: ^0.1.23
+        version: 0.1.23(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwind-merge@3.6.0)(tailwindcss@4.3.0)
       polpo-http-client:
         specifier: ^1.0.20
         version: 1.0.20
       polpo-tailwind-config:
-        specifier: ^0.1.0
-        version: 0.1.0
+        specifier: ^0.1.1
+        version: 0.1.1
       radix-ui:
         specifier: ^1.4.3
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.15))(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -3635,14 +3635,14 @@ packages:
   polpo-http-client@1.0.20:
     resolution: {integrity: sha512-/BvVd3vBpShLVd5LZ3/cWOJQSVwD5HBvv8z5LOo/JTkZD/H1t7gjNYwPCgBG4Q/JDO+JN/f9WQfvB+LKFMal9g==}
 
-  polpo-tailwind-config@0.1.0:
-    resolution: {integrity: sha512-VHxvt2dGpwvpsTugOOvMfACoPpYQHXGgkfCnRJSX6yu2+EkLoleBHD1vUooJvy7GFh2Dr+ZBHfvR+9I1HQhXyA==}
+  polpo-tailwind-config@0.1.1:
+    resolution: {integrity: sha512-q7de9titkSmOd2A6gOL42jYzsOT5JBtDYHRphO+2IP8o44ZxROkO7USietLVHKCZ6Pv1eC6znvD71++bPZW9DA==}
 
   polpo-typescript-config@1.0.0:
     resolution: {integrity: sha512-fkec8Iaux2JlOBUvrIKQb3ZInD+dl3KJEt2l4TONXmTmbsOJq+VWv4o6yV/xkKh4I/yABUuf7KDrkutsxq0QAw==}
 
-  polpo@0.1.21:
-    resolution: {integrity: sha512-uyyPZQuuZch4imZewkgvWCwDWYMMw0URtnr3BFg+dhq+CDoXM+e/jaNrAjHxT8WwP3ulDqGu+q5nzpkTtWpldQ==}
+  polpo@0.1.23:
+    resolution: {integrity: sha512-gULiFZIS3ZgAM5Muapv/uaPfRur7+3ZAEOPxL2AfFWLpiPDVzZDmjdn88k1cChCzSMh3PVPGbNSJPNYbfSI+DA==}
     peerDependencies:
       react: '*'
       react-dom: '*'
@@ -7942,16 +7942,16 @@ snapshots:
 
   polpo-http-client@1.0.20: {}
 
-  polpo-tailwind-config@0.1.0: {}
+  polpo-tailwind-config@0.1.1: {}
 
   polpo-typescript-config@1.0.0: {}
 
-  polpo@0.1.21(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwind-merge@3.6.0)(tailwindcss@4.3.0):
+  polpo@0.1.23(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwind-merge@3.6.0)(tailwindcss@4.3.0):
     dependencies:
       class-variance-authority: 0.7.1
       clsx: 2.1.1
       color: 5.0.3
-      polpo-tailwind-config: 0.1.0
+      polpo-tailwind-config: 0.1.1
       react: 19.2.6
       react-colorful: 5.7.0(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       react-dom: 19.2.6(react@19.2.6)

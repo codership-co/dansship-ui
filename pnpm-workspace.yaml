@@ -11,6 +11,5 @@ allowBuilds:
   unrs-resolver: false
 
 minimumReleaseAgeExclude:
-  - polpo-http-client@1.0.20
-  - polpo-tailwind-config@0.1.0
-  - polpo@0.1.21
+  - polpo-tailwind-config@0.1.1
+  - polpo@0.1.23
