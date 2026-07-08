@@ -264,7 +264,7 @@ function ProfilePage() {
 }
 
 export const SecureProfilePage = SecurityGuard(ProfilePage, {
-  featureFlags: [FEATURE_FLAG.isProfilePageEnabled],
+  featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isProfilePageEnabled],
   requiresAuth: true,
   redirect: PageURLS.auth.login,
 });

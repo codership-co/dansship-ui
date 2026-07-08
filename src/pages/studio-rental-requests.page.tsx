@@ -98,7 +98,7 @@ function StudioRentalRequestsPage() {
 }
 
 export const SecureStudioRentalRequestsPage = SecurityGuard(StudioRentalRequestsPage, {
-  featureFlags: [FEATURE_FLAG.isStudioRentalRequestsPageEnabled],
+  featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isStudioRentalRequestsPageEnabled],
   requiresAuth: true,
   redirect: PageURLS.auth.login,
 });

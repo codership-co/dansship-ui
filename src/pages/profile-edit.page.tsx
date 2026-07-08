@@ -354,7 +354,7 @@ function ProfileEditPage() {
 }
 
 export const SecureProfileEditPage = SecurityGuard(ProfileEditPage, {
-  featureFlags: [FEATURE_FLAG.isProfileEditPageEnabled],
+  featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isProfileEditPageEnabled],
   requiresAuth: true,
   redirect: PageURLS.auth.login,
 });

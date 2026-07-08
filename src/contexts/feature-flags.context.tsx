@@ -10,10 +10,11 @@ export enum FEATURE_FLAG {
   isVerifyEmailPageEnabled = 'isVerifyEmailPageEnabled',
   isOnboardingPageEnabled = 'isOnboardingPageEnabled',
 
-  // COMMON
+  // USER
+  areUserPagesEnabled = 'areUserPagesEnabled',
   isClassesPageEnabled = 'isClassesPageEnabled',
   isFigureCompletedPageEnabled = 'isFigureCompletedPageEnabled',
-  isFigureDetailsPageEnabled = 'isFigureDetailsPageEnabled',
+  isPaymentsResultsPageEnabled = 'isPaymentsResultsPageEnabled',
   isFigureSavedPageEnabled = 'isFigureSavedPageEnabled',
   isFiguresPageEnabled = 'isFiguresPageEnabled',
   isFiguresDetailsPageEnabled = 'isFiguresDetailsPageEnabled',
@@ -42,7 +43,52 @@ export enum FEATURE_FLAG {
   isAdminStudioRentalPageEnabled = 'isAdminStudioRentalPageEnabled',
 }
 
-interface FeatureFlagsContextState extends Record<FEATURE_FLAG, boolean> {}
+interface UserPages {
+  isClassesPageEnabled: boolean | string;
+  isFigureCompletedPageEnabled: boolean | string;
+  isPaymentsResultsPageEnabled: boolean | string;
+  isFigureSavedPageEnabled: boolean | string;
+  isFiguresPageEnabled: boolean | string;
+  isFiguresDetailsPageEnabled: boolean | string;
+  isInstructorDashboardPageEnabled: boolean | string;
+  isMyAccountBookingsPageEnabled: boolean | string;
+  isMyAccountSubscriptionPageEnabled: boolean | string;
+  isProfilePageEnabled: boolean | string;
+  isProfileEditPageEnabled: boolean | string;
+  isStudioRentalBrowsePageEnabled: boolean | string;
+  isStudioRentalRequestsPageEnabled: boolean | string;
+}
+
+interface AdminPages {
+  isAdminAccessPageEnabled: boolean | string;
+  isAdminPageEnabled: boolean | string;
+  isAdminAgendaPageEnabled: boolean | string;
+  isAdminAgendaConflictsPageEnabled: boolean | string;
+  isAdminBookingsPageEnabled: boolean | string;
+  isAdminFiguresPageEnabled: boolean | string;
+  isAdminInventoryPageEnabled: boolean | string;
+  isAdminMerchPageEnabled: boolean | string;
+  isAdminMerchPosPageEnabled: boolean | string;
+  isAdminPaymentsPageEnabled: boolean | string;
+  isAdminReportsPageEnabled: boolean | string;
+  isAdminScheduleBuilderPageEnabled: boolean | string;
+  isAdminStudioRentalPageEnabled: boolean | string;
+}
+
+interface AuthPages {
+  isLoginPageEnabled: boolean | string;
+  isSignupPageEnabled: boolean | string;
+  isForgotPasswordPageEnabled: boolean | string;
+  isResetPasswordPageEnabled: boolean | string;
+  isVerifyEmailPageEnabled: boolean | string;
+  isOnboardingPageEnabled: boolean | string;
+}
+
+interface FeatureFlagsContextState extends UserPages, AdminPages, AuthPages {
+  areUserPagesEnabled: boolean;
+  areAuthPagesEnabled: boolean;
+  areAdminPagesEnabled: boolean;
+}
 
 const FeatureFlagsContext = createContext<FeatureFlagsContextState | null>(null);
 
@@ -54,50 +100,57 @@ const envs = import.meta.env;
 
 export const FeatureFlagsProvider = ({ children }: FeatureFlagsProviderProps) => {
   const isAuthOn = envs.VITE_ARE_AUTH_PAGES_ENABLED === 'true';
+  const authPages = JSON.parse(envs.VITE_AUTH_PAGES) as AuthPages;
+
   const isAdminOn = envs.VITE_ARE_ADMIN_PAGES_ENABLED === 'true';
+  const adminPages = JSON.parse(envs.VITE_ADMIN_PAGES) as AdminPages;
+
+  const isUserOn = envs.VITE_ARE_USER_PAGES_ENABLED === 'true';
+  const userPages = JSON.parse(envs.VITE_USER_PAGES) as UserPages;
 
   return (
     <FeatureFlagsContext.Provider
       value={{
         // AUTH
         areAuthPagesEnabled: isAuthOn,
-        isLoginPageEnabled: isAuthOn && envs.VITE_IS_LOGIN_PAGE_ENABLED === 'true',
-        isSignupPageEnabled: isAuthOn && envs.VITE_IS_SIGNUP_PAGE_ENABLED === 'true',
-        isForgotPasswordPageEnabled: isAuthOn && envs.VITE_IS_FORGOT_PASSWORD_PAGE_ENABLED === 'true',
-        isResetPasswordPageEnabled: isAuthOn && envs.VITE_IS_RESET_PASSWORD_PAGE_ENABLED === 'true',
-        isVerifyEmailPageEnabled: isAuthOn && envs.VITE_IS_VERIFY_EMAIL_PAGE_ENABLED === 'true',
-        isOnboardingPageEnabled: isAuthOn && envs.VITE_IS_ONBOARDING_PAGE_ENABLED === 'true',
+        isLoginPageEnabled: isAuthOn && authPages.isLoginPageEnabled === true,
+        isSignupPageEnabled: isAuthOn && authPages.isSignupPageEnabled === true,
+        isForgotPasswordPageEnabled: isAuthOn && authPages.isForgotPasswordPageEnabled === true,
+        isResetPasswordPageEnabled: isAuthOn && authPages.isResetPasswordPageEnabled === true,
+        isVerifyEmailPageEnabled: isAuthOn && authPages.isVerifyEmailPageEnabled === true,
+        isOnboardingPageEnabled: isAuthOn && authPages.isOnboardingPageEnabled === true,
 
-        // COMMON
-        isClassesPageEnabled: envs.VITE_IS_CLASSES_PAGE_ENABLED === 'true',
-        isFigureCompletedPageEnabled: envs.VITE_IS_FIGURE_COMPLETED_PAGE_ENABLED === 'true',
-        isFigureDetailsPageEnabled: envs.VITE_IS_FIGURE_DETAILS_PAGE_ENABLED === 'true',
-        isFigureSavedPageEnabled: envs.VITE_IS_FIGURE_SAVED_PAGE_ENABLED === 'true',
-        isFiguresPageEnabled: envs.VITE_IS_FIGURES_PAGE_ENABLED === 'true',
-        isFiguresDetailsPageEnabled: envs.VITE_IS_FIGURES_DETAILS_PAGE_ENABLED === 'true',
-        isInstructorDashboardPageEnabled: envs.VITE_IS_INSTRUCTOR_DASHBOARD_PAGE_ENABLED === 'true',
-        isMyAccountBookingsPageEnabled: envs.VITE_IS_MY_ACCOUNT_BOOKINGS_PAGE_ENABLED === 'true',
-        isMyAccountSubscriptionPageEnabled: envs.VITE_IS_MY_ACCOUNT_SUBSCRIPTION_PAGE_ENABLED === 'true',
-        isProfilePageEnabled: envs.VITE_IS_PROFILE_PAGE_ENABLED === 'true',
-        isProfileEditPageEnabled: envs.VITE_IS_PROFILE_EDIT_PAGE_ENABLED === 'true',
-        isStudioRentalBrowsePageEnabled: envs.VITE_IS_STUDIO_RENTAL_BROWSE_PAGE_ENABLED === 'true',
-        isStudioRentalRequestsPageEnabled: envs.VITE_IS_STUDIO_RENTAL_REQUESTS_PAGE_ENABLED === 'true',
+        // USER
+        areUserPagesEnabled: isUserOn,
+        isClassesPageEnabled: isUserOn && userPages.isClassesPageEnabled === true,
+        isFigureCompletedPageEnabled: isUserOn && userPages.isFigureCompletedPageEnabled === true,
+        isPaymentsResultsPageEnabled: isUserOn && userPages.isPaymentsResultsPageEnabled === true,
+        isFigureSavedPageEnabled: isUserOn && userPages.isFigureSavedPageEnabled === true,
+        isFiguresPageEnabled: isUserOn && userPages.isFiguresPageEnabled === true,
+        isFiguresDetailsPageEnabled: isUserOn && userPages.isFiguresDetailsPageEnabled === true,
+        isInstructorDashboardPageEnabled: isUserOn && userPages.isInstructorDashboardPageEnabled === true,
+        isMyAccountBookingsPageEnabled: isUserOn && userPages.isMyAccountBookingsPageEnabled === true,
+        isMyAccountSubscriptionPageEnabled: isUserOn && userPages.isMyAccountSubscriptionPageEnabled === true,
+        isProfilePageEnabled: isUserOn && userPages.isProfilePageEnabled === true,
+        isProfileEditPageEnabled: isUserOn && userPages.isProfileEditPageEnabled === true,
+        isStudioRentalBrowsePageEnabled: isUserOn && userPages.isStudioRentalBrowsePageEnabled === true,
+        isStudioRentalRequestsPageEnabled: isUserOn && userPages.isStudioRentalRequestsPageEnabled === true,
 
         // ADMIN
         areAdminPagesEnabled: isAdminOn,
-        isAdminAccessPageEnabled: isAdminOn && envs.VITE_IS_ADMIN_ACCESS_PAGE_ENABLED === 'true',
-        isAdminPageEnabled: isAdminOn && envs.VITE_IS_ADMIN__PAGE_ENABLED === 'true',
-        isAdminAgendaPageEnabled: isAdminOn && envs.VITE_IS_ADMIN_AGENDA_PAGE_ENABLED === 'true',
-        isAdminAgendaConflictsPageEnabled: isAdminOn && envs.VITE_IS_ADMIN_AGENDA_CONFLICTS_PAGE_ENABLED === 'true',
-        isAdminBookingsPageEnabled: isAdminOn && envs.VITE_IS_ADMIN_BOOKINGS_PAGE_ENABLED === 'true',
-        isAdminFiguresPageEnabled: isAdminOn && envs.VITE_IS_ADMIN_FIGURES_PAGE_ENABLED === 'true',
-        isAdminInventoryPageEnabled: isAdminOn && envs.VITE_IS_ADMIN_INVENTORY_PAGE_ENABLED === 'true',
-        isAdminMerchPageEnabled: isAdminOn && envs.VITE_IS_ADMIN_MERCH_PAGE_ENABLED === 'true',
-        isAdminMerchPosPageEnabled: isAdminOn && envs.VITE_IS_ADMIN_MERCH_POS_PAGE_ENABLED === 'true',
-        isAdminPaymentsPageEnabled: isAdminOn && envs.VITE_IS_ADMIN_PAYMENTS_PAGE_ENABLED === 'true',
-        isAdminReportsPageEnabled: isAdminOn && envs.VITE_IS_ADMIN_REPORTS_PAGE_ENABLED === 'true',
-        isAdminScheduleBuilderPageEnabled: isAdminOn && envs.VITE_IS_ADMIN_SCHEDULE_BUILDER_PAGE_ENABLED === 'true',
-        isAdminStudioRentalPageEnabled: isAdminOn && envs.VITE_IS_ADMIN_STUDIO_RENTAL_PAGE_ENABLED === 'true',
+        isAdminAccessPageEnabled: isAdminOn && adminPages.isAdminAccessPageEnabled === true,
+        isAdminPageEnabled: isAdminOn && adminPages.isAdminPageEnabled === true,
+        isAdminAgendaPageEnabled: isAdminOn && adminPages.isAdminAgendaPageEnabled === true,
+        isAdminAgendaConflictsPageEnabled: isAdminOn && adminPages.isAdminAgendaConflictsPageEnabled === true,
+        isAdminBookingsPageEnabled: isAdminOn && adminPages.isAdminBookingsPageEnabled === true,
+        isAdminFiguresPageEnabled: isAdminOn && adminPages.isAdminFiguresPageEnabled === true,
+        isAdminInventoryPageEnabled: isAdminOn && adminPages.isAdminInventoryPageEnabled === true,
+        isAdminMerchPageEnabled: isAdminOn && adminPages.isAdminMerchPageEnabled === true,
+        isAdminMerchPosPageEnabled: isAdminOn && adminPages.isAdminMerchPosPageEnabled === true,
+        isAdminPaymentsPageEnabled: isAdminOn && adminPages.isAdminPaymentsPageEnabled === true,
+        isAdminReportsPageEnabled: isAdminOn && adminPages.isAdminReportsPageEnabled === true,
+        isAdminScheduleBuilderPageEnabled: isAdminOn && adminPages.isAdminScheduleBuilderPageEnabled === true,
+        isAdminStudioRentalPageEnabled: isAdminOn && adminPages.isAdminStudioRentalPageEnabled === true,
       }}
     >
       {children}

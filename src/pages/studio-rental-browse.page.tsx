@@ -215,7 +215,7 @@ function StudioRentalBrowsePage() {
 }
 
 export const SecureStudioRentalBrowsePage = SecurityGuard(StudioRentalBrowsePage, {
-  featureFlags: [FEATURE_FLAG.isStudioRentalBrowsePageEnabled],
+  featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isStudioRentalBrowsePageEnabled],
   requiresAuth: true,
   redirect: PageURLS.auth.login,
 });

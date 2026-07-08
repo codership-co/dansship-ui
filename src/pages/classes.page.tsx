@@ -21,5 +21,5 @@ function ClassesPage() {
 }
 
 export const SecureClassesPage = SecurityGuard(ClassesPage, {
-  featureFlags: [FEATURE_FLAG.isClassesPageEnabled],
+  featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isClassesPageEnabled],
 });

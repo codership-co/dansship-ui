@@ -135,7 +135,7 @@ function MyAccountSubscriptionPage() {
 }
 
 export const SecureMyAccountSubscriptionPage = SecurityGuard(MyAccountSubscriptionPage, {
-  featureFlags: [FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
+  featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
   requiresAuth: true,
   redirect: PageURLS.auth.login,
 });

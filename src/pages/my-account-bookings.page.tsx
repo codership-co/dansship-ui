@@ -129,7 +129,7 @@ function MyAccountBookingsPage() {
 }
 
 export const SecureMyAccountBookingsPage = SecurityGuard(MyAccountBookingsPage, {
-  featureFlags: [FEATURE_FLAG.isMyAccountBookingsPageEnabled],
+  featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isMyAccountBookingsPageEnabled],
   requiresAuth: true,
   redirect: PageURLS.auth.login,
 });

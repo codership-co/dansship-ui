@@ -34,7 +34,7 @@ function FigureCompletedPage() {
 }
 
 export const SecureFigureCompletedPage = SecurityGuard(FigureCompletedPage, {
-  featureFlags: [FEATURE_FLAG.isFigureCompletedPageEnabled],
+  featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isFigureCompletedPageEnabled],
   requiresAuth: true,
   redirect: PageURLS.auth.login,
 });

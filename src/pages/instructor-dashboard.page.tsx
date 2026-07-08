@@ -40,7 +40,7 @@ function InstructorDashboardPage() {
 }
 
 export const SecureInstructorDashboardPage = SecurityGuard(InstructorDashboardPage, {
-  featureFlags: [FEATURE_FLAG.isInstructorDashboardPageEnabled],
+  featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isInstructorDashboardPageEnabled],
   orPermissions: [...InstructorPermissions.dashboard, ...AdminPermissions.scheduleBuilder],
   requiresAuth: true,
   redirect: PageURLS.auth.login,

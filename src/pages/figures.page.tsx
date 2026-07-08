@@ -31,5 +31,5 @@ function FiguresPage() {
 }
 
 export const SecureFiguresPage = SecurityGuard(FiguresPage, {
-  featureFlags: [FEATURE_FLAG.isFiguresPageEnabled],
+  featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isFiguresPageEnabled],
 });

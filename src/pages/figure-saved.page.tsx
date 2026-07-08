@@ -33,7 +33,7 @@ function FigureSavedPage() {
 }
 
 export const SecureFigureSavedPage = SecurityGuard(FigureSavedPage, {
-  featureFlags: [FEATURE_FLAG.isFigureSavedPageEnabled],
+  featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isFigureSavedPageEnabled],
   requiresAuth: true,
   redirect: PageURLS.auth.login,
 });

@@ -5,7 +5,7 @@ import { LoaderFunctionArgs, useLoaderData, useRevalidator } from 'react-router'
 import { toast } from 'sonner';
 
 import { PaymentStatusBadge, UserPaymentHistory } from '@components/modules';
-import { SecurityGuard } from '@contexts';
+import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import {
   type ConfirmPaymentProofPayload,
   DansshipAPI,
@@ -302,7 +302,7 @@ function PaymentsResultPage() {
 }
 
 export const SecurePaymentsResultPage = SecurityGuard(PaymentsResultPage, {
-  featureFlags: [],
+  featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isPaymentsResultsPageEnabled],
   requiresAuth: true,
   redirect: PageURLS.auth.login,
 });
