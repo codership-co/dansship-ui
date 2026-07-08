@@ -20,7 +20,8 @@ cd dansship-ui                                               # Move to cloned re
 brew install vercel-cli                                      # Installing vercel CLI
 vercel login                                                 # Login to vercel account
 vercel link                                                  # Connect repository to vercel's project
-vercel env pull                                              # Configure .env.local file
+vercel env pull -y                                           # Configure .env.local file
+sed -e "s/\"{/'{/g" -e "s/\\\n  //g" -e "s/\\\n}\"/}'/g" .env.local > .env && mv .env .env.local
 sudo echo "127.0.0.1 localhost.dansship.com" >> /etc/hosts   # Add local host configuration to allow cookies normal use on your machine
 pnpm i                                                       # Install dependencies
 pnpm dev                                                     # Run the project
