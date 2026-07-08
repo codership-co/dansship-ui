@@ -10,7 +10,8 @@
     "lint:fix": "pnpm lint --fix",
     "preview": "vite preview",
     "prepare": "husky",
-    "create-component": "pnpm dlx shadcn@latest add"
+    "create-component": "pnpm dlx shadcn@latest add",
+    "deploy:dev": "vercel deploy --target=development"
   },
   "dependencies": {
     "@fontsource-variable/figtree": "^5.2.10",
