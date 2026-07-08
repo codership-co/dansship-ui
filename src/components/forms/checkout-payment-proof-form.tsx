@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { Button } from 'polpo/components';
 import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuArrowLeft } from 'react-icons/lu';
@@ -6,7 +7,6 @@ import { MdOutlinePayments } from 'react-icons/md';
 import { toast } from 'sonner';
 
 import { CheckoutFormValues } from '@components/forms/checkout-review-plan-form';
-import { Button } from '@components/ui';
 import {
   type ConfirmPaymentProofPayload,
   type CreatePaymentIntentPayload,
@@ -209,14 +209,16 @@ export function CheckoutPaymentProofForm({
       </section>
 
       <div className='flex justify-end gap-2 pt-4'>
-        <Button type='button' className='flex items-center' variant='outline' onClick={onBack}>
+        <Button type='button' className='flex items-center' color='primary' variant='outlined' onClick={onBack}>
           <LuArrowLeft />
           {t('common:back')}
         </Button>
 
         <Button
           type='submit'
-          disabled={isBusy || (requiresProof && !selectedProofFile)}
+          color='primary'
+          isLoading={isBusy}
+          disabled={requiresProof && !selectedProofFile}
           onClick={() => onConfirm()}
           className='flex items-center'
         >

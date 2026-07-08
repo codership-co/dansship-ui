@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TFunction } from 'i18next';
+import { Button } from 'polpo/components';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { LuBuilding, LuCalendar, LuHouse, LuIdCard, LuUser } from 'react-icons/lu';
 import { z } from 'zod';
 
 import { DateField, SelectField, TextField } from '@components/form-fields';
-import { Button } from '@components/ui';
 import { COUNTRY_CODE_OPTIONS, DOCUMENT_TYPE_OPTIONS } from '@core/constants';
 
 export const createStudentProfileSchema = (t: TFunction) => {
@@ -145,7 +145,7 @@ export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: Onb
 
         {error ? <p className='text-sm text-alert-600'>{error}</p> : null}
 
-        <Button type='submit' disabled={isLoading} className='mt-4 w-full'>
+        <Button type='submit' isLoading={isLoading} color='primary' className='mt-4' fullWidth>
           {isLoading ? t('common:loading') : t('auth:onboarding.continue')}
         </Button>
       </form>

@@ -142,6 +142,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       clearSessionArtifacts();
       setUser(null);
       toast.success(t('auth:registerSuccess'));
+      navigate(PageURLS.auth.verifyEmail, {
+        state: {
+          email: payload.email,
+        },
+      });
     } else {
       setLocalError(t('auth:registerFailed'));
       toast.error(t('auth:registerFailed'));
@@ -193,6 +198,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (ok) {
       setLocalError(null);
       toast.success(t('auth:resetPasswordSuccess'));
+      navigate(PageURLS.auth.login);
     } else {
       setLocalError(t('auth:resetPasswordFailed'));
       toast.error(t('auth:resetPasswordFailed'));

@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from 'polpo/components';
 import { useForm, useController } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 import { Checkbox, SelectField } from '@components/form-fields';
-import { Button, Label } from '@components/ui';
+import { Label } from '@components/ui';
 import {
   DISCOVERY_OPTIONS,
   DISCIPLINES_OPTIONS,
@@ -152,10 +153,10 @@ export function OnboardingStudentPreferencesForm({
         {error ? <p className='text-sm text-alert-600'>{error}</p> : null}
 
         <div className='mt-6 flex flex-col items-center space-y-3'>
-          <Button type='submit' disabled={isLoading} className='w-full'>
+          <Button type='submit' isLoading={isLoading} color='primary' fullWidth>
             {isLoading ? t('common:loading') : t('auth:onboarding.complete')}
           </Button>
-          <Button type='button' onClick={onSkip} variant='ghost' disabled={isLoading} className='w-full text-gray-500'>
+          <Button type='button' onClick={onSkip} color='tertiary' variant='text' isLoading={isLoading} fullWidth>
             {t('auth:onboarding.omitStep')}
           </Button>
         </div>

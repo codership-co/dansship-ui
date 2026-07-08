@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 
 import { SignUpForm, type SignUpFormData } from '@components/forms';
 import { AuthFormLayout } from '@components/layouts';
@@ -9,27 +8,18 @@ import { PageURLS } from '@core/constants';
 
 function SignupPage() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { signUp } = useAuth();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const handleSubmit = async (formData: SignUpFormData) => {
     setIsSubmitting(true);
 
-    const { data } = await signUp({
+    await signUp({
       email: formData.email,
       password: formData.password,
       confirm_password: formData.confirmPassword,
     });
     setIsSubmitting(false);
-
-    if (data) {
-      navigate(PageURLS.auth.verifyEmail, {
-        state: {
-          email: data.email,
-        },
-      });
-    }
   };
 
   return (

@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from 'polpo/components';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +8,6 @@ import { Link } from 'react-router';
 import { z } from 'zod';
 
 import { EmailField } from '@components/form-fields';
-import { Button } from '@components/ui';
 import { useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
 
@@ -94,19 +94,19 @@ export function ForgotPasswordForm({ onSubmit, isSubmitting }: ForgotPasswordFor
         {displayError ? <p className='text-sm text-alert-600'>{displayError}</p> : null}
 
         <section className='grid gap-2'>
-          <Button type='submit' disabled={isSubmitting} className='w-full'>
+          <Button type='submit' isLoading={isSubmitting} color='primary' fullWidth>
             {isSubmitting ? t('common:loading') : t('auth:forgotPassword.sendLink')}
           </Button>
 
           <Link to={PageURLS.auth.resetPassword} viewTransition>
-            <Button className='w-full' variant='outlinePrimary'>
+            <Button fullWidth color='primary' variant='outlined'>
               <LuKey className='w-4 h-4' />
               {t('auth:resetPassword.otpReady')}
             </Button>
           </Link>
 
           <Link to={PageURLS.auth.login} viewTransition>
-            <Button variant='ghostPrimary' className='w-full'>
+            <Button color='primary' variant='text' fullWidth>
               <LuArrowLeft className='w-4 h-4' />
               {t('auth:forgotPassword.backToLogin')}
             </Button>
@@ -123,16 +123,16 @@ export function ForgotPasswordForm({ onSubmit, isSubmitting }: ForgotPasswordFor
       </div>
       <div className='grid gap-4'>
         <Link to={PageURLS.auth.resetPassword} state={{ email: submittedEmail }} viewTransition>
-          <Button className='w-full'>
+          <Button fullWidth color='primary'>
             <LuKey className='w-4 h-4' />
             {t('auth:resetPassword.cta')}
           </Button>
         </Link>
-        <Button variant='outlinePrimary' onClick={handleTryAnother}>
+        <Button fullWidth color='primary' variant='outlined' onClick={handleTryAnother}>
           {t('auth:forgotPassword.tryAnother')}
         </Button>
         <Link to={PageURLS.auth.login} viewTransition>
-          <Button variant='ghostPrimary' className='w-full'>
+          <Button color='primary' variant='text' fullWidth>
             <LuArrowLeft className='w-4 h-4' />
             {t('auth:forgotPassword.backToLogin')}
           </Button>

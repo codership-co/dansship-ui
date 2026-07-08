@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TFunction } from 'i18next';
+import { Button } from 'polpo/components';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { LuArrowLeft, LuArrowRight } from 'react-icons/lu';
@@ -8,7 +9,6 @@ import { z } from 'zod';
 
 import { EmailField } from '@components/form-fields';
 import { Spinner, SpinnerLoader } from '@components/loaders';
-import { Button } from '@components/ui';
 import { PageURLS } from '@core/constants';
 
 const createVerifyEmailFormSchema = (t: TFunction) =>
@@ -78,7 +78,11 @@ export const VerifyEmailForm = ({
         {[VerificationStatus.VERIFICATION_FAILED, VerificationStatus.RESENDED_FAILED, VerificationStatus.IDLE].includes(
           status,
         ) && (
-          <Button className='w-full' disabled={status === VerificationStatus.RESENDING_EMAIL || isCountDownActive}>
+          <Button
+            fullWidth
+            color='primary'
+            disabled={status === VerificationStatus.RESENDING_EMAIL || isCountDownActive}
+          >
             {status === VerificationStatus.RESENDING_EMAIL && <Spinner />}
             {status !== VerificationStatus.RESENDING_EMAIL && isCountDownActive && <span>{formattedTime}</span>}
             {status !== VerificationStatus.RESENDING_EMAIL && !isCountDownActive && (
@@ -89,12 +93,12 @@ export const VerifyEmailForm = ({
 
         <Link to={PageURLS.auth.login} viewTransition>
           {status === VerificationStatus.VERIFIED ? (
-            <Button className='w-full' type='button'>
+            <Button fullWidth color='primary' type='button'>
               <LuArrowRight className='w-4 h-4' />
               {t('auth:verifyEmail.continueToLogin')}
             </Button>
           ) : (
-            <Button variant='ghostPrimary' className='w-full' type='button'>
+            <Button variant='text' fullWidth color='primary' type='button'>
               <LuArrowLeft className='w-4 h-4' />
               {t('auth:verifyEmail.backToLogin')}
             </Button>

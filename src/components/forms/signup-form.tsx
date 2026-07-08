@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from 'polpo/components';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { z } from 'zod';
 
 import { EmailField, PasswordFieldset } from '@components/form-fields';
-import { Button } from '@components/ui';
 import { PageURLS } from '@core/constants';
 
 const createSignUpSchema = (t: (key: string) => string) =>
@@ -74,8 +74,8 @@ export function SignUpForm({ onSubmit, isSubmitting }: SignUpFormProps) {
         }}
       />
 
-      <Button type='submit' disabled={isSubmitting} className='w-full'>
-        {isSubmitting ? t('common:loading') : t('auth:signup.createAccount')}
+      <Button color='primary' type='submit' isLoading={isSubmitting} fullWidth>
+        {t('auth:signup.createAccount')}
       </Button>
 
       <div className='text-center text-sm'>

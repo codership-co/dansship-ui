@@ -1,15 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TFunction } from 'i18next';
+import { Button } from 'polpo/components';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { LuArrowLeft, LuKey } from 'react-icons/lu';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { z } from 'zod';
 
 import { EmailField, PasswordFieldset, TextField } from '@components/form-fields';
 import { Spinner } from '@components/loaders';
-import { Button } from '@components/ui';
 import { useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
 import { useCountdown } from '@hooks';
@@ -41,7 +41,6 @@ const createResetPasswordFormSchema = (t: TFunction) =>
 export type ResetPasswordFormData = z.infer<ReturnType<typeof createResetPasswordFormSchema>>;
 
 const useResetPasswordForm = (email: string) => {
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const { forgotPassword, resetPassword } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -83,11 +82,7 @@ const useResetPasswordForm = (email: string) => {
     setIsSubmitting(true);
 
     try {
-      const { error } = await resetPassword({ email, new_password, code });
-
-      if (!error) {
-        navigate(PageURLS.auth.login);
-      }
+      await resetPassword({ email, new_password, code });
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Reset password failed:', error);
@@ -157,18 +152,19 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
       />
 
       <section className='grid gap-2'>
-        <Button type='submit' disabled={isSubmitting} className='w-full'>
+        <Button type='submit' isLoading={isSubmitting} color='primary' fullWidth>
           {isSubmitting && <Spinner />}
           {!isSubmitting && t('auth:resetPassword.submit')}
         </Button>
 
         {Boolean(email) && (
           <Button
-            className='w-full'
-            variant='outlinePrimary'
+            fullWidth
+            color='primary'
+            variant='outlined'
             type='button'
             onClick={isSendingCode ? undefined : resendCodeOTP}
-            disabled={isActive || isSendingCode}
+            isLoading={isActive || isSendingCode}
           >
             {isSendingCode && <Spinner />}
             {isActive && !isSendingCode && <span>{formattedTime}</span>}
@@ -182,7 +178,7 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
         )}
 
         <Link to={PageURLS.auth.login} viewTransition>
-          <Button variant='ghostPrimary' className='w-full'>
+          <Button variant='text' color='primary' fullWidth>
             <LuArrowLeft className='w-4 h-4' />
             {t('auth:resetPassword.backToLogin')}
           </Button>

@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TFunction } from 'i18next';
+import { Button } from 'polpo/components';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +9,6 @@ import { z } from 'zod';
 
 import { DateField, TextField } from '@components/form-fields';
 import { Spinner } from '@components/loaders';
-import { Button } from '@components/ui';
 import { DansshipAPI, DiscountPreviewRequest, PublicPlan } from '@core/api';
 import { formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
@@ -172,12 +172,12 @@ export const CheckoutReviewPlanFormInput = ({
         </div>
 
         <div className='flex justify-end gap-2 pt-4'>
-          <Button type='button' className='flex items-center' variant='outline' onClick={onCancel}>
+          <Button type='button' className='flex items-center' variant='outlined' color='primary' onClick={onCancel}>
             <LuX />
             {t('common:cancel')}
           </Button>
 
-          <Button disabled={isLoading} className='flex items-center'>
+          <Button isLoading={isLoading} color='primary' className='flex items-center'>
             {t('common:next')}
             <LuArrowRight />
           </Button>
