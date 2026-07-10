@@ -250,8 +250,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         resetPassword,
         verifyEmail,
         resendVerification,
-        requireOnboarding:
-          (user?.requiresOnboarding && user?.onboardingRequired && !user?.onboardingCompleted) ?? false,
+        requireOnboarding: (user?.requiresOnboarding && !user?.onboardingCompleted) ?? false,
       }}
     >
       {children}

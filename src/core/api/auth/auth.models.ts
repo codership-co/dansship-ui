@@ -15,7 +15,6 @@ export interface AuthUser {
   is_active?: boolean;
   is_email_verified?: boolean;
   requires_onboarding?: boolean;
-  onboarding_required?: boolean;
   onboarding_completed?: boolean;
   onboarding_pending_steps?: Array<string>;
   roles?: Array<string>;
@@ -60,7 +59,6 @@ export interface User {
   isActive?: boolean;
   isEmailVerified?: boolean;
   requiresOnboarding?: boolean;
-  onboardingRequired?: boolean;
   onboardingCompleted?: boolean;
   onboardingPendingSteps?: Array<string>;
   updatedAt?: string;
