@@ -49,7 +49,6 @@ export const mapAuthUserToUser = (authUser: AuthUser): User => {
     isActive: authUser.is_active,
     isEmailVerified: authUser.is_email_verified,
     requiresOnboarding: authUser.requires_onboarding,
-    onboardingRequired: authUser.onboarding_required,
     onboardingCompleted: authUser.onboarding_completed,
     onboardingPendingSteps: authUser.onboarding_pending_steps || [],
     updatedAt: authUser.updated_at,
