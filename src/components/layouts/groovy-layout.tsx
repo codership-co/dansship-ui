@@ -5,7 +5,6 @@ import { cn } from '@helpers';
 type Particle = {
   size: number;
   distance: number;
-  position: number;
   duration: number;
   delay: number;
 };
@@ -31,18 +30,18 @@ interface GroovyLayoutProps {
   particles?: number;
   minDistance?: number;
   maxDistance?: number;
-  marginTop?: React.CSSProperties['marginTop'];
+  marginTop?: number;
   background?: React.CSSProperties['background'];
   className?: string;
 }
 
 export function GroovyLayout({
   children,
-  particles: particlesCount = 200,
+  particles: particlesCount = 100,
   minDistance = 10,
-  maxDistance = 25,
+  maxDistance = 15,
   className,
-  marginTop = `${maxDistance * 0.75}vh`,
+  marginTop = 0.8,
   background = 'var(--color-primary)',
 }: GroovyLayoutProps) {
   const isSafari = useMemo(isSafariBrowser, []);
@@ -50,8 +49,7 @@ export function GroovyLayout({
     return Array.from({ length: particlesCount }, () => ({
       size: random(5, PARTICLE_MAX_SIZE),
       distance: random(minDistance, maxDistance),
-      position: random(-5, 110),
-      duration: random(3, 6),
+      duration: random(5, 8),
       delay: random(-10, 0),
     }));
   }, [maxDistance, minDistance, particlesCount]);
@@ -61,7 +59,7 @@ export function GroovyLayout({
       className={cn('relative w-full', className)}
       style={{
         background,
-        marginTop: isSafari ? 0 : marginTop,
+        marginTop: isSafari ? 0 : `${(PARTICLE_MAX_SIZE * -0.5 + maxDistance) * marginTop}rem`,
       }}
     >
       <svg className='h-px w-px pointer-events-none opacity-0 absolute' xmlns='http://www.w3.org/2000/svg'>
@@ -81,17 +79,18 @@ export function GroovyLayout({
 
       <section
         className={cn(
-          'pointer-events-none absolute w-full z-0 left-0 bottom-1/2 flex bg-red overflow-hidden',
+          'pointer-events-none absolute w-full z-0 left-0 bottom-full flex overflow-hidden',
           isSafari && 'hidden',
         )}
         style={{
-          height: `calc(${PARTICLE_MAX_SIZE * 0.4}rem + ${maxDistance}vh)`,
+          transform: `translateY(${PARTICLE_MAX_SIZE}rem)`,
+          height: `${PARTICLE_MAX_SIZE * 0.5 + maxDistance}rem`,
         }}
       >
         <div
           className='w-full mt-auto relative'
           style={{
-            height: `${PARTICLE_MAX_SIZE * 1.1}rem`,
+            height: `${PARTICLE_MAX_SIZE}rem`,
             filter: 'url(#gooey-footer)',
             background,
           }}
@@ -101,22 +100,17 @@ export function GroovyLayout({
               key={index}
               style={
                 {
-                  '--dim': `${particle.size}rem`,
-                  '--uplift': `${particle.distance}vh`,
-                  '--pos-x': `${particle.position}%`,
-                  '--dur': `${particle.duration}s`,
-                  '--delay': `${particle.delay}s`,
-
+                  '--uplift': `-${particle.distance}rem`,
                   position: 'absolute',
                   background,
                   borderRadius: '50%',
-                  bottom: 0,
-                  left: 'var(--pos-x, 50%)',
-                  width: 'var(--dim, 5rem)',
-                  height: 'var(--dim, 5rem)',
+                  top: 0,
+                  left: `${(110 / particles.length) * index - 5}%`,
+                  width: `${particle.size}rem`,
+                  height: `${particle.size}rem`,
                   transform: 'translate(-50%)',
-                  animation: 'float-up var(--dur, 4s) ease-in infinite',
-                  animationDelay: 'var(--delay, 0s)',
+                  animation: `float-up ${particle.duration}s ease-in infinite`,
+                  animationDelay: `${particle.delay}s`,
                 } as React.CSSProperties
               }
             />

@@ -35,14 +35,14 @@ export const Gradients = ({ className, flipped, styles }: GradientsProps) => {
         <path
           d='M65.9946 849.5C-95.5054 642.5 81.4946 529.5 170.995 537C260.495 544.5 405.995 546 485.495 507M485.495 507C564.995 468 664.995 329 636.495 236.5C607.995 144 522.995 153.5 490.995 115C458.995 76.5001 449.495 42.5001 457.495 0.500122M485.495 507C574.495 463.34 468.495 286.5 403.995 286.5C369.495 286.5 349.901 312 360.495 337C371.088 362 415.236 376.5 438.995 350.5C462.753 324.5 485.995 274.5 366.995 189.5C247.995 104.5 413.995 70.0001 385.495 0.500122'
           stroke={flipped ? 'var(--color-primary-500)' : 'var(--color-accent-500)'}
-          strokeWidth='2'
+          strokeWidth='1'
           strokeOpacity='15%'
           strokeLinecap='round'
           strokeLinejoin='round'
-          strokeDasharray={lengthLine / 6}
+          strokeDasharray={lengthLine / 6.1}
           strokeDashoffset={lengthLine}
           style={{
-            animation: 'dash 15s linear forwards infinite',
+            animation: 'dash 30s linear forwards infinite',
           }}
           ref={el => {
             if (el) {
@@ -64,7 +64,7 @@ export const Gradients = ({ className, flipped, styles }: GradientsProps) => {
           fill={flipped ? 'var(--color-primary-300)' : 'var(--color-accent-300)'}
           fillOpacity='10%'
           stroke={flipped ? 'var(--color-primary-300)' : 'var(--color-accent-400)'}
-          strokeWidth='4'
+          strokeWidth='2'
           strokeOpacity='30%'
           strokeLinecap='round'
           strokeLinejoin='round'

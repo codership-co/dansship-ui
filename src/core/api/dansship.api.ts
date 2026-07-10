@@ -41,7 +41,7 @@ export class DansshipAPI {
 
   static {
     this.httpClient.setOnErrorInterceptor(async (request, response) => {
-      if (response.status === 401 && request.urlParams.path !== '/auth/refresh-token') {
+      if (response.status === 401 && !['/auth/refresh-token', '/auth/signin'].includes(request.urlParams.path ?? '')) {
         const { ok } = await this.auth.refreshToken();
 
         if (!ok) {

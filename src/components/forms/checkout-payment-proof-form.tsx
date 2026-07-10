@@ -89,12 +89,9 @@ export function CheckoutPaymentProofForm({
       try {
         onClose();
 
-        // Allow the dialog to unmount first so Bold modal is not blocked by another layer.
-        setTimeout(() => {
-          void openBoldEmbeddedCheckout(data.checkout).catch(() => {
-            toast.error(t('payments:boldLoadFailed'));
-          });
-        }, 0);
+        void openBoldEmbeddedCheckout(data.checkout).catch(() => {
+          toast.error(t('payments:boldLoadFailed'));
+        });
       } catch {
         toast.error(t('payments:boldLoadFailed'));
       }

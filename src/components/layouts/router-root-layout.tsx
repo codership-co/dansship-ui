@@ -22,7 +22,7 @@ const Layout = ({ children }: LayoutProps) => {
   return (
     <>
       {children}
-      <Toaster />
+      <Toaster richColors expand position='bottom-center' />
     </>
   );
 };

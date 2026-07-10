@@ -17,16 +17,15 @@ function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const fromPath = useMemo(() => {
-    const locationState = location.state as { from?: { pathname?: string; search?: string; hash?: string } } | null;
+    const locationState = location.state as { from?: Location } | null;
 
-    if (!locationState?.from?.pathname) {
+    if (!locationState?.from) {
       return null;
     }
 
     return `${locationState.from.pathname}${locationState.from.search ?? ''}${locationState.from.hash ?? ''}`;
   }, [location]);
 
-  // Redirect to pending actions first, then route-origin, then role default.
   useEffect(() => {
     if (user) {
       if (fromPath && fromPath !== PageURLS.auth.login) {

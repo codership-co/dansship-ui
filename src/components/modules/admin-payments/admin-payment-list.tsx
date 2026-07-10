@@ -31,11 +31,11 @@ import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
 
 const STATUS_OPTIONS: Array<{ value: 'all' | PaymentStatus; labelKey: string }> = [
   { value: 'all', labelKey: 'payments:admin.filter.all' },
-  { value: 'pending_manual_review', labelKey: 'payments:status.pending_manual_review' },
-  { value: 'approved', labelKey: 'payments:status.approved' },
-  { value: 'rejected', labelKey: 'payments:status.rejected' },
-  { value: 'cancelled', labelKey: 'payments:status.cancelled' },
-  { value: 'expired', labelKey: 'payments:status.expired' },
+  { value: PaymentStatus.PENDING_MANUAL_REVIEW, labelKey: 'payments:status.pending_manual_review' },
+  { value: PaymentStatus.APPROVED, labelKey: 'payments:status.approved' },
+  { value: PaymentStatus.REJECTED, labelKey: 'payments:status.rejected' },
+  { value: PaymentStatus.CANCELLED, labelKey: 'payments:status.cancelled' },
+  { value: PaymentStatus.EXPIRED, labelKey: 'payments:status.expired' },
 ];
 
 export function AdminPaymentList() {

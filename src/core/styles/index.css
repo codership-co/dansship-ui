@@ -1,7 +1,7 @@
-@import "tailwindcss";
+@import "tailwindcss" theme(static);
+@import "polpo-tailwind-config/styles" theme(static);
 @import "tw-animate-css";
 @import "./animations.css";
-@import "polpo-tailwind-config/styles" theme(static);
 @import "polpo/components.css";
 
 @font-face {
@@ -152,7 +152,7 @@
   }
 
   :root {
-    --uplift: 10vh;
+    --uplift: 10rem;
   }
 
   .polpo-button {

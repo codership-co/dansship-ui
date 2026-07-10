@@ -29,7 +29,7 @@ export class AuthAPI {
   }
 
   async login(payload: LoginPayload) {
-    return this.httpClient.callNoError<AuthUser, LoginPayload, User>(
+    return this.httpClient.call<AuthUser, LoginPayload, User>(
       {
         path: '/auth/signin',
         method: 'POST',
@@ -40,7 +40,7 @@ export class AuthAPI {
   }
 
   async register(payload: RegisterPayload) {
-    return this.httpClient.callNoError<RegisterResponse, RegisterPayload>({
+    return this.httpClient.call<RegisterResponse, RegisterPayload>({
       path: '/auth/signup',
       method: 'POST',
       data: payload,
@@ -48,7 +48,7 @@ export class AuthAPI {
   }
 
   async verifyEmail(payload: VerifyEmailPayload) {
-    return this.httpClient.callNoError<VerifyEmailResponse, VerifyEmailPayload>({
+    return this.httpClient.call<VerifyEmailResponse, VerifyEmailPayload>({
       path: '/auth/verify-email',
       method: 'GET',
       params: payload,
@@ -71,7 +71,7 @@ export class AuthAPI {
   }
 
   async forgotPassword(payload: ForgotPasswordPayload) {
-    return this.httpClient.callNoError<void, ForgotPasswordPayload>({
+    return this.httpClient.call<void, ForgotPasswordPayload>({
       path: '/auth/forgot-password',
       method: 'POST',
       data: payload,
@@ -79,7 +79,7 @@ export class AuthAPI {
   }
 
   async resetPassword(payload: ResetPasswordPayload) {
-    return this.httpClient.callNoError<void, ResetPasswordPayload>({
+    return this.httpClient.call<void, ResetPasswordPayload>({
       path: '/auth/reset-password',
       method: 'POST',
       data: payload,
@@ -97,7 +97,7 @@ export class AuthAPI {
   }
 
   async updateProfile(payload: UpdateProfilePayload) {
-    return this.httpClient.callNoError<AuthUser, UpdateProfilePayload, User>(
+    return this.httpClient.call<AuthUser, UpdateProfilePayload, User>(
       {
         path: '/auth/profile',
         method: 'PUT',

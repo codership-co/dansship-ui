@@ -2,6 +2,7 @@ import { Button } from 'polpo/components';
 import { Trans, useTranslation } from 'react-i18next';
 import { LuArrowRight } from 'react-icons/lu';
 import { Link } from 'react-router';
+import { toast } from 'sonner';
 
 import { Section } from '@components/containers';
 import { Logotype } from '@components/svg';
@@ -18,7 +19,15 @@ export const HomeHero = () => {
         <div className='grid gap-4 content-center max-w-xl' style={{ gridArea: 'text' }}>
           <Logotype className='h-8 text-primary' />
 
-          <h1 className='text-accent leading-none m-0 mt-6'>
+          <h1
+            className='text-accent leading-none m-0 mt-6'
+            onClick={() =>
+              toast.success('Hola', {
+                description: 'Hola',
+                duration: 5000,
+              })
+            }
+          >
             <Trans
               i18nKey='home:stitch.hero.kicker'
               components={{
@@ -53,7 +62,7 @@ export const HomeHero = () => {
           <img
             src='/assets/images/home/bailarina.png'
             alt='Dansship'
-            className='absolute left-1/2 top-1/2 max-w-[initial] w-7/8 -translate-x-1/2 -translate-y-[70%] block'
+            className='absolute left-1/2 top-1/2 max-w-[initial] w-7/8 -translate-x-1/2 translate-y-[-70%] block'
           />
         </section>
       </div>

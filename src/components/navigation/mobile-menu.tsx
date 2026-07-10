@@ -28,7 +28,7 @@ interface MobileMenuProps {
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
 
   const authenticatedPrimaryMenuItems: Array<NavItem> = [
     {
@@ -187,12 +187,14 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               <MenuItem key={item.to} {...item} variant='aside' />
             ))}
 
-            <div className='py-2 space-y-2'>
-              <span className='text-sm font-bold text-gray-400 uppercase tracking-wider'>{t('nav:admin')}</span>
-              {adminMenuItems.map(item => (
-                <MenuItem key={item.to} {...item} variant='aside' />
-              ))}
-            </div>
+            {user?.isAdmin && (
+              <div className='py-2 space-y-2'>
+                <span className='text-sm font-bold text-gray-400 uppercase tracking-wider'>{t('nav:admin')}</span>
+                {adminMenuItems.map(item => (
+                  <MenuItem key={item.to} {...item} variant='aside' />
+                ))}
+              </div>
+            )}
           </nav>
 
           {/*<div className='mt-auto space-y-3 pt-4'>

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { LuCircleDollarSign, LuCreditCard, LuLandmark } from 'react-icons/lu';
+import { LuCreditCard, LuLandmark } from 'react-icons/lu';
 
 import { PaymentMethod } from '@core/api';
 import { cn } from '@helpers';
@@ -21,12 +21,6 @@ const PaymentMethods = {
     title: 'payments:method.transfer',
     description: 'payments:methodDesc.transfer',
     helperText: 'payments:methodHelper.transfer',
-  },
-  [PaymentMethod.CASH]: {
-    Icon: LuCircleDollarSign,
-    title: 'payments:method.cash',
-    description: 'payments:methodDesc.cash',
-    helperText: 'payments:methodHelper.cash',
   },
 };
 

@@ -8,7 +8,6 @@ import { Link } from 'react-router';
 import { z } from 'zod';
 
 import { EmailField } from '@components/form-fields';
-import { useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
 
 const createForgotPasswordSchema = (t: (key: string) => string) =>
@@ -28,7 +27,6 @@ interface ForgotPasswordFormProps {
 
 export function ForgotPasswordForm({ onSubmit, isSubmitting }: ForgotPasswordFormProps) {
   const { t } = useTranslation();
-  const { error } = useAuth();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState('');
 
@@ -60,8 +58,6 @@ export function ForgotPasswordForm({ onSubmit, isSubmitting }: ForgotPasswordFor
     }
   }, [clearErrors, emailValue, errors.email]);
 
-  const displayError = error || undefined;
-
   const handleTryAnother = () => {
     reset({ email: '' });
     clearErrors('email');
@@ -90,8 +86,6 @@ export function ForgotPasswordForm({ onSubmit, isSubmitting }: ForgotPasswordFor
           label={t('auth:forgotPassword.email')}
           placeholder={t('common:placeholder.email')}
         />
-
-        {displayError ? <p className='text-sm text-alert-600'>{displayError}</p> : null}
 
         <section className='grid gap-2'>
           <Button type='submit' isLoading={isSubmitting} color='primary' fullWidth>

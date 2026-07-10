@@ -44,9 +44,6 @@ function PaymentsResultPage() {
   const { t, i18n } = useTranslation();
   const revalidator = useRevalidator();
   const { intent, intentId } = useLoaderData<PaymentsResultsLoaderData>();
-  const { call: cancelIntentPromise, isLoading: isCancellingIntent } = useCallablePromise((id: string) =>
-    DansshipAPI.payments.cancelIntent(id),
-  );
   const { call: getProofViewUrlPromise, isLoading: isGettingProofViewUrl } = useCallablePromise((id: string) =>
     DansshipAPI.payments.getProofViewUrl(id),
   );
@@ -134,23 +131,12 @@ function PaymentsResultPage() {
     input.click();
   };
 
-  const cancelIntent = useCallback(
-    async (id: string) => {
-      const { ok } = await cancelIntentPromise(id);
-
-      if (ok) {
-        await revalidator.revalidate();
-      }
-    },
-    [cancelIntentPromise, revalidator],
-  );
-
   return (
     <div className='px-2 sm:px-4 md:px-8 pt-20 max-w-7xl mx-auto grid gap-20'>
       {intent && (
         <section className='rounded-2xl shadow-2xl'>
           <section className='bg-white p-8 rounded-2xl grid md:grid-cols-[1fr_1fr] gap-8 overflow-hidden'>
-            <section className='relative min-h-70 bg-primary text-primary-foreground px-8 py-16 rounded-lg shadow-lg'>
+            <section className='relative min-h-70 bg-accent px-8 py-16 rounded-lg shadow-lg'>
               <img
                 src='/assets/images/bailarina.png'
                 alt='Dansship'
@@ -248,17 +234,6 @@ function PaymentsResultPage() {
                     {t('payments:viewProof')}
                   </Button>
                 )}
-                {intent.status !== 'cancelled' && (
-                  <Button
-                    size='small'
-                    color='alert'
-                    variant='outlined'
-                    isLoading={isCancellingIntent}
-                    onClick={() => void cancelIntent(intent.id)}
-                  >
-                    {t('payments:cancelIntent')}
-                  </Button>
-                )}
               </section>
             </section>
           </section>
@@ -282,7 +257,7 @@ function PaymentsResultPage() {
                 {t('payments:retryIntentDetails')}
               </Button>
             </section>
-            <section className='relative bg-accent hidden md:block'>
+            <section className='relative bg-primary hidden md:block'>
               <img
                 src='/assets/images/bailarina.png'
                 alt='Dansship'

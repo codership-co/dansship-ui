@@ -1,10 +1,16 @@
 export enum PaymentMethod {
   TRANSFER = 'transfer',
-  CASH = 'cash',
   CARD = 'card',
 }
 
-export type PaymentStatus = 'pending' | 'pending_manual_review' | 'approved' | 'rejected' | 'cancelled' | 'expired';
+export enum PaymentStatus {
+  PENDING_MANUAL_REVIEW = 'pending_manual_review',
+  PENDING = 'pending',
+  APPROVED = 'approved',
+  REJECTED = 'rejected',
+  CANCELLED = 'cancelled',
+  EXPIRED = 'expired',
+}
 
 export type PurchaseType = 'plan' | 'merch' | 'workshop' | 'event' | 'private_class' | 'studio_rental' | (string & {});
 

@@ -16,13 +16,11 @@ import {
   Product,
 } from '@core/api';
 
-const DEFAULT_PAYMENT_METHOD = PaymentMethod.CASH;
-
 export const useMerchPos = () => {
   const { t } = useTranslation();
   const [cart, setCart] = useState<Array<CartItem>>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<CustomerSearchUser | null>(null);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>(DEFAULT_PAYMENT_METHOD);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<PaymentMethod>(PaymentMethod.TRANSFER);
   const [latestCreatedOrder, setLatestCreatedOrder] = useState<Order | null>(null);
 
   const cartTotal = useMemo(() => cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0), [cart]);

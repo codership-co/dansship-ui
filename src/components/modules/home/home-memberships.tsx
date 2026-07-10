@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { Link, useLoaderData } from 'react-router';
 
@@ -30,13 +31,16 @@ export const HomeMemberships = () => {
         <PlanSelector plans={publicPlans} />
       </div>
 
-      <p className='text-center mx-auto mt-8 max-w-2xl text-[0.92rem] text-muted-foreground'>
-        {t('home:stitch.membership.helpText')}
-        <br />
-        <Link to={plansPath} className='font-semibold text-primary underline-offset-2 transition hover:underline'>
-          {t('home:stitch.membership.viewAllPlans')}
+      <section className='grid gap-2 justify-items-center'>
+        <p className='text-center mx-auto mt-8 max-w-2xl text-[0.92rem] text-muted-foreground'>
+          {t('home:stitch.membership.helpText')}
+        </p>
+        <Link to={plansPath}>
+          <Button color='primary' className='mx-auto'>
+            {t('home:stitch.membership.viewAllPlans')}
+          </Button>
         </Link>
-      </p>
+      </section>
     </Section>
   );
 };
