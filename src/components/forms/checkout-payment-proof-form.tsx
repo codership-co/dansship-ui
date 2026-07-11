@@ -8,13 +8,11 @@ import { toast } from 'sonner';
 
 import { CheckoutFormValues } from '@components/forms/checkout-review-plan-form';
 import {
-  type ConfirmPaymentProofPayload,
   type CreatePaymentIntentPayload,
   DansshipAPI,
   openBoldEmbeddedCheckout,
   PaymentMethod,
   PaymentProofContentType,
-  type PaymentProofUploadRequest,
   PublicPlan,
 } from '@core/api';
 import { formatPrice } from '@helpers';
@@ -48,13 +46,9 @@ export function CheckoutPaymentProofForm({
   const { call: createBoldCheckout, isLoading: isCreatingBoldCheckout } = useCallablePromise(
     (payload: CreatePaymentIntentPayload) => DansshipAPI.payments.createBoldCheckout(payload),
   );
-  const { call: getProofUploadUrl, isLoading: isGettingProofUploadUrl } = useCallablePromise(
-    (id: string, payload: PaymentProofUploadRequest) => DansshipAPI.payments.getProofUploadUrl(id, payload),
+  const { call: uploadProof, isLoading: isUploadingProof } = useCallablePromise((id: string, file: File) =>
+    DansshipAPI.payments.uploadProof(id, file),
   );
-  const { call: confirmProofUpload, isLoading: isConfirmingProofUpload } = useCallablePromise(
-    (id: string, payload: ConfirmPaymentProofPayload) => DansshipAPI.payments.confirmProofUpload(id, payload),
-  );
-  const isUploadingProof = isGettingProofUploadUrl || isConfirmingProofUpload;
   const isCardMethod = paymentMethod === PaymentMethod.CARD;
   const requiresProof = paymentMethod === PaymentMethod.TRANSFER;
   const isBusy = isCreating || isCreatingBoldCheckout || isUploadingProof;
@@ -104,25 +98,7 @@ export function CheckoutPaymentProofForm({
     if (ok) {
       if (requiresProof && selectedProofFile) {
         try {
-          const { data, ok } = await getProofUploadUrl(intent.id, {
-            content_type: selectedProofFile.type as PaymentProofContentType,
-          });
-
-          if (ok) {
-            const uploadResponse = await fetch(data.upload_url, {
-              method: 'PUT',
-              headers: {
-                'Content-Type': selectedProofFile.type,
-              },
-              body: selectedProofFile,
-            });
-
-            if (!uploadResponse.ok) {
-              throw new Error('S3_UPLOAD_FAILED');
-            }
-
-            await confirmProofUpload(intent.id, { file_key: data.file_key });
-          }
+          await uploadProof(intent.id, selectedProofFile);
         } catch {
           toast.error(t('payments:proofUploadFailed'));
         }
@@ -206,7 +182,14 @@ export function CheckoutPaymentProofForm({
       </section>
 
       <div className='flex justify-end gap-2 pt-4'>
-        <Button type='button' className='flex items-center' color='primary' variant='outlined' onClick={onBack}>
+        <Button
+          type='button'
+          className='flex items-center'
+          isLoading={isBusy}
+          color='primary'
+          variant='outlined'
+          onClick={onBack}
+        >
           <LuArrowLeft />
           {t('common:back')}
         </Button>

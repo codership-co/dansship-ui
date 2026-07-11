@@ -44,7 +44,6 @@ import {
   PaymentsResultsLoader,
 } from '@pages';
 
-/* eslint-disable line-comment-position */ // This is temporal meanwhile I can finish the migration of all pages
 const routes: Array<RouteObject> = [
   {
     path: '/',
@@ -73,28 +72,28 @@ const routes: Array<RouteObject> = [
           { path: 'figures', Component: SecureFiguresPage },
           { path: 'figures/:id', Component: SecureFiguresDetailsPage },
           { path: 'classes', Component: SecureClassesPage },
-          { path: 'instructor/dashboard', Component: SecureInstructorDashboardPage }, // WIP
+          { path: 'instructor/dashboard', Component: SecureInstructorDashboardPage },
 
           {
             path: 'profile',
             children: [
-              { index: true, Component: SecureProfilePage }, // WIP
-              { path: 'edit', Component: SecureProfileEditPage }, // WIP
+              { index: true, Component: SecureProfilePage },
+              { path: 'edit', Component: SecureProfileEditPage },
             ],
           },
 
           {
             path: 'figure',
             children: [
-              { path: 'completed', Component: SecureFigureCompletedPage }, // WIP
-              { path: 'saved', Component: SecureFigureSavedPage }, // WIP
+              { path: 'completed', Component: SecureFigureCompletedPage },
+              { path: 'saved', Component: SecureFigureSavedPage },
             ],
           },
 
           {
             path: 'my-account',
             children: [
-              { path: 'subscription', Component: SecureMyAccountSubscriptionPage }, // WIP
+              { path: 'subscription', Component: SecureMyAccountSubscriptionPage },
               { path: 'bookings', Component: SecureMyAccountBookingsPage },
             ],
           },
@@ -112,19 +111,19 @@ const routes: Array<RouteObject> = [
           {
             path: 'admin',
             children: [
-              { index: true, Component: SecureAdminPage }, // WIP
-              { path: 'agenda', Component: SecureAdminAgendaPage }, // WIP
-              { path: 'agenda/conflicts', Component: SecureAdminAgendaConflictsPage }, // WIP
-              { path: 'inventory', Component: SecureAdminInventoryPage }, // WIP
-              { path: 'schedule-builder', Component: SecureAdminScheduleBuilderPage }, // WIP
-              { path: 'reports', Component: SecureAdminReportsPage }, // WIP
-              { path: 'bookings', Component: SecureAdminBookingsPage }, // WIP
-              { path: 'payments', Component: SecureAdminPaymentsPage }, // WIP
-              { path: 'merch', Component: SecureAdminMerchPage }, // WIP
-              { path: 'merch/pos', Component: SecureAdminMerchPosPage }, // WIP
-              { path: 'figures', Component: SecureAdminFiguresPage }, // WIP
-              { path: 'access', Component: SecureAdminAccessPage }, // WIP
-              { path: 'studio-rental', Component: SecureAdminStudioRentalPage }, // WIP
+              { index: true, Component: SecureAdminPage },
+              { path: 'agenda', Component: SecureAdminAgendaPage },
+              { path: 'agenda/conflicts', Component: SecureAdminAgendaConflictsPage },
+              { path: 'inventory', Component: SecureAdminInventoryPage },
+              { path: 'schedule-builder', Component: SecureAdminScheduleBuilderPage },
+              { path: 'reports', Component: SecureAdminReportsPage },
+              { path: 'bookings', Component: SecureAdminBookingsPage },
+              { path: 'payments', Component: SecureAdminPaymentsPage },
+              { path: 'merch', Component: SecureAdminMerchPage },
+              { path: 'merch/pos', Component: SecureAdminMerchPosPage },
+              { path: 'figures', Component: SecureAdminFiguresPage },
+              { path: 'access', Component: SecureAdminAccessPage },
+              { path: 'studio-rental', Component: SecureAdminStudioRentalPage },
             ],
           },
         ],
@@ -134,7 +133,6 @@ const routes: Array<RouteObject> = [
     ],
   },
 ];
-/* eslint-enable */
 
 const myRouter = createBrowserRouter(routes);
 

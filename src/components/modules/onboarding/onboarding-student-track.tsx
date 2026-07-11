@@ -51,16 +51,7 @@ export const OnboardingStudentTrack = ({
               onSubmit={data =>
                 submitProfileStep({
                   track: OnboardingTrackKey.STUDENT,
-                  payload: {
-                    full_name: data.fullName.trim(),
-                    birth_date: data.birthDate ? data.birthDate.toISOString().slice(0, 10) : undefined,
-                    phone_country_code: data.phoneCountryCode?.trim() || undefined,
-                    phone_number: data.phoneNumber?.trim() || undefined,
-                    document_type: data.documentType?.trim() || undefined,
-                    document_value: data.documentValue?.trim() || undefined,
-                    city: data.city?.trim() || undefined,
-                    address: data.address?.trim() || undefined,
-                  },
+                  payload: { ...data, birth_date: data.birth_date.toISOString().slice(0, 10) },
                 })
               }
             />
@@ -75,19 +66,7 @@ export const OnboardingStudentTrack = ({
             <OnboardingHealthForm
               isLoading={isLoading}
               error={error}
-              onContinue={data =>
-                submitHealthStep({
-                  track: OnboardingTrackKey.STUDENT,
-                  payload: {
-                    emergency_contact_name: data.emergencyContactName?.trim(),
-                    emergency_contact_relative: data.emergencyContactRelative?.trim(),
-                    emergency_contact_phone_country_code: data.emergencyContactPhoneCountryCode?.trim(),
-                    emergency_contact_phone_number: data.emergencyContactPhoneNumber?.trim(),
-                    eps: data.eps?.trim(),
-                    existing_medical_conditions: data.existingMedicalConditions?.trim(),
-                  },
-                })
-              }
+              onContinue={data => submitHealthStep({ track: OnboardingTrackKey.STUDENT, payload: data })}
               onSkip={() => skipHealthStep({ track: OnboardingTrackKey.STUDENT })}
             />
           ),
@@ -101,18 +80,7 @@ export const OnboardingStudentTrack = ({
             <OnboardingStudentPreferencesForm
               isLoading={isLoading}
               error={error}
-              onComplete={data =>
-                submitPreferencesStep({
-                  track: OnboardingTrackKey.STUDENT,
-                  payload: {
-                    heard_about_us: data.heardAboutUs,
-                    goals: data.goals,
-                    disciplines: data.disciplines,
-                    current_level: data.currentLevel,
-                    preferred_schedules: data.preferredSchedules,
-                  },
-                })
-              }
+              onComplete={data => submitPreferencesStep({ track: OnboardingTrackKey.STUDENT, payload: data })}
               onSkip={() => skipPreferencesStep({ track: OnboardingTrackKey.STUDENT })}
             />
           ),

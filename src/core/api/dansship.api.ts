@@ -41,10 +41,17 @@ export class DansshipAPI {
 
   static {
     this.httpClient.setOnErrorInterceptor(async (request, response) => {
-      if (response.status === 401 && !['/auth/refresh-token', '/auth/signin'].includes(request.urlParams.path ?? '')) {
+      if (
+        response.status === 401 &&
+        localStorage.getItem('auth_session') === '1' &&
+        localStorage.getItem('refreshing_token') !== '1' &&
+        !['/auth/refresh-token', '/auth/signin'].includes(request.urlParams.path ?? '')
+      ) {
+        localStorage.setItem('refreshing_token', '1');
         const { ok } = await this.auth.refreshToken();
 
         if (!ok) {
+          localStorage.removeItem('refreshing_token');
           window.dispatchEvent(new CustomEvent('auth:session-expired'));
         }
       }

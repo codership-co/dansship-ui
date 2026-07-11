@@ -2,7 +2,7 @@ import { HttpClient } from 'polpo-http-client';
 
 import { normalizeIntent } from './payments.helpers';
 
-import { DansshipAPIError } from '@core/api';
+import { DansshipAPIError, PaymentProofContentType } from '@core/api';
 
 import type {
   BoldCheckoutBootstrapResponse,
@@ -73,7 +73,7 @@ export class PaymentsAPI {
     );
   }
 
-  async getProofUploadUrl(id: string, payload: PaymentProofUploadRequest) {
+  private async getProofUploadUrl(id: string, payload: PaymentProofUploadRequest) {
     return this.httpClient.callNoError<PresignedUrlResponse, PaymentProofUploadRequest>({
       path: `/payments/intents/${id}/proof/upload-url`,
       method: 'POST',
@@ -81,7 +81,7 @@ export class PaymentsAPI {
     });
   }
 
-  async confirmProofUpload(id: string, payload: ConfirmPaymentProofPayload) {
+  private async confirmProofUpload(id: string, payload: ConfirmPaymentProofPayload) {
     return this.httpClient.callNoError<PaymentIntent, ConfirmPaymentProofPayload>(
       {
         path: `/payments/intents/${id}/proof/confirm`,
@@ -90,6 +90,26 @@ export class PaymentsAPI {
       },
       normalizeIntent,
     );
+  }
+
+  async uploadProof(id: string, file: File) {
+    const { data, ok } = await this.getProofUploadUrl(id, {
+      content_type: file.type as PaymentProofContentType,
+    });
+
+    if (ok) {
+      const uploadResponse = await fetch(data.upload_url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': file.type,
+        },
+        body: file,
+      });
+
+      if (uploadResponse.ok) {
+        await this.confirmProofUpload(id, { file_key: data.file_key });
+      }
+    }
   }
 
   async getProofViewUrl(id: string) {

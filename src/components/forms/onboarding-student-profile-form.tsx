@@ -14,14 +14,14 @@ export const createStudentProfileSchema = (t: TFunction) => {
   tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10);
 
   return z.object({
-    fullName: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
-    birthDate: z
+    full_name: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
+    birth_date: z
       .date(t('auth:onboarding.validationRequired'))
       .max(tenYearsAgo, { message: t('auth:onboarding.validationMinAge10') }),
-    phoneCountryCode: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
-    phoneNumber: z.string().regex(/^\d{10}$/, { message: t('auth:onboarding.validationPhoneLength') }),
-    documentType: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
-    documentValue: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
+    phone_country_code: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
+    phone_number: z.string().regex(/^\d{10}$/, { message: t('auth:onboarding.validationPhoneLength') }),
+    document_type: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
+    document_value: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
     city: z.string().optional(),
     address: z.string().optional(),
   });
@@ -44,12 +44,12 @@ export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: Onb
     // @ts-ignore
     resolver: zodResolver(schema),
     defaultValues: {
-      fullName: '',
-      birthDate: undefined,
-      phoneCountryCode: '+57',
-      phoneNumber: '',
-      documentType: '',
-      documentValue: '',
+      full_name: '',
+      birth_date: undefined,
+      phone_country_code: '+57',
+      phone_number: '',
+      document_type: '',
+      document_value: '',
       city: '',
       address: '',
     },
@@ -63,7 +63,7 @@ export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: Onb
             <TextField
               control={control}
               label={t('auth:onboarding.fields.fullName.label')}
-              name='fullName'
+              name='full_name'
               placeholder={t('auth:onboarding.fields.fullName.placeholder')}
               icon={<LuUser className='mr-2 h-4 w-4' />}
             />
@@ -72,7 +72,7 @@ export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: Onb
           <div className='space-y-2'>
             <DateField
               control={control}
-              name='birthDate'
+              name='birth_date'
               label={t('auth:onboarding.fields.birthDate.label')}
               icon={<LuCalendar className='mr-2 h-4 w-4' />}
               placeholder={t('auth:onboarding.fields.birthDate.placeholder')}
@@ -83,7 +83,7 @@ export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: Onb
         <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-start'>
           <SelectField
             control={control}
-            name='documentType'
+            name='document_type'
             label={t('auth:onboarding.fields.documentType.label')}
             options={DOCUMENT_TYPE_OPTIONS.map(option => ({
               ...option,
@@ -96,7 +96,7 @@ export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: Onb
             <TextField
               control={control}
               label={t('auth:onboarding.fields.documentValue.label')}
-              name='documentValue'
+              name='document_value'
               placeholder={t('auth:onboarding.fields.documentValue.placeholder')}
               icon={<LuIdCard className='mr-2 h-4 w-4' />}
             />
@@ -106,7 +106,7 @@ export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: Onb
         <div className='grid grid-cols-1 gap-4 lg:grid-cols-[auto_1fr] items-start'>
           <SelectField
             control={control}
-            name='phoneCountryCode'
+            name='phone_country_code'
             label={t('auth:onboarding.fields.phoneCode.label')}
             options={COUNTRY_CODE_OPTIONS}
             placeholder={t('auth:onboarding.fields.phoneCode.placeholder')}
@@ -115,7 +115,7 @@ export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: Onb
             control={control}
             type='tel'
             label={t('auth:onboarding.fields.phoneNumber.label')}
-            name='phoneNumber'
+            name='phone_number'
             placeholder={t('auth:onboarding.fields.phoneNumber.placeholder')}
             icon={<LuBuilding className='mr-2 h-4 w-4' />}
           />

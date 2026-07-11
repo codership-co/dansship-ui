@@ -25,7 +25,8 @@ export const RELATIVE_OPTIONS = [
   { value: 'mother', label: 'auth:onboarding.relativeOptions.mother' },
   { value: 'father', label: 'auth:onboarding.relativeOptions.father' },
   { value: 'sibling', label: 'auth:onboarding.relativeOptions.sibling' },
-  { value: 'spouse', label: 'auth:onboarding.relativeOptions.spouse' },
+  { value: 'couple', label: 'auth:onboarding.relativeOptions.couple' },
+  { value: 'familiar', label: 'auth:onboarding.relativeOptions.familiar' },
   { value: 'friend', label: 'auth:onboarding.relativeOptions.friend' },
   { value: 'other', label: 'auth:onboarding.relativeOptions.other' },
 ];

@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuArrowLeft, LuArrowRight, LuCreditCard, LuList, LuReceipt } from 'react-icons/lu';
@@ -14,7 +15,7 @@ import {
 } from '@components/forms/checkout-review-plan-form';
 import { FormStepperLayout } from '@components/layouts';
 import { PlanCard } from '@components/modules';
-import { Button, Dialog, DialogContent } from '@components/ui';
+import { Dialog, DialogContent } from '@components/ui';
 import { PaymentMethod, type PublicPlan } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { cn } from '@helpers';
@@ -107,8 +108,9 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
                 <div className='flex justify-end gap-2 pt-4'>
                   <Button
                     type='button'
+                    color='primary'
                     className='flex items-center'
-                    variant='outline'
+                    variant='outlined'
                     onClick={() => setStep(CheckoutStep.REVIEW)}
                   >
                     <LuArrowLeft />
@@ -117,6 +119,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
 
                   <Button
                     type='button'
+                    color='primary'
                     className='flex items-center'
                     disabled={!paymentMethod}
                     onClick={() => setStep(CheckoutStep.CONFIRM)}
@@ -149,7 +152,6 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
           },
         ]}
         currentStep={step}
-        noAvailableStepMessage={':D'}
       />
     </DialogContent>
   );

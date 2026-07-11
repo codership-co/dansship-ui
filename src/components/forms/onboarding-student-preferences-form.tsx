@@ -16,11 +16,11 @@ import {
 
 export const createStudentPreferencesSchema = () =>
   z.object({
-    heardAboutUs: z.string().optional(),
+    heard_about_us: z.string().optional(),
     goals: z.array(z.string()),
     disciplines: z.array(z.string()),
-    currentLevel: z.string().optional(),
-    preferredSchedules: z.array(z.string()),
+    current_level: z.string().optional(),
+    preferred_schedules: z.array(z.string()),
   });
 
 export type StudentPreferencesFormValues = z.infer<ReturnType<typeof createStudentPreferencesSchema>>;
@@ -46,17 +46,17 @@ export function OnboardingStudentPreferencesForm({
     // @ts-ignore
     resolver: zodResolver(schema),
     defaultValues: {
-      heardAboutUs: '',
+      heard_about_us: '',
       goals: [],
       disciplines: [],
-      currentLevel: '',
-      preferredSchedules: [],
+      current_level: '',
+      preferred_schedules: [],
     },
   });
 
   const { field: goalsField } = useController({ name: 'goals', control });
   const { field: disciplinesField } = useController({ name: 'disciplines', control });
-  const { field: preferredSchedulesField } = useController({ name: 'preferredSchedules', control });
+  const { field: preferredSchedulesField } = useController({ name: 'preferred_schedules', control });
 
   return (
     <div className='space-y-6'>
@@ -64,7 +64,7 @@ export function OnboardingStudentPreferencesForm({
         <div className='space-y-6'>
           <SelectField
             control={control}
-            name='heardAboutUs'
+            name='heard_about_us'
             label={t('auth:onboarding.fields.heardAboutUs.label')}
             options={DISCOVERY_OPTIONS.map(option => ({
               ...option,
@@ -119,7 +119,7 @@ export function OnboardingStudentPreferencesForm({
 
           <SelectField
             control={control}
-            name='currentLevel'
+            name='current_level'
             label={t('auth:onboarding.fields.currentLevel.label')}
             options={LEVEL_OPTIONS.map(option => ({
               ...option,

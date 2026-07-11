@@ -10,16 +10,16 @@ import { COUNTRY_CODE_OPTIONS, RELATIVE_OPTIONS } from '@core/constants';
 
 export const createHealthDataSchema = (t: TFunction) =>
   z.object({
-    emergencyContactName: z.string().optional(),
-    emergencyContactRelative: z.string().optional(),
-    emergencyContactPhoneCountryCode: z.string().optional(),
-    emergencyContactPhoneNumber: z
+    emergency_contact_name: z.string().optional(),
+    emergency_contact_relative: z.string().optional(),
+    emergency_contact_phone_country_code: z.string().optional(),
+    emergency_contact_phone_number: z
       .string()
       .regex(/^\d{10}$/, { message: t('auth:onboarding.validationPhoneLength') })
       .optional()
       .or(z.literal('')),
     eps: z.string().optional(),
-    existingMedicalConditions: z.string().optional(),
+    existing_medical_conditions: z.string().optional(),
   });
 
 export type HealthDataFormValues = z.infer<ReturnType<typeof createHealthDataSchema>>;
@@ -40,12 +40,12 @@ export function OnboardingHealthForm({ isLoading, error, onContinue, onSkip }: O
     // @ts-ignore
     resolver: zodResolver(schema),
     defaultValues: {
-      emergencyContactName: '',
-      emergencyContactRelative: '',
-      emergencyContactPhoneCountryCode: '+57',
-      emergencyContactPhoneNumber: '',
+      emergency_contact_name: '',
+      emergency_contact_relative: '',
+      emergency_contact_phone_country_code: '+57',
+      emergency_contact_phone_number: '',
       eps: '',
-      existingMedicalConditions: '',
+      existing_medical_conditions: '',
     },
   });
 
@@ -55,14 +55,14 @@ export function OnboardingHealthForm({ isLoading, error, onContinue, onSkip }: O
         <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-start'>
           <TextField
             control={control}
-            name='emergencyContactName'
+            name='emergency_contact_name'
             label={t('auth:onboarding.fields.emergencyContactName.label')}
             placeholder={t('auth:onboarding.fields.emergencyContactName.placeholder')}
           />
 
           <SelectField
             control={control}
-            name='emergencyContactRelative'
+            name='emergency_contact_relative'
             label={t('auth:onboarding.fields.relative.label')}
             options={RELATIVE_OPTIONS.map(option => ({
               ...option,
@@ -75,7 +75,7 @@ export function OnboardingHealthForm({ isLoading, error, onContinue, onSkip }: O
         <div className='grid grid-cols-1 gap-4 lg:grid-cols-[auto_1fr] items-start'>
           <SelectField
             control={control}
-            name='emergencyContactPhoneCountryCode'
+            name='emergency_contact_phone_country_code'
             label={t('auth:onboarding.fields.emergencyPhoneCode.label')}
             options={COUNTRY_CODE_OPTIONS}
             placeholder={t('auth:onboarding.fields.emergencyPhoneCode.placeholder')}
@@ -85,7 +85,7 @@ export function OnboardingHealthForm({ isLoading, error, onContinue, onSkip }: O
             type='number'
             inputMode='numeric'
             control={control}
-            name='emergencyContactPhoneNumber'
+            name='emergency_contact_phone_number'
             label={t('auth:onboarding.fields.emergencyPhoneNumber.label')}
             placeholder={t('auth:onboarding.fields.emergencyPhoneNumber.placeholder')}
           />
@@ -101,7 +101,7 @@ export function OnboardingHealthForm({ isLoading, error, onContinue, onSkip }: O
 
           <TextareaField
             control={control}
-            name='existingMedicalConditions'
+            name='existing_medical_conditions'
             label={t('auth:onboarding.fields.medicalConditions.label')}
             placeholder={t('auth:onboarding.fields.medicalConditions.placeholder')}
           />

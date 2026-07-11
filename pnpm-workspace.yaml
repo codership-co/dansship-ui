@@ -9,7 +9,3 @@ allowBuilds:
   esbuild: false
   msw: false
   unrs-resolver: false
-
-minimumReleaseAgeExclude:
-  - polpo-tailwind-config@0.1.1
-  - polpo@0.1.23

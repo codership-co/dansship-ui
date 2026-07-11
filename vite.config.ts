@@ -15,5 +15,6 @@ export default defineConfig({
   },
   server: {
     host: 'localhost.dansship.com',
+    open: true,
   },
 });

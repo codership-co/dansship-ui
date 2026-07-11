@@ -16,7 +16,7 @@ export interface FormStepperStep<T extends string> {
 interface FormStepperLayoutProps<T extends string> {
   steps: Array<FormStepperStep<T>>;
   currentStep: T;
-  noAvailableStepMessage: string;
+  noAvailableStepMessage?: string;
   className?: string;
 }
 
@@ -29,7 +29,7 @@ export const FormStepperLayout = <T extends string>({
   const { t } = useTranslation();
   const stepIndex = steps.findIndex(step => step.step === currentStep);
 
-  if (stepIndex === -1) {
+  if (stepIndex === -1 && noAvailableStepMessage) {
     return <p className='text-sm text-gray-600'>{noAvailableStepMessage}</p>;
   }
 

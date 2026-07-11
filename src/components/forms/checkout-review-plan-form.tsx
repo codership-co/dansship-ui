@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { addMonths } from 'date-fns';
 import { TFunction } from 'i18next';
 import { Button } from 'polpo/components';
 import { useCallback, useState } from 'react';
@@ -129,7 +130,13 @@ export const CheckoutReviewPlanFormInput = ({
   return (
     <form onSubmit={handleSubmit(handleInternalSubmit)} className='grid grid-rows-[1fr_auto] h-full'>
       <div className='grid gap-8 content-start'>
-        <DateField control={control} name='start_date' min={new Date()} label={t('subscriptions:startDate')} />
+        <DateField
+          control={control}
+          name='start_date'
+          min={new Date()}
+          max={addMonths(new Date(), 1)}
+          label={t('subscriptions:startDate')}
+        />
 
         <TextField
           inputClassName='uppercase'
