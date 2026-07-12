@@ -29,8 +29,7 @@ function isDisplayableImageUrl(value: string | null): value is string {
 
 export function PaymentProofUpload({ intentId, currentProofUrl, onUploaded, mode = 'owner' }: PaymentProofUploadProps) {
   const { t } = useTranslation();
-  const { getProofUploadUrl, getAdminProofUploadUrl, isGettingProofUploadUrl, isGettingAdminProofUploadUrl } =
-    usePaymentIntents();
+  const { uploadProof, uploadAdminProof, isUploadingProof, isAdminUploadingProof } = usePaymentIntents();
   const [previewUrl, setPreviewUrl] = useState<string | null>(
     isDisplayableImageUrl(currentProofUrl) ? currentProofUrl : null,
   );
@@ -39,7 +38,7 @@ export function PaymentProofUpload({ intentId, currentProofUrl, onUploaded, mode
     setPreviewUrl(isDisplayableImageUrl(currentProofUrl) ? currentProofUrl : null);
   }, [currentProofUrl]);
 
-  const isUploading = isGettingProofUploadUrl || isGettingAdminProofUploadUrl;
+  const isUploading = isUploadingProof || isAdminUploadingProof;
 
   const fileAccept = useMemo(() => PaymentProofContentTypesList.join(','), []);
 
@@ -54,9 +53,9 @@ export function PaymentProofUpload({ intentId, currentProofUrl, onUploaded, mode
 
     try {
       if (mode === 'admin') {
-        await getAdminProofUploadUrl(intentId, file);
+        await uploadAdminProof(intentId, file);
       } else {
-        await getProofUploadUrl(intentId, file);
+        await uploadProof(intentId, file);
       }
 
       setPreviewUrl(URL.createObjectURL(file));

@@ -11,7 +11,6 @@ import {
   DansshipAPI,
   Order,
   PaymentMethod,
-  PaymentProofContentType,
   PaymentProofContentTypesList,
   Product,
 } from '@core/api';
@@ -100,58 +99,37 @@ export const useMerchPos = () => {
 
     if (!intentId) return;
 
-    const contentType = proofFile.type as PaymentProofContentType;
+    try {
+      const updatedIntent =
+        proofUploadMode === 'admin'
+          ? await DansshipAPI.paymentsAdmin.uploadAdminProof(intentId, proofFile)
+          : await DansshipAPI.payments.uploadProof(intentId, proofFile);
 
-    const { data, ok } =
-      proofUploadMode === 'admin'
-        ? await DansshipAPI.paymentsAdmin.getAdminProofUploadUrl(intentId, { content_type: contentType })
-        : await DansshipAPI.payments.getProofUploadUrl(intentId, { content_type: contentType });
+      if (!updatedIntent) {
+        return;
+      }
 
-    if (!ok) {
-      return;
-    }
+      setLatestCreatedOrder(prev => {
+        if (!prev || prev.id !== order.id) return prev;
 
-    const { upload_url, file_key } = data;
-
-    const uploadResponse = await fetch(upload_url, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': proofFile.type,
-      },
-      body: proofFile,
-    });
-
-    if (!uploadResponse.ok) {
-      throw new Error('S3_UPLOAD_FAILED');
-    }
-
-    const { data: updatedIntent, ok: confirmOk } =
-      proofUploadMode === 'admin'
-        ? await DansshipAPI.paymentsAdmin.confirmAdminProofUpload(intentId, { file_key })
-        : await DansshipAPI.payments.confirmProofUpload(intentId, { file_key });
-
-    if (!confirmOk) {
-      return;
-    }
-
-    setLatestCreatedOrder(prev => {
-      if (!prev || prev.id !== order.id) return prev;
-
-      return {
-        ...prev,
-        payment_intent: {
-          ...(prev.payment_intent ?? {
+        return {
+          ...prev,
+          payment_intent: {
+            ...(prev.payment_intent ?? {
+              id: updatedIntent.id,
+              status: updatedIntent.status,
+              payment_method_type: updatedIntent.payment_method_type,
+            }),
             id: updatedIntent.id,
             status: updatedIntent.status,
             payment_method_type: updatedIntent.payment_method_type,
-          }),
-          id: updatedIntent.id,
-          status: updatedIntent.status,
-          payment_method_type: updatedIntent.payment_method_type,
-          proof_url: updatedIntent.proof_url,
-        },
-      };
-    });
+            proof_url: updatedIntent.proof_url,
+          },
+        };
+      });
+    } catch {
+      return;
+    }
 
     toast.success(
       t('merch:purchaseApproved', {

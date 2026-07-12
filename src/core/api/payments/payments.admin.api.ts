@@ -2,7 +2,7 @@ import { HttpClient } from 'polpo-http-client';
 
 import { normalizeAdminList, normalizeIntent } from './payments.helpers';
 
-import { DansshipAPIError } from '@core/api';
+import { DansshipAPIError, PaymentProofContentType } from '@core/api';
 
 import type {
   AdminPaymentListResponse,
@@ -47,16 +47,16 @@ export class PaymentsAdminAPI {
     });
   }
 
-  async getAdminProofUploadUrl(id: string, payload: PaymentProofUploadRequest) {
-    return this.httpClient.callNoError<PresignedUrlResponse, PaymentProofUploadRequest>({
+  private async getAdminProofUploadUrl(id: string, payload: PaymentProofUploadRequest) {
+    return this.httpClient.call<PresignedUrlResponse, PaymentProofUploadRequest>({
       path: `/admin/payments/${id}/proof/upload-url`,
       method: 'POST',
       data: payload,
     });
   }
 
-  async confirmAdminProofUpload(id: string, payload: ConfirmPaymentProofPayload) {
-    return this.httpClient.callNoError<PaymentIntent, ConfirmPaymentProofPayload>(
+  private async confirmAdminProofUpload(id: string, payload: ConfirmPaymentProofPayload) {
+    return this.httpClient.call<PaymentIntent, ConfirmPaymentProofPayload>(
       {
         path: `/admin/payments/${id}/proof/confirm`,
         method: 'POST',
@@ -64,6 +64,23 @@ export class PaymentsAdminAPI {
       },
       normalizeIntent,
     );
+  }
+
+  async uploadAdminProof(id: string, file: File) {
+    const data = await this.getAdminProofUploadUrl(id, {
+      content_type: file.type as PaymentProofContentType,
+    });
+    const uploadResponse = await fetch(data.upload_url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type,
+      },
+      body: file,
+    });
+
+    if (uploadResponse.ok) {
+      return this.confirmAdminProofUpload(id, { file_key: data.file_key });
+    }
   }
 
   async reviewPayment(id: string, payload: AdminPaymentReviewPayload) {
