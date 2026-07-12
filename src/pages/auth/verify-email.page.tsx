@@ -35,6 +35,7 @@ function VerifyEmailPage() {
   }, [verifyEmail, token]);
 
   useEffect(() => {
+    start(); // when the user is redirected to this page, start the countdown for resending the verification email
     void handleVerification();
   }, [token, handleVerification]);
 
@@ -100,7 +101,7 @@ function VerifyEmailPage() {
   );
 
   return (
-    <AuthFormLayout title={statusTitle} subtitle={statusSubTitle}>
+    <AuthFormLayout title={statusTitle} subtitle={statusSubTitle} className='VerifyEmailPage'>
       <VerifyEmailForm
         onSubmit={onSubmit}
         status={verificationStatus}

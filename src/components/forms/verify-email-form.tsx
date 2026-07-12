@@ -46,6 +46,7 @@ export const VerifyEmailForm = ({
   formattedTime,
   email,
 }: VerifyEmailFormProps) => {
+  const showCountDown = status !== VerificationStatus.RESENDING_EMAIL && isCountDownActive
   const { t } = useTranslation();
   const { control, handleSubmit } = useForm<VerifyEmailFormData>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -57,7 +58,7 @@ export const VerifyEmailForm = ({
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='grid gap-4'>
+    <form onSubmit={handleSubmit(onSubmit)} className='VerifyEmailForm grid gap-4'>
       {(![VerificationStatus.VERIFYING, VerificationStatus.RESENDING_EMAIL, VerificationStatus.VERIFIED].includes(
         status,
       ) ||
@@ -78,17 +79,25 @@ export const VerifyEmailForm = ({
         {[VerificationStatus.VERIFICATION_FAILED, VerificationStatus.RESENDED_FAILED, VerificationStatus.IDLE].includes(
           status,
         ) && (
-          <Button
-            fullWidth
-            color='primary'
-            disabled={status === VerificationStatus.RESENDING_EMAIL || isCountDownActive}
-          >
-            {status === VerificationStatus.RESENDING_EMAIL && <Spinner />}
-            {status !== VerificationStatus.RESENDING_EMAIL && isCountDownActive && <span>{formattedTime}</span>}
-            {status !== VerificationStatus.RESENDING_EMAIL && !isCountDownActive && (
-              <span>{t('auth:verifyEmail.resend')}</span>
-            )}
-          </Button>
+          <>
+            {
+              showCountDown && (
+                <label className='text-sm text-gray-500'>{t('auth:verifyEmail.labels.waitResend')}</label>
+              )
+            }
+
+            <Button
+              fullWidth
+              color='primary'
+              disabled={status === VerificationStatus.RESENDING_EMAIL || isCountDownActive}
+            >
+              {status === VerificationStatus.RESENDING_EMAIL && <Spinner />}
+              {showCountDown && <span>{formattedTime}</span>}
+              {status !== VerificationStatus.RESENDING_EMAIL && !isCountDownActive && (
+                <span>{t('auth:verifyEmail.resend')}</span>
+              )}
+            </Button>
+          </>
         )}
 
         <Link to={PageURLS.auth.login} viewTransition>
