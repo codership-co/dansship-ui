@@ -74,7 +74,7 @@ export class PaymentsAPI {
   }
 
   private async getProofUploadUrl(id: string, payload: PaymentProofUploadRequest) {
-    return this.httpClient.callNoError<PresignedUrlResponse, PaymentProofUploadRequest>({
+    return this.httpClient.call<PresignedUrlResponse, PaymentProofUploadRequest>({
       path: `/payments/intents/${id}/proof/upload-url`,
       method: 'POST',
       data: payload,
@@ -82,7 +82,7 @@ export class PaymentsAPI {
   }
 
   private async confirmProofUpload(id: string, payload: ConfirmPaymentProofPayload) {
-    return this.httpClient.callNoError<PaymentIntent, ConfirmPaymentProofPayload>(
+    return this.httpClient.call<PaymentIntent, ConfirmPaymentProofPayload>(
       {
         path: `/payments/intents/${id}/proof/confirm`,
         method: 'POST',
@@ -93,22 +93,19 @@ export class PaymentsAPI {
   }
 
   async uploadProof(id: string, file: File) {
-    const { data, ok } = await this.getProofUploadUrl(id, {
+    const data = await this.getProofUploadUrl(id, {
       content_type: file.type as PaymentProofContentType,
     });
+    const uploadResponse = await fetch(data.upload_url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type,
+      },
+      body: file,
+    });
 
-    if (ok) {
-      const uploadResponse = await fetch(data.upload_url, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': file.type,
-        },
-        body: file,
-      });
-
-      if (uploadResponse.ok) {
-        await this.confirmProofUpload(id, { file_key: data.file_key });
-      }
+    if (uploadResponse.ok) {
+      return this.confirmProofUpload(id, { file_key: data.file_key });
     }
   }
 
