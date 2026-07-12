@@ -49,17 +49,10 @@ export function UserRolesTab() {
   }, [searchInput]);
 
   const { response: allRoles } = usePromise(() => DansshipAPI.rbacAdmin.getRoles());
-  const { response: userWithRoles, isLoading } = usePromise(
-    () => DansshipAPI.rbacAdmin.getUserRoles(searchedUserId ?? ''),
-    !!searchedUserId,
-  );
+  const { response: userWithRoles, isLoading, call: searchRoles } = useCallablePromise((userId: string) => DansshipAPI.rbacAdmin.getUserRoles(userId));
 
-  const { response: searchResults, isLoading: isSearchingUsers } = usePromise(
-    () =>
-      DansshipAPI.usersAdmin.search({
-        email: debouncedSearch,
-      }),
-    debouncedSearch.length > 2,
+  const { response: searchResults, isLoading: isSearchingUsers, call: searchUsers } = useCallablePromise(
+    (email: string) => DansshipAPI.usersAdmin.search({ email }),
   );
 
   const { call: assignRole, isLoading: isAssigning } = useCallablePromise(
@@ -69,6 +62,12 @@ export function UserRolesTab() {
   const { call: revokeRole, isLoading: isRevoking } = useCallablePromise((userId: string, roleId: string) =>
     DansshipAPI.rbacAdmin.revokeRoleFromUser(userId, roleId),
   );
+
+  useEffect(() => {
+    if (debouncedSearch.length > 2) {
+      void searchUsers(debouncedSearch);
+    }
+  }, [debouncedSearch, searchUsers]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -92,6 +91,7 @@ export function UserRolesTab() {
     setSearchedUserId(userId);
     setSearchInput(email);
     setIsDropdownOpen(false);
+    searchRoles(userId);
   };
 
   const isInstructorRole = (role: RoleResponse): boolean => role.name.trim().toLowerCase() === 'instructor';
