@@ -2,7 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { addMonths } from 'date-fns';
 import { TFunction } from 'i18next';
 import { Button } from 'polpo/components';
-import { useCallback, useState } from 'react';
+import { useDebounce } from 'polpo/hooks';
+import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { LuArrowRight, LuX } from 'react-icons/lu';
@@ -72,38 +73,28 @@ export const CheckoutReviewPlanFormInput = ({
     DansshipAPI.subscriptions.previewDiscount(payload),
   );
 
-  const { handleSubmit, control } = useForm<CheckoutFormValues>({
+  const { handleSubmit, watch, control } = useForm<CheckoutFormValues>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     resolver: zodResolver(createCheckoutSchema(t)),
     defaultValues: defaultFormValues,
   });
 
-  const handleInternalSubmit = useCallback(
-    async (formData: CheckoutFormValues) => {
-      const { discount_code } = formData;
-      let discountData = {
-        ...DefaultDiscountData,
-        finalPrice: plan.price,
-      };
+  const discountCode = useDebounce(watch('discount_code'), 800);
 
-      if (!discount_code) {
-        await onSubmit(formData, discountData);
-
-        return;
-      } else {
-        const { data, ok } = await previewDiscount({
-          plan_id: plan.id,
-          discount_code,
-        });
-
+  useEffect(() => {
+    if (discountCode) {
+      previewDiscount({
+        plan_id: plan.id,
+        discount_code: discountCode.toUpperCase(),
+      }).then(({ data, ok }) => {
         if (ok) {
           const { discount_type, rejection_reason, is_valid, discount_applied, final_price, discount_value } = data;
           const value = discount_value ? Number(data.discount_value) : 0;
 
-          discountData = {
+          setDiscountData({
             isValid: !!is_valid,
-            discountCode: discount_code.toUpperCase(),
+            discountCode: discountCode.toUpperCase(),
             error: rejection_reason || '',
             applied: Boolean(discount_applied),
             value,
@@ -114,17 +105,22 @@ export const CheckoutReviewPlanFormInput = ({
                 : discount_type === 'fixed_amount'
                   ? formatPrice(value, plan.currency)
                   : '',
-          };
-
-          setDiscountData(discountData);
-
-          if (is_valid) {
-            await onSubmit(formData, discountData);
-          }
+          });
         }
-      }
+      });
+    } else {
+      setDiscountData({
+        ...DefaultDiscountData,
+        finalPrice: plan.price,
+      });
+    }
+  }, [discountCode, plan.currency, plan.id, plan.price, previewDiscount]);
+
+  const handleInternalSubmit = useCallback(
+    async (formData: CheckoutFormValues) => {
+      await onSubmit(formData, discountData);
     },
-    [onSubmit, plan.currency, plan.id, plan.price, previewDiscount],
+    [discountData, onSubmit],
   );
 
   return (
@@ -184,7 +180,12 @@ export const CheckoutReviewPlanFormInput = ({
             {t('common:cancel')}
           </Button>
 
-          <Button isLoading={isLoading} color='primary' className='flex items-center'>
+          <Button
+            isLoading={isLoading}
+            disabled={!!discountCode && !discountData.isValid}
+            color='primary'
+            className='flex items-center'
+          >
             {t('common:next')}
             <LuArrowRight />
           </Button>

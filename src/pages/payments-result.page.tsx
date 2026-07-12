@@ -7,13 +7,11 @@ import { toast } from 'sonner';
 import { PaymentStatusBadge, UserPaymentHistory } from '@components/modules';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import {
-  type ConfirmPaymentProofPayload,
   DansshipAPI,
   PaymentIntentDetail,
   PaymentMethod,
   PaymentProofContentType,
   PaymentProofContentTypesList,
-  type PaymentProofUploadRequest,
 } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { cn, formatDateTime, formatPrice } from '@helpers';
@@ -47,11 +45,8 @@ function PaymentsResultPage() {
   const { call: getProofViewUrlPromise, isLoading: isGettingProofViewUrl } = useCallablePromise((id: string) =>
     DansshipAPI.payments.getProofViewUrl(id),
   );
-  const { call: getProofUploadUrlPromise, isLoading: isGettingProofUploadUrl } = useCallablePromise(
-    (id: string, payload: PaymentProofUploadRequest) => DansshipAPI.payments.getProofUploadUrl(id, payload),
-  );
-  const { call: confirmProofUploadPromise, isLoading: isConfirmingUpload } = useCallablePromise(
-    (id: string, payload: ConfirmPaymentProofPayload) => DansshipAPI.payments.confirmProofUpload(id, payload),
+  const { call: uploadProofPromise, isLoading: isUploadingProof } = useCallablePromise((id: string, file: File) =>
+    DansshipAPI.payments.uploadProof(id, file),
   );
 
   const getProofViewUrl = useCallback(
@@ -65,48 +60,16 @@ function PaymentsResultPage() {
     [getProofViewUrlPromise],
   );
 
-  const confirmProofUpload = useCallback(
-    async (id: string, payload: ConfirmPaymentProofPayload) => {
-      const { error } = await confirmProofUploadPromise(id, payload);
-
-      if (error) {
-        toast.error(t('payments:proofUploadFailedDesc'));
-      } else {
-        toast.success(t('payments:proofUploadSuccess'));
-      }
-    },
-    [confirmProofUploadPromise, t],
-  );
-
-  const getProofUploadUrl = useCallback(
+  const uploadProof = useCallback(
     async (id: string, file: File) => {
       try {
-        const { data } = await getProofUploadUrlPromise(id, {
-          content_type: file.type as PaymentProofContentType,
-        });
-
-        if (data) {
-          const { upload_url, file_key } = data;
-
-          const uploadResponse = await fetch(upload_url, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': file.type,
-            },
-            body: file,
-          });
-
-          if (!uploadResponse.ok) {
-            toast.error(t('payments:proofUploadFailedDesc'));
-          }
-
-          await confirmProofUpload(id, { file_key });
-        }
+        await uploadProofPromise(id, file);
+        toast.success(t('payments:proofUploadSuccess'));
       } catch {
         toast.error(t('payments:proofUploadFailedDesc'));
       }
     },
-    [confirmProofUpload, getProofUploadUrlPromise, t],
+    [uploadProofPromise, t],
   );
 
   const handleUploadProof = (intentId: string) => {
@@ -125,7 +88,7 @@ function PaymentsResultPage() {
         return;
       }
 
-      await getProofUploadUrl(intentId, file);
+      await uploadProof(intentId, file);
     };
 
     input.click();
@@ -216,7 +179,7 @@ function PaymentsResultPage() {
                     size='small'
                     color='primary'
                     variant='outlined'
-                    isLoading={isGettingProofUploadUrl || isConfirmingUpload}
+                    isLoading={isUploadingProof}
                     onClick={() => void handleUploadProof(intent.id)}
                   >
                     {t('payments:uploadProof')}
@@ -268,10 +231,7 @@ function PaymentsResultPage() {
         </section>
       )}
 
-      <UserPaymentHistory
-        title={t('payments:result.historyTitle')}
-        statuses={['pending_manual_review', 'approved', 'rejected', 'cancelled', 'expired']}
-      />
+      <UserPaymentHistory title={t('payments:result.historyTitle')} />
     </div>
   );
 }

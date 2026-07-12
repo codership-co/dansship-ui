@@ -48,8 +48,8 @@ importers:
         specifier: ^0.4.6
         version: 0.4.6(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       polpo:
-        specifier: ^0.1.25
-        version: 0.1.25(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwind-merge@3.6.0)(tailwindcss@4.3.0)
+        specifier: ^0.1.27
+        version: 0.1.27(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwind-merge@3.6.0)(tailwindcss@4.3.0)
       polpo-http-client:
         specifier: ^1.0.20
         version: 1.0.20
@@ -3641,8 +3641,8 @@ packages:
   polpo-typescript-config@1.0.0:
     resolution: {integrity: sha512-fkec8Iaux2JlOBUvrIKQb3ZInD+dl3KJEt2l4TONXmTmbsOJq+VWv4o6yV/xkKh4I/yABUuf7KDrkutsxq0QAw==}
 
-  polpo@0.1.25:
-    resolution: {integrity: sha512-WT+l5mtAaSe2csD2TlnlaaPNw1n8o+mFW0eJR1fwaWtDcOgzRR7RO5/UwHdVOfuARl5aTTlgK1n/WppXOux4Zw==}
+  polpo@0.1.27:
+    resolution: {integrity: sha512-BeY/osHTLktPKuD6agrphqhkYJ95skSHESX9GPPD7S8r1N5neHwcsZvG+YwgtqM8sYxRiFk5J8rpxVjhD6s9+Q==}
     peerDependencies:
       react: '*'
       react-dom: '*'
@@ -7946,7 +7946,7 @@ snapshots:
 
   polpo-typescript-config@1.0.0: {}
 
-  polpo@0.1.25(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwind-merge@3.6.0)(tailwindcss@4.3.0):
+  polpo@0.1.27(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(tailwind-merge@3.6.0)(tailwindcss@4.3.0):
     dependencies:
       class-variance-authority: 0.7.1
       clsx: 2.1.1

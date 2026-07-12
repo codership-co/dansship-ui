@@ -126,10 +126,10 @@ const routes: Array<RouteObject> = [
               { path: 'studio-rental', Component: SecureAdminStudioRentalPage },
             ],
           },
+
+          { path: '*', Component: Error404Page },
         ],
       },
-
-      { path: '*', Component: Error404Page },
     ],
   },
 ];

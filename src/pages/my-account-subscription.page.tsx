@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { ActiveSubscriptionWidget, PlanSelector, UserPaymentHistory } from '@components/modules';
 import { Badge, Card, CardContent, CardHeader, CardTitle } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
-import { DansshipAPI } from '@core/api';
+import { DansshipAPI, PaymentStatus } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { useDateLocale, usePromise } from '@hooks';
 
@@ -40,7 +40,7 @@ function MyAccountSubscriptionPage() {
   );
 
   return (
-    <div className='max-w-7xl mx-auto py-10 px-4'>
+    <div className='max-w-7xl mx-auto py-10 px-4 pt-20'>
       <div className='mb-10'>
         <h4>{t('subscriptions:store.title')}</h4>
         <p>{t('subscriptions:store.subtitle')}</p>
@@ -113,7 +113,7 @@ function MyAccountSubscriptionPage() {
             <div className='mt-4'>
               <UserPaymentHistory
                 title={t('subscriptions:store.inProgressPayments')}
-                statuses={['pending', 'pending_manual_review']}
+                statuses={[PaymentStatus.PENDING, PaymentStatus.PENDING_MANUAL_REVIEW]}
                 emptyStateKey='payments:inProgressEmptyState'
               />
             </div>
@@ -123,7 +123,12 @@ function MyAccountSubscriptionPage() {
             <div className='mt-4'>
               <UserPaymentHistory
                 title={t('subscriptions:store.historicalPayments')}
-                statuses={['approved', 'rejected', 'cancelled', 'expired']}
+                statuses={[
+                  PaymentStatus.APPROVED,
+                  PaymentStatus.REJECTED,
+                  PaymentStatus.CANCELLED,
+                  PaymentStatus.EXPIRED,
+                ]}
                 emptyStateKey='payments:historicalEmptyState'
               />
             </div>

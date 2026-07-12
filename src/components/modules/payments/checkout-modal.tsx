@@ -1,4 +1,4 @@
-import { Button } from 'polpo/components';
+import { ActionModal, Button } from 'polpo/components';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuArrowLeft, LuArrowRight, LuCreditCard, LuList, LuReceipt } from 'react-icons/lu';
@@ -15,7 +15,6 @@ import {
 } from '@components/forms/checkout-review-plan-form';
 import { FormStepperLayout } from '@components/layouts';
 import { PlanCard } from '@components/modules';
-import { Dialog, DialogContent } from '@components/ui';
 import { PaymentMethod, type PublicPlan } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { cn } from '@helpers';
@@ -28,14 +27,23 @@ export enum CheckoutStep {
 
 interface CheckoutModalProps {
   onClose: () => void;
-  plan: PublicPlan | null;
+  isOpen: boolean;
+  plan: PublicPlan;
 }
 
-export function CheckoutModal({ onClose, plan }: CheckoutModalProps) {
+export function CheckoutModal({ onClose, plan, isOpen }: CheckoutModalProps) {
   return (
-    <Dialog open={plan !== null} onOpenChange={open => !open && onClose()}>
-      {plan && <ModalContent onClose={onClose} plan={plan} />}
-    </Dialog>
+    <ActionModal
+      closeOnClickOutside={false}
+      backCard
+      lineOnTop
+      icon={LuCreditCard}
+      isOpen={isOpen}
+      onClose={onClose}
+      className='p-0 rounded-none sm:rounded-xl'
+    >
+      <ModalContent onClose={onClose} plan={plan} />
+    </ActionModal>
   );
 }
 
@@ -66,10 +74,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
   }, []);
 
   return (
-    <DialogContent
-      className='bg-transparent shadow-none border-0 p-0 max-w-none w-auto h-auto m-auto'
-      onInteractOutside={event => event.preventDefault()}
-    >
+    <section className='bg-transparent shadow-none border-0 p-0 max-w-none w-auto h-auto m-auto'>
       <FormStepperLayout
         className={cn(
           'm-auto overflow-auto rounded-none sm:rounded-xl',
@@ -153,6 +158,6 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
         ]}
         currentStep={step}
       />
-    </DialogContent>
+    </section>
   );
 }

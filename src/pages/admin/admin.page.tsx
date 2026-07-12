@@ -166,7 +166,7 @@ function AdminPage() {
   };
 
   return (
-    <div className='mx-auto max-w-7xl px-4 py-8 space-y-6'>
+    <div className='mx-auto max-w-7xl px-4 py-8 space-y-6 pt-20'>
       <header className='rounded-[calc(var(--radius)+4px)] bg-[hsl(var(--surface-container-low))] p-5'>
         <div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
           <div>

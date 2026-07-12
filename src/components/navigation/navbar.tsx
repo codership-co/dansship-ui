@@ -172,7 +172,7 @@ export const MenuItem = ({
     }`;
 
   return (
-    <NavLink to={to} className={variant === 'navbar' ? navbarClassName : asideClassName}>
+    <NavLink to={to} className={variant === 'navbar' ? navbarClassName : asideClassName} end>
       {Icon ? <Icon className='h-4 w-4' /> : null}
       {label}
     </NavLink>

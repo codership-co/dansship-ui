@@ -46,7 +46,7 @@ export const VerifyEmailForm = ({
   formattedTime,
   email,
 }: VerifyEmailFormProps) => {
-  const showCountDown = status !== VerificationStatus.RESENDING_EMAIL && isCountDownActive
+  const showCountDown = status !== VerificationStatus.RESENDING_EMAIL && isCountDownActive;
   const { t } = useTranslation();
   const { control, handleSubmit } = useForm<VerifyEmailFormData>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -58,7 +58,7 @@ export const VerifyEmailForm = ({
   });
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='VerifyEmailForm grid gap-4'>
+    <form onSubmit={handleSubmit(onSubmit)} className='grid gap-4' data-component='VerifyEmailForm'>
       {(![VerificationStatus.VERIFYING, VerificationStatus.RESENDING_EMAIL, VerificationStatus.VERIFIED].includes(
         status,
       ) ||
@@ -80,11 +80,7 @@ export const VerifyEmailForm = ({
           status,
         ) && (
           <>
-            {
-              showCountDown && (
-                <label className='text-sm mb-0'>{t('auth:verifyEmail.labels.waitResend')}</label>
-              )
-            }
+            {showCountDown && <label className='text-sm mb-0'>{t('auth:verifyEmail.labels.waitResend')}</label>}
 
             <Button
               fullWidth

@@ -293,14 +293,14 @@ function AdminScheduleBuilderPage() {
 
   if (isLoadingWeeks) {
     return (
-      <div className='flex justify-center py-12'>
+      <div className='flex justify-center py-12 pt-20'>
         <SpinnerLoader />
       </div>
     );
   }
 
   return (
-    <div className='max-w-350 mx-auto py-8 px-4'>
+    <div className='max-w-350 mx-auto py-8 px-4 pt-20'>
       <div className='flex justify-between items-end mb-8'>
         <div>
           <h1 className='text-3xl font-bold text-gray-900'>{t('schedules:builderTitle')}</h1>

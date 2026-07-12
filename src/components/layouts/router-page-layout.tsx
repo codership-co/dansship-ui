@@ -19,7 +19,7 @@ export const RouterPageLayout = () => {
         />
       )}
       <Navbar />
-      <section className={`h-full ${pathname !== PageURLS.home ? 'pt-20' : ''}`}>
+      <section className='h-full'>
         <SecurityOutlet />
       </section>
       <Footer />

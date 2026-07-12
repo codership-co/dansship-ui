@@ -5,7 +5,7 @@ const variants = Object.values(VariantTypes);
 
 export function UiPage() {
   return (
-    <section className='max-w-7xl px-4 grid gap-6 mx-auto'>
+    <section className='max-w-7xl px-4 grid gap-6 mx-auto pt-20'>
       <section>
         <h4>Tipografía</h4>
 

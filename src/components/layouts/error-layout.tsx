@@ -9,13 +9,14 @@ interface ErrorLayoutProps {
 
 export const ErrorLayout = ({ hero, image, title, description, actions, footer }: ErrorLayoutProps) => {
   return (
-    <main className='flex items-center justify-center content-center px-6 py-20 min-h-dvh'>
-      <section className='relative w-xl group'>
-        <div className='bg-primary/40 absolute -z-10 left-[-25%] top-[-5%] h-96 w-96 rounded-full animate-pulse duration-4000' />
-        <div className='bg-secondary/80 absolute -z-10 right-[-20%] top-[5%] h-56 w-56 rounded-full animate-pulse duration-8000' />
-        <div className='bg-tertiary/40 absolute -z-10 bottom-[-10%] right-[-10%] h-75 w-75 rounded-full animate-pulse duration-12000' />
-
-        <div className='rounded-4xl px-8 pb-8 pt-16 text-center shadow-2xl backdrop-blur-xl bg-secondary/30'>
+    <main className='relative grid sm:place-content-center sm:px-6 sm:py-20 min-h-dvh'>
+      <section className='fixed hidden sm:block -z-10 size-full top-0 left-0 overflow-hidden bg-blue'>
+        <div className='bg-primary/40 absolute right-[-6%] top-[-5%] size-96 rounded-full' />
+        <div className='bg-secondary/80 absolute left-[-2%] top-[5%] size-56 rounded-full' />
+        <div className='bg-tertiary/40 absolute bottom-[-8%] left-[-6%] size-120 rounded-full' />
+      </section>
+      <section className='relative sm:max-w-xl group'>
+        <div className='sm:rounded-4xl px-8 pt-40 pb-20 sm:pb-8 sm:pt-16 text-center grid content-center sm:shadow-2xl sm:backdrop-blur-xl sm:bg-secondary/30 h-full sm:h-auto'>
           {image}
 
           {Boolean(hero) && (

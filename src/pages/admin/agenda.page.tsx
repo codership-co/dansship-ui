@@ -122,7 +122,7 @@ function AdminAgendaPage() {
   ];
 
   return (
-    <div className='mx-auto max-w-7xl px-4 py-8 space-y-4'>
+    <div className='mx-auto max-w-7xl px-4 py-8 space-y-4 pt-20'>
       <header className='rounded-[calc(var(--radius)+4px)] bg-[hsl(var(--surface-container-low))] p-5'>
         <div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
           <div>

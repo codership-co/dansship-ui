@@ -1,9 +1,9 @@
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import { ErrorLayout } from '@components/layouts';
 import { Error404 } from '@components/svg';
-import { Button } from '@components/ui';
 import { PageURLS } from '@core/constants';
 
 export function Error404Page() {
@@ -18,10 +18,10 @@ export function Error404Page() {
       actions={
         <>
           <Link to={PageURLS.home}>
-            <Button>{t('error404:backToHome')}</Button>
+            <Button color='primary'>{t('error404:backToHome')}</Button>
           </Link>
 
-          <Button onClick={() => window.history.back()} variant='outline'>
+          <Button color='primary' onClick={() => window.history.back()} variant='outlined'>
             {t('error404:back')}
           </Button>
         </>

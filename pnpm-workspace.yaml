@@ -11,4 +11,4 @@ allowBuilds:
   unrs-resolver: false
 
 minimumReleaseAgeExclude:
-  - polpo@0.1.25
+  - polpo@0.1.27

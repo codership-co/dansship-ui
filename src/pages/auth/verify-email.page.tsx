@@ -35,9 +35,9 @@ function VerifyEmailPage() {
   }, [verifyEmail, token]);
 
   useEffect(() => {
-    start(); // when the user is redirected to this page, start the countdown for resending the verification email
+    start();
     void handleVerification();
-  }, [token, handleVerification]);
+  }, [token, handleVerification, start]);
 
   const statusTitle = useMemo(() => {
     const titles = {
@@ -101,7 +101,7 @@ function VerifyEmailPage() {
   );
 
   return (
-    <AuthFormLayout title={statusTitle} subtitle={statusSubTitle} className='VerifyEmailPage'>
+    <AuthFormLayout title={statusTitle} subtitle={statusSubTitle} dataComponent='VerifyEmailPage'>
       <VerifyEmailForm
         onSubmit={onSubmit}
         status={verificationStatus}
