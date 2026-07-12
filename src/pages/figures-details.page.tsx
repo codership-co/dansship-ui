@@ -64,7 +64,7 @@ function FiguresDetailsPage() {
   };
 
   return (
-    <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12'>
+    <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-20'>
       <Button asChild variant='ghost' size='default' className='mb-6 h-10 px-4 text-sm sm:h-11 sm:px-5 sm:text-base'>
         <Link to='/figures'>
           <LuChevronLeft className='h-5 w-5' />

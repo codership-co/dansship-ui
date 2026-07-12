@@ -1,9 +1,9 @@
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import { ErrorLayout } from '@components/layouts';
 import { Unauthorized } from '@components/svg';
-import { Button } from '@components/ui';
 import { PageURLS } from '@core/constants';
 
 export function UnauthorizedPage() {
@@ -18,10 +18,10 @@ export function UnauthorizedPage() {
       actions={
         <>
           <Link to={PageURLS.home}>
-            <Button>{t('unauthorized:backToHome')}</Button>
+            <Button color='primary'>{t('unauthorized:backToHome')}</Button>
           </Link>
 
-          <Button onClick={() => window.history.back()} variant='outline'>
+          <Button color='primary' onClick={() => window.history.back()} variant='outlined'>
             {t('unauthorized:back')}
           </Button>
         </>

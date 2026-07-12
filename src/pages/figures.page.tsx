@@ -11,7 +11,7 @@ function FiguresPage() {
   const { filters, setFilters, figures, isLoading, hasMore, total, loadNextPage } = useFigures();
 
   return (
-    <main className='min-h-dvh mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12'>
+    <main className='min-h-dvh mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12 pt-20'>
       <FiguresHeader />
       <FigureCatalogMobileFilters filters={filters} setFilters={setFilters} />
       <section className='flex flex-col gap-6 lg:flex-row lg:gap-10'>

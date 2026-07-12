@@ -24,9 +24,11 @@
   "menuFigures": "Figuras",
   "menuProgress": "Progreso",
   "adminMenu": {
+    "agenda": "Agenda",
     "scheduleBuilder": "Gestor de Horarios",
     "inventoryBilling": "Inventario y Facturacion",
     "manualBookings": "Reservas Manuales",
+    "figures": "Figuras",
     "payments": "Pagos",
     "merchProducts": "Productos Merch",
     "merchPos": "Punto de Venta",

@@ -25,7 +25,7 @@ function AdminMerchPosPage() {
   } = useMerchPos();
 
   return (
-    <div className='mx-auto max-w-7xl space-y-6 px-4 py-8'>
+    <div className='mx-auto max-w-7xl space-y-6 px-4 py-8 pt-20'>
       <div>
         <h1 className='text-3xl font-bold text-gray-900'>{t('merch:posTitle')}</h1>
         <p className='mt-2 text-gray-500'>{t('merch:completeSale')}</p>

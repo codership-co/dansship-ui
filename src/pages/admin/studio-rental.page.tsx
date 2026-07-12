@@ -121,7 +121,7 @@ function AdminStudioRentalPage() {
   );
 
   return (
-    <div className='max-w-7xl mx-auto py-8 px-4 space-y-6'>
+    <div className='max-w-7xl mx-auto py-8 px-4 space-y-6 pt-20'>
       <div>
         <h1 className='text-primary'>{t('studioRental:admin.title')}</h1>
         <p className='text-muted-foreground mt-2'>{t('studioRental:admin.subtitle')}</p>

@@ -68,7 +68,7 @@ function MyAccountBookingsPage() {
   const isSubmitting = isCancelingClass || isCancelingWaitlist;
 
   return (
-    <div className='max-w-6xl mx-auto py-10 px-4'>
+    <div className='max-w-6xl mx-auto py-10 px-4 pt-20'>
       <div className='mb-10'>
         <h1 className='text-3xl font-bold text-gray-900'>{t('bookings:myBookingsTitle')}</h1>
         <p className='text-gray-500 mt-2'>{t('bookings:myBookingsSubtitle')}</p>

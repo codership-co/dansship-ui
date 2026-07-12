@@ -1,9 +1,9 @@
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import { ErrorLayout } from '@components/layouts';
 import { UnderConstruction } from '@components/svg';
-import { Button } from '@components/ui';
 import { PageURLS } from '@core/constants';
 
 export function UnavailablePage() {
@@ -18,10 +18,10 @@ export function UnavailablePage() {
       actions={
         <>
           <Link to={PageURLS.home}>
-            <Button>{t('unavailable:backToHome')}</Button>
+            <Button color='primary'>{t('unavailable:backToHome')}</Button>
           </Link>
 
-          <Button onClick={() => window.history.back()} variant='outline'>
+          <Button color='primary' onClick={() => window.history.back()} variant='outlined'>
             {t('unavailable:back')}
           </Button>
         </>

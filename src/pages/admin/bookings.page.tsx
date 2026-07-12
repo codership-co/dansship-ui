@@ -144,7 +144,7 @@ function AdminBookingsPage() {
   const shouldShowUserEmptyState = !isLoadingUsers && emailQuery.length >= 3 && (!users?.ok || users.data.length === 0);
 
   return (
-    <div className='max-w-6xl mx-auto py-8 px-4 space-y-6'>
+    <div className='max-w-6xl mx-auto py-8 px-4 space-y-6 pt-20'>
       <div>
         <h1 className='text-3xl font-bold text-gray-900'>{t('admin:bookings.title')}</h1>
         <p className='text-gray-500 mt-2'>{t('admin:bookings.subtitle')}</p>

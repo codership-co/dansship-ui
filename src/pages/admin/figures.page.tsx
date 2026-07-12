@@ -251,7 +251,7 @@ function AdminFiguresPage() {
   };
 
   return (
-    <div className='mx-auto max-w-7xl px-4 py-8'>
+    <div className='mx-auto max-w-7xl px-4 py-8 pt-20'>
       <div className='mb-8'>
         <h1 className='text-3xl font-bold text-gray-900'>
           {t('figures.admin.title', { defaultValue: 'Figure Management' })}

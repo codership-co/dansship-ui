@@ -10,7 +10,7 @@ function AdminInventoryPage() {
   const { t } = useTranslation();
 
   return (
-    <div className='max-w-7xl mx-auto py-8 px-4'>
+    <div className='max-w-7xl mx-auto py-8 px-4 pt-20'>
       <div className='mb-8'>
         <h1 className='text-3xl font-bold text-gray-900'>{t('admin:inventory.title')}</h1>
         <p className='text-gray-500 mt-2'>{t('admin:inventory.subtitle')}</p>

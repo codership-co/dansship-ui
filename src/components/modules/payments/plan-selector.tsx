@@ -39,6 +39,7 @@ export function PlanSelector({ plans }: PlanSelectorProps) {
   const location = useLocation();
 
   const [selectedPlan, setSelectedPlan] = useState<PublicPlan | null>(null);
+  const [isOpen, setOpen] = useState(false);
 
   const displayPlans = useMemo(() => orderPlansForDisplay(plans), [plans]);
 
@@ -50,6 +51,7 @@ export function PlanSelector({ plans }: PlanSelectorProps) {
       return;
     }
 
+    setOpen(true);
     setSelectedPlan(plan);
   };
 
@@ -70,6 +72,7 @@ export function PlanSelector({ plans }: PlanSelectorProps) {
       return;
     }
 
+    setOpen(true);
     setSelectedPlan(pendingPlan);
   }, [isAuthenticated, plans]);
 
@@ -96,13 +99,16 @@ export function PlanSelector({ plans }: PlanSelectorProps) {
         ))}
       </div>
 
-      <CheckoutModal
-        plan={selectedPlan}
-        onClose={() => {
-          setSelectedPlan(null);
-          clearPendingPlanCheckoutIntent();
-        }}
-      />
+      {selectedPlan && (
+        <CheckoutModal
+          plan={selectedPlan}
+          isOpen={isOpen}
+          onClose={() => {
+            setOpen(false);
+            clearPendingPlanCheckoutIntent();
+          }}
+        />
+      )}
     </div>
   );
 }
