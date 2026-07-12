@@ -1,4 +1,4 @@
-name: Validación de Código (ESLint y TS)
+name: Clean code test (ESLint y TS)
 
 on:
   push:
@@ -12,25 +12,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 🛑 Clonar repositorio
+      - name: 🛑 Clone Repository
         uses: actions/checkout@v4
 
-      - name: 📦 Instalar pnpm
+      - name: 📦 Installing PNPM
         uses: pnpm/action-setup@v3
         with:
           version: 11.11.0
 
-      - name: ⚙️ Configurar Node.js
+      - name: ⚙️ Configuring Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '24'
           cache: 'pnpm'
 
-      - name: 📦 Instalar dependencias
+      - name: 📦 Installing dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: 🔍 Ejecutar ESLint
+      - name: 🔍 Running ESLint
         run: pnpm run lint
 
-      - name: ʦ Validar TypeScript (tsc)
+      - name: ʦ Validating TypeScript (tsc)
         run: pnpm exec tsc --noEmit
