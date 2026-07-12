@@ -1,0 +1,36 @@
+name: Clean code test (ESLint y TS)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    name: Lint & Compile
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛑 Clone Repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Installing PNPM
+        uses: pnpm/action-setup@v3
+        with:
+          version: 11.11.0
+
+      - name: ⚙️ Configuring Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: 📦 Installing dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Running ESLint
+        run: pnpm run lint
+
+      - name: ʦ Validating TypeScript (tsc)
+        run: pnpm exec tsc --noEmit
