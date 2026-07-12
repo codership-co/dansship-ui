@@ -10,12 +10,14 @@ interface AuthFormLayoutProps {
   title: React.ReactNode;
   subtitle: React.ReactNode;
   children: React.ReactNode;
+  className?: string;
 }
 
-export const AuthFormLayout = ({ isFlipped, title, subtitle, children }: AuthFormLayoutProps) => {
+export const AuthFormLayout = ({ isFlipped, title, subtitle, children, className }: AuthFormLayoutProps) => {
   return (
     <div
       className={cn(
+        className,
         'relative',
         'md:min-h-200 md:h-dvh',
         // eslint-disable-next-line quotes
