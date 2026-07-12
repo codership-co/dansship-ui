@@ -82,7 +82,7 @@ export const VerifyEmailForm = ({
           <>
             {
               showCountDown && (
-                <label className='text-sm text-gray-500'>{t('auth:verifyEmail.labels.waitResend')}</label>
+                <label className='text-sm mb-0'>{t('auth:verifyEmail.labels.waitResend')}</label>
               )
             }
 

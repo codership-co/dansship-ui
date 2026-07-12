@@ -38,7 +38,7 @@ export function useCountdown(initialSeconds: number) {
     const mins = Math.floor(secondsLeft / 60);
     const secs = secondsLeft % 60;
 
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')} min`;
   };
 
   return { secondsLeft, isActive, start, pause, reset, formattedTime: formatTime() };
