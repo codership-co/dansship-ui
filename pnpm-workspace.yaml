@@ -9,3 +9,6 @@ allowBuilds:
   esbuild: false
   msw: false
   unrs-resolver: false
+
+minimumReleaseAgeExclude:
+  - polpo@0.1.25

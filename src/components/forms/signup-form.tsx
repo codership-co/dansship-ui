@@ -1,11 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from 'polpo/components';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { z } from 'zod';
 
 import { EmailField, PasswordFieldset } from '@components/form-fields';
+import { useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
 
 const createSignUpSchema = (t: (key: string) => string) =>
@@ -19,22 +21,19 @@ const createSignUpSchema = (t: (key: string) => string) =>
         .string()
         .min(1, { message: t('validation:required') })
         .min(8, { message: t('validation:password.length') }),
-      confirmPassword: z.string().min(1, { message: t('validation:required') }),
+      confirm_password: z.string().min(1, { message: t('validation:required') }),
     })
-    .refine(data => data.password === data.confirmPassword, {
+    .refine(data => data.password === data.confirm_password, {
       message: t('validation:password.match'),
-      path: ['confirmPassword'],
+      path: ['confirm_password'],
     });
 
 export type SignUpFormData = z.infer<ReturnType<typeof createSignUpSchema>>;
 
-interface SignUpFormProps {
-  onSubmit: (data: SignUpFormData) => Promise<void>;
-  isSubmitting?: boolean;
-}
-
-export function SignUpForm({ onSubmit, isSubmitting }: SignUpFormProps) {
+export function SignUpForm() {
   const { t } = useTranslation();
+  const { signUp } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
   const signUpSchema = createSignUpSchema(t);
 
@@ -45,12 +44,18 @@ export function SignUpForm({ onSubmit, isSubmitting }: SignUpFormProps) {
     defaultValues: {
       email: '',
       password: '',
-      confirmPassword: '',
+      confirm_password: '',
     },
   });
 
+  const internalSubmit = async (data: SignUpFormData) => {
+    setIsLoading(true);
+    await signUp(data);
+    setIsLoading(false);
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+    <form onSubmit={handleSubmit(internalSubmit)} className='space-y-6'>
       <EmailField
         id='email'
         control={control}
@@ -62,7 +67,7 @@ export function SignUpForm({ onSubmit, isSubmitting }: SignUpFormProps) {
       <PasswordFieldset
         control={control}
         passwordName='password'
-        confirmPasswordName='confirmPassword'
+        confirmPasswordName='confirm_password'
         passwordLabel={t('auth:signup.password.label')}
         confirmPasswordLabel={t('auth:signup.confirmPassword')}
         showStrength
@@ -74,7 +79,7 @@ export function SignUpForm({ onSubmit, isSubmitting }: SignUpFormProps) {
         }}
       />
 
-      <Button color='primary' type='submit' isLoading={isSubmitting} fullWidth>
+      <Button color='primary' type='submit' isLoading={isLoading} fullWidth>
         {t('auth:signup.createAccount')}
       </Button>
 

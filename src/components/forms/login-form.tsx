@@ -1,11 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from 'polpo/components';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { z } from 'zod';
 
 import { EmailField, PasswordField } from '@components/form-fields';
+import { useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
 
 /*
@@ -27,13 +29,10 @@ const createLoginSchema = (t: (key: string) => string) =>
 
 export type LoginFormData = z.infer<ReturnType<typeof createLoginSchema>>;
 
-interface LoginFormProps {
-  onSubmit: (data: LoginFormData) => Promise<void>;
-  isSubmitting?: boolean;
-}
-
-export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
+export function LoginForm() {
   const { t } = useTranslation();
+  const { login } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
 
   const loginSchema = createLoginSchema(t);
 
@@ -47,8 +46,14 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
     },
   });
 
+  const internalSubmit = async (data: LoginFormData) => {
+    setIsLoading(true);
+    await login(data);
+    setIsLoading(false);
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+    <form onSubmit={handleSubmit(internalSubmit)} className='grid gap-6'>
       <EmailField
         id='email'
         control={control}
@@ -72,8 +77,8 @@ export function LoginForm({ onSubmit, isSubmitting }: LoginFormProps) {
         </Link>
       </div>
 
-      <Button type='submit' isLoading={isSubmitting} color='primary' className='w-full'>
-        {isSubmitting ? t('common:loading') : t('auth:login.signIn')}
+      <Button type='submit' isLoading={isLoading} color='primary' className='w-full'>
+        {t('auth:login.signIn')}
       </Button>
 
       <div className='text-center text-sm'>

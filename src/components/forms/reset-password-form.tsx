@@ -5,11 +5,10 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { LuArrowLeft, LuKey } from 'react-icons/lu';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { z } from 'zod';
 
 import { EmailField, PasswordFieldset, TextField } from '@components/form-fields';
-import { Spinner } from '@components/loaders';
 import { useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
 import { useCountdown } from '@hooks';
@@ -80,15 +79,8 @@ const useResetPasswordForm = (email: string) => {
 
   const onSubmit = async ({ email, new_password, code }: ResetPasswordPayload) => {
     setIsSubmitting(true);
-
-    try {
-      await resetPassword({ email, new_password, code });
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Reset password failed:', error);
-    } finally {
-      setIsSubmitting(false);
-    }
+    await resetPassword({ email, new_password, code });
+    setIsSubmitting(false);
   };
 
   return {
@@ -102,12 +94,10 @@ const useResetPasswordForm = (email: string) => {
   };
 };
 
-interface ResetPasswordFormProps {
-  email: string;
-}
-
-export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
+export function ResetPasswordForm() {
   const { t } = useTranslation();
+  const { state } = useLocation();
+  const email: string = state?.email ?? '';
   const { isActive, isSubmitting, isSendingCode, formattedTime, onSubmit, resendCodeOTP, control } =
     useResetPasswordForm(email);
 
@@ -153,8 +143,7 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
 
       <section className='grid gap-2'>
         <Button type='submit' isLoading={isSubmitting} color='primary' fullWidth>
-          {isSubmitting && <Spinner />}
-          {!isSubmitting && t('auth:resetPassword.submit')}
+          {t('auth:resetPassword.submit')}
         </Button>
 
         {Boolean(email) && (
@@ -164,11 +153,11 @@ export function ResetPasswordForm({ email }: ResetPasswordFormProps) {
             variant='outlined'
             type='button'
             onClick={isSendingCode ? undefined : resendCodeOTP}
-            isLoading={isActive || isSendingCode}
+            isLoading={isSendingCode}
+            disabled={isActive}
           >
-            {isSendingCode && <Spinner />}
-            {isActive && !isSendingCode && <span>{formattedTime}</span>}
-            {!isSendingCode && !isActive && (
+            {isActive && <span>{formattedTime}</span>}
+            {!isActive && (
               <>
                 <LuKey className='w-4 h-4' />
                 {t('auth:resetPassword.sendAgain')}

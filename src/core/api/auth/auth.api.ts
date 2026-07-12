@@ -22,7 +22,7 @@ export class AuthAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async refreshToken() {
-    return this.httpClient.callNoError<void>({
+    return this.httpClient.call<void>({
       path: '/auth/refresh-token',
       method: 'POST',
     });
@@ -56,7 +56,7 @@ export class AuthAPI {
   }
 
   async resendVerification(payload: ResendVerificationPayload) {
-    return this.httpClient.callNoError<RegisterResponse, ResendVerificationPayload>({
+    return this.httpClient.call<RegisterResponse, ResendVerificationPayload>({
       path: '/auth/resend-verification',
       method: 'POST',
       data: payload,
@@ -87,7 +87,7 @@ export class AuthAPI {
   }
 
   async getProfile() {
-    return this.httpClient.callNoError<AuthUser, object, User>(
+    return this.httpClient.call<AuthUser, object, User>(
       {
         path: '/auth/profile',
         method: 'GET',
@@ -108,7 +108,7 @@ export class AuthAPI {
   }
 
   async updatePreferredLanguage(payload: UpdatePreferredLanguagePayload) {
-    return this.httpClient.callNoError<AuthUser, object, User>(
+    return this.httpClient.call<AuthUser, object, User>(
       {
         path: '/auth/profile',
         method: 'PUT',

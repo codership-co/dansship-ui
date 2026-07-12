@@ -14,7 +14,9 @@ export const useLanguage = () => {
       i18n.changeLanguage(code);
 
       if (isAuthenticated) {
-        void DansshipAPI.auth.updatePreferredLanguage({ preferred_language: code });
+        try {
+          void DansshipAPI.auth.updatePreferredLanguage({ preferred_language: code });
+        } catch {}
       }
     },
     [i18n, isAuthenticated],

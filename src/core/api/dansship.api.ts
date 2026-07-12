@@ -48,9 +48,10 @@ export class DansshipAPI {
         !['/auth/refresh-token', '/auth/signin'].includes(request.urlParams.path ?? '')
       ) {
         localStorage.setItem('refreshing_token', '1');
-        const { ok } = await this.auth.refreshToken();
 
-        if (!ok) {
+        try {
+          await this.auth.refreshToken();
+        } catch {
           localStorage.removeItem('refreshing_token');
           window.dispatchEvent(new CustomEvent('auth:session-expired'));
         }

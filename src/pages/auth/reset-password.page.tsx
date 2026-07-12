@@ -23,7 +23,7 @@ function ResetPasswordPage() {
         />
       }
     >
-      <ResetPasswordForm email={email} />
+      <ResetPasswordForm />
     </AuthFormLayout>
   );
 }
