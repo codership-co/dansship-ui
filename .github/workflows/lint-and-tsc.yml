@@ -1,0 +1,36 @@
+name: Validación de Código (ESLint y TS)
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    name: Lint & Compile
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛑 Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: 📦 Instalar pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 11.11.0
+
+      - name: ⚙️ Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: 📦 Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Ejecutar ESLint
+        run: pnpm run lint
+
+      - name: ʦ Validar TypeScript (tsc)
+        run: pnpm exec tsc --noEmit
