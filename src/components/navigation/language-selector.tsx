@@ -5,6 +5,8 @@ import { LanguageFlag } from './language-flag';
 
 import { useLanguage } from '@hooks';
 
+import type { LanguageCode } from '@core/constants';
+
 interface LanguageSelectorProps {
   variant?: 'buttons' | 'dropdown';
 }
@@ -13,8 +15,8 @@ export function LanguageSelector({ variant = 'buttons' }: LanguageSelectorProps)
   const [isOpen, setIsOpen] = useState(false);
   const { currentLanguage, changeLanguage, languages } = useLanguage();
 
-  const handleLanguageChange = (code: string) => {
-    changeLanguage(code as 'en' | 'es');
+  const handleLanguageChange = (code: LanguageCode) => {
+    changeLanguage(code);
     setIsOpen(false);
   };
 
