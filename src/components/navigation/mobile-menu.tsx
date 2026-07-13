@@ -1,6 +1,7 @@
-import { AsideModal } from 'polpo/components';
+import { AsideModal, Button, Line } from 'polpo/components';
+import { cn } from 'polpo/helpers';
 import { useTranslation } from 'react-i18next';
-import { FaCartArrowDown, FaChalkboardTeacher } from 'react-icons/fa';
+import { FaCartArrowDown } from 'react-icons/fa';
 import { GiAvoidance } from 'react-icons/gi';
 import { GrSchedules } from 'react-icons/gr';
 import { HiOutlineDocument } from 'react-icons/hi';
@@ -15,11 +16,11 @@ import { useNavigate } from 'react-router';
 
 import { MenuItem, NavItem } from './navbar';
 
+import { LanguageSelector } from '@components/navigation/language-selector';
 import { Isotype, Logotype } from '@components/svg';
-import { Button } from '@components/ui';
 import { FEATURE_FLAG, useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
-import { AdminPermissions, InstructorPermissions, PERMISSION } from '@core/permissions';
+import { AdminPermissions } from '@core/permissions';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -166,13 +167,6 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       featureFlags: [FEATURE_FLAG.isAdminMerchPosPageEnabled],
       icon: FaCartArrowDown,
     },
-    {
-      to: PageURLS.instructorDashboard,
-      label: t('nav:instructorPortal'),
-      orPermissions: [...InstructorPermissions.dashboard, PERMISSION.SCHEDULE_MANAGE],
-      featureFlags: [FEATURE_FLAG.isInstructorDashboardPageEnabled],
-      icon: FaChalkboardTeacher,
-    },
   ];
 
   if (!isOpen) return null;
@@ -182,8 +176,8 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       isOpen={isOpen}
       onClose={onClose}
       contentClassName='p-0 h-full overflow-auto flex flex-col'
-      size='340px'
       noCloseButton
+      size='340px'
     >
       <div className='p-4 flex items-center justify-between border-b'>
         <div className='flex items-center gap-2'>
@@ -192,44 +186,67 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           </span>
           <Logotype className='h-5 text-primary' />
         </div>
-        <button onClick={onClose} className='text-gray-500 hover:text-gray-700'>
+        <button onClick={onClose} className='text-gray-500 hover:text-gray-900 cursor-pointer'>
           <LuX className='w-6 h-6' />
         </button>
       </div>
 
-      <div className='p-4 flex-1 flex flex-col min-h-0'>
-        <nav className='grid gap-12 overflow-y-auto'>
-          <section className='grid gap-4'>
-            {authenticatedPrimaryMenuItems.map(item => (
-              <MenuItem key={item.to} {...item} variant='aside' />
+      <div className='p-4 pt-8 flex-1 flex flex-col'>
+        <nav className='grid gap-8 overflow-y-auto'>
+          <section className='grid gap-2'>
+            {authenticatedPrimaryMenuItems.map((item, i) => (
+              <MenuItem
+                key={item.to}
+                {...item}
+                variant='aside'
+                className='animate-in fade-in slide-in-from-left duration-300 fill-mode-both'
+                style={{ animationDelay: `${80 * (i + 2)}ms` }}
+              />
             ))}
           </section>
 
           {user?.isAdmin && (
             <section>
-              <span className='font-bold uppercase text-primary mb-4 block'>{t('nav:admin')}</span>
-              <section className='grid gap-4'>
-                {adminMenuItems.map(item => (
-                  <MenuItem key={item.to} {...item} variant='aside' />
+              <label
+                className={cn(
+                  'font-bold uppercase text-primary mb-4 grid grid-cols-[1fr_auto_1fr] items-center gap-4',
+                  'animate-in fade-in slide-in-from-left duration-300 fill-mode-both',
+                )}
+                style={{ animationDelay: `${80 * (2 + authenticatedPrimaryMenuItems.length)}ms` }}
+              >
+                <Line color='var(--color-primary-200)' />
+                {t('nav:admin')}
+                <Line color='var(--color-primary-200)' />
+              </label>
+              <section className='grid gap-2'>
+                {adminMenuItems.map((item, i) => (
+                  <MenuItem
+                    key={item.to}
+                    {...item}
+                    variant='aside'
+                    className='animate-in fade-in slide-in-from-left duration-300 fill-mode-both'
+                    style={{ animationDelay: `${80 * (i + 3 + authenticatedPrimaryMenuItems.length)}ms` }}
+                  />
                 ))}
               </section>
             </section>
           )}
         </nav>
 
-        {/*<div className='mt-auto space-y-3 pt-4'>
-            <LanguageSelector variant='buttons' />
-          </div>*/}
+        <div className='mt-auto space-y-3 pt-4'>
+          <LanguageSelector variant='buttons' />
+        </div>
       </div>
 
       <div className='p-4 grid border-t'>
         <Button
+          color='primary'
+          variant='text'
           onClick={() => {
             logout();
             onClose();
             navigate(PageURLS.home, { replace: true });
           }}
-          variant='ghost'
         >
           {t('nav:signOut')}
         </Button>

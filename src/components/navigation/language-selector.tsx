@@ -20,7 +20,7 @@ export function LanguageSelector({ variant = 'buttons' }: LanguageSelectorProps)
     setIsOpen(false);
   };
 
-  if (!currentLanguage) return null;
+  if (!currentLanguage || languages.length < 2) return null;
 
   if (variant === 'buttons') {
     return (

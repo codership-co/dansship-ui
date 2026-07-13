@@ -80,7 +80,6 @@ export const PageURLS = {
   figuresById: (id: number) => `/figures/${id}`,
   browse: '/browse',
   classes: '/classes',
-  instructorDashboard: '/instructor/dashboard',
   profile: '/profile',
   profileEdit: '/profile/edit',
   figureCompleted: '/figure/completed',
