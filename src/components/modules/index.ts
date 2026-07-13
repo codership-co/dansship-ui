@@ -1,4 +1,4 @@
-export * from './admin-access';
+export * from './admin-users';
 export * from './schedules';
 export * from './admin-inventory';
 export * from './admin-merch';

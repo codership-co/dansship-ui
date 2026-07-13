@@ -37,7 +37,6 @@ i18n
       'notifications',
       'payments',
       'profile',
-      'rbac',
       'reports',
       'savedFigures',
       'schedules',

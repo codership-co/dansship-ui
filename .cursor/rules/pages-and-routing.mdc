@@ -1,0 +1,45 @@
+---
+description: Page modules, SecurityGuard, and router wiring conventions
+globs: src/pages/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Pages & Routing
+
+## File naming
+
+- Pages: `*.page.tsx` (e.g. `login.page.tsx`, `user-list.page.tsx`)
+- Folder barrels: `index.ts` re-exports; root surface is `src/pages/index.ts`
+
+## Pattern
+
+Pages stay thin: layout + feature form/module. Export a `Secure*` wrapper when auth/flags/permissions apply.
+
+```tsx
+function LoginPage() {
+  const { t } = useTranslation();
+  return (
+    <AuthFormLayout title={t('auth:login.title')} subtitle={t('auth:login.subtitle')}>
+      <LoginForm />
+    </AuthFormLayout>
+  );
+}
+
+export const SecureLoginPage = SecurityGuard(LoginPage, {
+  redirect: PageURLS.home,
+  requiresNoAuth: true,
+  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled, FEATURE_FLAG.isLoginPageEnabled],
+});
+```
+
+Admin example: `requiresAuth: true`, `andPermissions: [PERMISSION.*]`, `redirect: PageURLS.auth.login`.
+
+## Checklist for a new page
+
+1. Add `*.page.tsx` under the right folder (`auth/`, `admin/`, or root `pages/`)
+2. Re-export from folder `index.ts` and `src/pages/index.ts` if needed
+3. Register route in `src/core/router.tsx` under the matching layout (`RouterAuthLayout` / `RouterPageLayout`)
+4. Add URL helper on `PageURLS` in `src/core/constants.ts`
+5. Wire `SecurityGuard` + `FEATURE_FLAG` / `PERMISSION` as peers do
+
+Prefer `PageURLS.*` and `viewTransition` on links over hard-coded paths.

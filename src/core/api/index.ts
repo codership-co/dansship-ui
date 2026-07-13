@@ -11,7 +11,6 @@ export * from './notifications/notifications.models';
 export * from './onboarding/onboarding.models';
 export * from './payments/payments.models';
 export * from './payments/payments.helpers';
-export * from './rbac/rbac.models';
 export * from './reports/reports.models';
 export * from './schedules/schedules.models';
 export * from './schedules/schedules.helpers';

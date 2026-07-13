@@ -97,3 +97,12 @@ export interface AdminInstructorListItem {
   user_id: string;
   email: string;
 }
+
+export interface InstructorInviteResponse {
+  user_id: string;
+  email: string;
+}
+
+export interface InstructorDeactivateResponse {
+  user_id: string;
+}

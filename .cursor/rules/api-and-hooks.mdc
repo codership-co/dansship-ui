@@ -1,0 +1,41 @@
+---
+description: DansshipAPI domain clients, models, helpers, and service hooks
+globs: src/core/api/**/*.{ts,tsx},src/hooks/services/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# API & Service Hooks
+
+## Domain layout (`src/core/api/<domain>/`)
+
+- `*.api.ts` — public client class using `HttpClient` + `callNoError`
+- `*.admin.api.ts` — admin endpoints when needed
+- `*.models.ts` — request/response types
+- `*.helpers.ts` — response mappers/transformers
+- Wire new clients on `DansshipAPI` in `dansship.api.ts` and re-export models from `core/api/index.ts`
+
+```ts
+async getFigures(payload?: GetFiguresParams) {
+  return this.httpClient.callNoError<OffsetPaginatedResponse<Figure>, object, GetFiguresResponse>(
+    { path: '/figures', method: 'GET', params: payload },
+    response => ({
+      figures: response.data.map(transformFigure),
+      total: response.total,
+    }),
+  );
+}
+```
+
+## Service hooks (`src/hooks/services/`)
+
+- Name: `use-<domain>.ts`; re-export from `hooks/services/index.ts` and `@hooks`
+- Call `DansshipAPI.<domain>.*` via `useCallablePromise` (or existing promise helpers)
+- Keep loading/pagination/filter state in the hook; pages/modules consume the returned API shape
+
+```ts
+const { isLoading, call } = useCallablePromise((payload: GetFiguresParams) =>
+  DansshipAPI.figures.getFigures(payload),
+);
+```
+
+Do not fetch raw envelopes in page components — normalize in API helpers / context, then expose clean domain types to UI.

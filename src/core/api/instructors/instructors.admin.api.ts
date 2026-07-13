@@ -5,6 +5,8 @@ import {
   type AvailabilityApiItem,
   type AvailabilityWeek,
   DAY_TO_INDEX,
+  type InstructorDeactivateResponse,
+  type InstructorInviteResponse,
 } from './instructors.models';
 
 import { DansshipAPIError } from '@core/api';
@@ -16,6 +18,20 @@ export class InstructorsAdminAPI {
     return this.httpClient.callNoError<Array<AdminInstructorListItem>>({
       path: '/admin/instructors',
       method: 'GET',
+    });
+  }
+
+  async inviteInstructor(userId: string) {
+    return this.httpClient.callNoError<InstructorInviteResponse>({
+      path: `/admin/instructors/${userId}/invite`,
+      method: 'POST',
+    });
+  }
+
+  async deactivateInstructor(userId: string) {
+    return this.httpClient.callNoError<InstructorDeactivateResponse>({
+      path: `/admin/instructors/${userId}/deactivate`,
+      method: 'POST',
     });
   }
 

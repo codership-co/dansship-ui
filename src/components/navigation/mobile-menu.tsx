@@ -7,7 +7,7 @@ import { HiOutlineDocument } from 'react-icons/hi';
 import { HiMiniShoppingCart } from 'react-icons/hi2';
 import { LuBellElectric, LuBookHeart, LuBookImage, LuCalendarHeart, LuFootprints, LuUser, LuX } from 'react-icons/lu';
 import { MdOutlineInventory, MdOutlinePayments } from 'react-icons/md';
-import { RiAdminFill, RiFolderKeyholeLine } from 'react-icons/ri';
+import { RiAdminFill } from 'react-icons/ri';
 import { SiReasonstudios } from 'react-icons/si';
 import { TbManualGearbox } from 'react-icons/tb';
 import { TfiAgenda } from 'react-icons/tfi';
@@ -83,7 +83,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         ...AdminPermissions.merchPos,
         ...AdminPermissions.figures,
         ...AdminPermissions.reports,
-        ...AdminPermissions.access,
+        ...AdminPermissions.users,
         ...AdminPermissions.studioRental,
       ],
       icon: RiAdminFill,
@@ -95,6 +95,13 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       orPermissions: AdminPermissions.scheduleBuilder,
       featureFlags: [FEATURE_FLAG.isAdminAgendaPageEnabled],
       icon: TfiAgenda,
+    },
+    {
+      to: PageURLS.admin.users,
+      label: t('nav:adminMenu.users'),
+      orPermissions: AdminPermissions.users,
+      featureFlags: [FEATURE_FLAG.isAdminUserListPageEnabled],
+      icon: RiAdminFill,
     },
     {
       to: PageURLS.admin.scheduleBuilder,
@@ -116,13 +123,6 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       orPermissions: AdminPermissions.reports,
       featureFlags: [FEATURE_FLAG.isAdminReportsPageEnabled],
       icon: HiOutlineDocument,
-    },
-    {
-      to: PageURLS.admin.access,
-      label: t('nav:adminMenu.accessManagement'),
-      orPermissions: AdminPermissions.access,
-      featureFlags: [FEATURE_FLAG.isAdminAccessPageEnabled],
-      icon: RiFolderKeyholeLine,
     },
     {
       to: PageURLS.admin.inventory,

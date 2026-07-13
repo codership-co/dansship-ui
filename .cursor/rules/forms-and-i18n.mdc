@@ -1,0 +1,30 @@
+---
+description: Forms, Zod schemas, and i18n namespace conventions
+globs: src/components/forms/**/*.{ts,tsx},src/components/form-fields/**/*.{ts,tsx},public/locales/**/*.json,src/core/i18n.ts
+alwaysApply: false
+---
+
+# Forms & i18n
+
+## Forms
+
+- Live in `src/components/forms/`; shared inputs in `form-fields/`
+- Use `react-hook-form` + `zod` + `zodResolver`; build schema with `t` inside the component factory
+- Prefer existing fields (`EmailField`, `PasswordField`, …) over raw inputs
+- Buttons/links: `polpo/components` `Button`, `PageURLS`, `viewTransition`
+- Copy keys: `namespace:path` (e.g. `auth:login.email`, `validation:required`)
+
+```ts
+const createLoginSchema = (t: (key: string) => string) =>
+  z.object({
+    email: z.string().min(1, { message: t('validation:required') }).email({ message: t('validation:email') }),
+  });
+```
+
+## Locales
+
+- Files: `public/locales/es/<namespace>.json` (Spanish is the active language today)
+- New namespace: add JSON file **and** register in `ns` array in `src/core/i18n.ts`
+- Option lists in `constants.ts` store **i18n keys** as labels, not translated strings
+
+Never hard-code user-facing Spanish/English in forms or pages when a namespace key exists or should exist.
