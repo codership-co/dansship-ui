@@ -65,6 +65,18 @@ export const SCHEDULE_OPTIONS = [
   { value: 'holidays', label: 'auth:onboarding.scheduleOptions.holidays' },
 ];
 
+export const DAY_OF_WEEK_OPTIONS = [
+  { value: 'monday', label: 'common:days.monday' },
+  { value: 'tuesday', label: 'common:days.tuesday' },
+  { value: 'wednesday', label: 'common:days.wednesday' },
+  { value: 'thursday', label: 'common:days.thursday' },
+  { value: 'friday', label: 'common:days.friday' },
+  { value: 'saturday', label: 'common:days.saturday' },
+  { value: 'sunday', label: 'common:days.sunday' },
+] as const;
+
+export const FORCE_INSTRUCTOR_ONBOARDING_KEY = 'force_instructor_onboarding';
+
 export const PageURLS = {
   home: '/',
   auth: {
@@ -74,12 +86,14 @@ export const PageURLS = {
     verifyEmail: '/auth/verify-email',
     resetPassword: '/auth/reset-password',
     onboarding: '/auth/onboarding',
+    instructorOnboarding: '/auth/instructor-onboarding',
   },
   userId: (id: number) => `/user/${id}`,
   figures: '/figures',
   figuresById: (id: number) => `/figures/${id}`,
   browse: '/browse',
   classes: '/classes',
+  instructorInvite: '/instructor-onboarding',
   instructorDashboard: '/instructor/dashboard',
   profile: '/profile',
   profileEdit: '/profile/edit',

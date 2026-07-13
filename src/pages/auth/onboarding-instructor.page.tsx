@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next';
 
 import { SpinnerLoader } from '@components/loaders';
-import { OnboardingStudentTrack } from '@components/modules';
+import { OnboardingInstructorTrack } from '@components/modules';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { OnboardingTrackKey } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { useOnboarding } from '@hooks';
 
-function OnboardingPage() {
+function OnboardingInstructorPage() {
   const { t } = useTranslation();
   const {
     status,
@@ -15,18 +15,19 @@ function OnboardingPage() {
     isSubmitting,
     error,
     currentStep,
-    submitProfileStep,
-    submitHealthStep,
-    skipHealthStep,
-    submitPreferencesStep,
-    skipPreferencesStep,
-  } = useOnboarding({ preferredTrack: OnboardingTrackKey.STUDENT });
+    operationalProfileDraft,
+    canNavigateToStep,
+    goToStep,
+    submitOperationalProfileStep,
+    submitCertificationsStep,
+    skipCertificationsStep,
+  } = useOnboarding({ preferredTrack: OnboardingTrackKey.INSTRUCTOR });
 
   if (isLoading || !status) {
     return <SpinnerLoader />;
   }
 
-  if (!status.required || currentStep?.track !== OnboardingTrackKey.STUDENT) {
+  if (!status.required || currentStep?.track !== OnboardingTrackKey.INSTRUCTOR) {
     return (
       <div className='min-h-dvh flex items-center justify-center'>
         <p>{t('auth:onboarding.notRequired')}</p>
@@ -38,26 +39,27 @@ function OnboardingPage() {
     <div className='min-h-[calc(100vh-4rem)] pt-16'>
       <div className='mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 pb-24 grid gap-8'>
         <div>
-          <h3>{t('auth:onboarding.title')}</h3>
-          <label>{t('auth:onboarding.subtitle')}</label>
+          <h3>{t('auth:onboarding.instructorTitle')}</h3>
+          <label>{t('auth:onboarding.instructorSubtitle')}</label>
         </div>
 
-        <OnboardingStudentTrack
+        <OnboardingInstructorTrack
           currentStep={currentStep.step}
           isLoading={isSubmitting}
           error={error}
-          submitProfileStep={submitProfileStep}
-          submitHealthStep={submitHealthStep}
-          skipHealthStep={skipHealthStep}
-          submitPreferencesStep={submitPreferencesStep}
-          skipPreferencesStep={skipPreferencesStep}
+          operationalProfileDraft={operationalProfileDraft}
+          canNavigateToStep={canNavigateToStep}
+          goToStep={goToStep}
+          submitOperationalProfileStep={submitOperationalProfileStep}
+          submitCertificationsStep={submitCertificationsStep}
+          skipCertificationsStep={skipCertificationsStep}
         />
       </div>
     </div>
   );
 }
 
-export const SecureOnboardingPage = SecurityGuard(OnboardingPage, {
+export const SecureOnboardingInstructorPage = SecurityGuard(OnboardingInstructorPage, {
   redirect: PageURLS.auth.login,
   requiresAuth: true,
   featureFlags: [FEATURE_FLAG.areAuthPagesEnabled, FEATURE_FLAG.isOnboardingPageEnabled],

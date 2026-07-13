@@ -2,10 +2,33 @@ export enum OnboardingStepKey {
   PROFILE = 'student_profile',
   HEALTH = 'health_data',
   PREFERENCES = 'student_preferences',
+  OPERATIONAL_PROFILE = 'operational_profile',
+  CERTIFICATIONS = 'certifications',
 }
 
 export enum OnboardingTrackKey {
   STUDENT = 'student',
+  INSTRUCTOR = 'instructor',
+}
+
+export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+
+export interface OnboardingAvailabilitySlot {
+  day_of_week: DayOfWeek;
+  start_time: string;
+  end_time: string;
+}
+
+export interface InstructorDisciplinePayload {
+  discipline_name: string;
+  years_experience: number;
+}
+
+export interface InstructorCertificationPayload {
+  title: string;
+  issuer: string;
+  file_key?: string;
+  issue_date?: string | null;
 }
 
 export interface OnboardingStep {
@@ -68,7 +91,41 @@ export interface CompletePreferencesStepPayload {
   };
 }
 
+export interface CompleteOperationalProfileStepPayload {
+  stepKey: OnboardingStepKey.OPERATIONAL_PROFILE;
+  track: OnboardingTrackKey.INSTRUCTOR;
+  payload: {
+    instagram: string;
+    availability: Array<OnboardingAvailabilitySlot>;
+    disciplines: Array<InstructorDisciplinePayload>;
+  };
+}
+
+export interface CompleteCertificationsStepPayload {
+  stepKey: OnboardingStepKey.CERTIFICATIONS;
+  track: OnboardingTrackKey.INSTRUCTOR;
+  payload: {
+    documents: Array<InstructorCertificationPayload>;
+  };
+}
+
 export type CompleteStepPayload =
   | CompleteStudentStepPayload
   | CompleteHealthStepPayload
-  | CompletePreferencesStepPayload;
+  | CompletePreferencesStepPayload
+  | CompleteOperationalProfileStepPayload
+  | CompleteCertificationsStepPayload;
+
+export enum OnboardingUploadPurpose {
+  INSTRUCTOR_CERTIFICATION = 'instructor:certification',
+}
+
+export interface OnboardingUploadRequest {
+  purpose: OnboardingUploadPurpose;
+  content_type: string;
+}
+
+export interface PresignedUploadResponse {
+  upload_url: string;
+  file_key: string;
+}

@@ -22,6 +22,7 @@ interface TextFieldProps<T extends FieldValues = Record<string, unknown>> {
   helperText?: string;
   inputClassName?: string;
   errorMessage?: string;
+  hideLabel?: boolean;
 }
 
 export function TextField<T extends FieldValues = Record<string, unknown>>({
@@ -41,6 +42,7 @@ export function TextField<T extends FieldValues = Record<string, unknown>>({
   helperText,
   inputClassName,
   errorMessage,
+  hideLabel = false,
 }: TextFieldProps<T>) {
   const hasLeftIcon = Boolean(icon);
   const hasRightElement = Boolean(rightElement);
@@ -52,7 +54,7 @@ export function TextField<T extends FieldValues = Record<string, unknown>>({
       name={name}
       render={({ field, fieldState: { error } }) => (
         <div className='grid gap-2'>
-          <Label htmlFor={fieldId}>{label}</Label>
+          {!hideLabel ? <Label htmlFor={fieldId}>{label}</Label> : null}
           <div className='relative'>
             {hasLeftIcon && <div className='absolute top-0 left-0 h-full pl-3 flex items-center'>{icon}</div>}
             <Input

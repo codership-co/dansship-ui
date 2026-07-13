@@ -1,6 +1,8 @@
 import { HttpClient } from 'polpo-http-client';
 
 import {
+  type AcceptInstructorInvitePayload,
+  type AcceptInstructorInviteResponse,
   type AvailabilityApiItem,
   type AvailabilityWeek,
   type ClassRosterResponse,
@@ -20,6 +22,14 @@ import type { ScheduledClass } from '../schedules/schedules.models';
 
 export class InstructorsAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
+
+  async acceptInvite(payload: AcceptInstructorInvitePayload) {
+    return this.httpClient.call<AcceptInstructorInviteResponse, AcceptInstructorInvitePayload>({
+      path: '/instructors/invitations/accept',
+      method: 'POST',
+      data: payload,
+    });
+  }
 
   async getProfile() {
     return this.httpClient.callNoError<InstructorProfile>({

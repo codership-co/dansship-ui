@@ -66,5 +66,13 @@
     "friday": "Viernes",
     "saturday": "Sabado",
     "sunday": "Domingo"
+  },
+  "fileUpload": {
+    "upload": "Subir archivo",
+    "replace": "Reemplazar archivo",
+    "remove": "Eliminar",
+    "uploading": "Subiendo...",
+    "invalidType": "Tipo de archivo no válido. Usa JPG, PNG o WEBP.",
+    "previewAlt": "Vista previa del archivo"
   }
 }
