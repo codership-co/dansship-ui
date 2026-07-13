@@ -5,13 +5,7 @@ import { toast } from 'sonner';
 import { useCallablePromise } from '../use-callable-promise';
 import { usePromise } from '../use-promise';
 
-import {
-  type ConfirmPaymentProofPayload,
-  CreatePaymentIntentPayload,
-  DansshipAPI,
-  PaymentProofContentType,
-  type PaymentProofUploadRequest,
-} from '@core/api';
+import { CreatePaymentIntentPayload, DansshipAPI } from '@core/api';
 
 export const usePaymentIntents = () => {
   const { t } = useTranslation();
@@ -24,20 +18,14 @@ export const usePaymentIntents = () => {
   const { call: cancelIntentPromise, isLoading: isCancellingIntent } = useCallablePromise((id: string) =>
     DansshipAPI.payments.cancelIntent(id),
   );
-  const { call: getProofUploadUrlPromise, isLoading: isGettingProofUploadUrl } = useCallablePromise(
-    (id: string, payload: PaymentProofUploadRequest) => DansshipAPI.payments.getProofUploadUrl(id, payload),
+  const { call: uploadProofPromise, isLoading: isUploadingProof } = useCallablePromise((id: string, file: File) =>
+    DansshipAPI.payments.uploadProof(id, file),
   );
-  const { call: getAdminProofUploadUrlPromise, isLoading: isGettingAdminProofUploadUrl } = useCallablePromise(
-    (id: string, payload: PaymentProofUploadRequest) => DansshipAPI.paymentsAdmin.getAdminProofUploadUrl(id, payload),
+  const { call: uploadAdminProofPromise, isLoading: isAdminUploadingProof } = useCallablePromise(
+    (id: string, file: File) => DansshipAPI.paymentsAdmin.uploadAdminProof(id, file),
   );
   const { call: getProofViewUrlPromise, isLoading: isGettingProofViewUrl } = useCallablePromise((id: string) =>
     DansshipAPI.payments.getProofViewUrl(id),
-  );
-  const { call: confirmProofUploadPromise } = useCallablePromise((id: string, payload: ConfirmPaymentProofPayload) =>
-    DansshipAPI.payments.confirmProofUpload(id, payload),
-  );
-  const { call: confirmAdminProofUploadPromise } = useCallablePromise(
-    (id: string, payload: ConfirmPaymentProofPayload) => DansshipAPI.paymentsAdmin.confirmAdminProofUpload(id, payload),
   );
 
   const createIntent = useCallback(
@@ -66,92 +54,28 @@ export const usePaymentIntents = () => {
     [cancelIntentPromise, t],
   );
 
-  const confirmProofUpload = useCallback(
-    async (id: string, payload: ConfirmPaymentProofPayload) => {
-      const { error } = await confirmProofUploadPromise(id, payload);
-
-      if (error) {
-        toast.error(t('payments:proofUploadFailedDesc'));
-      } else {
-        toast.success(t('payments:proofUploadSuccess'));
-      }
-    },
-    [confirmProofUploadPromise, t],
-  );
-
-  const confirmAdminProofUpload = useCallback(
-    async (id: string, payload: ConfirmPaymentProofPayload) => {
-      const { error } = await confirmAdminProofUploadPromise(id, payload);
-
-      if (error) {
-        toast.error(t('payments:proofUploadFailedDesc'));
-      } else {
-        toast.success(t('payments:proofUploadSuccess'));
-      }
-    },
-    [confirmAdminProofUploadPromise, t],
-  );
-
-  const getProofUploadUrl = useCallback(
+  const uploadProof = useCallback(
     async (id: string, file: File) => {
       try {
-        const { data } = await getProofUploadUrlPromise(id, {
-          content_type: file.type as PaymentProofContentType,
-        });
-
-        if (data) {
-          const { upload_url, file_key } = data;
-
-          const uploadResponse = await fetch(upload_url, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': file.type,
-            },
-            body: file,
-          });
-
-          if (!uploadResponse.ok) {
-            toast.error(t('payments:proofUploadFailedDesc'));
-          }
-
-          await confirmProofUpload(id, { file_key });
-        }
+        await uploadProofPromise(id, file);
+        toast.success(t('payments:proofUploadSuccess'));
       } catch {
         toast.error(t('payments:proofUploadFailedDesc'));
       }
     },
-    [confirmProofUpload, getProofUploadUrlPromise, t],
+    [uploadProofPromise, t],
   );
 
-  const getAdminProofUploadUrl = useCallback(
+  const uploadAdminProof = useCallback(
     async (id: string, file: File) => {
       try {
-        const { data } = await getAdminProofUploadUrlPromise(id, {
-          content_type: file.type as PaymentProofContentType,
-        });
-
-        if (data) {
-          const { upload_url, file_key } = data;
-
-          const uploadResponse = await fetch(upload_url, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': file.type,
-            },
-            body: file,
-          });
-
-          if (!uploadResponse.ok) {
-            toast.error(t('payments:proofUploadFailedDesc'));
-          }
-
-          await confirmAdminProofUpload(id, { file_key });
-        }
+        await uploadAdminProofPromise(id, file);
+        toast.success(t('payments:proofUploadSuccess'));
       } catch {
         toast.error(t('payments:proofUploadFailedDesc'));
       }
     },
-    [confirmAdminProofUpload, getAdminProofUploadUrlPromise, t],
+    [uploadAdminProofPromise, t],
   );
 
   const getProofViewUrl = useCallback(
@@ -173,13 +97,13 @@ export const usePaymentIntents = () => {
     error,
     createIntent,
     cancelIntent,
-    getProofUploadUrl,
-    getAdminProofUploadUrl,
+    uploadProof,
+    uploadAdminProof,
     getProofViewUrl,
     isCreatingIntent,
     isCancellingIntent,
-    isGettingProofUploadUrl,
-    isGettingAdminProofUploadUrl,
+    isUploadingProof,
+    isAdminUploadingProof,
     isGettingProofViewUrl,
   };
 };
