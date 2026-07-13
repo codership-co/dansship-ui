@@ -1,0 +1,44 @@
+---
+description: Dansship UI stack, module map, and change rules for generating code
+alwaysApply: true
+---
+
+# Dansship UI Overview
+
+React 19 + TypeScript SPA (Vite). Stack: React Router 7, i18next, Tailwind v4, Radix/shadcn-style UI, `polpo` / `polpo-http-client`.
+
+## Tooling
+
+- Node `>24.14.0`; package manager `pnpm@11.2.2` (`corepack pnpm` if needed)
+- Validate: `corepack pnpm build`, then `corepack pnpm lint` (`--max-warnings 0`). No test script today.
+
+## Path aliases (prefer these)
+
+- `@components/*`, `@contexts`, `@core/*`, `@helpers`, `@hooks`, `@pages`
+
+## Where code lives
+
+| Concern | Location |
+| --- | --- |
+| Routes | `src/core/router.tsx` |
+| Page exports | `src/pages/` + `src/pages/index.ts` |
+| API clients | `src/core/api/<domain>/` via `DansshipAPI` |
+| Data hooks | `src/hooks/services/` |
+| Layouts / UI / features | `src/components/{layouts,ui,modules,forms,form-fields}/` |
+| Locales | `public/locales/es/<ns>.json` + namespaces in `src/core/i18n.ts` |
+| URLs / options | `src/core/constants.ts` (`PageURLS`) |
+| Permissions | `src/core/permissions.ts` |
+
+## Change rules
+
+- Reuse existing module boundaries; do not invent new top-level folders.
+- New/changed routes: update `router.tsx` **and** page barrel exports.
+- New copy: update locale JSON **and** register namespace in `i18n.ts` if new.
+- Shared primitives → `components/ui`; feature UI → `components/modules/<feature>`.
+- Auth/errors: use constants from `@core/constants`; pages consume normalized values (`errorCode`), not raw API envelopes.
+- Public routes must stay SPA-safe (`vercel.json` rewrite to `index.html`).
+---
+
+# Efficiency
+
+Start from the files above before broad search. Keep diffs small; validate with build/lint after meaningful changes.

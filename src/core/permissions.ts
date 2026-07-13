@@ -6,6 +6,10 @@ export enum ROLE {
 }
 
 export enum PERMISSION {
+  // USERS
+  USER_READ = 'read:user',
+  USER_MANAGE = 'manage:user',
+
   // ATTENDANCE
   ATTENDANCE_MARK = 'mark:attendance',
 
@@ -37,9 +41,6 @@ export enum PERMISSION {
   // PLAN
   PLAN_MANAGE = 'manage:plan',
 
-  // POLICY
-  POLICY_MANAGE = 'manage:policy',
-
   // PRODUCT
   PRODUCT_MANAGE = 'manage:product',
 
@@ -51,9 +52,6 @@ export enum PERMISSION {
 
   // FINANCIAL REPORT
   FINANCIAL_REPORT_READ = 'read:financial_report',
-
-  // ROLE
-  ROLE_MANAGE = 'manage:role',
 
   // ROOM
   ROOM_MANAGE = 'manage:room',
@@ -93,6 +91,7 @@ export const StudentPermissions = {
 };
 
 export const AdminPermissions = {
+  users: [PERMISSION.USER_MANAGE, PERMISSION.USER_READ],
   scheduleBuilder: [PERMISSION.SCHEDULE_MANAGE],
   inventory: [
     PERMISSION.ROOM_MANAGE,
@@ -106,6 +105,5 @@ export const AdminPermissions = {
   merchPos: [PERMISSION.ORDER_CREATE],
   figures: [PERMISSION.FIGURE_MANAGE],
   reports: [PERMISSION.REPORT_READ],
-  access: [PERMISSION.ROLE_MANAGE, PERMISSION.POLICY_MANAGE],
   studioRental: [PERMISSION.STUDIO_RENTAL_MANAGE],
 };

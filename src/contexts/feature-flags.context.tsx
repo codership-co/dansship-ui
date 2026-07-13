@@ -28,7 +28,7 @@ export enum FEATURE_FLAG {
 
   // ADMIN
   areAdminPagesEnabled = 'areAdminPagesEnabled',
-  isAdminAccessPageEnabled = 'isAdminAccessPageEnabled',
+  isAdminUserListPageEnabled = 'isAdminUserListPageEnabled',
   isAdminPageEnabled = 'isAdminPageEnabled',
   isAdminAgendaPageEnabled = 'isAdminAgendaPageEnabled',
   isAdminAgendaConflictsPageEnabled = 'isAdminAgendaConflictsPageEnabled',
@@ -60,7 +60,7 @@ interface UserPages {
 }
 
 interface AdminPages {
-  isAdminAccessPageEnabled: boolean | string;
+  isAdminUserListPageEnabled: boolean | string;
   isAdminPageEnabled: boolean | string;
   isAdminAgendaPageEnabled: boolean | string;
   isAdminAgendaConflictsPageEnabled: boolean | string;
@@ -138,7 +138,7 @@ export const FeatureFlagsProvider = ({ children }: FeatureFlagsProviderProps) =>
 
         // ADMIN
         areAdminPagesEnabled: isAdminOn,
-        isAdminAccessPageEnabled: isAdminOn && adminPages.isAdminAccessPageEnabled === true,
+        isAdminUserListPageEnabled: isAdminOn && adminPages.isAdminUserListPageEnabled === true,
         isAdminPageEnabled: isAdminOn && adminPages.isAdminPageEnabled === true,
         isAdminAgendaPageEnabled: isAdminOn && adminPages.isAdminAgendaPageEnabled === true,
         isAdminAgendaConflictsPageEnabled: isAdminOn && adminPages.isAdminAgendaConflictsPageEnabled === true,

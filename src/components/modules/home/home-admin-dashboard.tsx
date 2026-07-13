@@ -24,7 +24,7 @@ export const HomeAdminDashboard = () => {
     ...AdminPermissions.merchPos,
     ...AdminPermissions.figures,
     ...AdminPermissions.reports,
-    ...AdminPermissions.access,
+    ...AdminPermissions.users,
     ...AdminPermissions.studioRental,
   ]);
   const canReadAgenda = useOrPermissions(AdminPermissions.scheduleBuilder);

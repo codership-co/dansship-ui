@@ -1,0 +1,31 @@
+---
+description: Component folders, barrels, and UI composition patterns
+globs: src/components/**/*.{ts,tsx}
+alwaysApply: false
+---
+
+# Components
+
+## Folders
+
+| Folder | Use for |
+| --- | --- |
+| `layouts/` | Route shells (`AuthFormLayout`, `RouterPageLayout`, …) |
+| `forms/` / `form-fields/` | Form compositions and field controls |
+| `modules/<feature>/` | Feature UI (figures, payments, admin-*, …) |
+| `ui/` | Shared primitives (shadcn-style); add via `pnpm create-component` when appropriate |
+| `modals/`, `loaders/`, `navigation/`, `containers/`, `svg/` | Cross-cutting UI |
+
+Every folder keeps an `index.ts` barrel. Import from `@components/<area>` / `@components/<area>/<file>` aliases — avoid deep relative paths.
+
+## Composition
+
+- Pages compose layouts + forms/modules; put business UI in modules, not pages
+- Use `cn` from `@helpers` for classNames; Tailwind utility classes matching neighbors
+- Prefer existing `polpo/components` for buttons and shared controls before inventing new ones
+- Feature work stays under the matching `modules/<feature>/` package; only promote to `ui/` when truly shared
+
+```tsx
+import { LoginForm } from '@components/forms';
+import { AuthFormLayout } from '@components/layouts';
+```

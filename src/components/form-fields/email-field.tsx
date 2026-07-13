@@ -3,6 +3,8 @@ import { LuMail } from 'react-icons/lu';
 
 import { TextField } from './text-field';
 
+import { Spinner } from '@components/loaders';
+
 interface EmailFieldProps<T extends FieldValues = Record<string, unknown>> {
   control: Control<T>;
   name: Path<T>;
@@ -10,6 +12,8 @@ interface EmailFieldProps<T extends FieldValues = Record<string, unknown>> {
   id?: string;
   placeholder?: string;
   disabled?: boolean;
+  isLoading?: boolean;
+  icon?: React.ReactNode;
 }
 
 export function EmailField<T extends FieldValues = Record<string, unknown>>({
@@ -19,6 +23,8 @@ export function EmailField<T extends FieldValues = Record<string, unknown>>({
   id,
   placeholder,
   disabled,
+  isLoading = false,
+  icon = <LuMail className='h-5 w-5 text-gray-400' />,
 }: EmailFieldProps<T>) {
   return (
     <TextField
@@ -29,7 +35,7 @@ export function EmailField<T extends FieldValues = Record<string, unknown>>({
       type='email'
       autoComplete='email'
       placeholder={placeholder}
-      icon={<LuMail className='h-5 w-5 text-gray-400' />}
+      icon={isLoading ? <Spinner size='sm' /> : icon}
       disabled={disabled}
     />
   );

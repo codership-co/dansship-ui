@@ -42,7 +42,6 @@ function AdminPage() {
   const canReadAgenda = useOrPermissions(AdminPermissions.scheduleBuilder);
   const canManageStudioRental = useOrPermissions(AdminPermissions.studioRental);
   const canReadReports = useOrPermissions(AdminPermissions.reports);
-  const canManageAccess = useOrPermissions(AdminPermissions.access);
 
   const {
     response: listRequests,
@@ -75,7 +74,6 @@ function AdminPage() {
   const agendaEvents = useMemo(() => agendaEventsList?.data ?? [], [agendaEventsList?.data]);
   const conflicts = useMemo(() => buildAgendaConflicts(agendaEvents), [agendaEvents]);
 
-  const internalReservedUseCount = agendaEvents.filter(event => event.event_type === 'internal_reserved_use').length;
   const blockedSpaceCount = agendaEvents.filter(event => event.event_type === 'blocked_space').length;
 
   const operations = [
@@ -118,16 +116,6 @@ function AdminPage() {
       }),
       metric: blockedSpaceCount,
       visible: canReadReports,
-    },
-    {
-      id: 'access',
-      to: PageURLS.admin.access,
-      title: t('admin:workspace.cards.access', { defaultValue: 'Access Control' }),
-      description: t('admin:workspace.cards.accessDescription', {
-        defaultValue: 'Review RBAC policies and role responsibilities.',
-      }),
-      metric: internalReservedUseCount,
-      visible: canManageAccess,
     },
   ].filter(item => item.visible);
 
@@ -310,7 +298,7 @@ function AdminPage() {
 export const SecureAdminPage = SecurityGuard(AdminPage, {
   featureFlags: [FEATURE_FLAG.areAdminPagesEnabled, FEATURE_FLAG.isAdminPageEnabled],
   orPermissions: [
-    ...AdminPermissions.access,
+    ...AdminPermissions.users,
     ...AdminPermissions.bookings,
     ...AdminPermissions.figures,
     ...AdminPermissions.inventory,

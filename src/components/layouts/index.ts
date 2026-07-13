@@ -1,3 +1,4 @@
+export * from './admin-page-layout';
 export * from './auth-form-layout';
 export * from './error-layout';
 export * from './form-stepper-layout';

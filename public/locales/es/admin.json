@@ -9,13 +9,40 @@
       "discounts": "Descuentos"
     }
   },
-  "rbac": {
-    "title": "Gestion de Accesos",
-    "subtitle": "Administra roles, politicas y asigna accesos a usuarios.",
-    "tabs": {
-      "roles": "Roles",
-      "policies": "Politicas",
-      "userAssignments": "Asignaciones de Usuarios"
+  "users": {
+    "title": "Gestion de Usuarios",
+    "subtitle": "Consulta usuarios y abre el detalle de uno para revisar su informacion.",
+    "searchLabel": "Buscar por correo",
+    "searchPlaceholder": "Buscar por correo (min. 3 caracteres)",
+    "loading": "Cargando usuarios...",
+    "empty": "No hay usuarios para mostrar.",
+    "noUsersFound": "No se encontraron usuarios con ese correo.",
+    "total": "{{count}} usuario(s) encontrado(s)",
+    "columns": {
+      "fullName": "Nombre completo",
+      "profileCompleted": "Perfil completado",
+      "roles": "Roles"
+    },
+    "noRoles": "Sin roles",
+    "noPermissions": "Sin permisos",
+    "viewUser": "Ver usuario",
+    "details": {
+      "title": "Detalle de Usuario",
+      "subtitle": "Informacion completa del usuario seleccionado.",
+      "loading": "Cargando usuario...",
+      "notFound": "No se pudo cargar este usuario.",
+      "backToList": "Volver a usuarios",
+      "alias": "Gusta ser llamado(a) como...",
+      "birthDate": "Fecha de nacimiento",
+      "phoneNumber": "Número de teléfono",
+      "documentNumber": "Número de documento",
+      "actionsMenu": "Acciones del usuario",
+      "convertToInstructor": "Convertir en Instructor",
+      "deactivateInstructor": "Quitar rol de Instructor",
+      "inviteInstructorSuccess": "Enviamos un correo a {{email}} para que continue con su perfil de instructor.",
+      "inviteInstructorFailed": "No se pudo invitar al usuario como instructor.",
+      "deactivateInstructorSuccess": "El acceso de instructor fue desactivado.",
+      "deactivateInstructorFailed": "No se pudo desactivar el acceso de instructor."
     }
   },
   "reports": {

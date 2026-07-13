@@ -93,6 +93,8 @@ export const PageURLS = {
   admin: {
     root: '/admin',
     agenda: '/admin/agenda',
+    users: '/admin/users',
+    userDetails: (userId: string) => `/admin/users/${userId}`,
     agendaConflicts: '/admin/agenda/conflicts',
     inventory: '/admin/inventory',
     scheduleBuilder: '/admin/schedule-builder',
@@ -102,7 +104,6 @@ export const PageURLS = {
     merch: '/admin/merch',
     merchPos: '/admin/merch/pos',
     figures: '/admin/figures',
-    access: '/admin/access',
     studioRental: '/admin/studio-rental',
   },
 } as const;
