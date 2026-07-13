@@ -1,4 +1,5 @@
 import { Button } from 'polpo/components';
+import { cn } from 'polpo/helpers';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdMenu } from 'react-icons/md';
@@ -6,11 +7,12 @@ import { NavLink, NavLinkProps } from 'react-router';
 
 import { MobileMenu } from './mobile-menu';
 
+import { LanguageSelector } from '@components/navigation/language-selector';
 import { Isotype } from '@components/svg';
 import { FEATURE_FLAG, useAuth, useEnabledFeatureFlag, useFeatureFlags, usePermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { AdminPermissions, InstructorPermissions, PERMISSION } from '@core/permissions';
+import { AdminPermissions, PERMISSION } from '@core/permissions';
 import { usePromise } from '@hooks';
 
 import type { IconType } from 'react-icons';
@@ -27,7 +29,7 @@ export interface NavItem {
 
 export const Navbar = () => {
   const { t } = useTranslation();
-  const { isAuthenticated, requireOnboarding } = useAuth();
+  const { isAuthenticated, requireOnboarding, user } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { response } = usePromise(
     () => DansshipAPI.subscriptions.getMySubscriptions(),
@@ -44,12 +46,6 @@ export const Navbar = () => {
       to: isAuthenticated ? PageURLS.myAccountSubscription : '/#planes',
       label: t('nav:menuPlans'),
       featureFlags: [FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
-    },
-    {
-      to: PageURLS.instructorDashboard,
-      label: t('nav:instructorPortal'),
-      orPermissions: [...InstructorPermissions.dashboard, PERMISSION.SCHEDULE_MANAGE],
-      featureFlags: [FEATURE_FLAG.isInstructorDashboardPageEnabled],
     },
     {
       to: PageURLS.admin.root,
@@ -102,7 +98,7 @@ export const Navbar = () => {
           </div>
 
           <div className='ml-auto flex items-center justify-end gap-1.5 sm:gap-2'>
-            {/*<LanguageSelector variant='dropdown' />*/}
+            <LanguageSelector variant='dropdown' />
             {!isAuthenticated && isLoginPageEnabled && (
               <NavLink to={PageURLS.auth.login}>
                 <Button color='primary' size='small'>
@@ -124,6 +120,24 @@ export const Navbar = () => {
                 </Button>
               </NavLink>
             )}
+            {isAuthenticated && (
+              <NavLink to={PageURLS.profile}>
+                {({ isActive }) => (
+                  <section
+                    className={cn(
+                      'size-10 rounded-full m-2 cursor-pointer border-2 border-transparent hover:border-primary transition-[border]',
+                      isActive && 'border-primary',
+                    )}
+                  >
+                    <img
+                      className='w-full h-full'
+                      src={user.instructorProfile?.photoUrl || user.avatar || 'https://placehold.net/avatar.png'}
+                      alt='Dansship'
+                    />
+                  </section>
+                )}
+              </NavLink>
+            )}
           </div>
         </div>
       </div>
@@ -135,6 +149,8 @@ export const Navbar = () => {
 
 interface MenuItemProps extends NavItem {
   variant: 'navbar' | 'aside';
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 export const MenuItem = ({
@@ -146,6 +162,8 @@ export const MenuItem = ({
   featureFlags = [],
   requireAuthentication,
   variant,
+  className,
+  style,
 }: MenuItemProps) => {
   const { isAuthenticated } = useAuth();
   const havePermissions = usePermissions({ orPermissions, andPermissions });
@@ -158,21 +176,23 @@ export const MenuItem = ({
   if (!havePermissions) return null;
 
   const navbarClassName: NavLinkProps['className'] = ({ isActive }) =>
-    `relative font-semibold tracking-tight transition after:absolute after:bottom-[-0.35rem] after:left-0 after:h-0.75 after:w-full after:rounded-full after:bg-primary after:transition-transform after:duration-200 ${
-      isActive
-        ? 'text-primary after:scale-x-100'
-        : 'text-foreground/80 after:scale-x-0 hover:text-primary hover:after:scale-x-100'
-    }`;
+    cn(
+      'relative font-semibold transition after:absolute after:bottom-[-0.35rem] after:left-0 after:h-0.75 after:w-full after:rounded-full after:bg-primary after:transition-transform after:duration-200',
+      isActive && 'text-primary after:scale-x-100',
+      !isActive && 'text-foreground/80 after:scale-x-0 hover:text-primary hover:after:scale-x-100',
+      className,
+    );
 
   const asideClassName: NavLinkProps['className'] = ({ isActive }) =>
-    `flex items-center gap-2 transition-all after:transition-all pl-2 relative after:rounded-full after:bg-primary-500 after:absolute after:content-[''] after:left-2 after:top-1/2 after:-translate-y-1/2 ${
-      isActive
-        ? 'after:w-1 after:h-1 pl-6 font-semibold text-primary'
-        : 'hover:after:w-1 hover:after:h-1 hover:pl-6 text-gray-600 hover:text-primary'
-    }`;
+    cn(
+      'flex items-center gap-2 transition-all py-2 px-4 rounded-sm relative',
+      isActive && 'bg-primary-100 font-semibold text-primary',
+      !isActive && 'hover:bg-primary-50 hover:pl-6 text-gray-600 hover:text-primary',
+      className,
+    );
 
   return (
-    <NavLink to={to} className={variant === 'navbar' ? navbarClassName : asideClassName} end>
+    <NavLink to={to} className={variant === 'navbar' ? navbarClassName : asideClassName} style={style} end>
       {Icon ? <Icon className='h-4 w-4' /> : null}
       {label}
     </NavLink>

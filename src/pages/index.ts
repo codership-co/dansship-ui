@@ -11,7 +11,6 @@ export * from './profile-edit.page';
 export * from './figures-details.page';
 export * from './figure-completed.page';
 export * from './my-account-bookings.page';
-export * from './instructor-dashboard.page';
 export * from './studio-rental-browse.page';
 export * from './studio-rental-requests.page';
 export * from './my-account-subscription.page';

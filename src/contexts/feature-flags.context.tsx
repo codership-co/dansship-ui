@@ -18,7 +18,6 @@ export enum FEATURE_FLAG {
   isFigureSavedPageEnabled = 'isFigureSavedPageEnabled',
   isFiguresPageEnabled = 'isFiguresPageEnabled',
   isFiguresDetailsPageEnabled = 'isFiguresDetailsPageEnabled',
-  isInstructorDashboardPageEnabled = 'isInstructorDashboardPageEnabled',
   isMyAccountBookingsPageEnabled = 'isMyAccountBookingsPageEnabled',
   isMyAccountSubscriptionPageEnabled = 'isMyAccountSubscriptionPageEnabled',
   isProfilePageEnabled = 'isProfilePageEnabled',
@@ -50,7 +49,6 @@ interface UserPages {
   isFigureSavedPageEnabled: boolean | string;
   isFiguresPageEnabled: boolean | string;
   isFiguresDetailsPageEnabled: boolean | string;
-  isInstructorDashboardPageEnabled: boolean | string;
   isMyAccountBookingsPageEnabled: boolean | string;
   isMyAccountSubscriptionPageEnabled: boolean | string;
   isProfilePageEnabled: boolean | string;
@@ -128,7 +126,6 @@ export const FeatureFlagsProvider = ({ children }: FeatureFlagsProviderProps) =>
         isFigureSavedPageEnabled: isUserOn && userPages.isFigureSavedPageEnabled === true,
         isFiguresPageEnabled: isUserOn && userPages.isFiguresPageEnabled === true,
         isFiguresDetailsPageEnabled: isUserOn && userPages.isFiguresDetailsPageEnabled === true,
-        isInstructorDashboardPageEnabled: isUserOn && userPages.isInstructorDashboardPageEnabled === true,
         isMyAccountBookingsPageEnabled: isUserOn && userPages.isMyAccountBookingsPageEnabled === true,
         isMyAccountSubscriptionPageEnabled: isUserOn && userPages.isMyAccountSubscriptionPageEnabled === true,
         isProfilePageEnabled: isUserOn && userPages.isProfilePageEnabled === true,
