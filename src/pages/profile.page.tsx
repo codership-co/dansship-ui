@@ -1,3 +1,4 @@
+import { Line } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import {
   LuPencil,
@@ -12,11 +13,25 @@ import {
 } from 'react-icons/lu';
 import { Link } from 'react-router';
 
-import { SavedFigures } from '@components/modules';
-import { Badge, Button, Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui';
-import { FEATURE_FLAG, useAuth, SecurityGuard } from '@contexts';
+import { SavedFigures, AssignedSchedule, AvailabilityForm, ProfileForm } from '@components/modules';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Badge,
+  Button,
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@components/ui';
+import { FEATURE_FLAG, useAuth, SecurityGuard, useOrPermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
+import { InstructorPermissions, PERMISSION } from '@core/permissions';
 import { usePromise } from '@hooks';
 
 function ProfilePage() {
@@ -24,6 +39,7 @@ function ProfilePage() {
   const { user } = useAuth();
   const { response: savedFiguresResponse } = usePromise(() => DansshipAPI.figures.getSavedFigures());
   const { response: mySubscriptionsResponse } = usePromise(() => DansshipAPI.subscriptions.getMySubscriptions());
+  const hasInstructorPermissions = useOrPermissions([...InstructorPermissions.dashboard, PERMISSION.SCHEDULE_MANAGE]);
   const savedFigures = savedFiguresResponse?.data ?? [];
   const summary = mySubscriptionsResponse?.data?.summary ?? null;
 
@@ -32,13 +48,11 @@ function ProfilePage() {
   }
 
   const normalizedRoles = (user.roles ?? []).map(role => role.toLowerCase());
-  const hasExplicitStudentRole = normalizedRoles.includes('user') || normalizedRoles.includes('student');
-  const isInstructor =
-    normalizedRoles.includes('instructor') || normalizedRoles.includes('coach') || Boolean(user.isCoach);
+  const isInstructor = user.isInstructor || user.isCoach;
   const isAdmin = normalizedRoles.includes('admin');
-  const isStudent = hasExplicitStudentRole || (!isInstructor && !isAdmin);
+  const isStudent = !user.isInstructor && !user.isCoach && !user.isAdmin;
 
-  const profileImage = user.instructorProfile?.photoUrl || user.avatar || 'https://via.placeholder.com/150';
+  const profileImage = user.instructorProfile?.photoUrl || user.avatar || 'https://placehold.net/avatar.png';
   const profileName = user.displayName || user.fullName || user.name || user.username;
   const profileBio = user.instructorProfile?.bio || user.bio;
   const profileCompletion = user.profileCompletionPercent ?? 100;
@@ -259,6 +273,37 @@ function ProfilePage() {
           </Card>
         </div>
       </div>
+
+      {hasInstructorPermissions && (
+        <>
+          <Line />
+
+          <div className='mb-8'>
+            <h1 className='text-3xl font-bold text-gray-900'>{t('instructor:dashboard.title')}</h1>
+            <p className='text-gray-500 mt-2'>{t('instructor:dashboard.subtitle')}</p>
+          </div>
+
+          <Tabs defaultValue='roster' className='w-full'>
+            <TabsList className='mb-4 bg-white border border-gray-200 shadow-sm'>
+              <TabsTrigger value='roster'>{t('instructor:dashboard.tabs.roster')}</TabsTrigger>
+              <TabsTrigger value='availability'>{t('instructor:dashboard.tabs.availability')}</TabsTrigger>
+              <TabsTrigger value='profile'>{t('instructor:dashboard.tabs.profile')}</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value='roster' className='outline-none'>
+              <AssignedSchedule />
+            </TabsContent>
+
+            <TabsContent value='availability' className='outline-none'>
+              <AvailabilityForm />
+            </TabsContent>
+
+            <TabsContent value='profile' className='outline-none'>
+              <ProfileForm />
+            </TabsContent>
+          </Tabs>
+        </>
+      )}
     </main>
   );
 }

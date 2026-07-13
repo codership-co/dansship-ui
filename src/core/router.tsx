@@ -27,7 +27,6 @@ import {
   SecureFiguresDetailsPage,
   SecureFiguresPage,
   SecureForgotPasswordPage,
-  SecureInstructorDashboardPage,
   SecureInstructorOnboardingPage,
   SecureLoginPage,
   SecureMyAccountBookingsPage,
@@ -80,7 +79,6 @@ const routes: Array<RouteObject> = [
           { path: 'figures', Component: SecureFiguresPage },
           { path: 'figures/:id', Component: SecureFiguresDetailsPage },
           { path: 'classes', Component: SecureClassesPage },
-          { path: 'instructor/dashboard', Component: SecureInstructorDashboardPage },
 
           {
             path: 'profile',
