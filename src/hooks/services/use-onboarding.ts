@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router';
 
 import { useAuth } from '@contexts';
 import {
+  CompleteCertificationsStepPayload,
   CompleteHealthStepPayload,
+  CompleteOperationalProfileStepPayload,
   CompletePreferencesStepPayload,
   CompleteStepPayload,
   CompleteStudentStepPayload,
@@ -13,7 +15,7 @@ import {
   OnboardingStepKey,
   OnboardingTrackKey,
 } from '@core/api';
-import { PageURLS } from '@core/constants';
+import { FORCE_INSTRUCTOR_ONBOARDING_KEY, PageURLS } from '@core/constants';
 import { useCallablePromise } from '@hooks';
 
 export interface OnboardingCurrentStep {
@@ -21,13 +23,96 @@ export interface OnboardingCurrentStep {
   step: OnboardingStepKey;
 }
 
+const OPERATIONAL_PROFILE_DRAFT_KEY = 'instructor_operational_profile_draft';
+
+const readOperationalProfileDraft = (): CompleteOperationalProfileStepPayload['payload'] | null => {
+  try {
+    const raw = sessionStorage.getItem(OPERATIONAL_PROFILE_DRAFT_KEY);
+
+    return raw ? (JSON.parse(raw) as CompleteOperationalProfileStepPayload['payload']) : null;
+  } catch {
+    return null;
+  }
+};
+
+const writeOperationalProfileDraft = (payload: CompleteOperationalProfileStepPayload['payload']) => {
+  sessionStorage.setItem(OPERATIONAL_PROFILE_DRAFT_KEY, JSON.stringify(payload));
+};
+
+const clearOperationalProfileDraft = () => {
+  sessionStorage.removeItem(OPERATIONAL_PROFILE_DRAFT_KEY);
+};
+
 interface MemoryRouterState {
   currentStep: OnboardingCurrentStep | null;
   visitedSteps: Set<string>;
   status: OnboardingStatus | null;
+  operationalProfileDraft: CompleteOperationalProfileStepPayload['payload'] | null;
 }
 
-export const useOnboarding = () => {
+interface UseOnboardingOptions {
+  preferredTrack?: OnboardingTrackKey;
+}
+
+const parseNextStep = (nextStep: string | null): OnboardingCurrentStep | null => {
+  if (!nextStep) return null;
+
+  const [track, step] = nextStep.split(':');
+
+  if (!track || !step) return null;
+
+  return {
+    track: track as OnboardingTrackKey,
+    step: step as OnboardingStepKey,
+  };
+};
+
+const resolveCurrentStep = (
+  status: OnboardingStatus,
+  preferredTrack?: OnboardingTrackKey,
+): OnboardingCurrentStep | null => {
+  if (preferredTrack) {
+    const trackStatus = status.tracks.find(track => track.track === preferredTrack && !track.completed);
+    const pendingStep = trackStatus?.pending_steps[0];
+
+    if (pendingStep) {
+      return {
+        track: preferredTrack,
+        step: pendingStep,
+      };
+    }
+
+    return null;
+  }
+
+  return parseNextStep(status.next_step);
+};
+
+const buildVisitedSteps = (
+  status: OnboardingStatus,
+  currentStep: OnboardingCurrentStep | null,
+  preferredTrack?: OnboardingTrackKey,
+) => {
+  const visitedSteps = new Set<string>();
+
+  if (preferredTrack) {
+    const trackStatus = status.tracks.find(track => track.track === preferredTrack);
+
+    trackStatus?.steps
+      .filter(step => step.completed)
+      .forEach(step => {
+        visitedSteps.add(`${preferredTrack}:${step.step_key}`);
+      });
+  }
+
+  if (currentStep) {
+    visitedSteps.add(`${currentStep.track}:${currentStep.step}`);
+  }
+
+  return visitedSteps;
+};
+
+export const useOnboarding = ({ preferredTrack }: UseOnboardingOptions = {}) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { getProfile, requireOnboarding } = useAuth();
@@ -42,30 +127,61 @@ export const useOnboarding = () => {
     currentStep: null,
     visitedSteps: new Set(),
     status: null,
+    operationalProfileDraft: readOperationalProfileDraft(),
   });
+
+  const clearForceInstructorTrack = useCallback(() => {
+    sessionStorage.removeItem(FORCE_INSTRUCTOR_ONBOARDING_KEY);
+  }, []);
 
   const getStatus = useCallback(async () => {
     try {
       const { data } = await getOnboardingStatus();
 
       if (data) {
-        const nextStepSplited = data.next_step ? data.next_step.split(':') : null;
-        const nextStep = nextStepSplited
-          ? { track: nextStepSplited[0] as OnboardingTrackKey, step: nextStepSplited[1] as OnboardingStepKey }
-          : null;
+        const nextStep = resolveCurrentStep(data, preferredTrack);
 
-        setMemoryRouter({
+        if (preferredTrack === OnboardingTrackKey.INSTRUCTOR && !nextStep) {
+          clearForceInstructorTrack();
+        }
+
+        setMemoryRouter(prev => ({
+          ...prev,
           status: data,
           currentStep: nextStep,
-          visitedSteps: nextStep ? new Set([`${nextStep.track}:${nextStep.step}`]) : new Set(),
-        });
+          visitedSteps: buildVisitedSteps(data, nextStep, preferredTrack),
+        }));
       } else {
         setError(t('auth:onboarding.loadFailed'));
       }
     } catch {
       setError(t('auth:onboarding.loadFailed'));
     }
-  }, [getOnboardingStatus, t]);
+  }, [clearForceInstructorTrack, getOnboardingStatus, preferredTrack, t]);
+
+  const canNavigateToStep = useCallback(
+    (step: OnboardingStepKey) => {
+      if (!preferredTrack) return false;
+
+      return memoryRouter.visitedSteps.has(`${preferredTrack}:${step}`);
+    },
+    [memoryRouter.visitedSteps, preferredTrack],
+  );
+
+  const goToStep = useCallback(
+    (step: OnboardingStepKey) => {
+      if (!preferredTrack || !canNavigateToStep(step)) return;
+
+      setMemoryRouter(prev => ({
+        ...prev,
+        currentStep: {
+          track: preferredTrack,
+          step,
+        },
+      }));
+    },
+    [canNavigateToStep, preferredTrack],
+  );
 
   const submitStep = useCallback(
     async (data: CompleteStepPayload) => {
@@ -75,23 +191,30 @@ export const useOnboarding = () => {
         const response = await completeOnboardingStep(data);
 
         if (response.data) {
-          const nextStepSplited = response.data.next_step ? response.data.next_step.split(':') : null;
-          const nextStep = nextStepSplited
-            ? { track: nextStepSplited[0] as OnboardingTrackKey, step: nextStepSplited[1] as OnboardingStepKey }
-            : null;
+          const nextStep = resolveCurrentStep(response.data, preferredTrack);
+
+          if (preferredTrack === OnboardingTrackKey.INSTRUCTOR && !nextStep) {
+            clearForceInstructorTrack();
+          }
 
           setMemoryRouter(prev => {
-            const newVisitedSteps = new Set(prev.visitedSteps);
+            const operationalProfileDraft =
+              data.stepKey === OnboardingStepKey.OPERATIONAL_PROFILE ? data.payload : prev.operationalProfileDraft;
 
-            if (nextStep) {
-              newVisitedSteps.add(`${nextStep.track}:${nextStep.step}`);
+            if (data.stepKey === OnboardingStepKey.OPERATIONAL_PROFILE) {
+              writeOperationalProfileDraft(data.payload);
+            }
+
+            if (preferredTrack === OnboardingTrackKey.INSTRUCTOR && !nextStep) {
+              clearOperationalProfileDraft();
             }
 
             return {
               ...prev,
               status: response.data,
               currentStep: nextStep,
-              visitedSteps: newVisitedSteps,
+              visitedSteps: buildVisitedSteps(response.data, nextStep, preferredTrack),
+              operationalProfileDraft,
             };
           });
         } else {
@@ -101,7 +224,7 @@ export const useOnboarding = () => {
         setError(t('auth:onboarding.submitFailed'));
       }
     },
-    [completeOnboardingStep, t],
+    [clearForceInstructorTrack, completeOnboardingStep, preferredTrack, t],
   );
 
   const submitProfileStep = useCallback(
@@ -160,6 +283,39 @@ export const useOnboarding = () => {
     [submitStep],
   );
 
+  const submitOperationalProfileStep = useCallback(
+    (data: Omit<CompleteOperationalProfileStepPayload, 'stepKey'>) => {
+      void submitStep({
+        stepKey: OnboardingStepKey.OPERATIONAL_PROFILE,
+        ...data,
+      });
+    },
+    [submitStep],
+  );
+
+  const submitCertificationsStep = useCallback(
+    (data: Omit<CompleteCertificationsStepPayload, 'stepKey'>) => {
+      void submitStep({
+        stepKey: OnboardingStepKey.CERTIFICATIONS,
+        ...data,
+      });
+    },
+    [submitStep],
+  );
+
+  const skipCertificationsStep = useCallback(
+    (data: Omit<CompleteCertificationsStepPayload, 'stepKey' | 'payload'>) => {
+      void submitStep({
+        stepKey: OnboardingStepKey.CERTIFICATIONS,
+        payload: {
+          documents: [],
+        },
+        ...data,
+      });
+    },
+    [submitStep],
+  );
+
   useEffect(() => {
     void getStatus();
   }, [getStatus]);
@@ -167,21 +323,29 @@ export const useOnboarding = () => {
   useEffect(() => {
     if (!memoryRouter.status?.completed || !requireOnboarding) return;
 
+    clearForceInstructorTrack();
+    clearOperationalProfileDraft();
     getProfile().then(user => {
       navigate(user?.baseProfileRedirect ?? PageURLS.home, { replace: true });
     });
-  }, [getProfile, memoryRouter.status?.completed, navigate, requireOnboarding]);
+  }, [clearForceInstructorTrack, getProfile, memoryRouter.status?.completed, navigate, requireOnboarding]);
 
   return {
     status: memoryRouter.status,
     isLoading: getOngetOnboardingStatusIsLoading,
     isSubmitting: completeOnboardingStepIsLoading,
     currentStep: memoryRouter.currentStep,
+    operationalProfileDraft: memoryRouter.operationalProfileDraft,
     error,
+    canNavigateToStep,
+    goToStep,
     submitProfileStep,
     submitHealthStep,
     skipHealthStep,
     submitPreferencesStep,
     skipPreferencesStep,
+    submitOperationalProfileStep,
+    submitCertificationsStep,
+    skipCertificationsStep,
   };
 };
