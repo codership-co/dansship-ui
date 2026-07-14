@@ -112,6 +112,8 @@ export const PageURLS = {
   },
   userId: (id: number) => `/user/${id}`,
   figures: '/figures',
+  instructorInvite: '/instructor-onboarding',
+  instructorDashboard: '/instructor/dashboard',
   figuresById: (id: number) => `/figures/${id}`,
   browse: '/browse',
   classes: '/classes',
