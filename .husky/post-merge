@@ -8,3 +8,4 @@ if [ "$current_branch" = "main" ]; then
 fi
 
 pnpm lint:fix
+pnpm exec tsc --noEmit

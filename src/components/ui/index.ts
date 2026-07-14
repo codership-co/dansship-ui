@@ -3,6 +3,7 @@ export * from './checkbox';
 export * from './select';
 export * from './badge';
 export * from './input';
+export * from './date-picker';
 export * from './label';
 export * from './button';
 export * from './profile-picture';
