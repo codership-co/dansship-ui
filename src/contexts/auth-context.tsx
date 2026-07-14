@@ -21,15 +21,20 @@ import {
   type VerifyEmailPayload,
   VerifyEmailResponse,
 } from '@core/api';
-import { PageURLS } from '@core/constants';
+import { FORCE_INSTRUCTOR_ONBOARDING_KEY, PageURLS } from '@core/constants';
 import { type PERMISSION } from '@core/permissions';
 import { getPendingPlanCheckoutIntent, getRedirectPathByRole } from '@helpers';
 import { useEventListener } from '@hooks';
 import { Error404Page, UnauthorizedPage, UnavailablePage } from '@pages';
 
+interface LoginOptions {
+  redirectTo?: string;
+  redirectState?: Record<string, unknown>;
+}
+
 interface CommonAuthContextState {
   ready: boolean;
-  login: (data: LoginPayload) => Promise<void>;
+  login: (data: LoginPayload, options?: LoginOptions) => Promise<void>;
   signUp: (data: RegisterPayload) => Promise<void>;
   updateProfile: (data: UpdateProfilePayload) => Promise<void>;
   forgotPassword: (data: ForgotPasswordPayload) => Promise<void>;
@@ -127,14 +132,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }
 
-  async function login(payload: LoginPayload) {
+  async function login(payload: LoginPayload, options?: LoginOptions) {
     try {
       const data = await DansshipAPI.auth.login(payload);
       localStorage.setItem(AUTH_SESSION_KEY, '1');
       toast.success(t('auth:loginSuccess'));
       setUser(data);
 
-      if (fromPath && fromPath !== PageURLS.auth.login) {
+      if (options?.redirectTo) {
+        navigate(options.redirectTo, { replace: true, state: options.redirectState });
+      } else if (fromPath && fromPath !== PageURLS.auth.login) {
         navigate(fromPath, { replace: true });
       } else {
         const redirectPath = getRedirectPathByRole(data.roles);
@@ -367,8 +374,17 @@ export function SecurityGuard(
         return <UnauthorizedPage />;
       }
 
-      if (isAuthenticated && requireOnboarding && pathname !== PageURLS.auth.onboarding) {
-        return <Navigate to={PageURLS.auth.onboarding} state={{ from: location }} />;
+      if (
+        isAuthenticated &&
+        requireOnboarding &&
+        pathname !== PageURLS.auth.onboarding &&
+        pathname !== PageURLS.auth.instructorOnboarding &&
+        pathname !== PageURLS.instructorInvite
+      ) {
+        const forceInstructor = sessionStorage.getItem(FORCE_INSTRUCTOR_ONBOARDING_KEY) === '1';
+        const onboardingPath = forceInstructor ? PageURLS.auth.instructorOnboarding : PageURLS.auth.onboarding;
+
+        return <Navigate to={onboardingPath} state={{ from: location }} />;
       }
 
       if (isAuthenticated && getPendingPlanCheckoutIntent() && pathname !== PageURLS.home) {

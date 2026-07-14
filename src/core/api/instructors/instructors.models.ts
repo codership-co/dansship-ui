@@ -106,3 +106,13 @@ export interface InstructorInviteResponse {
 export interface InstructorDeactivateResponse {
   user_id: string;
 }
+
+export interface AcceptInstructorInvitePayload {
+  token: string;
+}
+
+export interface AcceptInstructorInviteResponse {
+  accepted?: boolean;
+  email: string;
+  message?: string;
+}

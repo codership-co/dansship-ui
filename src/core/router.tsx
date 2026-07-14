@@ -27,8 +27,10 @@ import {
   SecureFiguresDetailsPage,
   SecureFiguresPage,
   SecureForgotPasswordPage,
+  SecureInstructorOnboardingPage,
   SecureLoginPage,
   SecureOnboardingPage,
+  SecureOnboardingInstructorPage,
   SecureProfileEditPage,
   SecurePaymentsResultPage,
   SecureResetPasswordPage,
@@ -61,7 +63,12 @@ const routes: Array<RouteObject> = [
           { path: 'verify-email', Component: SecureVerifyEmailPage },
           { path: 'reset-password', Component: SecureResetPasswordPage },
           { path: 'onboarding', Component: SecureOnboardingPage },
+          { path: 'instructor-onboarding', Component: SecureOnboardingInstructorPage },
         ],
+      },
+      {
+        Component: RouterAuthLayout,
+        children: [{ path: 'instructor-onboarding', Component: SecureInstructorOnboardingPage }],
       },
       {
         Component: RouterPageLayout,

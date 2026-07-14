@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from 'polpo/components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -10,11 +10,6 @@ import { EmailField, PasswordField } from '@components/form-fields';
 import { useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
 
-/*
- * Note: Using i18n directly in schema is tricky since schemas are often defined outside components,
- * but we can generate the schema inside the component or use an error map.
- * Alternatively, we use useTranslation and define schema inside or pass translation hook to schema builder.
- */
 const createLoginSchema = (t: (key: string) => string) =>
   z.object({
     email: z
@@ -29,26 +24,49 @@ const createLoginSchema = (t: (key: string) => string) =>
 
 export type LoginFormData = z.infer<ReturnType<typeof createLoginSchema>>;
 
-export function LoginForm() {
+interface LoginFormProps {
+  defaultEmail?: string;
+  emailReadOnly?: boolean;
+  hideLinks?: boolean;
+  redirectTo?: string;
+  redirectState?: Record<string, unknown>;
+}
+
+export function LoginForm({
+  defaultEmail = '',
+  emailReadOnly = false,
+  hideLinks = false,
+  redirectTo,
+  redirectState,
+}: LoginFormProps = {}) {
   const { t } = useTranslation();
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const loginSchema = createLoginSchema(t);
 
-  const { control, handleSubmit } = useForm<LoginFormData>({
+  const { control, handleSubmit, reset } = useForm<LoginFormData>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: '',
+      email: defaultEmail,
       password: '',
     },
   });
 
+  useEffect(() => {
+    if (!defaultEmail) return;
+
+    reset({
+      email: defaultEmail,
+      password: '',
+    });
+  }, [defaultEmail, reset]);
+
   const internalSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    await login(data);
+    await login(data, redirectTo ? { redirectTo, redirectState } : undefined);
     setIsLoading(false);
   };
 
@@ -60,6 +78,7 @@ export function LoginForm() {
         name='email'
         label={t('auth:login.email')}
         placeholder={t('common:placeholder.email')}
+        disabled={emailReadOnly}
       />
 
       <PasswordField
@@ -71,22 +90,26 @@ export function LoginForm() {
         placeholder={t('common:placeholder.password')}
       />
 
-      <div className='flex items-center justify-end'>
-        <Link to={PageURLS.auth.forgotPassword} viewTransition className='text-sm text-primary hover:text-primary/90'>
-          {t('auth:login.forgotPassword')}
-        </Link>
-      </div>
+      {!hideLinks ? (
+        <div className='flex items-center justify-end'>
+          <Link to={PageURLS.auth.forgotPassword} viewTransition className='text-sm text-primary hover:text-primary/90'>
+            {t('auth:login.forgotPassword')}
+          </Link>
+        </div>
+      ) : null}
 
       <Button type='submit' isLoading={isLoading} color='primary' className='w-full'>
-        {t('auth:login.signIn')}
+        {hideLinks ? t('auth:instructorOnboarding.completeProfile') : t('auth:login.signIn')}
       </Button>
 
-      <div className='text-center text-sm'>
-        <span className='text-gray-600'>{t('auth:login.noAccount')}</span>{' '}
-        <Link to={PageURLS.auth.signup} viewTransition className='font-medium text-primary hover:text-primary/90'>
-          {t('auth:login.signUp')}
-        </Link>
-      </div>
+      {!hideLinks ? (
+        <div className='text-center text-sm'>
+          <span className='text-gray-600'>{t('auth:login.noAccount')}</span>{' '}
+          <Link to={PageURLS.auth.signup} viewTransition className='font-medium text-primary hover:text-primary/90'>
+            {t('auth:login.signUp')}
+          </Link>
+        </div>
+      ) : null}
     </form>
   );
 }

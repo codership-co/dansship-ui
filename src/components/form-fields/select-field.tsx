@@ -15,6 +15,7 @@ interface SelectFieldProps<T extends FieldValues = Record<string, unknown>> {
   placeholder?: string;
   disabled?: boolean;
   id?: string;
+  hideLabel?: boolean;
 }
 
 export function SelectField<T extends FieldValues = Record<string, unknown>>({
@@ -25,6 +26,7 @@ export function SelectField<T extends FieldValues = Record<string, unknown>>({
   placeholder,
   disabled,
   id,
+  hideLabel = false,
 }: SelectFieldProps<T>) {
   const fieldId = id || `field-${name}`;
 
@@ -34,7 +36,7 @@ export function SelectField<T extends FieldValues = Record<string, unknown>>({
       name={name}
       render={({ field, fieldState: { error } }) => (
         <div className='grid gap-2'>
-          <Label htmlFor={fieldId}>{label}</Label>
+          {!hideLabel ? <Label htmlFor={fieldId}>{label}</Label> : null}
           <Select value={field.value || ''} onValueChange={field.onChange} disabled={disabled}>
             <SelectTrigger id={fieldId} className={error ? 'border-alert-600 focus-visible:ring-alert-600' : ''}>
               <SelectValue placeholder={placeholder || 'Select an option'} />
