@@ -1,6 +1,7 @@
 import { HttpClient } from 'polpo-http-client';
 
 import { AuthAPI } from './auth/auth.api';
+import { installAuthRefreshInterceptor } from './auth-refresh';
 import { BillingAdminAPI } from './billing/billing.admin.api';
 import { BookingsAdminAPI } from './bookings/bookings.admin.api';
 import { BookingsAPI } from './bookings/bookings.api';
@@ -38,29 +39,6 @@ export class DansshipAPI {
     },
   });
 
-  static {
-    this.httpClient.setOnErrorInterceptor(async (request, response) => {
-      if (
-        response.status === 401 &&
-        localStorage.getItem('auth_session') === '1' &&
-        localStorage.getItem('refreshing_token') !== '1' &&
-        !['/auth/refresh-token', '/auth/signin'].includes(request.urlParams.path ?? '')
-      ) {
-        localStorage.setItem('refreshing_token', '1');
-
-        try {
-          await this.auth.refreshToken();
-        } catch {
-          localStorage.removeItem('refreshing_token');
-          window.dispatchEvent(new CustomEvent('auth:session-expired'));
-        }
-      }
-
-      // eslint-disable-next-line no-console
-      console.log({ request, response });
-    });
-  }
-
   static auth = new AuthAPI(this.httpClient);
   static billingAdmin = new BillingAdminAPI(this.httpClient);
   static bookings = new BookingsAPI(this.httpClient);
@@ -82,4 +60,8 @@ export class DansshipAPI {
   static studioRentalAdmin = new StudioRentalAdminAPI(this.httpClient);
   static subscriptions = new SubscriptionsAPI(this.httpClient);
   static usersAdmin = new UsersAdminAPI(this.httpClient);
+
+  static {
+    installAuthRefreshInterceptor(this.httpClient, () => this.auth.refreshToken());
+  }
 }

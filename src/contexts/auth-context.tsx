@@ -21,7 +21,7 @@ import {
   type VerifyEmailPayload,
   VerifyEmailResponse,
 } from '@core/api';
-import { FORCE_INSTRUCTOR_ONBOARDING_KEY, PageURLS } from '@core/constants';
+import { AUTH_SESSION_KEY, FORCE_INSTRUCTOR_ONBOARDING_KEY, PageURLS } from '@core/constants';
 import { type PERMISSION } from '@core/permissions';
 import { getPendingPlanCheckoutIntent, getRedirectPathByRole } from '@helpers';
 import { useEventListener } from '@hooks';
@@ -60,12 +60,12 @@ type AuthContextState = AuthenticatedAuthContextState | UnAuthenticatedAuthConte
 
 const AuthContext = createContext<AuthContextState | null>(null);
 
-const AUTH_SESSION_KEY = 'auth_session';
 const AUTH_TOKEN_KEY = 'auth_token';
 
 const clearSessionArtifacts = () => {
   localStorage.removeItem(AUTH_SESSION_KEY);
   localStorage.removeItem(AUTH_TOKEN_KEY);
+  localStorage.removeItem('refreshing_token');
   sessionStorage.clear();
 
   if (typeof document !== 'undefined' && document.cookie) {
@@ -94,11 +94,17 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEventListener('auth:session-expired' as keyof WindowEventMap, () => {
     clearSessionArtifacts();
-    toast.error('Session expired. Please sign in again.');
+    setUser(null);
+    toast.error(t('auth:sessionExpired'));
+
+    if (location.pathname !== PageURLS.auth.login) {
+      navigate(PageURLS.auth.login, { replace: true, state: { from: location } });
+    }
   });
 
   useEventListener('auth:logout' as keyof WindowEventMap, () => {
     clearSessionArtifacts();
+    setUser(null);
   });
 
   useEffect(() => {
