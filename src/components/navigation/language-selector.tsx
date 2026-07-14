@@ -24,7 +24,7 @@ export function LanguageSelector({ variant = 'buttons' }: LanguageSelectorProps)
 
   if (variant === 'buttons') {
     return (
-      <div className='flex items-center space-x-2'>
+      <div className='flex items-center space-x-2 p-4'>
         {languages.map(({ code, name, flag }) => (
           <button
             key={code}

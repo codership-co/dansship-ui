@@ -5,6 +5,7 @@ export * from './badge';
 export * from './input';
 export * from './label';
 export * from './button';
+export * from './profile-picture';
 export * from './popover';
 export * from './dialog';
 export * from './sonner';
