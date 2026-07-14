@@ -1,6 +1,7 @@
 import { HttpClient, type HttpClientRequestConfig, type HttpClientResponse } from 'polpo-http-client';
 
 import { DansshipAPIError } from './dansship.error';
+
 import { AUTH_SESSION_KEY } from '@core/constants';
 
 const AUTH_REFRESH_SKIP_PATHS = new Set(['/auth/refresh-token', '/auth/signin', '/auth/signup', '/auth/signout']);
