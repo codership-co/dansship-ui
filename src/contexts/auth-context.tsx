@@ -60,12 +60,8 @@ type AuthContextState = AuthenticatedAuthContextState | UnAuthenticatedAuthConte
 
 const AuthContext = createContext<AuthContextState | null>(null);
 
-const AUTH_TOKEN_KEY = 'auth_token';
-
 const clearSessionArtifacts = () => {
-  localStorage.removeItem(AUTH_SESSION_KEY);
-  localStorage.removeItem(AUTH_TOKEN_KEY);
-  localStorage.removeItem('refreshing_token');
+  localStorage.clear();
   sessionStorage.clear();
 
   if (typeof document !== 'undefined' && document.cookie) {

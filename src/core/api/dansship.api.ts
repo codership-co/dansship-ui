@@ -1,7 +1,6 @@
 import { HttpClient } from 'polpo-http-client';
 
 import { AuthAPI } from './auth/auth.api';
-import { installAuthRefreshInterceptor } from './auth-refresh';
 import { BillingAdminAPI } from './billing/billing.admin.api';
 import { BookingsAdminAPI } from './bookings/bookings.admin.api';
 import { BookingsAPI } from './bookings/bookings.api';
@@ -23,6 +22,10 @@ import { StudioRentalAdminAPI } from './studio-rental/studio-rental.admin.api';
 import { StudioRentalAPI } from './studio-rental/studio-rental.api';
 import { SubscriptionsAPI } from './subscriptions/subscriptions.api';
 import { UsersAdminAPI } from './users/users.admin.api';
+
+import { AUTH_SESSION_KEY } from '@core/constants';
+
+const AUTH_REFRESH_SKIP_PATHS = new Set(['/auth/refresh-token', '/auth/signin', '/auth/signup', '/auth/signout']);
 
 export class DansshipAPI {
   static readonly httpClient = new HttpClient<DansshipAPIError>({
@@ -62,6 +65,21 @@ export class DansshipAPI {
   static usersAdmin = new UsersAdminAPI(this.httpClient);
 
   static {
-    installAuthRefreshInterceptor(this.httpClient, () => this.auth.refreshToken());
+    this.httpClient.setOnErrorInterceptor(async (request, response) => {
+      if (
+        response.status === 401 &&
+        !request.isReFetch &&
+        localStorage.getItem(AUTH_SESSION_KEY) === '1' &&
+        !AUTH_REFRESH_SKIP_PATHS.has(request.urlParams.path ?? '')
+      ) {
+        try {
+          await this.auth.refreshToken();
+
+          return request.reFetch();
+        } catch {
+          window.dispatchEvent(new CustomEvent('auth:session-expired'));
+        }
+      }
+    });
   }
 }

@@ -12,3 +12,4 @@ allowBuilds:
 
 minimumReleaseAgeExclude:
   - polpo@0.1.27
+  - polpo-http-client@1.0.22 || 1.1.0
