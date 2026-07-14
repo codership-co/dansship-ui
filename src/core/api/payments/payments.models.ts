@@ -113,3 +113,36 @@ export interface AdminPaymentListResponse {
   items: Array<PaymentIntent>;
   total: number;
 }
+
+export interface PaymentPreviewRequest {
+  plan_id: string;
+  discount_code?: string;
+}
+
+export interface PaymentPreviewResponse {
+  base_amount: string;
+  discount_applied: boolean;
+  discount_type: 'percentage' | 'fixed_amount' | null;
+  discount_value: string | null;
+  final_price: string;
+  is_valid: boolean;
+  original_price: string;
+  rejection_reason: string | null;
+  tax_amount: string;
+  tax_rate_percentage: string;
+  tax_type_name: string;
+}
+
+export interface PaymentPreviewMappedResponse {
+  base_amount: number;
+  discount_applied: boolean;
+  discount_type: 'percentage' | 'fixed_amount' | null;
+  discount_value: number;
+  final_price: number;
+  is_valid: boolean;
+  original_price: number;
+  rejection_reason: string | null;
+  tax_amount: number;
+  tax_rate_percentage: number;
+  tax_type_name: string;
+}

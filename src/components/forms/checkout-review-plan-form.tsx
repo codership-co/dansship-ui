@@ -11,7 +11,7 @@ import { z } from 'zod';
 
 import { DateField, TextField } from '@components/form-fields';
 import { Spinner } from '@components/loaders';
-import { DansshipAPI, DiscountPreviewRequest, PublicPlan } from '@core/api';
+import { DansshipAPI, PaymentPreviewRequest, PublicPlan } from '@core/api';
 import { formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
 
@@ -31,30 +31,38 @@ const createCheckoutSchema = (t: TFunction) =>
 
 export type CheckoutFormValues = z.infer<ReturnType<typeof createCheckoutSchema>>;
 
-export interface DiscountData {
+export interface PaymentData {
   discountCode: string;
-  context: string;
+  taxContext: string;
+  discountContext: string;
   error: string;
   isValid: boolean;
-  value: number;
+  discountValue: number;
   finalPrice: number;
   applied: boolean;
+  baseAmount: number;
+  originalPrice: number;
+  taxAmount: number;
 }
 
-export const DefaultDiscountData: DiscountData = {
-  context: '',
+export const DefaultPaymentData: PaymentData = {
+  taxContext: '',
+  discountContext: '',
   discountCode: '',
   error: '',
   isValid: false,
-  value: 0,
+  discountValue: 0,
   finalPrice: 0,
+  baseAmount: 0,
+  originalPrice: 0,
+  taxAmount: 0,
   applied: false,
 };
 
 interface CheckoutReviewPlanFormInputProps {
   plan: PublicPlan;
   onCancel: () => void;
-  onSubmit: (data: CheckoutFormValues, discountData: DiscountData) => Promise<void>;
+  onSubmit: (data: CheckoutFormValues, paymentData: PaymentData) => Promise<void>;
   defaultFormValues: CheckoutFormValues;
 }
 
@@ -66,12 +74,12 @@ export const CheckoutReviewPlanFormInput = ({
 }: CheckoutReviewPlanFormInputProps) => {
   const { t } = useTranslation();
   const [termsAndConditions, setTermsAndConditions] = useState(false);
-  const [discountData, setDiscountData] = useState<DiscountData>({
-    ...DefaultDiscountData,
+  const [paymentData, setPaymentData] = useState<PaymentData>({
+    ...DefaultPaymentData,
     finalPrice: plan.price,
   });
-  const { call: previewDiscount, isLoading } = useCallablePromise((payload: DiscountPreviewRequest) =>
-    DansshipAPI.subscriptions.previewDiscount(payload),
+  const { call: previewPayment, isLoading } = useCallablePromise((payload: PaymentPreviewRequest) =>
+    DansshipAPI.payments.previewPayment(payload),
   );
 
   const { handleSubmit, watch, control } = useForm<CheckoutFormValues>({
@@ -83,45 +91,56 @@ export const CheckoutReviewPlanFormInput = ({
 
   const discountCode = useDebounce(watch('discount_code'), 800);
 
-  useEffect(() => {
-    if (discountCode) {
-      previewDiscount({
-        plan_id: plan.id,
-        discount_code: discountCode.toUpperCase(),
-      }).then(({ data, ok }) => {
-        if (ok) {
-          const { discount_type, rejection_reason, is_valid, discount_applied, final_price, discount_value } = data;
-          const value = discount_value ? Number(data.discount_value) : 0;
+  const getPaymentPreview = useCallback(async () => {
+    previewPayment({
+      plan_id: plan.id,
+      discount_code: discountCode ? discountCode.toUpperCase() : undefined,
+    }).then(({ data, ok }) => {
+      if (ok) {
+        const {
+          base_amount,
+          discount_applied,
+          discount_type,
+          discount_value,
+          final_price,
+          is_valid,
+          original_price,
+          rejection_reason,
+          tax_amount,
+          tax_rate_percentage,
+        } = data;
 
-          setDiscountData({
-            isValid: !!is_valid,
-            discountCode: discountCode.toUpperCase(),
-            error: rejection_reason || '',
-            applied: Boolean(discount_applied),
-            value,
-            finalPrice: Number(final_price) || plan.price,
-            context:
-              discount_type === 'percentage'
-                ? `${value}%`
-                : discount_type === 'fixed_amount'
-                  ? formatPrice(value, plan.currency)
-                  : '',
-          });
-        }
-      });
-    } else {
-      setDiscountData({
-        ...DefaultDiscountData,
-        finalPrice: plan.price,
-      });
-    }
-  }, [discountCode, plan.currency, plan.id, plan.price, previewDiscount]);
+        setPaymentData({
+          isValid: is_valid,
+          discountCode: discountCode.toUpperCase(),
+          error: rejection_reason || '',
+          applied: discount_applied,
+          discountValue: discount_value,
+          finalPrice: final_price,
+          baseAmount: base_amount,
+          originalPrice: original_price,
+          taxAmount: tax_amount,
+          taxContext: `${tax_rate_percentage}%`,
+          discountContext:
+            discount_type === 'percentage'
+              ? `${discount_value}%`
+              : discount_type === 'fixed_amount'
+                ? formatPrice(discount_value, plan.currency)
+                : '',
+        });
+      }
+    });
+  }, [discountCode, plan.currency, plan.id, previewPayment]);
+
+  useEffect(() => {
+    void getPaymentPreview();
+  }, [getPaymentPreview]);
 
   const handleInternalSubmit = useCallback(
     async (formData: CheckoutFormValues) => {
-      await onSubmit(formData, discountData);
+      await onSubmit(formData, paymentData);
     },
-    [discountData, onSubmit],
+    [paymentData, onSubmit],
   );
 
   return (
@@ -143,9 +162,9 @@ export const CheckoutReviewPlanFormInput = ({
           rightElement={isLoading ? <Spinner /> : undefined}
           placeholder={t('subscriptions:discountCodePlaceholder')}
           label={t('subscriptions:discountCodeLabel')}
-          helperText={discountData.isValid ? t('subscriptions:codeValidationNote') : undefined}
+          helperText={paymentData.isValid ? t('subscriptions:codeValidationNote') : undefined}
           errorMessage={
-            !isLoading && !discountData.isValid && discountData.discountCode
+            !isLoading && !paymentData.isValid && paymentData.discountCode
               ? t('subscriptions:invalidDiscountCode')
               : undefined
           }
@@ -156,22 +175,22 @@ export const CheckoutReviewPlanFormInput = ({
         <div>
           <div className='mb-2 flex items-center justify-between'>
             <span className='text-gray-500'>{t('subscriptions:subtotal')}</span>
-            <span>{formatPrice(plan.price * 0.81, plan.currency)}</span>
+            <span>{formatPrice(paymentData.baseAmount, plan.currency)}</span>
           </div>
           <div className='mb-2 flex items-center justify-between'>
             <span className='text-gray-500'>{t('subscriptions:iva')}</span>
-            <span>{formatPrice(plan.price * 0.19, plan.currency)}</span>
+            <span>{formatPrice(paymentData.taxAmount, plan.currency)}</span>
           </div>
-          {discountData.isValid && (
+          {paymentData.applied && (
             <div className='mb-2 flex items-center justify-between'>
               <span className='text-gray-500'>{t('subscriptions:discountCode')}</span>
-              <span>{isLoading ? <Spinner /> : formatPrice(discountData.value, plan.currency)}</span>
+              <span>{isLoading ? <Spinner /> : paymentData.discountContext}</span>
             </div>
           )}
 
           <div className='mt-4 flex items-center justify-between border-t pt-4 text-lg font-bold'>
             <span>{t('subscriptions:totalDue')}</span>
-            <span>{formatPrice(discountData.finalPrice, plan.currency)}</span>
+            <span>{formatPrice(paymentData.finalPrice, plan.currency)}</span>
           </div>
         </div>
 
@@ -205,7 +224,7 @@ export const CheckoutReviewPlanFormInput = ({
 
           <Button
             isLoading={isLoading}
-            disabled={(Boolean(discountCode) && !discountData.isValid) || !termsAndConditions}
+            disabled={(Boolean(discountCode) && !paymentData.isValid) || !termsAndConditions}
             color='primary'
             className='flex items-center'
           >

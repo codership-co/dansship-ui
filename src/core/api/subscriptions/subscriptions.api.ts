@@ -1,13 +1,11 @@
 import { HttpClient } from 'polpo-http-client';
 
-import { normalizePlan, normalizeSubscription, toNumber } from './subscriptions.helpers';
+import { normalizePlan, normalizeSubscription } from './subscriptions.helpers';
 
 import { DansshipAPIError } from '@core/api';
 
 import type {
   ActiveSubscription,
-  DiscountPreviewRequest,
-  DiscountPreviewResponse,
   MySubscriptionsResponse,
   PublicPlan,
   PurchaseSubscriptionPayload,
@@ -33,25 +31,6 @@ export class SubscriptionsAPI {
       method: 'POST',
       data: payload,
     });
-  }
-
-  async previewDiscount(payload: DiscountPreviewRequest) {
-    return this.httpClient.callNoError<DiscountPreviewResponse, DiscountPreviewRequest>(
-      {
-        path: '/discounts/preview',
-        method: 'POST',
-        data: payload,
-      },
-      data => ({
-        ...data,
-        discount_applied: data.discount_applied === true,
-        original_price: data.original_price !== undefined ? toNumber(data.original_price) : undefined,
-        final_price: data.final_price !== undefined ? toNumber(data.final_price) : undefined,
-        discount_value:
-          data.discount_value !== undefined && data.discount_value !== null ? toNumber(data.discount_value) : null,
-        rejection_reason: data.rejection_reason ?? data.reason ?? data.message ?? null,
-      }),
-    );
   }
 
   async getMySubscriptions() {

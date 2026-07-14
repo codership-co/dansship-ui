@@ -17,23 +17,6 @@ export interface DiscountValidationResponse {
   message?: string;
 }
 
-export interface DiscountPreviewRequest {
-  plan_id: string;
-  discount_code: string;
-}
-
-export interface DiscountPreviewResponse {
-  is_valid?: boolean;
-  discount_applied?: boolean;
-  original_price?: number | string;
-  final_price?: number | string;
-  discount_type?: 'percentage' | 'fixed_amount' | null;
-  discount_value?: number | string | null;
-  rejection_reason?: string | null;
-  message?: string;
-  reason?: string;
-}
-
 export interface PurchaseSubscriptionPayload {
   plan_id: string;
   discount_code?: string;

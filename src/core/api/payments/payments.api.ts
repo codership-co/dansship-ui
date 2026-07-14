@@ -1,8 +1,14 @@
 import { HttpClient } from 'polpo-http-client';
 
-import { normalizeIntent } from './payments.helpers';
+import { normalizeIntent, toNumber } from './payments.helpers';
 
-import { DansshipAPIError, PaymentProofContentType } from '@core/api';
+import {
+  DansshipAPIError,
+  PaymentPreviewMappedResponse,
+  PaymentPreviewRequest,
+  PaymentPreviewResponse,
+  PaymentProofContentType,
+} from '@core/api';
 
 import type {
   BoldCheckoutBootstrapResponse,
@@ -39,6 +45,25 @@ export class PaymentsAPI {
       data => ({
         ...data,
         intent: normalizeIntent(data.intent),
+      }),
+    );
+  }
+
+  async previewPayment(payload: PaymentPreviewRequest) {
+    return this.httpClient.callNoError<PaymentPreviewResponse, PaymentPreviewRequest, PaymentPreviewMappedResponse>(
+      {
+        path: '/payments/preview',
+        method: 'POST',
+        data: payload,
+      },
+      data => ({
+        ...data,
+        base_amount: toNumber(data.base_amount),
+        discount_value: toNumber(data.discount_value) || 0,
+        final_price: toNumber(data.final_price),
+        original_price: toNumber(data.original_price),
+        tax_amount: toNumber(data.tax_amount),
+        tax_rate_percentage: toNumber(data.tax_rate_percentage),
       }),
     );
   }

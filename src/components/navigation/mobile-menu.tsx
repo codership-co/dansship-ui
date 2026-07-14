@@ -69,6 +69,13 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       featureFlags: [FEATURE_FLAG.isFigureSavedPageEnabled],
       icon: LuBookHeart,
     },
+    {
+      to: PageURLS.admin.users,
+      label: t('nav:adminMenu.users'),
+      orPermissions: AdminPermissions.users,
+      featureFlags: [FEATURE_FLAG.isAdminUserListPageEnabled],
+      icon: RiAdminFill,
+    },
   ];
 
   const adminMenuItems: Array<NavItem> = [
