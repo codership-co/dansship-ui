@@ -1,6 +1,6 @@
 import { Badge, Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
-import { LuCreditCard, LuPencil } from 'react-icons/lu';
+import { LuCalendar, LuCreditCard, LuPencil } from 'react-icons/lu';
 import { Link } from 'react-router';
 
 import { Section } from '@components/containers';
@@ -80,7 +80,7 @@ export function ProfileHeader() {
 
           <Link to={PageURLS.profile.bookings}>
             <Button variant='solid' color='primary' size='small'>
-              <LuCreditCard className='h-4 w-4' />
+              <LuCalendar className='h-4 w-4' />
               {t('profile:bookings')}
             </Button>
           </Link>
