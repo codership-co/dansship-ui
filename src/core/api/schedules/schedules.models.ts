@@ -14,7 +14,7 @@ export interface ScheduledClass {
 
   class_definition?: { id: string; name: string; duration_minutes: number; level?: string | null };
   room?: { id: string; name: string };
-  instructor?: { id: string; user_id: string; email: string };
+  instructor?: { id: string; user_id: string; email: string; full_name: string };
 }
 
 export interface ScheduleWeek {

@@ -1,9 +1,11 @@
 import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '@components/ui';
 import { useAuth } from '@contexts';
 import { DansshipAPI, PublishedClass } from '@core/api';
+import { PageURLS } from '@core/constants';
 import { useDateLocale, usePromise, useMyBookings } from '@hooks';
 
 interface BookingModalProps {
@@ -15,6 +17,7 @@ interface BookingModalProps {
 
 export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscription }: BookingModalProps) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const locale = useDateLocale();
   const {
@@ -94,6 +97,11 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
     }
   };
 
+  const handleBuyPlan = () => {
+    onClose();
+    navigate(PageURLS.profile.subscription);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className='max-w-md'>
@@ -120,7 +128,9 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
             </div>
             <div>
               <span className='text-gray-500 block'>{t('bookings:instructor')}</span>
-              <span className='font-medium text-gray-900'>{selectedClass.instructor?.email || t('common:tba')}</span>
+              <span className='font-medium text-gray-900'>
+                {selectedClass.instructor?.full_name || t('common:tba')}
+              </span>
             </div>
             <div>
               <span className='text-gray-500 block'>{t('bookings:room')}</span>
@@ -155,12 +165,14 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
               <Button variant='outline' onClick={handleWaitlistCancel} disabled={isLoading}>
                 {isCancelingWaitlist ? t('bookings:leaving') : t('bookings:leaveWaitlist')}
               </Button>
+            ) : !hasActiveSubscription ? (
+              <Button onClick={handleBuyPlan}>{t('bookings:buyPlan')}</Button>
             ) : isFull ? (
-              <Button onClick={handleWaitlistJoin} disabled={isLoading || !hasActiveSubscription}>
+              <Button onClick={handleWaitlistJoin} disabled={isLoading}>
                 {isJoiningWaitlist ? t('bookings:joining') : t('bookings:joinWaitlist')}
               </Button>
             ) : (
-              <Button onClick={handleBook} disabled={isLoading || !hasActiveSubscription}>
+              <Button onClick={handleBook} disabled={isLoading}>
                 {isBookingClass ? t('bookings:booking') : t('bookings:bookClass')}
               </Button>
             )}
