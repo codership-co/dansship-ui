@@ -77,6 +77,7 @@ export const DAY_OF_WEEK_OPTIONS = [
 
 export const FORCE_INSTRUCTOR_ONBOARDING_KEY = 'force_instructor_onboarding';
 export const AUTH_SESSION_KEY = 'auth_session';
+export const AUTH_TOKEN_KEY = 'auth_token';
 
 export const PageURLS = {
   home: '/',
