@@ -8,6 +8,7 @@ export * from './auth';
 export * from './admin-studio-rentals';
 export * from './instructor';
 export * from './classes';
+export * from './profile';
 export * from './figure-details';
 export * from './figures';
 export * from './home';

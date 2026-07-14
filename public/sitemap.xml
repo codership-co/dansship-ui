@@ -5,13 +5,13 @@
   <url><loc>https://dansship.com/figures</loc></url>
   <url><loc>https://dansship.com/browse</loc></url>
   <url><loc>https://dansship.com/classes</loc></url>
-  <url><loc>https://dansship.com/instructor/dashboard</loc></url>
   <url><loc>https://dansship.com/profile</loc></url>
   <url><loc>https://dansship.com/profile/edit</loc></url>
+  <url><loc>https://dansship.com/profile/subscription</loc></url>
+  <url><loc>https://dansship.com/profile/bookings</loc></url>
   <url><loc>https://dansship.com/figure/completed</loc></url>
   <url><loc>https://dansship.com/figure/saved</loc></url>
-  <url><loc>https://dansship.com/my-account/subscription</loc></url>
-  <url><loc>https://dansship.com/my-account/bookings</loc></url>
+  <url><loc>https://dansship.com/payments/result</loc></url>
   <url><loc>https://dansship.com/studio-rental/browse</loc></url>
   <url><loc>https://dansship.com/studio-rental/requests</loc></url>
 
@@ -35,6 +35,6 @@
   <url><loc>https://dansship.com/admin/merch</loc></url>
   <url><loc>https://dansship.com/admin/merch/pos</loc></url>
   <url><loc>https://dansship.com/admin/figures</loc></url>
-  <url><loc>https://dansship.com/admin/access</loc></url>
+  <url><loc>https://dansship.com/admin/users</loc></url>
   <url><loc>https://dansship.com/admin/studio-rental</loc></url>
 </urlset>
