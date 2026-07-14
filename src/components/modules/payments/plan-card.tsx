@@ -64,18 +64,23 @@ export function PlanCard({ plan, onSelectPlan, isFeatured, hoverable, className,
 
         <CardContent className='flex grow flex-col pt-0'>
           {!asIndividual && (
-            <div className='mb-5 flex items-end gap-1.5 sm:mb-7 sm:gap-2'>
-              <h3 className='font-main m-0'>
-                {new Intl.NumberFormat('es-CO', {
-                  style: 'currency',
-                  currency: 'COP',
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0,
-                }).format(price)}
-              </h3>
+            <section className='mb-5 sm:mb-7'>
+              <div className='flex items-end gap-1.5 sm:gap-2'>
+                <h2 className='lg:text-header3 xl:text-header2 font-main m-0'>
+                  {new Intl.NumberFormat('es-CO', {
+                    style: 'currency',
+                    currency: 'COP',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                  }).format(price)}
+                </h2>
 
-              <label className='mb-2'>{plan.currency}</label>
-            </div>
+                <label className='mb-2'>{plan.currency}</label>
+              </div>
+              <small className='block text-[0.6rem] relative left-7 bottom-1 m-0'>
+                {t('subscriptions:ivaIncluded')}
+              </small>
+            </section>
           )}
 
           <ul className='text-label grid gap-4 px-4'>

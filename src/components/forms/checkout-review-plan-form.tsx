@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { addMonths } from 'date-fns';
 import { TFunction } from 'i18next';
-import { Button } from 'polpo/components';
+import { Button, Checkbox } from 'polpo/components';
 import { useDebounce } from 'polpo/hooks';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { LuArrowRight, LuX } from 'react-icons/lu';
 import { z } from 'zod';
 
@@ -65,6 +65,7 @@ export const CheckoutReviewPlanFormInput = ({
   defaultFormValues,
 }: CheckoutReviewPlanFormInputProps) => {
   const { t } = useTranslation();
+  const [termsAndConditions, setTermsAndConditions] = useState(false);
   const [discountData, setDiscountData] = useState<DiscountData>({
     ...DefaultDiscountData,
     finalPrice: plan.price,
@@ -151,8 +152,8 @@ export const CheckoutReviewPlanFormInput = ({
         />
       </div>
 
-      <section className='grid gap-8'>
-        <div className='pt-20'>
+      <section className='grid gap-2'>
+        <div>
           <div className='mb-2 flex items-center justify-between'>
             <span className='text-gray-500'>{t('subscriptions:subtotal')}</span>
             <span>{formatPrice(plan.price * 0.81, plan.currency)}</span>
@@ -174,6 +175,28 @@ export const CheckoutReviewPlanFormInput = ({
           </div>
         </div>
 
+        <section className='justify-self-end text-label w-90'>
+          <Checkbox
+            label={
+              <Trans
+                i18nKey='subscriptions:terms'
+                components={{
+                  LinkTerms: (
+                    <a
+                      target='_blank'
+                      href='/assets/legal/terminos-y-condiciones-para-compras.pdf'
+                      className='text-info underline'
+                    />
+                  ),
+                }}
+              />
+            }
+            name='terms_and_conditions'
+            value={termsAndConditions}
+            setValue={() => setTermsAndConditions(p => !p)}
+          />
+        </section>
+
         <div className='flex justify-end gap-2 pt-4'>
           <Button type='button' className='flex items-center' variant='outlined' color='primary' onClick={onCancel}>
             <LuX />
@@ -182,7 +205,7 @@ export const CheckoutReviewPlanFormInput = ({
 
           <Button
             isLoading={isLoading}
-            disabled={!!discountCode && !discountData.isValid}
+            disabled={(Boolean(discountCode) && !discountData.isValid) || !termsAndConditions}
             color='primary'
             className='flex items-center'
           >
