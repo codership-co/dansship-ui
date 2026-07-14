@@ -32,7 +32,7 @@ export const HomeOfferings = () => {
   const { t } = useTranslation();
 
   return (
-    <Section id='disciplinas'>
+    <Section id='disciplinas' verticalPadding>
       <SectionHeading
         className='max-w-3xl'
         intro={t('home:stitch.offerings.kicker')}

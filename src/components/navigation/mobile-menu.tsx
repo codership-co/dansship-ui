@@ -1,7 +1,7 @@
 import { AsideModal, Button, Line } from 'polpo/components';
 import { cn } from 'polpo/helpers';
 import { useTranslation } from 'react-i18next';
-import { FaCartArrowDown } from 'react-icons/fa';
+import { FaCartArrowDown, FaSignOutAlt } from 'react-icons/fa';
 import { GiAvoidance } from 'react-icons/gi';
 import { GrSchedules } from 'react-icons/gr';
 import { HiOutlineDocument } from 'react-icons/hi';
@@ -34,7 +34,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
   const authenticatedPrimaryMenuItems: Array<NavItem> = [
     {
-      to: PageURLS.profile,
+      to: PageURLS.profile.root,
       label: t('nav:profile'),
       featureFlags: [FEATURE_FLAG.isProfilePageEnabled],
       icon: LuUser,
@@ -46,13 +46,13 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       icon: LuFootprints,
     },
     {
-      to: PageURLS.myAccountSubscription,
+      to: PageURLS.profile.subscription,
       label: t('nav:menuPlans'),
       featureFlags: [FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
       icon: LuBellElectric,
     },
     {
-      to: PageURLS.myAccountBookings,
+      to: PageURLS.profile.bookings,
       label: t('nav:menuBookings'),
       featureFlags: [FEATURE_FLAG.isMyAccountBookingsPageEnabled],
       icon: LuCalendarHeart,
@@ -179,7 +179,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       noCloseButton
       size='340px'
     >
-      <div className='p-4 flex items-center justify-between border-b'>
+      <div className='p-4 flex items-center justify-between bg-accent/30'>
         <div className='flex items-center gap-2'>
           <span className='size-8 rounded-full grid place-content-center bg-primary'>
             <Isotype className='w-2/3 mx-auto' mainColor='var(--color-accent)' />
@@ -191,8 +191,8 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
         </button>
       </div>
 
-      <div className='p-4 pt-8 flex-1 flex flex-col'>
-        <nav className='grid gap-8 overflow-y-auto'>
+      <div className='flex-1 flex flex-col overflow-auto'>
+        <nav className='p-4 pt-8 grid gap-4 overflow-y-auto'>
           <section className='grid gap-2'>
             {authenticatedPrimaryMenuItems.map((item, i) => (
               <MenuItem
@@ -200,7 +200,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 {...item}
                 variant='aside'
                 className='animate-in fade-in slide-in-from-left duration-300 fill-mode-both'
-                style={{ animationDelay: `${80 * (i + 2)}ms` }}
+                style={{ animationDelay: `${50 * (i + 2)}ms` }}
               />
             ))}
           </section>
@@ -212,7 +212,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   'font-bold uppercase text-primary mb-4 grid grid-cols-[1fr_auto_1fr] items-center gap-4',
                   'animate-in fade-in slide-in-from-left duration-300 fill-mode-both',
                 )}
-                style={{ animationDelay: `${80 * (2 + authenticatedPrimaryMenuItems.length)}ms` }}
+                style={{ animationDelay: `${50 * (2 + authenticatedPrimaryMenuItems.length)}ms` }}
               >
                 <Line color='var(--color-primary-200)' />
                 {t('nav:admin')}
@@ -225,7 +225,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     {...item}
                     variant='aside'
                     className='animate-in fade-in slide-in-from-left duration-300 fill-mode-both'
-                    style={{ animationDelay: `${80 * (i + 3 + authenticatedPrimaryMenuItems.length)}ms` }}
+                    style={{ animationDelay: `${50 * (i + 3 + authenticatedPrimaryMenuItems.length)}ms` }}
                   />
                 ))}
               </section>
@@ -233,12 +233,10 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           )}
         </nav>
 
-        <div className='mt-auto space-y-3 pt-4'>
-          <LanguageSelector variant='buttons' />
-        </div>
+        <LanguageSelector variant='buttons' />
       </div>
 
-      <div className='p-4 grid border-t'>
+      <div className='p-4 grid bg-accent/30'>
         <Button
           color='primary'
           variant='text'
@@ -248,6 +246,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             navigate(PageURLS.home, { replace: true });
           }}
         >
+          <FaSignOutAlt />
           {t('nav:signOut')}
         </Button>
       </div>

@@ -29,12 +29,9 @@ import {
   SecureForgotPasswordPage,
   SecureInstructorOnboardingPage,
   SecureLoginPage,
-  SecureMyAccountBookingsPage,
-  SecureMyAccountSubscriptionPage,
   SecureOnboardingPage,
   SecureOnboardingInstructorPage,
   SecureProfileEditPage,
-  SecureProfilePage,
   SecurePaymentsResultPage,
   SecureResetPasswordPage,
   SecureSignupPage,
@@ -44,6 +41,9 @@ import {
   UiPage,
   HomeLoader,
   PaymentsResultsLoader,
+  SecureProfilePage,
+  SecureSubscriptionPage,
+  SecureBookingsPage,
 } from '@pages';
 
 const routes: Array<RouteObject> = [
@@ -85,6 +85,8 @@ const routes: Array<RouteObject> = [
             children: [
               { index: true, Component: SecureProfilePage },
               { path: 'edit', Component: SecureProfileEditPage },
+              { path: 'subscription', Component: SecureSubscriptionPage },
+              { path: 'bookings', Component: SecureBookingsPage },
             ],
           },
 
@@ -93,14 +95,6 @@ const routes: Array<RouteObject> = [
             children: [
               { path: 'completed', Component: SecureFigureCompletedPage },
               { path: 'saved', Component: SecureFigureSavedPage },
-            ],
-          },
-
-          {
-            path: 'my-account',
-            children: [
-              { path: 'subscription', Component: SecureMyAccountSubscriptionPage },
-              { path: 'bookings', Component: SecureMyAccountBookingsPage },
             ],
           },
 

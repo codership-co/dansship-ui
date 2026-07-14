@@ -48,6 +48,7 @@
   "pendingPaymentDesc": "En espera de verificacion de pago",
   "store": {
     "title": "Mis Suscripciones",
+    "history": "Historial de transacciones",
     "subtitle": "Administra tus planes y compra paquetes de clases.",
     "availablePlans": "Planes Disponibles",
     "historicalSubscriptions": "Suscripciones historicas",

@@ -7,8 +7,10 @@ import { NavLink, NavLinkProps } from 'react-router';
 
 import { MobileMenu } from './mobile-menu';
 
+import { Section } from '@components/containers';
 import { LanguageSelector } from '@components/navigation/language-selector';
 import { Isotype } from '@components/svg';
+import { ProfilePicture } from '@components/ui';
 import { FEATURE_FLAG, useAuth, useEnabledFeatureFlag, useFeatureFlags, usePermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -29,7 +31,7 @@ export interface NavItem {
 
 export const Navbar = () => {
   const { t } = useTranslation();
-  const { isAuthenticated, requireOnboarding, user } = useAuth();
+  const { isAuthenticated, requireOnboarding } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { response } = usePromise(
     () => DansshipAPI.subscriptions.getMySubscriptions(),
@@ -43,7 +45,7 @@ export const Navbar = () => {
     { to: PageURLS.figures, label: t('nav:menuFigures'), featureFlags: [FEATURE_FLAG.isFiguresPageEnabled] },
     { to: PageURLS.classes, label: t('nav:menuScheduleClass'), featureFlags: [FEATURE_FLAG.isClassesPageEnabled] },
     {
-      to: isAuthenticated ? PageURLS.myAccountSubscription : '/#planes',
+      to: isAuthenticated ? PageURLS.profile.subscription : '/#planes',
       label: t('nav:menuPlans'),
       featureFlags: [FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
     },
@@ -67,83 +69,80 @@ export const Navbar = () => {
   ];
 
   return (
-    <nav className='fixed w-full top-0 left-0 z-50 sm:pt-3 sm:px-5'>
-      <div className='mx-auto max-w-7xl sm:rounded-[1.25rem] bg-white/90 shadow-[0_10px_32px_-16px_rgba(88,47,89,0.35)] backdrop-blur-xl'>
-        <div className='flex min-h-16 items-center justify-between gap-8 px-4 sm:px-6'>
-          <div className='flex items-center gap-6'>
-            {isAuthenticated ? (
-              <Button
-                forIcon
-                size='small'
-                variant='text'
-                onClick={() => setIsMobileMenuOpen(true)}
-                aria-label={t('nav:menu')}
-              >
-                <MdMenu className='h-6 w-6' />
-              </Button>
-            ) : null}
+    <Section
+      fullOnMobile
+      className='fixed w-full top-0 left-0 z-50 sm:pt-4'
+      contentClassName={cn(
+        'sm:rounded-[1.25rem] bg-white/60 shadow-[0_10px_32px_-16px_rgba(88,47,89,0.35)] backdrop-blur-md',
+        'flex min-h-16 items-center justify-between gap-8 px-4 sm:px-6',
+      )}
+    >
+      <div className='flex items-center gap-4'>
+        {isAuthenticated ? (
+          <Button
+            forIcon
+            size='small'
+            variant='text'
+            onClick={() => setIsMobileMenuOpen(true)}
+            aria-label={t('nav:menu')}
+          >
+            <MdMenu className='h-6 w-6' />
+          </Button>
+        ) : null}
 
-            <NavLink
-              to={PageURLS.home}
-              className='inline-flex items-center text-header4 text-primary font-brand hover:text-primary-300 transition-[all_300ms-ease]'
-            >
-              <Isotype className='transition-[all_3000ms_ease] h-7' />
-            </NavLink>
-          </div>
+        <NavLink
+          to={PageURLS.home}
+          className='inline-flex items-center text-header4 text-primary font-brand hover:text-primary-300 transition-[all_300ms-ease]'
+        >
+          <Isotype className='transition-[all_3000ms_ease] h-7' />
+        </NavLink>
+      </div>
 
-          <div className='hidden items-center gap-8 lg:flex'>
-            {navLinks.map(item => (
-              <MenuItem key={item.to} {...item} variant='navbar' />
-            ))}
-          </div>
+      <div className='hidden items-center gap-8 lg:flex'>
+        {navLinks.map(item => (
+          <MenuItem key={item.to} {...item} variant='navbar' />
+        ))}
+      </div>
 
-          <div className='ml-auto flex items-center justify-end gap-1.5 sm:gap-2'>
-            <LanguageSelector variant='dropdown' />
-            {!isAuthenticated && isLoginPageEnabled && (
-              <NavLink to={PageURLS.auth.login}>
-                <Button color='primary' size='small'>
-                  {t('nav:signIn')}
-                </Button>
-              </NavLink>
-            )}
-            {isAuthenticated && hasActivePlan && isMyAccountBookingsPageEnabled && (
-              <NavLink to={PageURLS.myAccountBookings}>
-                <Button color='primary' size='small'>
-                  {t('nav:myBookings')}
-                </Button>
-              </NavLink>
-            )}
-            {isAuthenticated && !hasActivePlan && isMyAccountSubscriptionPageEnabled && (
-              <NavLink to={PageURLS.myAccountSubscription}>
-                <Button color='primary' size='small'>
-                  {t('nav:buy')}
-                </Button>
-              </NavLink>
-            )}
-            {isAuthenticated && (
-              <NavLink to={PageURLS.profile}>
-                {({ isActive }) => (
-                  <section
-                    className={cn(
-                      'size-10 rounded-full m-2 cursor-pointer border-2 border-transparent hover:border-primary transition-[border]',
-                      isActive && 'border-primary',
-                    )}
-                  >
-                    <img
-                      className='w-full h-full'
-                      src={user.instructorProfile?.photoUrl || user.avatar || 'https://placehold.net/avatar.png'}
-                      alt='Dansship'
-                    />
-                  </section>
+      <div className='ml-auto flex items-center justify-end gap-2 sm:gap-4'>
+        <LanguageSelector variant='dropdown' />
+        {!isAuthenticated && isLoginPageEnabled && (
+          <NavLink to={PageURLS.auth.login}>
+            <Button color='primary' size='small' className='hidden xs:block'>
+              {t('nav:signIn')}
+            </Button>
+          </NavLink>
+        )}
+        {isAuthenticated && hasActivePlan && isMyAccountBookingsPageEnabled && (
+          <NavLink to={PageURLS.profile.bookings}>
+            <Button color='primary' size='small' className='hidden xs:block'>
+              {t('nav:myBookings')}
+            </Button>
+          </NavLink>
+        )}
+        {isAuthenticated && !hasActivePlan && isMyAccountSubscriptionPageEnabled && (
+          <NavLink to={PageURLS.profile.subscription}>
+            <Button color='primary' size='small' className='hidden xs:block'>
+              {t('nav:buy')}
+            </Button>
+          </NavLink>
+        )}
+        {isAuthenticated && (
+          <NavLink to={PageURLS.profile.root} end>
+            {({ isActive }) => (
+              <ProfilePicture
+                className={cn(
+                  'size-10 rounded-full cursor-pointer border-2 border-transparent hover:border-primary transition-[border]',
+                  isActive && 'border-primary',
                 )}
-              </NavLink>
+              />
             )}
-          </div>
-        </div>
+          </NavLink>
+        )}
       </div>
 
       {isAuthenticated ? <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} /> : null}
-    </nav>
+    </Section>
   );
 };
 
@@ -185,9 +184,9 @@ export const MenuItem = ({
 
   const asideClassName: NavLinkProps['className'] = ({ isActive }) =>
     cn(
-      'flex items-center gap-2 transition-all py-2 px-4 rounded-sm relative',
-      isActive && 'bg-primary-100 font-semibold text-primary',
-      !isActive && 'hover:bg-primary-50 hover:pl-6 text-gray-600 hover:text-primary',
+      'flex items-center gap-2 transition-all py-2 px-4 rounded-lg relative',
+      isActive && 'bg-primary/20 font-semibold text-primary',
+      !isActive && 'hover:bg-primary/10 hover:pl-6 text-gray-600 hover:text-primary',
       className,
     );
 

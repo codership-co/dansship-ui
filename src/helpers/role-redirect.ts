@@ -14,7 +14,7 @@ export function getRedirectPathByRole(roles?: Array<string>): string {
   }
 
   if (roles.includes('instructor')) {
-    return PageURLS.profile;
+    return PageURLS.profile.root;
   }
 
   return PageURLS.classes;
