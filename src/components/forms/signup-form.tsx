@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button } from 'polpo/components';
+import { Button, Checkbox } from 'polpo/components';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
+import { Trans, useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { z } from 'zod';
 
@@ -34,6 +34,7 @@ export function SignUpForm() {
   const { t } = useTranslation();
   const { signUp } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [termsAndConditions, setTermsAndConditions] = useState(false);
 
   const signUpSchema = createSignUpSchema(t);
 
@@ -79,7 +80,27 @@ export function SignUpForm() {
         }}
       />
 
-      <Button color='primary' type='submit' isLoading={isLoading} fullWidth>
+      <Checkbox
+        label={
+          <Trans
+            className='text-small'
+            i18nKey='auth:signup.terms'
+            components={{
+              LinkTerms: (
+                <a target='_blank' href='/assets/legal/terminos-y-condiciones.pdf' className='text-info underline' />
+              ),
+              LinkPrivacy: (
+                <a target='_blank' href='/assets/legal/politica-privacidad.pdf' className='text-info underline' />
+              ),
+            }}
+          />
+        }
+        name='terms_and_conditions'
+        value={termsAndConditions}
+        setValue={() => setTermsAndConditions(p => !p)}
+      />
+
+      <Button color='primary' type='submit' isLoading={isLoading} disabled={!termsAndConditions} fullWidth>
         {t('auth:signup.createAccount')}
       </Button>
 
