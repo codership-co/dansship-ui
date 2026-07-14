@@ -13,7 +13,7 @@ export const HomeHero = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <Section compact className='bg-gradient-hero'>
+    <Section className='bg-gradient-hero' contentClassName='pt-10'>
       <div className='relative gap-10 xl:gap-20 home-hero transition-[all_300ms_ease] pb-7 pt-20 md:pt-30 lg:pt-40 lg:pb-10'>
         <div className='grid gap-4 content-center max-w-xl' style={{ gridArea: 'text' }}>
           <Logotype className='h-8 text-primary' />
@@ -31,7 +31,7 @@ export const HomeHero = () => {
           <p className='m-0'>{t('home:stitch.hero.description')}</p>
 
           <div className='mt-4 flex flex-col xs:flex-row gap-2.5 sm:max-w-90'>
-            <Link to={isAuthenticated ? PageURLS.profile : PageURLS.auth.signup}>
+            <Link to={isAuthenticated ? PageURLS.profile.root : PageURLS.auth.signup}>
               <Button color='primary'>
                 {t('home:stitch.hero.bookClass')}
                 <LuArrowRight className='h-4 w-4' />

@@ -3,14 +3,15 @@ import { Tabs } from 'polpo/components';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { Section, SectionHeading } from '@components/containers';
 import { ActiveSubscriptionWidget, PlanSelector, UserPaymentHistory } from '@components/modules';
 import { Badge, Card, CardContent, CardHeader, CardTitle } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
-import { DansshipAPI, PaymentStatus } from '@core/api';
+import { DansshipAPI, PaymentStatus, SubscriptionStatus } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { useDateLocale, usePromise } from '@hooks';
 
-function statusBadgeVariant(status: 'active' | 'pending_payment' | 'expired' | 'canceled') {
+function statusBadgeVariant(status: SubscriptionStatus) {
   if (status === 'active') return 'default' as const;
 
   if (status === 'pending_payment') return 'outline' as const;
@@ -20,7 +21,7 @@ function statusBadgeVariant(status: 'active' | 'pending_payment' | 'expired' | '
   return 'secondary' as const;
 }
 
-function MyAccountSubscriptionPage() {
+function SubscriptionPage() {
   const { t } = useTranslation();
   const locale = useDateLocale();
   const { response: mySubscriptionsResponse } = usePromise(() => DansshipAPI.subscriptions.getMySubscriptions());
@@ -40,25 +41,23 @@ function MyAccountSubscriptionPage() {
   );
 
   return (
-    <div className='max-w-7xl mx-auto py-10 px-4 pt-20'>
-      <div className='mb-10'>
-        <h4>{t('subscriptions:store.title')}</h4>
-        <p>{t('subscriptions:store.subtitle')}</p>
-      </div>
-
-      <div className='mb-12'>
+    <div className='grid gap-20'>
+      <Section navbarPadding>
+        <SectionHeading title={t('subscriptions:store.title')} subtitle={t('subscriptions:store.subtitle')} />
         <ActiveSubscriptionWidget />
-      </div>
+      </Section>
 
-      <div className='mx-auto mt-8 max-w-6xl'>
-        <h4>{t('subscriptions:store.availablePlans')}</h4>
+      <Section>
+        <SectionHeading title={t('subscriptions:store.availablePlans')} />
         <PlanSelector plans={publicPlans?.data ?? []} />
-      </div>
+      </Section>
 
-      <section className='mt-20'>
+      <Section footerMargin>
+        <SectionHeading title={t('subscriptions:store.history')} />
+
         <Tabs defaultOpenTab='inProgressPayments'>
           <Tabs.TabList
-            variant='line'
+            variant='solid'
             color='primary'
             tabs={[
               { id: 'historicalSubscriptions', label: t('subscriptions:store.historicalSubscriptions') },
@@ -134,12 +133,12 @@ function MyAccountSubscriptionPage() {
             </div>
           </Tabs.TabPanel>
         </Tabs>
-      </section>
+      </Section>
     </div>
   );
 }
 
-export const SecureMyAccountSubscriptionPage = SecurityGuard(MyAccountSubscriptionPage, {
+export const SecureSubscriptionPage = SecurityGuard(SubscriptionPage, {
   featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
   requiresAuth: true,
   redirect: PageURLS.auth.login,

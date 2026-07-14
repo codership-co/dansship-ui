@@ -127,7 +127,7 @@ export const HomeAdminDashboard = () => {
   }
 
   return (
-    <Section id='admin-operations' compact className='py-8'>
+    <Section id='admin-operations' className='py-8'>
       <SectionHeading
         className='max-w-3xl'
         intro={t('home:admin.kicker')}

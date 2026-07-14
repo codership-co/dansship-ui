@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { LoaderFunctionArgs, useLoaderData, useRevalidator } from 'react-router';
 import { toast } from 'sonner';
 
+import { Section } from '@components/containers';
 import { PaymentStatusBadge, UserPaymentHistory } from '@components/modules';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import {
@@ -95,144 +96,150 @@ function PaymentsResultPage() {
   };
 
   return (
-    <div className='px-2 sm:px-4 md:px-8 pt-20 max-w-7xl mx-auto grid gap-20'>
+    <section className='grid gap-20'>
       {intent && (
-        <section className='rounded-2xl shadow-2xl'>
-          <section className='bg-white p-8 rounded-2xl grid md:grid-cols-[1fr_1fr] gap-8 overflow-hidden'>
-            <section className='relative min-h-70 bg-accent px-8 py-16 rounded-lg shadow-lg'>
-              <img
-                src='/assets/images/bailarina.png'
-                alt='Dansship'
-                className='absolute w-40 xs:w-50 sm:w-60 md:w-60/100 bottom-1/2 right-1/2 translate-1/2'
-              />
-            </section>
-            <section className='grid content-center gap-4 py-14 relative bg-white'>
-              <h4 className='m-0 text-center'>{intent.purchase_reference?.human_identifier}</h4>
-              {intent.payment_method_type === PaymentMethod.CARD &&
-                ['pending', 'pending_manual_review'].includes(intent.status) && (
-                  <p className='m-0 text-center'>{t('payments:result.description')}</p>
-                )}
-
-              <section className='grid place-content-center gap-1 justify-items-center py-4'>
-                <PaymentStatusBadge status={intent.status} />
-                <small className='m-0'>{t('payments:currentIntentStatus')}</small>
+        <Section contentClassName='grid gap-20' navbarPadding>
+          <section className='rounded-2xl shadow-2xl'>
+            <section className='bg-white p-8 rounded-2xl grid md:grid-cols-[1fr_1fr] gap-8 overflow-hidden'>
+              <section className='relative min-h-70 bg-accent px-8 py-16 rounded-lg shadow-lg'>
+                <img
+                  src='/assets/images/bailarina.png'
+                  alt='Dansship'
+                  className='absolute w-40 xs:w-50 sm:w-60 md:w-60/100 bottom-1/2 right-1/2 translate-1/2'
+                />
               </section>
+              <section className='grid content-center gap-4 py-14 relative bg-white'>
+                <h4 className='m-0 text-center'>{intent.purchase_reference?.human_identifier}</h4>
+                {intent.payment_method_type === PaymentMethod.CARD &&
+                  ['pending', 'pending_manual_review'].includes(intent.status) && (
+                    <p className='m-0 text-center'>{t('payments:result.description')}</p>
+                  )}
 
-              <section className='border py-4 border-gray-200 rounded-2xl overflow-hidden'>
-                {[
-                  {
-                    label: t('payments:createdAt'),
-                    value: formatDateTime(intent.created_at, i18n.language),
-                  },
-                  {
-                    label: t('payments:referenceId'),
-                    value: <span className='font-code'>{intent.reference_id}</span>,
-                  },
-                  {
-                    label: t('payments:methodLabel'),
-                    value: t(`payments:method.${intent.payment_method_type}`),
-                  },
-                  {
-                    label: '',
-                    value: '',
-                  },
-                  {
-                    label: t('payments:subtotal'),
-                    value: formatPrice(intent.amount * 0.81, intent.currency),
-                  },
-                  {
-                    label: t('payments:iva'),
-                    value: formatPrice(intent.amount * 0.19, intent.currency),
-                  },
-                  {
-                    label: t('payments:ammount'),
-                    value: formatPrice(intent.amount, intent.currency),
-                  },
-                ].map(({ label, value }) => (
-                  <section
-                    key={label}
-                    className={cn(
-                      'grid grid-cols-[auto_1fr_auto] justify-between gap-2 items-center',
-                      label && 'px-4 py-2 hover:bg-gray-100',
-                      !label && 'border-b border-gray-200 my-4',
-                    )}
-                  >
-                    {label && (
-                      <>
-                        <small className='m-0'>{label}</small>
-                        <span className='border-b border-dashed border-gray-300' />
-                        <small className='m-0'>{value}</small>
-                      </>
-                    )}
-                  </section>
-                ))}
-              </section>
+                <section className='grid place-content-center gap-1 justify-items-center py-4'>
+                  <PaymentStatusBadge status={intent.status} />
+                  <small className='m-0'>{t('payments:currentIntentStatus')}</small>
+                </section>
 
-              <section className='bg-gray-200/60 rounded-2xl flex overflow-hidden'>
-                <small className='m-0 block bg-gray-200 px-4 py-2'>{t('payments:intentId')}</small>
-                <small className='m-0 block font-code px-4 py-2'>{intent.id}</small>
-              </section>
+                <section className='border py-4 border-gray-200 rounded-2xl overflow-hidden'>
+                  {[
+                    {
+                      label: t('payments:createdAt'),
+                      value: formatDateTime(intent.created_at, i18n.language),
+                    },
+                    {
+                      label: t('payments:referenceId'),
+                      value: <span className='font-code'>{intent.reference_id}</span>,
+                    },
+                    {
+                      label: t('payments:methodLabel'),
+                      value: t(`payments:method.${intent.payment_method_type}`),
+                    },
+                    {
+                      label: '',
+                      value: '',
+                    },
+                    {
+                      label: t('payments:subtotal'),
+                      value: formatPrice(intent.amount * 0.81, intent.currency),
+                    },
+                    {
+                      label: t('payments:iva'),
+                      value: formatPrice(intent.amount * 0.19, intent.currency),
+                    },
+                    {
+                      label: t('payments:ammount'),
+                      value: formatPrice(intent.amount, intent.currency),
+                    },
+                  ].map(({ label, value }) => (
+                    <section
+                      key={label}
+                      className={cn(
+                        'grid grid-cols-[auto_1fr_auto] justify-between gap-2 items-center',
+                        label && 'px-4 py-2 hover:bg-gray-100',
+                        !label && 'border-b border-gray-200 my-4',
+                      )}
+                    >
+                      {label && (
+                        <>
+                          <small className='m-0'>{label}</small>
+                          <span className='border-b border-dashed border-gray-300' />
+                          <small className='m-0'>{value}</small>
+                        </>
+                      )}
+                    </section>
+                  ))}
+                </section>
 
-              <section className='flex gap-4 items-center justify-end mt-4'>
-                {intent.payment_method_type === PaymentMethod.TRANSFER && (
-                  <Button
-                    size='small'
-                    color='primary'
-                    variant='outlined'
-                    isLoading={isUploadingProof}
-                    onClick={() => void handleUploadProof(intent.id)}
-                  >
-                    {t('payments:uploadProof')}
-                  </Button>
-                )}
+                <section className='bg-gray-200/60 rounded-2xl flex overflow-hidden'>
+                  <small className='m-0 block bg-gray-200 px-4 py-2'>{t('payments:intentId')}</small>
+                  <small className='m-0 block font-code px-4 py-2'>{intent.id}</small>
+                </section>
 
-                {intent.proof_url && (
-                  <Button
-                    size='small'
-                    color='primary'
-                    variant='outlined'
-                    isLoading={isGettingProofViewUrl}
-                    onClick={() => void getProofViewUrl(intent.id)}
-                  >
-                    {t('payments:viewProof')}
-                  </Button>
-                )}
+                <section className='flex gap-4 items-center justify-end mt-4'>
+                  {intent.payment_method_type === PaymentMethod.TRANSFER && (
+                    <Button
+                      size='small'
+                      color='primary'
+                      variant='outlined'
+                      isLoading={isUploadingProof}
+                      onClick={() => void handleUploadProof(intent.id)}
+                    >
+                      {t('payments:uploadProof')}
+                    </Button>
+                  )}
+
+                  {intent.proof_url && (
+                    <Button
+                      size='small'
+                      color='primary'
+                      variant='outlined'
+                      isLoading={isGettingProofViewUrl}
+                      onClick={() => void getProofViewUrl(intent.id)}
+                    >
+                      {t('payments:viewProof')}
+                    </Button>
+                  )}
+                </section>
               </section>
             </section>
           </section>
-        </section>
+        </Section>
       )}
 
       {!intent && intentId && (
-        <section className='rounded-2xl shadow-2xl'>
-          <section className='bg-white rounded-2xl grid md:grid-cols-[3fr_2fr] overflow-hidden'>
-            <section className='grid px-8 py-40 place-content-center gap-4 justify-items-center text-center'>
-              <p className='whitespace-pre-line m-0'>{t('payments:intentDetailsNotFound')}</p>
-              <section className='bg-gray-200/60 rounded-2xl flex overflow-hidden'>
-                <small className='m-0 block bg-gray-200 px-4 py-2'>{t('payments:intentId')}</small>
-                <small className='m-0 block font-code px-4 py-2'>{intentId}</small>
+        <Section contentClassName='grid gap-20' navbarPadding>
+          <section className='rounded-2xl shadow-2xl'>
+            <section className='bg-white rounded-2xl grid md:grid-cols-[3fr_2fr] overflow-hidden'>
+              <section className='grid px-8 py-40 place-content-center gap-4 justify-items-center text-center'>
+                <p className='whitespace-pre-line m-0'>{t('payments:intentDetailsNotFound')}</p>
+                <section className='bg-gray-200/60 rounded-2xl flex overflow-hidden'>
+                  <small className='m-0 block bg-gray-200 px-4 py-2'>{t('payments:intentId')}</small>
+                  <small className='m-0 block font-code px-4 py-2'>{intentId}</small>
+                </section>
+                <Button
+                  color='primary'
+                  onClick={() => revalidator.revalidate()}
+                  isLoading={revalidator.state === 'loading'}
+                >
+                  {t('payments:retryIntentDetails')}
+                </Button>
               </section>
-              <Button
-                color='primary'
-                onClick={() => revalidator.revalidate()}
-                isLoading={revalidator.state === 'loading'}
-              >
-                {t('payments:retryIntentDetails')}
-              </Button>
-            </section>
-            <section className='relative bg-primary hidden md:block'>
-              <img
-                src='/assets/images/bailarina.png'
-                alt='Dansship'
-                className='absolute w-60/100 bottom-1/2 right-1/2 translate-1/2'
-              />
+              <section className='relative bg-primary hidden md:block'>
+                <img
+                  src='/assets/images/bailarina.png'
+                  alt='Dansship'
+                  className='absolute w-60/100 bottom-1/2 right-1/2 translate-1/2'
+                />
+              </section>
             </section>
           </section>
-        </section>
+        </Section>
       )}
 
-      <UserPaymentHistory title={t('payments:result.historyTitle')} />
-    </div>
+      <Section contentClassName='grid gap-20' footerMargin>
+        <UserPaymentHistory title={t('payments:result.historyTitle')} />
+      </Section>
+    </section>
   );
 }
 

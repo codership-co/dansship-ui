@@ -5,7 +5,7 @@ import { MdOutlinePolicy } from 'react-icons/md';
 import { RiContactsBook2Line } from 'react-icons/ri';
 import { Link } from 'react-router';
 
-import { PageContainer } from '@components/containers';
+import { Section } from '@components/containers';
 import { GroovyLayout } from '@components/layouts';
 import { Logotype } from '@components/svg';
 
@@ -14,8 +14,8 @@ export function Footer() {
 
   return (
     <footer className='drop-shadow-[0_0.5rem_1em_#00000033]'>
-      <GroovyLayout background='var(--color-accent)'>
-        <PageContainer className='text-accent-foreground py-12'>
+      <GroovyLayout background='var(--color-accent)' marginTop={0}>
+        <Section className='text-accent-foreground py-12'>
           <Logotype className='h-8 text-primary' />
           <div className='flex flex-col gap-6 md:flex-row md:items-center md:justify-between'>
             <div>
@@ -62,7 +62,7 @@ export function Footer() {
               </a>
             </div>
           </div>
-        </PageContainer>
+        </Section>
       </GroovyLayout>
     </footer>
   );

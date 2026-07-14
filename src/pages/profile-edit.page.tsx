@@ -172,11 +172,11 @@ function ProfileEditPage() {
       }
     }
 
-    navigate(PageURLS.profile);
+    navigate(PageURLS.profile.root);
   };
 
   const handleCancel = () => {
-    navigate(PageURLS.profile);
+    navigate(PageURLS.profile.root);
   };
 
   if (canEditInstructorProfile && isProfileLoading) {

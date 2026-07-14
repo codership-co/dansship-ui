@@ -48,7 +48,7 @@ const canCancel = (booking: MyBooking) => {
   return isFuture && (booking.status === 'active' || booking.status === 'waitlisted');
 };
 
-function MyAccountBookingsPage() {
+function BookingsPage() {
   const { t, i18n } = useTranslation();
   const {
     response: myBookingsResponse,
@@ -128,7 +128,7 @@ function MyAccountBookingsPage() {
   );
 }
 
-export const SecureMyAccountBookingsPage = SecurityGuard(MyAccountBookingsPage, {
+export const SecureBookingsPage = SecurityGuard(BookingsPage, {
   featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isMyAccountBookingsPageEnabled],
   requiresAuth: true,
   redirect: PageURLS.auth.login,

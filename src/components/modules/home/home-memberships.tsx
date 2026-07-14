@@ -13,10 +13,10 @@ export const HomeMemberships = () => {
   const { isAuthenticated } = useAuth();
   const { publicPlans } = useLoaderData<HomeLoaderData>();
 
-  const plansPath = isAuthenticated ? PageURLS.myAccountSubscription : PageURLS.auth.login;
+  const plansPath = isAuthenticated ? PageURLS.profile.subscription : PageURLS.auth.login;
 
   return (
-    <Section id='planes'>
+    <Section id='planes' verticalPadding footerMargin>
       <SectionHeading
         className='mx-auto max-w-2xl'
         centered
