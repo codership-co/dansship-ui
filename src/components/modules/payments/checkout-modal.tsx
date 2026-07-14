@@ -10,8 +10,8 @@ import { CheckoutPaymentProofForm } from '@components/forms/checkout-payment-pro
 import {
   CheckoutFormValues,
   CheckoutReviewPlanFormInput,
-  DefaultDiscountData,
-  DiscountData,
+  DefaultPaymentData,
+  PaymentData,
 } from '@components/forms/checkout-review-plan-form';
 import { FormStepperLayout } from '@components/layouts';
 import { PlanCard } from '@components/modules';
@@ -62,14 +62,14 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
     start_date: new Date(),
     discount_code: '',
   });
-  const [discountData, setDiscountData] = useState<DiscountData>({
-    ...DefaultDiscountData,
+  const [paymentData, setPaymentData] = useState<PaymentData>({
+    ...DefaultPaymentData,
     finalPrice: plan.price,
   });
 
-  const handleSubmit = useCallback(async (data: CheckoutFormValues, discountData: DiscountData) => {
+  const handleSubmit = useCallback(async (data: CheckoutFormValues, paymentData: PaymentData) => {
     setCheckoutData(data);
-    setDiscountData(discountData);
+    setPaymentData(paymentData);
     setStep(CheckoutStep.METHOD);
   }, []);
 
@@ -146,7 +146,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
                 plan={plan}
                 checkoutData={checkoutData}
                 paymentMethod={paymentMethod ?? PaymentMethod.CARD}
-                finalPrice={discountData.finalPrice}
+                finalPrice={paymentData.finalPrice}
                 onClose={onClose}
                 onBack={() => setStep(CheckoutStep.METHOD)}
                 onSubmit={(intentId: string) => {

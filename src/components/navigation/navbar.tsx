@@ -61,7 +61,6 @@ export const Navbar = () => {
         ...AdminPermissions.merchPos,
         ...AdminPermissions.figures,
         ...AdminPermissions.reports,
-        ...AdminPermissions.users,
         ...AdminPermissions.studioRental,
       ],
       featureFlags: [FEATURE_FLAG.isAdminPageEnabled],
