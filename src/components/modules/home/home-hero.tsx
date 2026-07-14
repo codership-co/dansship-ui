@@ -5,12 +5,10 @@ import { Link } from 'react-router';
 
 import { Section } from '@components/containers';
 import { Logotype } from '@components/svg';
-import { useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
 
 export const HomeHero = () => {
   const { t } = useTranslation();
-  const { isAuthenticated } = useAuth();
 
   return (
     <Section className='bg-gradient-hero' contentClassName='pt-10'>
@@ -31,16 +29,11 @@ export const HomeHero = () => {
           <p className='m-0'>{t('home:stitch.hero.description')}</p>
 
           <div className='mt-4 flex flex-col xs:flex-row gap-2.5 sm:max-w-90'>
-            <Link to={isAuthenticated ? PageURLS.profile.root : PageURLS.auth.signup}>
+            <Link to={PageURLS.classes}>
               <Button color='primary'>
                 {t('home:stitch.hero.bookClass')}
-                <LuArrowRight className='h-4 w-4' />
-              </Button>
-            </Link>
 
-            <Link to={PageURLS.figures}>
-              <Button color='tertiary' variant='outlined'>
-                {t('home:stitch.hero.trackProgress')}
+                <LuArrowRight className='h-4 w-4' />
               </Button>
             </Link>
           </div>
