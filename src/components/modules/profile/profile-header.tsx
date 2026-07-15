@@ -21,6 +21,7 @@ export function ProfileHeader() {
   if (!user) return null;
 
   const profileCompletion = user.profileCompletionPercent ?? 100;
+  const bio = user.instructorProfile?.bio || user.bio;
 
   return (
     <section>
@@ -29,7 +30,7 @@ export function ProfileHeader() {
           <section className='bg-accent h-full p-4 xl:p-6 flex'>
             <ProfilePicture className='transition-all size-50 xl:size-80 border-10 bg-transparent border-accent m-auto' />
           </section>
-          <section className='px-16 py-8 grid justify-items-center md:justify-items-start md:justify-start md:pl-8 md:pr-8 lg:pr-16'>
+          <section className='px-8 py-8 grid justify-items-center md:justify-items-start md:pl-8 md:pr-8 lg:pr-16'>
             {user.roles.length > 0 && (
               <div className='mt-2 flex flex-wrap gap-2'>
                 {user.roles.map(role => (
@@ -40,9 +41,9 @@ export function ProfileHeader() {
 
             <h2 className='text-primary'>{user.displayName || user.fullName || user.name || user.username}</h2>
 
-            <p className='hidden sm:block'>{user.instructorProfile?.bio || user.bio}</p>
+            {bio && <p className='hidden sm:block'>{bio}</p>}
 
-            <section className='grid grid-cols-[repeat(auto-fit,80px)] gap-3 text-center justify-center md:justify-start w-full'>
+            <section className='grid grid-cols-[80px_80px] xs:grid-cols-[repeat(auto-fit,80px)] gap-3 text-center justify-center md:justify-start w-full'>
               <article className='w-20 grid justify-items-center'>
                 <h4 className='m-0'>{savedFigures.length}</h4>
                 <small className='m-0'>{t('profile:stats.savedFigures')}</small>
