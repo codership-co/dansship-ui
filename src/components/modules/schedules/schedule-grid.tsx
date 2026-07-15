@@ -202,16 +202,16 @@ export function ScheduleGrid({
   }, [allEvents]);
 
   return (
-    <div className='flex bg-white rounded-lg shadow border border-gray-200 overflow-hidden'>
+    <div className='flex bg-white rounded-xl shadow-xl border border-gray-200 overflow-auto'>
       {/* Time column */}
-      <div className='w-16 flex-shrink-0 border-r border-gray-200 bg-gray-50'>
+      <div className='w-16 shrink-0 border-r border-gray-200 bg-gray-50'>
         <div className='h-14 border-b border-gray-200'></div> {/* Header spacer */}
         <div className='relative' style={{ height: `${HOURS.length * HOUR_HEIGHT_PX}px` }}>
           {HOURS.map(hour => (
             <div
               key={hour}
               className='absolute w-full text-right pr-2 text-xs text-gray-500 transform -translate-y-1/2'
-              style={{ top: `${(hour - 6) * HOUR_HEIGHT_PX}px` }}
+              style={{ top: `${(hour - 6) * HOUR_HEIGHT_PX + 10}px` }}
             >
               {hour}:00
             </div>
@@ -233,7 +233,7 @@ export function ScheduleGrid({
                 day.isPast ? 'bg-gray-100' : 'bg-gray-50'
               }`}
             >
-              <span className={`text-sm font-semibold ${day.isPast ? 'text-gray-400' : 'text-gray-700'}`}>
+              <span className={`text-sm font-semibold ${day.isPast ? 'text-gray-400' : 'text-primary'}`}>
                 {day.dayName}
               </span>
               <span className={`text-xs ${day.isPast ? 'text-gray-400' : 'text-gray-500'}`}>{day.shortDate}</span>
