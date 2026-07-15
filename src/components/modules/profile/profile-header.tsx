@@ -30,7 +30,7 @@ export function ProfileHeader() {
           <section className='bg-accent h-full p-4 xl:p-6 flex'>
             <ProfilePicture className='transition-all size-50 xl:size-80 border-10 bg-transparent border-accent m-auto' />
           </section>
-          <section className='px-8 py-8 grid justify-items-center md:justify-items-start md:justify-start md:pl-8 md:pr-8 lg:pr-16'>
+          <section className='px-8 py-8 grid justify-items-center md:justify-items-start md:pl-8 md:pr-8 lg:pr-16'>
             {user.roles.length > 0 && (
               <div className='mt-2 flex flex-wrap gap-2'>
                 {user.roles.map(role => (
