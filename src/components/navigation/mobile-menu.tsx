@@ -176,8 +176,6 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     },
   ];
 
-  if (!isOpen) return null;
-
   return (
     <AsideModal
       isOpen={isOpen}

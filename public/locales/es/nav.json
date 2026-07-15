@@ -19,8 +19,9 @@
   "studioRental": "Renta de Estudio",
   "myRentalRequests": "Mis Solicitudes de Renta",
   "menuScheduleClass": "Agendar Clase",
-  "menuPlans": "Planes",
-  "menuBookings": "Reservas",
+  "navPlans": "Planes",
+  "menuPlans": "Mis Suscripciones",
+  "menuBookings": "Mis Reservas",
   "menuFigures": "Figuras",
   "menuProgress": "Progreso",
   "adminMenu": {

@@ -2,6 +2,7 @@ import { Button, SmartTable, Tooltip } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
+import { SectionEmpty } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { PaymentStatusBadge } from '@components/modules';
 import { DansshipAPI, type PaymentStatus } from '@core/api';
@@ -38,14 +39,7 @@ export function UserPaymentHistory({
   }
 
   if (visibleIntents.length === 0) {
-    return (
-      <section className='grid gap-4'>
-        <h4>{title || t('payments:myPayments')}</h4>
-        <section className='px-8 py-16 rounded-3xl bg-white/50 grid place-content-center text-center'>
-          <p>{t(emptyStateKey)}</p>
-        </section>
-      </section>
-    );
+    return <SectionEmpty title={title || t('payments:myPayments')} message={t(emptyStateKey)} />;
   }
 
   return (

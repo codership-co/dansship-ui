@@ -6,22 +6,9 @@ import { LuTrash2, LuPlus } from 'react-icons/lu';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { Container } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
-import {
-  Button,
-  Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Input,
-  Card,
-  CardContent,
-  CardHeader,
-  CardDescription,
-  CardTitle,
-} from '@components/ui';
+import { Button, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Input } from '@components/ui';
 import { DansshipAPI, UpdateAvailabilityPayload } from '@core/api';
 import { useCallablePromise, usePromise } from '@hooks';
 
@@ -156,14 +143,13 @@ export function AvailabilityForm() {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t('instructor:availability.title')}</CardTitle>
+    <Container>
+      <section>
+        <h4>{t('instructor:availability.title')}</h4>
+        <label>{t('instructor:availability.description')}</label>
+      </section>
 
-        <CardDescription>{t('instructor:availability.description')}</CardDescription>
-      </CardHeader>
-
-      <CardContent>
+      <section>
         {/* Week Selector */}
         <div className='mb-6 flex items-center space-x-4'>
           <Button variant='outline' onClick={() => setCurrentWeek(getPrevMonday(currentWeek))}>
@@ -276,7 +262,7 @@ export function AvailabilityForm() {
             </form>
           </>
         )}
-      </CardContent>
-    </Card>
+      </section>
+    </Container>
   );
 }

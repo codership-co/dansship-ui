@@ -3,9 +3,9 @@ import { Tabs } from 'polpo/components';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Section, SectionHeading } from '@components/containers';
+import { Section, SectionEmpty, SectionHeading } from '@components/containers';
 import { ActiveSubscriptionWidget, PlanSelector, UserPaymentHistory } from '@components/modules';
-import { Badge, Card, CardContent, CardHeader, CardTitle } from '@components/ui';
+import { Badge } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { DansshipAPI, PaymentStatus, SubscriptionStatus } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -57,7 +57,7 @@ function SubscriptionPage() {
 
         <Tabs defaultOpenTab='inProgressPayments'>
           <Tabs.TabList
-            variant='solid'
+            variant='ghost'
             color='primary'
             tabs={[
               { id: 'historicalSubscriptions', label: t('subscriptions:store.historicalSubscriptions') },
@@ -67,45 +67,43 @@ function SubscriptionPage() {
           />
 
           <Tabs.TabPanel id='historicalSubscriptions'>
-            <Card className='mt-4'>
-              <CardHeader>
-                <CardTitle>{t('subscriptions:store.historicalSubscriptions')}</CardTitle>
-              </CardHeader>
+            <section className='mt-4'>
+              {historicalSubscriptions.length === 0 ? (
+                <SectionEmpty
+                  title={t('subscriptions:store.historicalSubscriptions')}
+                  message={t('subscriptions:store.historicalSubscriptionsEmpty')}
+                />
+              ) : (
+                historicalSubscriptions.map(subscription => (
+                  <div key={subscription.id} className='rounded-lg border border-gray-200 p-4'>
+                    <h4>{t('subscriptions:store.historicalSubscriptions')}</h4>
+                    <div className='flex flex-wrap items-start justify-between gap-2'>
+                      <div>
+                        <p className='font-semibold text-gray-900'>{subscription.plan_name_snapshot}</p>
 
-              <CardContent className='space-y-3'>
-                {historicalSubscriptions.length === 0 ? (
-                  <p className='text-sm text-gray-500'>{t('subscriptions:store.historicalSubscriptionsEmpty')}</p>
-                ) : (
-                  historicalSubscriptions.map(subscription => (
-                    <div key={subscription.id} className='rounded-lg border border-gray-200 p-4'>
-                      <div className='flex flex-wrap items-start justify-between gap-2'>
-                        <div>
-                          <p className='font-semibold text-gray-900'>{subscription.plan_name_snapshot}</p>
+                        <p className='text-sm text-gray-600'>
+                          {t('subscriptions:store.startedAt')}:{' '}
+                          {format(new Date(subscription.start_date), 'MMM d, yyyy', {
+                            locale,
+                          })}
+                        </p>
 
-                          <p className='text-sm text-gray-600'>
-                            {t('subscriptions:store.startedAt')}:{' '}
-                            {format(new Date(subscription.start_date), 'MMM d, yyyy', {
-                              locale,
-                            })}
-                          </p>
-
-                          <p className='text-sm text-gray-600'>
-                            {t('subscriptions:store.endedAt')}:{' '}
-                            {format(new Date(subscription.expiration_date), 'MMM d, yyyy', {
-                              locale,
-                            })}
-                          </p>
-                        </div>
-
-                        <Badge variant={statusBadgeVariant(subscription.status)}>
-                          {t(`subscriptions:store.status.${subscription.status}`)}
-                        </Badge>
+                        <p className='text-sm text-gray-600'>
+                          {t('subscriptions:store.endedAt')}:{' '}
+                          {format(new Date(subscription.expiration_date), 'MMM d, yyyy', {
+                            locale,
+                          })}
+                        </p>
                       </div>
+
+                      <Badge variant={statusBadgeVariant(subscription.status)}>
+                        {t(`subscriptions:store.status.${subscription.status}`)}
+                      </Badge>
                     </div>
-                  ))
-                )}
-              </CardContent>
-            </Card>
+                  </div>
+                ))
+              )}
+            </section>
           </Tabs.TabPanel>
 
           <Tabs.TabPanel id='inProgressPayments'>
