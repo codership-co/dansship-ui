@@ -13,3 +13,4 @@ export * from './use-my-bookings';
 export * from './use-onboarding';
 export * from './use-products';
 export * from './use-payment-intents';
+export * from './use-payment-preview';

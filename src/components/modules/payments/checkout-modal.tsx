@@ -1,5 +1,6 @@
 import { ActionModal, Button } from 'polpo/components';
-import { useCallback, useState } from 'react';
+import { useDebounce } from 'polpo/hooks';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuArrowLeft, LuArrowRight, LuCreditCard, LuList, LuReceipt } from 'react-icons/lu';
 import { useNavigate } from 'react-router';
@@ -7,17 +8,13 @@ import { useNavigate } from 'react-router';
 import { PaymentMethodSelector } from './payment-method-selector';
 
 import { CheckoutPaymentProofForm } from '@components/forms/checkout-payment-proof-form';
-import {
-  CheckoutFormValues,
-  CheckoutReviewPlanFormInput,
-  DefaultPaymentData,
-  PaymentData,
-} from '@components/forms/checkout-review-plan-form';
+import { CheckoutFormValues, CheckoutReviewPlanFormInput } from '@components/forms/checkout-review-plan-form';
 import { FormStepperLayout } from '@components/layouts';
 import { PlanCard } from '@components/modules';
 import { PaymentMethod, type PublicPlan } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { cn } from '@helpers';
+import { CheckoutPaymentPreview, usePaymentPreview } from '@hooks';
 
 export enum CheckoutStep {
   REVIEW = 'REVIEW',
@@ -42,17 +39,18 @@ export function CheckoutModal({ onClose, plan, isOpen }: CheckoutModalProps) {
       onClose={onClose}
       className='p-0 rounded-none sm:rounded-xl'
     >
-      <ModalContent onClose={onClose} plan={plan} />
+      <ModalContent onClose={onClose} plan={plan} isOpen={isOpen} />
     </ActionModal>
   );
 }
 
 interface ModalContentProps {
   onClose: () => void;
+  isOpen: boolean;
   plan: PublicPlan;
 }
 
-function ModalContent({ onClose, plan }: ModalContentProps) {
+function ModalContent({ onClose, plan, isOpen }: ModalContentProps) {
   const { t } = useTranslation();
 
   const navigate = useNavigate();
@@ -62,14 +60,25 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
     start_date: new Date(),
     discount_code: '',
   });
-  const [paymentData, setPaymentData] = useState<PaymentData>({
-    ...DefaultPaymentData,
-    finalPrice: plan.price,
-  });
+  const [discountCode, setDiscountCode] = useState('');
+  const [checkoutPreview, setCheckoutPreview] = useState<CheckoutPaymentPreview | null>(null);
+  const debouncedDiscountCode = useDebounce(discountCode, 800);
+  const { preview, isLoading: isPreviewLoading } = usePaymentPreview(plan.id, debouncedDiscountCode, isOpen);
 
-  const handleSubmit = useCallback(async (data: CheckoutFormValues, paymentData: PaymentData) => {
+  const handleDiscountCodeChange = useCallback((value: string) => {
+    setDiscountCode(value);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) {
+      setDiscountCode('');
+      setCheckoutPreview(null);
+    }
+  }, [isOpen]);
+
+  const handleSubmit = useCallback(async (data: CheckoutFormValues, paymentPreview: CheckoutPaymentPreview) => {
     setCheckoutData(data);
-    setPaymentData(paymentData);
+    setCheckoutPreview(paymentPreview);
     setStep(CheckoutStep.METHOD);
   }, []);
 
@@ -94,7 +103,10 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
                 <PlanCard plan={plan} className='border-none' asIndividual />
                 <CheckoutReviewPlanFormInput
                   plan={plan}
+                  preview={preview}
+                  isPreviewLoading={isPreviewLoading}
                   onCancel={onClose}
+                  onDiscountCodeChange={handleDiscountCodeChange}
                   onSubmit={handleSubmit}
                   defaultFormValues={checkoutData}
                 />
@@ -146,7 +158,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
                 plan={plan}
                 checkoutData={checkoutData}
                 paymentMethod={paymentMethod ?? PaymentMethod.CARD}
-                finalPrice={paymentData.finalPrice}
+                finalPrice={checkoutPreview?.finalPrice ?? 0}
                 onClose={onClose}
                 onBack={() => setStep(CheckoutStep.METHOD)}
                 onSubmit={(intentId: string) => {
