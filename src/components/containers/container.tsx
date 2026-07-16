@@ -6,5 +6,5 @@ interface ContainerProps {
 }
 
 export function Container({ children, className }: ContainerProps) {
-  return <section className={cn('bg-white px-16 py-8 rounded-xl shadow-lg', className)}>{children}</section>;
+  return <section className={cn('bg-white px-8 py-8 rounded-xl shadow-lg', className)}>{children}</section>;
 }

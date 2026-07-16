@@ -9,7 +9,7 @@ export function SectionEmpty({ message, label, title }: SectionEmptyProps) {
     <section className='grid gap-4'>
       {title && <h4>{title}</h4>}
       <section className='px-8 py-16 rounded-3xl bg-white/50 grid place-content-center text-center'>
-        <p>{message}</p>
+        <p className='m-0'>{message}</p>
         {label && <label className='text-gray-500'>{label}</label>}
       </section>
     </section>

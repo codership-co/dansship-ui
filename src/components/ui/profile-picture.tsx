@@ -11,12 +11,13 @@ const images = [
 
 type ProfilePictureProps = {
   className?: string;
+  image?: string;
 };
 
-export function ProfilePicture({ className }: ProfilePictureProps) {
+export function ProfilePicture({ className, image }: ProfilePictureProps) {
   const { user } = useAuth();
 
-  const imageUrl = user?.instructorProfile?.photoUrl || user?.avatar;
+  const imageUrl = image || user?.instructorProfile?.photoUrl || user?.avatar;
   const defaultImage = images[Math.floor(Math.random() * 4)];
 
   return (
