@@ -1,22 +1,58 @@
+import { Button } from 'polpo/components';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LuClock } from 'react-icons/lu';
 
-import { BookingCalendar } from '@components/modules';
+import { Container, Section, SectionHeading } from '@components/containers';
+import { SpinnerLoader } from '@components/loaders';
+import { BookingCalendar, WeekSelector } from '@components/modules';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
+import { DansshipAPI } from '@core/api';
+import { getMonday } from '@helpers';
+import { useNearestWeekWithClasses, usePromise } from '@hooks';
 
 function ClassesPage() {
   const { t } = useTranslation();
+  const currentWeek = getMonday(new Date());
+  const [week, setWeek] = useState(() => currentWeek);
+  const { nearestWeek, isLookingForNearestWeek } = useNearestWeekWithClasses(8);
+
+  const { response: mySubscriptionsResponse, isLoading: isSubLoading } = usePromise(() =>
+    DansshipAPI.subscriptions.getMySubscriptions(),
+  );
+  const totalRemainingClasses = mySubscriptionsResponse?.data?.summary?.total_remaining_classes ?? 0;
+
+  const isLoading = isSubLoading || isLookingForNearestWeek;
 
   return (
-    <div className='min-h-dvh max-w-6xl mx-auto py-10 px-4 pt-20'>
-      <div className='mb-10'>
-        <h1 className='text-3xl font-bold text-gray-900'>{t('classes:title')}</h1>
-        <p className='text-gray-500 mt-2'>{t('classes:subtitle')}</p>
-      </div>
+    <Section className='min-h-dvh' navbarPadding footerMargin>
+      <SectionHeading title={t('classes:title')} subtitle={t('classes:subtitle')} />
 
-      <div className='bg-white rounded-lg shadow-sm border border-gray-100 p-6'>
-        <BookingCalendar />
-      </div>
-    </div>
+      <section className='grid gap-8'>
+        <Container>
+          <WeekSelector week={week} setWeek={setWeek} disablePastWeeks>
+            <Button
+              size='small'
+              color='secondary'
+              disabled={!nearestWeek || nearestWeek === week}
+              variant='flat'
+              onClick={() => setWeek(nearestWeek ?? week)}
+            >
+              <span className='hidden sm:inline'>{t('bookings:nextAvailable')}</span>
+              <LuClock className='size-4' />
+            </Button>
+          </WeekSelector>
+        </Container>
+
+        {isLoading && (
+          <Container>
+            <SpinnerLoader />
+          </Container>
+        )}
+
+        {!isLoading && <BookingCalendar week={week} hasActiveSubscription={totalRemainingClasses > 0} />}
+      </section>
+    </Section>
   );
 }
 

@@ -1,4 +1,4 @@
-import { addDays, format, parseISO } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { SubmitEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuChevronLeft, LuChevronRight, LuSearch } from 'react-icons/lu';
@@ -20,23 +20,8 @@ import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { type AdminBookClassPayload, DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions } from '@core/permissions';
+import { getMonday, getNextMonday, getPrevMonday } from '@helpers';
 import { useCallablePromise, usePromise } from '@hooks';
-
-const getMonday = (d: Date) => {
-  const date = new Date(d);
-  const day = date.getDay();
-  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-
-  return format(new Date(date.setDate(diff)), 'yyyy-MM-dd');
-};
-
-const getNextMonday = (mondayStr: string) => {
-  return format(addDays(parseISO(mondayStr), 7), 'yyyy-MM-dd');
-};
-
-const getPrevMonday = (mondayStr: string) => {
-  return format(addDays(parseISO(mondayStr), -7), 'yyyy-MM-dd');
-};
 
 function AdminBookingsPage() {
   const { t } = useTranslation();

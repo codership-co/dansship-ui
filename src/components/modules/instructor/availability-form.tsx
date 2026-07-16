@@ -10,30 +10,8 @@ import { Container } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { Button, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Input } from '@components/ui';
 import { DansshipAPI, UpdateAvailabilityPayload } from '@core/api';
+import { getMonday, getNextMonday, getPrevMonday } from '@helpers';
 import { useCallablePromise, usePromise } from '@hooks';
-
-// Helpers to get current week Monday string
-const getMonday = (d: Date) => {
-  const date = new Date(d);
-  const day = date.getDay();
-  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-
-  return new Date(date.setDate(diff)).toISOString().split('T')[0];
-};
-
-const getNextMonday = (mondayStr: string) => {
-  const d = new Date(mondayStr);
-  d.setDate(d.getDate() + 7);
-
-  return d.toISOString().split('T')[0];
-};
-
-const getPrevMonday = (mondayStr: string) => {
-  const d = new Date(mondayStr);
-  d.setDate(d.getDate() - 7);
-
-  return d.toISOString().split('T')[0];
-};
 
 const DAYS_OF_WEEK = [
   { value: 0, labelKey: 'common:days.monday' },
