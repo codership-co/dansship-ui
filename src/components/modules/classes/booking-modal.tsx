@@ -1,12 +1,19 @@
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
+import { AsideModal, Button } from 'polpo/components';
+import { toCapitalize } from 'polpo/helpers';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '@components/ui';
+import { Container } from '@components/containers';
+import { ProfilePicture } from '@components/ui';
 import { useAuth } from '@contexts';
 import { DansshipAPI, PublishedClass } from '@core/api';
 import { PageURLS } from '@core/constants';
+import { formatTimeDifference } from '@helpers';
 import { useDateLocale, usePromise, useMyBookings } from '@hooks';
+
+const image =
+  'https://content.arquitecturaydiseno.es/medio/2023/12/06/casa-meritxell-ribe-angli-05_5001cc3f_231206133301_1280x794.jpg';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -103,86 +110,112 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='max-w-md'>
-        <DialogHeader>
-          <DialogTitle>{t('bookings:classDetails')}</DialogTitle>
-        </DialogHeader>
+    <AsideModal
+      isOpen={isOpen}
+      onClose={onClose}
+      position='right'
+      size='600px'
+      contentClassName='p-0 h-full overflow-auto grid grid-rows-[auto_1fr]'
+    >
+      <img src={image} alt='Room class' className='aspect-16/8 object-cover [@media(min-height:1000px)]:aspect-16/10' />
+      <section className='grid gap-4 grid-rows-[1fr_auto] h-full overflow-auto'>
+        <section className='grid gap-4 pt-4 px-8 content-start'>
+          <h3 className='text-center text-primary'>
+            {selectedClass.class_definition?.name || t('bookings:classDefault')}
+          </h3>
 
-        <div className='space-y-4'>
-          <div className='bg-gray-50 p-4 rounded-md border border-gray-200'>
-            <h3 className='font-semibold text-gray-900 text-lg'>
-              {selectedClass.class_definition?.name || t('bookings:classDefault')}
-            </h3>
-            <p className='text-gray-600 text-sm mt-1'>{selectedClass.class_definition?.name}</p>
-          </div>
+          <Container className='bg-secondary/20 py-8 xs:py-4 grid grid-flow-row xs:grid-flow-col justify-center xs:justify-between gap-4 xs:gap-8 items-center shadow-none'>
+            <section className='grid'>
+              <ProfilePicture className='size-20 border-primary border-2' />
+            </section>
+            <section className='grid content-center text-center xs:text-right'>
+              <p className='m-0 font-bold'>{selectedClass.instructor?.full_name || t('bookings:instructorTBA')}</p>
+              <label className='m-0 whitespace-nowrap'>{t('bookings:instructor')}</label>
+            </section>
+          </Container>
 
-          <div className='grid grid-cols-2 gap-4 text-sm'>
-            <div>
-              <span className='text-gray-500 block'>{t('bookings:dateAndTime')}</span>
-              <span className='font-medium text-gray-900'>
-                {format(new Date(selectedClass.start_time), 'MMM d, yyyy', { locale })} <br />
-                {format(new Date(selectedClass.start_time), 'h:mm a', { locale })} -{' '}
-                {format(new Date(selectedClass.end_time), 'h:mm a', { locale })}
-              </span>
-            </div>
-            <div>
-              <span className='text-gray-500 block'>{t('bookings:instructor')}</span>
-              <span className='font-medium text-gray-900'>
-                {selectedClass.instructor?.full_name || t('common:tba')}
-              </span>
-            </div>
-            <div>
-              <span className='text-gray-500 block'>{t('bookings:room')}</span>
-              <span className='font-medium text-gray-900'>{selectedClass.room?.name || t('common:tba')}</span>
-            </div>
-            <div>
-              <span className='text-gray-500 block'>{t('bookings:capacity')}</span>
-              <span className={`font-medium ${isFull ? 'text-alert-600' : 'text-active-600'}`}>
-                {selectedClass.enrolled_count} / {selectedClass.capacity} {isFull ? t('bookings:full') : ''}
-              </span>
-            </div>
-          </div>
+          <Container className='bg-secondary/20 py-4 grid grid-flow-col justify-between gap-8 items-center shadow-none'>
+            <section className='grid'>
+              <p className='m-0 font-bold'>
+                {toCapitalize(format(parseISO(selectedClass.start_time), 'EEEE', { locale }))}
+              </p>
+              <label className='m-0 whitespace-nowrap'>
+                {format(parseISO(selectedClass.start_time), 'MMMM d', { locale })}
+              </label>
+            </section>
+            <section className='grid content-center text-right'>
+              <p className='m-0 font-bold'>{formatTimeDifference(selectedClass.end_time, selectedClass.start_time)}</p>
+              <label className='m-0 whitespace-nowrap'>{t('bookings:duration')}</label>
+            </section>
+          </Container>
 
+          <Container className='bg-secondary/20 py-4 grid grid-flow-col justify-between gap-8 items-center shadow-none'>
+            <section className='grid'>
+              <p className='m-0 font-bold'>{format(parseISO(selectedClass.start_time), 'h:mm a', { locale })}</p>
+              <label className='m-0 whitespace-nowrap'>{t('bookings:startTime')}</label>
+            </section>
+            <section className='grid content-center text-right'>
+              <p className='m-0 font-bold'>{format(parseISO(selectedClass.end_time), 'h:mm a', { locale })}</p>
+              <label className='m-0 whitespace-nowrap'>{t('bookings:endTime')}</label>
+            </section>
+          </Container>
+
+          <Container className='bg-secondary/20 py-4 grid grid-flow-col justify-between gap-8 items-center shadow-none'>
+            <section className='grid'>
+              <p className='m-0 font-bold'>
+                {isFull ? `${t('bookings:spotsFull')}` : `${selectedClass.enrolled_count} / ${selectedClass.capacity}`}
+              </p>
+              <label className='m-0 whitespace-nowrap'>{t('bookings:capacity')}</label>
+            </section>
+            <section className='grid content-center text-right'>
+              <p className='m-0 font-bold'>{selectedClass.room?.name || t('bookings:roomTBA')}</p>
+              <label className='m-0 whitespace-nowrap'>{t('bookings:room')}</label>
+            </section>
+          </Container>
+        </section>
+
+        <section className='grid gap-4 px-8 pb-4'>
           {!hasActiveSubscription && !isBooked && !isWaitlisted && (
-            <div className='bg-red-50 p-3 rounded text-sm text-alert-800 border border-alert-200'>
+            <label className='bg-alert-50 p-3 rounded text-alert-800 border border-alert-200'>
               {t('bookings:noSubscriptionWarning')}
-            </div>
+            </label>
           )}
 
           {hasTimeOverlap && !isBooked && !isWaitlisted && (
-            <div className='bg-amber-50 p-3 rounded text-sm text-warning-800 border border-warning-200'>
+            <label className='bg-warning-50 p-3 rounded text-warning-800 border border-warning-200'>
               {t('bookings:timeOverlapWarning')}
-            </div>
+            </label>
           )}
 
-          <div className='pt-4 flex flex-col space-y-2'>
+          <section className='flex flex-col gap-2'>
             {isBooked ? (
-              <Button variant='destructive' onClick={handleCancel} disabled={isLoading}>
+              <Button color='alert' onClick={handleCancel} isLoading={isLoading}>
                 {isCancelingClass ? t('bookings:cancelling') : t('bookings:cancelBooking')}
               </Button>
             ) : isWaitlisted ? (
-              <Button variant='outline' onClick={handleWaitlistCancel} disabled={isLoading}>
+              <Button color='primary' variant='outlined' onClick={handleWaitlistCancel} isLoading={isLoading}>
                 {isCancelingWaitlist ? t('bookings:leaving') : t('bookings:leaveWaitlist')}
               </Button>
             ) : !hasActiveSubscription ? (
-              <Button onClick={handleBuyPlan}>{t('bookings:buyPlan')}</Button>
+              <Button color='primary' onClick={handleBuyPlan}>
+                {t('bookings:buyPlan')}
+              </Button>
             ) : isFull ? (
-              <Button onClick={handleWaitlistJoin} disabled={isLoading}>
+              <Button color='primary' onClick={handleWaitlistJoin} isLoading={isLoading}>
                 {isJoiningWaitlist ? t('bookings:joining') : t('bookings:joinWaitlist')}
               </Button>
             ) : (
-              <Button onClick={handleBook} disabled={isLoading}>
+              <Button color='primary' onClick={handleBook} isLoading={isLoading}>
                 {isBookingClass ? t('bookings:booking') : t('bookings:bookClass')}
               </Button>
             )}
 
-            <Button variant='ghost' onClick={onClose} disabled={isLoading}>
+            <Button color='primary' variant='text' onClick={onClose} isLoading={isLoading}>
               {t('common:close')}
             </Button>
-          </div>
-        </div>
-      </DialogContent>
-    </Dialog>
+          </section>
+        </section>
+      </section>
+    </AsideModal>
   );
 }

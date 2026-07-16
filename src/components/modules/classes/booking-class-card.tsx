@@ -57,15 +57,15 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
           <section className='grid grid-cols-[1fr_1fr] sm:grid-cols-none sm:grid-flow-col gap-8 items-center'>
             <section className='text-center'>
               <h4 className='m-0'>{format(new Date(bookingClass.start_time), 'H:mm a')}</h4>
-              <label>Inicio</label>
+              <label>{t('bookings:startTime')}</label>
             </section>
             <section className='text-center'>
               <h4 className='m-0'>{formatTimeDifference(bookingClass.end_time, bookingClass.start_time)}</h4>
-              <label>Duración</label>
+              <label>{t('bookings:duration')}</label>
             </section>
             <section className='text-center'>
               <h4 className='m-0'>{bookingClass.room?.name || t('bookings:roomTBA')}</h4>
-              <label>Salon</label>
+              <label>{t('bookings:room')}</label>
             </section>
           </section>
           <Link

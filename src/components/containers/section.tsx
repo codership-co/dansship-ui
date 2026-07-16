@@ -30,7 +30,7 @@ export function Section({
         fullOnMobile && 'sm:px-6',
         verticalPadding && 'py-8 sm:py-16',
         navbarPadding && 'pt-25 sm:pt-30',
-        footerMargin && 'mb-40 sm:mb-30',
+        footerMargin && 'mb-60',
         className,
       )}
       {...props}
