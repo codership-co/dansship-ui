@@ -12,7 +12,7 @@ import { RiAdminFill } from 'react-icons/ri';
 import { SiReasonstudios } from 'react-icons/si';
 import { TbManualGearbox } from 'react-icons/tb';
 import { TfiAgenda } from 'react-icons/tfi';
-import { useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
 
 import { MenuItem, NavItem } from './navbar';
 
@@ -30,12 +30,14 @@ interface MobileMenuProps {
 export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { logout, user } = useAuth();
+  const location = useLocation();
+  const { logout, user, isAuthenticated } = useAuth();
 
   const authenticatedPrimaryMenuItems: Array<NavItem> = [
     {
       to: PageURLS.profile.root,
       label: t('nav:profile'),
+      requireAuthentication: true,
       featureFlags: [FEATURE_FLAG.isProfilePageEnabled],
       icon: LuUser,
     },
@@ -47,13 +49,14 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     },
     {
       to: PageURLS.profile.subscription,
-      label: t('nav:menuPlans'),
+      label: isAuthenticated ? t('nav:menuPlans') : t('nav:navPlans'),
       featureFlags: [FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
       icon: LuBellElectric,
     },
     {
       to: PageURLS.profile.bookings,
       label: t('nav:menuBookings'),
+      requireAuthentication: true,
       featureFlags: [FEATURE_FLAG.isMyAccountBookingsPageEnabled],
       icon: LuCalendarHeart,
     },
@@ -66,6 +69,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     {
       to: PageURLS.figureSaved,
       label: t('nav:menuProgress'),
+      requireAuthentication: true,
       featureFlags: [FEATURE_FLAG.isFigureSavedPageEnabled],
       icon: LuBookHeart,
     },
@@ -246,13 +250,16 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           color='primary'
           variant='text'
           onClick={() => {
-            logout();
-            onClose();
-            navigate(PageURLS.home, { replace: true });
+            if (isAuthenticated) {
+              logout();
+              navigate(PageURLS.home, { replace: true });
+            } else {
+              navigate(PageURLS.auth.login, { replace: true, state: { from: location } });
+            }
           }}
         >
           <FaSignOutAlt />
-          {t('nav:signOut')}
+          {isAuthenticated ? t('nav:signOut') : t('nav:signIn')}
         </Button>
       </div>
     </AsideModal>

@@ -3,7 +3,7 @@ import { cn } from 'polpo/helpers';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdMenu } from 'react-icons/md';
-import { NavLink, NavLinkProps } from 'react-router';
+import { NavLink, NavLinkProps, useLocation } from 'react-router';
 
 import { MobileMenu } from './mobile-menu';
 
@@ -31,6 +31,7 @@ export interface NavItem {
 
 export const Navbar = () => {
   const { t } = useTranslation();
+  const location = useLocation();
   const { isAuthenticated, requireOnboarding } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { response } = usePromise(
@@ -42,13 +43,13 @@ export const Navbar = () => {
   const hasActivePlan = (response?.data?.summary?.active_count ?? 0) > 0;
 
   const navLinks: Array<NavItem> = [
-    { to: PageURLS.figures, label: t('nav:menuFigures'), featureFlags: [FEATURE_FLAG.isFiguresPageEnabled] },
     { to: PageURLS.classes, label: t('nav:menuScheduleClass'), featureFlags: [FEATURE_FLAG.isClassesPageEnabled] },
     {
       to: isAuthenticated ? PageURLS.profile.subscription : '/#planes',
       label: isAuthenticated ? t('nav:menuPlans') : t('nav:navPlans'),
       featureFlags: [FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
     },
+    { to: PageURLS.figures, label: t('nav:menuFigures'), featureFlags: [FEATURE_FLAG.isFiguresPageEnabled] },
     {
       to: PageURLS.admin.root,
       label: t('nav:admin'),
@@ -77,17 +78,16 @@ export const Navbar = () => {
       )}
     >
       <div className='flex items-center gap-4'>
-        {isAuthenticated ? (
-          <Button
-            forIcon
-            size='small'
-            variant='text'
-            onClick={() => setIsMobileMenuOpen(true)}
-            aria-label={t('nav:menu')}
-          >
-            <MdMenu className='h-6 w-6' />
-          </Button>
-        ) : null}
+        <Button
+          forIcon
+          size='small'
+          variant='text'
+          className={isAuthenticated ? '' : 'lg:hidden'}
+          onClick={() => setIsMobileMenuOpen(true)}
+          aria-label={t('nav:menu')}
+        >
+          <MdMenu className='h-6 w-6' />
+        </Button>
 
         <NavLink
           to={PageURLS.home}
@@ -106,7 +106,7 @@ export const Navbar = () => {
       <div className='ml-auto flex items-center justify-end gap-2 sm:gap-4'>
         <LanguageSelector variant='dropdown' />
         {!isAuthenticated && isLoginPageEnabled && (
-          <NavLink to={PageURLS.auth.login}>
+          <NavLink to={PageURLS.auth.login} state={{ from: location }}>
             <Button color='primary' size='small' className='hidden xs:block'>
               {t('nav:signIn')}
             </Button>
@@ -140,7 +140,7 @@ export const Navbar = () => {
         )}
       </div>
 
-      {isAuthenticated ? <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} /> : null}
+      <MobileMenu isOpen={isMobileMenuOpen} onClose={() => setIsMobileMenuOpen(false)} />
     </Section>
   );
 };

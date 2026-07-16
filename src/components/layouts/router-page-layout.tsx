@@ -15,7 +15,7 @@ export const RouterPageLayout = () => {
         <img
           src='/assets/images/bg-girl.png'
           alt='Dansship'
-          className='pointer-events-none select-none fixed bottom-0 right-0 m-8 w-[15vw] min-w-40 max-w-70 hidden lg:block -z-1'
+          className='pointer-events-none select-none fixed bottom-0 right-0 m-8 w-[15vw] min-w-40 max-w-70 hidden lg:block -z-100'
         />
       )}
       <Navbar />
