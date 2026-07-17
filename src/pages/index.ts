@@ -3,6 +3,7 @@ export * from './admin';
 export * from './error';
 export * from './home.page';
 export * from './ui.page';
+export * from './legal.page';
 export * from './classes.page';
 export * from './figures.page';
 export * from './figure-saved.page';

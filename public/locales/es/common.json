@@ -4,6 +4,7 @@
   "save": "Guardar",
   "thisWeek": "Esta semana",
   "cancel": "Cancelar",
+  "paginator": "Página {{page}} de {{pages}}",
   "edit": "Editar",
   "delete": "Eliminar",
   "loading": "Cargando...",

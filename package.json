@@ -13,6 +13,7 @@
     "create-component": "pnpm dlx shadcn@latest add"
   },
   "dependencies": {
+    "@embedpdf/react-pdf-viewer": "^2.14.4",
     "@fontsource-variable/figtree": "^5.2.10",
     "@fontsource-variable/nunito-sans": "^5.2.7",
     "@hookform/resolvers": "^5.4.0",

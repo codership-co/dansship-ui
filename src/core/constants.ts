@@ -83,6 +83,7 @@ export const AUTH_TOKEN_KEY = 'auth_token';
 
 export const PageURLS = {
   home: '/',
+  legal: '/legal',
   auth: {
     login: '/auth/login',
     signup: '/auth/signup',
@@ -94,7 +95,7 @@ export const PageURLS = {
   },
   profile: {
     root: '/profile',
-    user: (id: string | number) => `/${id}`,
+    user: (id: string | number) => `/profile/${id}`,
     edit: '/profile/edit',
     subscription: '/profile/subscription',
     bookings: '/profile/bookings',

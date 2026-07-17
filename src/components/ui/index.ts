@@ -1,6 +1,7 @@
 export * from './card';
 export * from './checkbox';
 export * from './select';
+export * from './pdf-viewer';
 export * from './badge';
 export * from './input';
 export * from './date-picker';

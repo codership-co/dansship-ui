@@ -1,13 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { LiaFileContractSolid } from 'react-icons/lia';
 import { LuInstagram, LuMusic2 } from 'react-icons/lu';
-import { MdOutlinePolicy } from 'react-icons/md';
 import { RiContactsBook2Line } from 'react-icons/ri';
 import { Link } from 'react-router';
 
 import { Section } from '@components/containers';
 import { GroovyLayout } from '@components/layouts';
 import { Logotype } from '@components/svg';
+import { PageURLS } from '@core/constants';
 
 export function Footer() {
   const { t } = useTranslation();
@@ -28,13 +28,9 @@ export function Footer() {
             </div>
 
             <div className='flex flex-wrap items-center gap-x-8 gap-y-2'>
-              <Link to='/privacy' className='inline-flex items-center gap-2 transition hover:text-primary'>
-                <MdOutlinePolicy className='h-4 w-4' />
-                {t('home:sharedFooter.legal.privacy')}
-              </Link>
-              <Link to='/terms' className='inline-flex items-center gap-2 transition hover:text-primary'>
+              <Link to={PageURLS.legal} className='inline-flex items-center gap-2 transition hover:text-primary'>
                 <LiaFileContractSolid className='h-4 w-4' />
-                {t('home:sharedFooter.legal.terms')}
+                {t('home:sharedFooter.legal.title')}
               </Link>
               <Link to='/contact' className='inline-flex items-center gap-2 transition hover:text-primary'>
                 <RiContactsBook2Line className='h-4 w-4' />

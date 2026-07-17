@@ -1,0 +1,19 @@
+{
+  "intro": "Documentos legales",
+  "title": "Politicas y condiciones de Dansship",
+  "subtitle": "Aqui te dejamos a la mano los documentos legales que puedes llegar a necesitar",
+  "documents": {
+    "privacy": {
+      "tab": "Politica de privacidad",
+      "description": "En Dansship nos preocupamos por tu privacidad. Lee nuestra Política de Privacidad para conocer qué datos personales recopilamos, cómo los utilizamos y tus derechos para acceder, rectificar o eliminar tu información."
+    },
+    "termsAndConditions": {
+      "tab": "Terminos y condiciones",
+      "description": "Al navegar y utilizar este sitio web, aceptas cumplir con nuestros Términos y Condiciones. Si no estás de acuerdo con alguna parte de estos términos, te solicitamos no utilizar nuestros servicios."
+    },
+    "classTermsAndConditions": {
+      "tab": "Terminos y condiciones de enseñanza",
+      "description": "Al comprar y asistir a nuestras clases y servicios, aceptas cumplir con nuestros Términos y Condiciones de enseñanza. Si no estás de acuerdo con alguna parte de estos términos, te solicitamos no utilizar nuestros servicios."
+    }
+  }
+}
