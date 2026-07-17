@@ -8,7 +8,6 @@ import { Link } from 'react-router';
 import { z } from 'zod';
 
 import { EmailField } from '@components/form-fields';
-import { Spinner, SpinnerLoader } from '@components/loaders';
 import { PageURLS } from '@core/constants';
 
 const createVerifyEmailFormSchema = (t: TFunction) =>
@@ -46,7 +45,6 @@ export const VerifyEmailForm = ({
   formattedTime,
   email,
 }: VerifyEmailFormProps) => {
-  const showCountDown = status !== VerificationStatus.RESENDING_EMAIL && isCountDownActive;
   const { t } = useTranslation();
   const { control, handleSubmit } = useForm<VerifyEmailFormData>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -59,39 +57,38 @@ export const VerifyEmailForm = ({
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className='grid gap-4' data-component='VerifyEmailForm'>
-      {(![VerificationStatus.VERIFYING, VerificationStatus.RESENDING_EMAIL, VerificationStatus.VERIFIED].includes(
-        status,
-      ) ||
-        email) && (
+      {(![VerificationStatus.VERIFYING, VerificationStatus.VERIFIED].includes(status) || email) && (
         <EmailField
           id='email'
           control={control}
           name='email'
           label={t('auth:verifyEmail.email')}
           placeholder={t('common:placeholder.email')}
-          disabled={Boolean(email) || status === VerificationStatus.RESENDED_EMAIL}
+          disabled={
+            Boolean(email) || [VerificationStatus.RESENDING_EMAIL, VerificationStatus.RESENDED_EMAIL].includes(status)
+          }
         />
       )}
 
-      {[VerificationStatus.VERIFYING, VerificationStatus.RESENDING_EMAIL].includes(status) && <SpinnerLoader />}
-
       <section className='grid gap-2 mt-4'>
-        {[VerificationStatus.VERIFICATION_FAILED, VerificationStatus.RESENDED_FAILED, VerificationStatus.IDLE].includes(
-          status,
-        ) && (
+        {[
+          VerificationStatus.VERIFICATION_FAILED,
+          VerificationStatus.RESENDED_EMAIL,
+          VerificationStatus.RESENDED_FAILED,
+          VerificationStatus.RESENDING_EMAIL,
+          VerificationStatus.IDLE,
+        ].includes(status) && (
           <>
-            {showCountDown && <label className='text-sm mb-0'>{t('auth:verifyEmail.labels.waitResend')}</label>}
+            {isCountDownActive && <label className='mb-0 text-center'>{t('auth:verifyEmail.labels.waitResend')}</label>}
 
             <Button
               fullWidth
               color='primary'
-              disabled={status === VerificationStatus.RESENDING_EMAIL || isCountDownActive}
+              disabled={isCountDownActive}
+              isLoading={status === VerificationStatus.RESENDING_EMAIL}
             >
-              {status === VerificationStatus.RESENDING_EMAIL && <Spinner />}
-              {showCountDown && <span>{formattedTime}</span>}
-              {status !== VerificationStatus.RESENDING_EMAIL && !isCountDownActive && (
-                <span>{t('auth:verifyEmail.resend')}</span>
-              )}
+              {isCountDownActive && <span>{formattedTime}</span>}
+              {!isCountDownActive && <span>{t('auth:verifyEmail.resend')}</span>}
             </Button>
           </>
         )}

@@ -19,7 +19,7 @@ export enum PaymentProofContentType {
   PNG = 'image/png',
   WEBP = 'image/webp',
 }
-export const PaymentProofContentTypesList = Object.keys(PaymentProofContentType);
+export const PaymentProofContentTypesList = Object.values(PaymentProofContentType);
 
 export interface CreatePaymentIntentPayload {
   plan_id: string;

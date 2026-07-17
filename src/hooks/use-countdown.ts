@@ -32,6 +32,9 @@ export function useCountdown(initialSeconds: number) {
     setIsActive(false);
     setSecondsLeft(initialSeconds);
   };
+  const setCustomSecondsLeft = (seconds: number) => {
+    setSecondsLeft(seconds);
+  };
 
   // Format time utility (MM:SS)
   const formatTime = () => {
@@ -41,5 +44,5 @@ export function useCountdown(initialSeconds: number) {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')} min`;
   };
 
-  return { secondsLeft, isActive, start, pause, reset, formattedTime: formatTime() };
+  return { secondsLeft, isActive, start, pause, reset, setCustomSecondsLeft, formattedTime: formatTime() };
 }

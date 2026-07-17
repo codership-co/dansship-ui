@@ -29,7 +29,7 @@ export function Section({
         !fullOnMobile && 'xs:px-2',
         fullOnMobile && 'sm:px-6',
         verticalPadding && 'py-8 sm:py-16',
-        navbarPadding && 'pt-25 sm:pt-30',
+        navbarPadding && 'pt-30 sm:pt-35',
         footerMargin && 'mb-60',
         className,
       )}

@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { IconType } from 'react-icons';
-import { LuChevronLeft, LuCircleArrowRight, LuCircleCheck } from 'react-icons/lu';
+import { LuCircleArrowRight, LuCircleCheck } from 'react-icons/lu';
 
-import { Badge, Button } from '@components/ui';
+import { Badge } from '@components/ui';
 import { cn } from '@helpers';
 
-export interface FormStepperStep<T extends string> {
+export interface FormStepperStep<T extends React.Key> {
   title: string;
   subtitle: string;
   step: T;
@@ -13,24 +13,22 @@ export interface FormStepperStep<T extends string> {
   form: React.ReactNode;
 }
 
-interface FormStepperLayoutProps<T extends string> {
+interface FormStepperLayoutProps<T extends React.Key> {
   steps: Array<FormStepperStep<T>>;
   currentStep: T;
   noAvailableStepMessage?: string;
   className?: string;
   onStepSelect?: (step: T) => void;
   canNavigateToStep?: (step: T) => boolean;
-  onBack?: () => void;
 }
 
-export const FormStepperLayout = <T extends string>({
+export const FormStepperLayout = <T extends React.Key>({
   steps,
   currentStep,
   noAvailableStepMessage,
   className,
   onStepSelect,
   canNavigateToStep,
-  onBack,
 }: FormStepperLayoutProps<T>) => {
   const { t } = useTranslation();
   const stepIndex = steps.findIndex(step => step.step === currentStep);
@@ -109,18 +107,6 @@ export const FormStepperLayout = <T extends string>({
         <section className='px-8 py-6 md:py-16 md:pr-8 md:pl-12 h-full grid grid-rows-[auto_1fr] overflow-y-auto'>
           <section className='mb-10'>
             <div className='flex items-start gap-2'>
-              {onBack ? (
-                <Button
-                  type='button'
-                  variant='ghost'
-                  size='icon'
-                  className='mt-0.5 shrink-0'
-                  onClick={onBack}
-                  aria-label={t('common:back')}
-                >
-                  <LuChevronLeft className='size-6' />
-                </Button>
-              ) : null}
               <div>
                 <h4 className='m-0 text-primary'>{steps[stepIndex].title}</h4>
                 <label>{steps[stepIndex].subtitle}</label>

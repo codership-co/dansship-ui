@@ -14,6 +14,12 @@ function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
   const { state } = useLocation();
   const stateEmail: string = state?.email;
+  const [shouldResendVerificationImmediately, setShouldResendVerificationImmediately] = useState(
+    Boolean(state?.shouldResendVerificationImmediately),
+  );
+  const [shouldStartCountDownImmediately, setShouldStartCountDownImmediately] = useState(
+    Boolean(state?.shouldStartCountDownImmediately),
+  );
   const token = searchParams.get('token');
   const paramEmail = searchParams.get('email');
   const email = stateEmail ?? paramEmail ?? '';
@@ -32,12 +38,13 @@ function VerifyEmailPage() {
     } catch {
       setVerificationStatus(VerificationStatus.VERIFICATION_FAILED);
     }
-  }, [verifyEmail, token]);
+  }, [token, verifyEmail]);
 
   useEffect(() => {
-    start();
-    void handleVerification();
-  }, [token, handleVerification, start]);
+    if (verificationStatus === VerificationStatus.IDLE) {
+      void handleVerification();
+    }
+  }, [token, handleVerification, verificationStatus]);
 
   const statusTitle = useMemo(() => {
     const titles = {
@@ -83,22 +90,35 @@ function VerifyEmailPage() {
 
   const onSubmit = useCallback(
     async ({ email }: VerifyEmailFormData) => {
+      if (verificationStatus === VerificationStatus.RESENDING_EMAIL) {
+        return;
+      }
+
       reset();
       setVerificationStatus(VerificationStatus.RESENDING_EMAIL);
-      try {
-        const data = await resendVerification({ email });
+      const data = await resendVerification({ email });
 
-        if (data?.verification_sent) {
-          setVerificationStatus(VerificationStatus.RESENDED_EMAIL);
-          start();
-        }
-      } catch {
-      } finally {
+      if (data?.verification_sent) {
+        setVerificationStatus(VerificationStatus.RESENDED_EMAIL);
+        start();
+      } else {
         setVerificationStatus(VerificationStatus.RESENDED_FAILED);
+        reset();
+        start();
       }
     },
-    [resendVerification, reset, start],
+    [resendVerification, reset, start, verificationStatus],
   );
+
+  useEffect(() => {
+    if (shouldResendVerificationImmediately) {
+      setShouldResendVerificationImmediately(false);
+      void onSubmit({ email });
+    } else if (shouldStartCountDownImmediately) {
+      setShouldStartCountDownImmediately(false);
+      start();
+    }
+  }, [email, onSubmit, shouldResendVerificationImmediately, shouldStartCountDownImmediately, start]);
 
   return (
     <AuthFormLayout title={statusTitle} subtitle={statusSubTitle} dataComponent='VerifyEmailPage'>

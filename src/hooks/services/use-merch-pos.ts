@@ -11,6 +11,7 @@ import {
   DansshipAPI,
   Order,
   PaymentMethod,
+  PaymentProofContentType,
   PaymentProofContentTypesList,
   Product,
 } from '@core/api';
@@ -167,7 +168,7 @@ export const useMerchPos = () => {
 
     if (!proofFile || !createdOrder) return true;
 
-    if (!PaymentProofContentTypesList.includes(proofFile.type)) {
+    if (!PaymentProofContentTypesList.includes(proofFile.type as PaymentProofContentType)) {
       toast.error(t('payments:proofInvalidTypeDesc'));
 
       return false;

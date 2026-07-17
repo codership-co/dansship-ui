@@ -13,12 +13,11 @@ import {
   openBoldEmbeddedCheckout,
   PaymentMethod,
   PaymentProofContentType,
+  PaymentProofContentTypesList,
   PublicPlan,
 } from '@core/api';
 import { formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
-
-const fileAccept = `${PaymentProofContentType.JPEG},${PaymentProofContentType.PNG},${PaymentProofContentType.WEBP}`;
 
 interface CheckoutPaymentProofFormProps {
   plan: PublicPlan;
@@ -154,7 +153,12 @@ export function CheckoutPaymentProofForm({
               <p className='text-xs text-gray-600'>{t('payments:proofUploadInCheckoutDesc')}</p>
               <label className='inline-flex cursor-pointer items-center gap-2 rounded-md border border-accent bg-background px-3 py-2 text-xs font-medium shadow-sm hover:bg-accent hover:text-accent-foreground'>
                 {selectedProofFile ? t('payments:replaceProof') : t('payments:uploadProof')}
-                <input type='file' className='hidden' accept={fileAccept} onChange={handleInputFileUpload} />
+                <input
+                  type='file'
+                  className='hidden'
+                  accept={PaymentProofContentTypesList.join(',')}
+                  onChange={handleInputFileUpload}
+                />
               </label>
             </section>
             <section>
@@ -172,7 +176,7 @@ export function CheckoutPaymentProofForm({
                 <input
                   type='file'
                   className='absolute w-full h-full cursor-pointer opacity-0'
-                  accept={fileAccept}
+                  accept={PaymentProofContentTypesList.join(',')}
                   onChange={handleInputFileUpload}
                 />
               </section>

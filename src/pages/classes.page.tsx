@@ -6,23 +6,60 @@ import { LuClock } from 'react-icons/lu';
 import { Container, Section, SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { BookingCalendar, WeekSelector } from '@components/modules';
-import { FEATURE_FLAG, SecurityGuard } from '@contexts';
+import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
 import { DansshipAPI } from '@core/api';
-import { getMonday } from '@helpers';
-import { useNearestWeekWithClasses, usePromise } from '@hooks';
+import { addDaysToFormat, getMonday, getNextMonday } from '@helpers';
+import { usePromise } from '@hooks';
+
+async function findNearWeekWithClasses(weeksToSearch: number) {
+  const baseWeek = getMonday(new Date());
+
+  for (let i = 0; i < weeksToSearch; i++) {
+    const weekCandidate = addDaysToFormat(baseWeek, i * 7);
+    const { data, ok } = await DansshipAPI.schedules.getPublishedClassesByRange(
+      `${weekCandidate}T00:00:00Z`,
+      `${getNextMonday(weekCandidate)}T00:00:00Z`,
+    );
+
+    if (ok && data.length > 0) {
+      return weekCandidate;
+    }
+  }
+
+  return null;
+}
 
 function ClassesPage() {
   const { t } = useTranslation();
+  const { isAuthenticated } = useAuth();
   const currentWeek = getMonday(new Date());
   const [week, setWeek] = useState(() => currentWeek);
-  const { nearestWeek, isLookingForNearestWeek } = useNearestWeekWithClasses(8);
 
-  const { response: mySubscriptionsResponse, isLoading: isSubLoading } = usePromise(() =>
-    DansshipAPI.subscriptions.getMySubscriptions(),
-  );
-  const totalRemainingClasses = mySubscriptionsResponse?.data?.summary?.total_remaining_classes ?? 0;
+  const { response, isLoading } = usePromise(async () => {
+    if (!isAuthenticated) {
+      const nearestWeek = await findNearWeekWithClasses(8);
 
-  const isLoading = isSubLoading || isLookingForNearestWeek;
+      return {
+        nearestWeek,
+        hasActiveSubscription: false,
+        myBookings: [],
+      };
+    }
+
+    const [{ data: mySubscriptions }, { data: myBookings }, nearestWeek] = await Promise.all([
+      DansshipAPI.subscriptions.getMySubscriptions(),
+      DansshipAPI.bookings.getMyBookings(),
+      findNearWeekWithClasses(8),
+    ]);
+
+    const totalRemainingClasses = mySubscriptions?.summary?.total_remaining_classes ?? 0;
+
+    return {
+      nearestWeek,
+      hasActiveSubscription: totalRemainingClasses > 0,
+      myBookings: myBookings ?? [],
+    };
+  });
 
   return (
     <Section className='min-h-dvh' navbarPadding footerMargin>
@@ -34,9 +71,9 @@ function ClassesPage() {
             <Button
               size='small'
               color='secondary'
-              disabled={!nearestWeek || nearestWeek === week}
+              disabled={!response?.nearestWeek || response?.nearestWeek === week}
               variant='flat'
-              onClick={() => setWeek(nearestWeek ?? week)}
+              onClick={() => setWeek(response?.nearestWeek ?? week)}
             >
               <span className='hidden sm:inline'>{t('bookings:nextAvailable')}</span>
               <LuClock className='size-4' />
@@ -50,7 +87,13 @@ function ClassesPage() {
           </Container>
         )}
 
-        {!isLoading && <BookingCalendar week={week} hasActiveSubscription={totalRemainingClasses > 0} />}
+        {!isLoading && (
+          <BookingCalendar
+            week={week}
+            myBookings={response?.myBookings ?? []}
+            hasActiveSubscription={response?.hasActiveSubscription ?? false}
+          />
+        )}
       </section>
     </Section>
   );

@@ -1,5 +1,6 @@
 export { cn } from 'polpo/helpers';
 export * from './checkout-intent';
+export * from './classes';
 export * from './date';
 export * from './merch';
 export * from './delay-promise';

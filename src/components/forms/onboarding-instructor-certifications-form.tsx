@@ -4,7 +4,7 @@ import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { LuPlus, LuTrash2 } from 'react-icons/lu';
+import { LuChevronLeft, LuPlus, LuTrash2 } from 'react-icons/lu';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
@@ -38,6 +38,7 @@ interface OnboardingInstructorCertificationsFormProps {
   error: string | null;
   onComplete: (documents: Array<InstructorCertificationPayload>) => void;
   onSkip: () => void;
+  onBack: () => void;
 }
 
 export function OnboardingInstructorCertificationsForm({
@@ -45,6 +46,7 @@ export function OnboardingInstructorCertificationsForm({
   error,
   onComplete,
   onSkip,
+  onBack,
 }: OnboardingInstructorCertificationsFormProps) {
   const { t } = useTranslation();
   const schema = createInstructorCertificationsSchema(t);
@@ -127,9 +129,9 @@ export function OnboardingInstructorCertificationsForm({
   };
 
   return (
-    <div className='space-y-6' data-component='onboarding-instructor-certifications-form'>
-      <form className='space-y-6' onSubmit={handleSubmit(handleFormSubmit)}>
-        <div className='flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between'>
+    <div className='space-y-6' data-component='OnboardingInstructorCertificationsForm'>
+      <form className='grid gap-8' onSubmit={handleSubmit(handleFormSubmit)}>
+        <div className='flex items-center justify-between gap-2'>
           <label className='font-medium text-left'>{t('auth:onboarding.certifications')}</label>
 
           <Button
@@ -199,10 +201,23 @@ export function OnboardingInstructorCertificationsForm({
 
         {error ? <p className='text-sm text-alert-600'>{error}</p> : null}
 
-        <div className='mt-4 flex flex-col items-center space-y-3'>
-          <Button type='submit' isLoading={isLoading || uploadingIndex !== null} color='primary' fullWidth>
-            {isLoading ? t('common:loading') : t('auth:onboarding.complete')}
-          </Button>
+        <div className='mt-20 grid gap-4'>
+          <section className='grid grid-cols-2 gap-4'>
+            <Button
+              type='button'
+              variant='outlined'
+              color='primary'
+              onClick={onBack}
+              aria-label={t('common:back')}
+              fullWidth
+            >
+              <LuChevronLeft className='size-6' />
+              {t('common:back')}
+            </Button>
+            <Button type='submit' fullWidth isLoading={isLoading || uploadingIndex !== null} color='primary'>
+              {t('auth:onboarding.complete')}
+            </Button>
+          </section>
           <Button
             type='button'
             onClick={onSkip}
