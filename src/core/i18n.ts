@@ -32,6 +32,7 @@ i18n
       'home',
       'instructor',
       'inventory',
+      'legal',
       'merch',
       'nav',
       'notifications',

@@ -44,6 +44,7 @@ import {
   SecureProfilePage,
   SecureSubscriptionPage,
   SecureBookingsPage,
+  SecureLegalPage,
 } from '@pages';
 
 const routes: Array<RouteObject> = [
@@ -84,8 +85,9 @@ const routes: Array<RouteObject> = [
       {
         Component: RouterPageLayout,
         children: [
-          { path: 'ui', Component: UiPage },
           { index: true, Component: HomePage, loader: HomeLoader },
+          { path: 'legal', Component: SecureLegalPage },
+          { path: 'ui', Component: UiPage },
 
           { path: 'auth/onboarding', Component: SecureOnboardingPage },
 
