@@ -30,7 +30,7 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
   const state = location.state;
-  const defaultEmail = state.email || '';
+  const defaultEmail = state?.email || '';
 
   const loginSchema = createLoginSchema(t);
 
