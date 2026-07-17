@@ -1,18 +1,33 @@
 import { Badge, Button } from 'polpo/components';
+import { cn } from 'polpo/helpers';
+import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { FaFileUpload, FaSave } from 'react-icons/fa';
 import { LuCalendar, LuCreditCard, LuPencil } from 'react-icons/lu';
 import { Link } from 'react-router';
+import { toast } from 'sonner';
 
 import { Section } from '@components/containers';
 import { ProfilePicture } from '@components/ui';
 import { useAuth } from '@contexts';
-import { DansshipAPI } from '@core/api';
+import { DansshipAPI, PaymentProofContentType, PaymentProofContentTypesList } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { usePromise } from '@hooks';
 
-export function ProfileHeader() {
+interface ProfileHeaderEditableData {
+  profilePhoto?: File;
+}
+
+interface ProfileHeaderProps {
+  onEdit: () => void;
+  editMode: boolean;
+  onChange: (data: ProfileHeaderEditableData) => void;
+}
+
+export function ProfileHeader({ editMode, onEdit, onChange }: ProfileHeaderProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
+  const [imageURL, setImageURL] = useState<string>('');
   const { response: savedFiguresResponse } = usePromise(() => DansshipAPI.figures.getSavedFigures());
   const { response: mySubscriptionsResponse } = usePromise(() => DansshipAPI.subscriptions.getMySubscriptions());
   const savedFigures = savedFiguresResponse?.data ?? [];
@@ -23,12 +38,50 @@ export function ProfileHeader() {
   const profileCompletion = user.profileCompletionPercent ?? 100;
   const bio = user.instructorProfile?.bio || user.bio;
 
+  const handleInputFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+
+    if (!file) return;
+
+    const isValidType = Object.values(PaymentProofContentType).includes(file.type as PaymentProofContentType);
+
+    if (!isValidType) {
+      toast.error(t('payments:proofInvalidTypeTitle'));
+      event.currentTarget.value = '';
+
+      return;
+    }
+
+    setImageURL(URL.createObjectURL(file));
+    onChange({ profilePhoto: file });
+    event.currentTarget.value = '';
+  };
+
   return (
     <section>
       <Section navbarPadding className='bg-primary' contentClassName='pb-8 md:pb-15'>
         <section className='bg-white rounded-[0_100px_0_100px] md:rounded-[0_158px_0_158px] shadow-2xl grid md:grid-cols-[auto_1fr] lg:grid-cols-[auto_1fr_auto] lg:gap-8 mt-20 items-center overflow-hidden'>
-          <section className='bg-accent h-full p-4 xl:p-6 flex'>
-            <ProfilePicture className='transition-all size-50 xl:size-80 border-10 bg-transparent border-accent m-auto' />
+          <section className='relative bg-accent h-full p-4 xl:p-6 flex overflow-hidden'>
+            <ProfilePicture
+              image={imageURL}
+              className='transition-all size-50 xl:size-80 border-10 bg-transparent border-accent m-auto'
+            />
+            <section
+              className={cn(
+                !editMode && 'hidden',
+                editMode && 'absolute top-0 left-0 size-full bg-gray-400/50 grid place-content-center',
+              )}
+            >
+              <section className='rounded-full size-50 text-white bg-gray-300/50 shadow-sm grid place-content-center border border-solid'>
+                <FaFileUpload className='size-20' />
+              </section>
+              <input
+                type='file'
+                className='absolute size-full top-0 left-0 cursor-pointer opacity-0'
+                accept={PaymentProofContentTypesList.join(',')}
+                onChange={handleInputFileUpload}
+              />
+            </section>
           </section>
           <section className='px-8 py-8 grid justify-items-center md:justify-items-start md:pl-8 md:pr-8 lg:pr-16'>
             {user.roles.length > 0 && (
@@ -81,12 +134,10 @@ export function ProfileHeader() {
       <Section>
         <section className='relative pt-8 md:pt-0'>
           <section className='bg-white md:bg-accent/80 w-full md:w-auto backdrop-blur-md p-4 shadow-lg rounded-lg flex flex-col md:flex-row gap-4 md:absolute md:top-full md:-translate-y-1/2 md:right-0'>
-            <Link to={PageURLS.profile.edit}>
-              <Button variant='solid' color='secondary' size='small' fullWidth>
-                <LuPencil className='h-4 w-4' />
-                {t('common:edit')}
-              </Button>
-            </Link>
+            <Button variant='solid' color='secondary' size='small' fullWidth onClick={onEdit}>
+              {editMode ? <FaSave className='size-4' /> : <LuPencil className='size-4' />}
+              {editMode ? t('common:save') : t('common:edit')}
+            </Button>
 
             <Link to={PageURLS.profile.subscription}>
               <Button variant='solid' color='primary' size='small' fullWidth>
