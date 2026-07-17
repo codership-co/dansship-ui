@@ -11,5 +11,7 @@ export * from './use-classes';
 export * from './use-instructor-profile';
 export * from './use-my-bookings';
 export * from './use-onboarding';
+export * from './use-instructor-onboarding';
+export * from './use-student-onboarding';
 export * from './use-products';
 export * from './use-payment-intents';

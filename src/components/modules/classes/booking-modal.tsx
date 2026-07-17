@@ -8,12 +8,9 @@ import { Container } from '@components/containers';
 import { ProfilePicture } from '@components/ui';
 import { useAuth } from '@contexts';
 import { DansshipAPI, PublishedClass } from '@core/api';
-import { PageURLS } from '@core/constants';
+import { DEFAULT_ROOM_IMAGE, PageURLS } from '@core/constants';
 import { formatTimeDifference } from '@helpers';
 import { useDateLocale, usePromise, useMyBookings } from '@hooks';
-
-const image =
-  'https://content.arquitecturaydiseno.es/medio/2023/12/06/casa-meritxell-ribe-angli-05_5001cc3f_231206133301_1280x794.jpg';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -117,7 +114,11 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
       size='600px'
       contentClassName='p-0 h-full overflow-auto grid grid-rows-[auto_1fr]'
     >
-      <img src={image} alt='Room class' className='aspect-16/8 object-cover [@media(min-height:1000px)]:aspect-16/10' />
+      <img
+        src={DEFAULT_ROOM_IMAGE}
+        alt='Room class'
+        className='aspect-16/8 object-cover [@media(min-height:1000px)]:aspect-16/10'
+      />
       <section className='grid gap-4 grid-rows-[1fr_auto] h-full overflow-auto'>
         <section className='grid gap-4 pt-4 px-8 content-start'>
           <h3 className='text-center text-primary'>
@@ -125,7 +126,7 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
           </h3>
 
           <Container className='bg-secondary/20 py-8 xs:py-4 grid grid-flow-row xs:grid-flow-col justify-center xs:justify-between gap-4 xs:gap-8 items-center shadow-none'>
-            <section className='grid'>
+            <section className='grid justify-items-center'>
               <ProfilePicture className='size-20 border-primary border-2' />
             </section>
             <section className='grid content-center text-center xs:text-right'>

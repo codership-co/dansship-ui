@@ -3,10 +3,11 @@ import { TFunction } from 'i18next';
 import { Button } from 'polpo/components';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { LuPhone } from 'react-icons/lu';
 import { z } from 'zod';
 
-import { SelectField, TextareaField, TextField } from '@components/form-fields';
-import { COUNTRY_CODE_OPTIONS, RELATIVE_OPTIONS } from '@core/constants';
+import { PhoneField, SelectField, TextareaField, TextField } from '@components/form-fields';
+import { RELATIVE_OPTIONS } from '@core/constants';
 
 export const createHealthDataSchema = (t: TFunction) =>
   z.object({
@@ -52,7 +53,7 @@ export function OnboardingHealthForm({ isLoading, error, onContinue, onSkip }: O
   return (
     <div className='space-y-6'>
       <form className='space-y-6' onSubmit={handleSubmit(onContinue)}>
-        <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-start'>
+        <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-end'>
           <TextField
             control={control}
             name='emergency_contact_name'
@@ -72,40 +73,32 @@ export function OnboardingHealthForm({ isLoading, error, onContinue, onSkip }: O
           />
         </div>
 
-        <div className='grid grid-cols-1 gap-4 lg:grid-cols-[auto_1fr] items-start'>
-          <SelectField
+        <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-end'>
+          <PhoneField
             control={control}
-            name='emergency_contact_phone_country_code'
-            label={t('auth:onboarding.fields.emergencyPhoneCode.label')}
-            options={COUNTRY_CODE_OPTIONS}
-            placeholder={t('auth:onboarding.fields.emergencyPhoneCode.placeholder')}
-          />
-
-          <TextField
-            type='number'
-            inputMode='numeric'
-            control={control}
+            codeName='emergency_contact_phone_country_code'
+            codePlaceholder={t('auth:onboarding.fields.emergencyPhoneCode.placeholder')}
             name='emergency_contact_phone_number'
+            icon={<LuPhone className='mr-2 h-4 w-4' />}
+            type='tel'
             label={t('auth:onboarding.fields.emergencyPhoneNumber.label')}
             placeholder={t('auth:onboarding.fields.emergencyPhoneNumber.placeholder')}
           />
-        </div>
-
-        <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-start'>
           <TextField
             control={control}
             name='eps'
             label={t('auth:onboarding.fields.eps.label')}
             placeholder={t('auth:onboarding.fields.eps.placeholder')}
           />
-
-          <TextareaField
-            control={control}
-            name='existing_medical_conditions'
-            label={t('auth:onboarding.fields.medicalConditions.label')}
-            placeholder={t('auth:onboarding.fields.medicalConditions.placeholder')}
-          />
         </div>
+
+        <TextareaField
+          control={control}
+          rows={8}
+          name='existing_medical_conditions'
+          label={t('auth:onboarding.fields.medicalConditions.label')}
+          placeholder={t('auth:onboarding.fields.medicalConditions.placeholder')}
+        />
 
         {error ? <p className='text-sm text-alert-600'>{error}</p> : null}
 

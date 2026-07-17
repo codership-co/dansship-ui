@@ -21,20 +21,15 @@ import {
   type VerifyEmailPayload,
   VerifyEmailResponse,
 } from '@core/api';
-import { AUTH_SESSION_KEY, FORCE_INSTRUCTOR_ONBOARDING_KEY, PageURLS } from '@core/constants';
+import { AUTH_SESSION_KEY, PageURLS } from '@core/constants';
 import { type PERMISSION } from '@core/permissions';
 import { getPendingPlanCheckoutIntent, getRedirectPathByRole } from '@helpers';
 import { useEventListener } from '@hooks';
 import { Error404Page, UnauthorizedPage, UnavailablePage } from '@pages';
 
-interface LoginOptions {
-  redirectTo?: string;
-  redirectState?: Record<string, unknown>;
-}
-
 interface CommonAuthContextState {
   ready: boolean;
-  login: (data: LoginPayload, options?: LoginOptions) => Promise<void>;
+  login: (data: LoginPayload) => Promise<void>;
   signUp: (data: RegisterPayload) => Promise<void>;
   updateProfile: (data: UpdateProfilePayload) => Promise<void>;
   forgotPassword: (data: ForgotPasswordPayload) => Promise<void>;
@@ -134,16 +129,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }
 
-  async function login(payload: LoginPayload, options?: LoginOptions) {
+  async function login(payload: LoginPayload) {
     try {
       const data = await DansshipAPI.auth.login(payload);
       localStorage.setItem(AUTH_SESSION_KEY, '1');
       toast.success(t('auth:loginSuccess'));
       setUser(data);
 
-      if (options?.redirectTo) {
-        navigate(options.redirectTo, { replace: true, state: options.redirectState });
-      } else if (fromPath && fromPath !== PageURLS.auth.login) {
+      if (fromPath && fromPath !== PageURLS.auth.login) {
         navigate(fromPath, { replace: true });
       } else {
         const redirectPath = getRedirectPathByRole(data.roles);
@@ -152,9 +145,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } catch (error) {
       if (error instanceof DansshipAPIError) {
         if (error.body.error_code === DANSSHIP_ERROR_CODE.EMAIL_NOT_VERIFIED) {
-          navigate(PageURLS.auth.verifyEmail, { replace: true, state: { email: payload.email } });
+          navigate(PageURLS.auth.verifyEmail, {
+            replace: true,
+            state: {
+              email: payload.email,
+              shouldResendVerificationImmediately: true,
+            },
+          });
 
-          toast.error(t('auth:emailVerificationNeeded'));
+          toast.info(t('auth:emailVerificationNeeded'));
         }
 
         if (error.body.error_code === DANSSHIP_ERROR_CODE.UNAUTHORIZED) {
@@ -178,11 +177,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       navigate(PageURLS.auth.verifyEmail, {
         state: {
           email: payload.email,
+          shouldStartCountDownImmediately: true,
         },
       });
 
       toast.success(t('auth:registerSuccess'));
-    } catch {
+    } catch (error) {
+      if (error instanceof DansshipAPIError) {
+        if (error.body.error_code === DANSSHIP_ERROR_CODE.BAD_REQUEST) {
+          toast.error(t('auth:signUpBadRequest'), {
+            description: t('auth:signUpBadRequestDescription'),
+          });
+        }
+
+        return;
+      }
+
       toast.error(t('auth:registerFailed'));
     }
   }
@@ -235,11 +245,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   async function verifyEmail(payload: VerifyEmailPayload) {
     try {
       const data = await DansshipAPI.auth.verifyEmail(payload);
-      toast.success(data.message);
+      toast.success(t('auth:verifyEmail.titles.verified'), {
+        description: t('auth:verifyEmail.subtitles.verified'),
+      });
 
       return data;
     } catch {
-      toast.error(t('auth:verifyEmail.subtitles.verificationFailed'));
+      toast.error(t('auth:verifyEmail.titles.verificationFailed'), {
+        description: t('auth:verifyEmail.subtitles.verificationFailed'),
+      });
     }
   }
 
@@ -248,15 +262,32 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const data = await DansshipAPI.auth.resendVerification(payload);
 
       if (data.verification_sent) {
-        toast.success(data.message);
+        toast.success(t('auth:verifyEmail.titles.verificationResended'), {
+          description: t('auth:verifyEmail.subtitles.verificationResended'),
+        });
       }
 
       return data;
-    } catch {
+    } catch (error) {
+      if (error instanceof DansshipAPIError) {
+        if (error.body.error_code === DANSSHIP_ERROR_CODE.TOO_MANY_REQUESTS) {
+          toast.error(t('auth:resendVerificationManyRequests'), {
+            description: t('auth:resendVerificationManyRequestsDescription', {
+              email: payload.email,
+            }),
+          });
+        }
+
+        return;
+      }
+
       toast.error(
-        t('auth:verifyEmail.subtitles.verificationResendFailed', {
+        t('auth:verifyEmail.titles.verificationResendFailed', {
           email: payload.email,
         }),
+        {
+          description: t('auth:verifyEmail.subtitles.verificationResendFailed'),
+        },
       );
     }
   }
@@ -380,13 +411,9 @@ export function SecurityGuard(
         isAuthenticated &&
         requireOnboarding &&
         pathname !== PageURLS.auth.onboarding &&
-        pathname !== PageURLS.auth.instructorOnboarding &&
-        pathname !== PageURLS.instructorInvite
+        pathname !== PageURLS.auth.verifyInstructor
       ) {
-        const forceInstructor = sessionStorage.getItem(FORCE_INSTRUCTOR_ONBOARDING_KEY) === '1';
-        const onboardingPath = forceInstructor ? PageURLS.auth.instructorOnboarding : PageURLS.auth.onboarding;
-
-        return <Navigate to={onboardingPath} state={{ from: location }} />;
+        return <Navigate to={PageURLS.auth.onboarding} state={{ from: location }} />;
       }
 
       if (isAuthenticated && getPendingPlanCheckoutIntent() && pathname !== PageURLS.home) {

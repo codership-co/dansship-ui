@@ -7,6 +7,9 @@ export const languageCodes = languages.map(l => l.code);
 export type LanguageCode = (typeof languageCodes)[number];
 export const defaultLanguage = languages[0];
 
+export const DEFAULT_ROOM_IMAGE =
+  'https://content.arquitecturaydiseno.es/medio/2023/12/06/casa-meritxell-ribe-angli-05_5001cc3f_231206133301_1280x794.jpg';
+
 export const DOCUMENT_TYPE_OPTIONS = [
   { value: 'CC', label: 'auth:onboarding.documentTypeOptions.CC' },
   { value: 'CE', label: 'auth:onboarding.documentTypeOptions.CE' },
@@ -75,7 +78,6 @@ export const DAY_OF_WEEK_OPTIONS = [
   { value: 'sunday', label: 'common:days.sunday' },
 ] as const;
 
-export const FORCE_INSTRUCTOR_ONBOARDING_KEY = 'force_instructor_onboarding';
 export const AUTH_SESSION_KEY = 'auth_session';
 export const AUTH_TOKEN_KEY = 'auth_token';
 
@@ -88,10 +90,11 @@ export const PageURLS = {
     verifyEmail: '/auth/verify-email',
     resetPassword: '/auth/reset-password',
     onboarding: '/auth/onboarding',
-    instructorOnboarding: '/auth/instructor-onboarding',
+    verifyInstructor: '/auth/verify-instructor',
   },
   profile: {
     root: '/profile',
+    user: (id: string | number) => `/${id}`,
     edit: '/profile/edit',
     subscription: '/profile/subscription',
     bookings: '/profile/bookings',
@@ -112,10 +115,7 @@ export const PageURLS = {
     figures: '/admin/figures',
     studioRental: '/admin/studio-rental',
   },
-  userId: (id: string | number) => `/user/${id}`,
   figures: '/figures',
-  instructorInvite: '/instructor-onboarding',
-  instructorDashboard: '/instructor/dashboard',
   figuresById: (id: string | number) => `/figures/${id}`,
   browse: '/browse',
   classes: '/classes',

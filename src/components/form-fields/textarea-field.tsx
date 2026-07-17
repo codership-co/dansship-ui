@@ -17,6 +17,7 @@ interface TextareaFieldProps<T extends FieldValues = Record<string, unknown>> {
   inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode'];
   maxLength?: number;
   disabled?: boolean;
+  rows?: number;
 }
 
 export function TextareaField<T extends FieldValues = Record<string, unknown>>({
@@ -31,6 +32,7 @@ export function TextareaField<T extends FieldValues = Record<string, unknown>>({
   inputMode,
   maxLength,
   disabled,
+  rows,
 }: TextareaFieldProps<T>) {
   const hasLeftIcon = Boolean(icon);
   const hasRightElement = Boolean(rightElement);
@@ -52,8 +54,9 @@ export function TextareaField<T extends FieldValues = Record<string, unknown>>({
               inputMode={inputMode}
               maxLength={maxLength}
               disabled={disabled}
+              rows={rows}
               className={cn(
-                'pr-8',
+                'pr-8 min-h-50',
                 hasLeftIcon && 'pl-10',
                 hasRightElement && !error && 'pr-10',
                 hasRightElement && error && 'pr-16',

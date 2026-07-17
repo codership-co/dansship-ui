@@ -2,6 +2,7 @@ export * from './textarea-field';
 export * from './checkbox';
 export * from './date-field';
 export * from './text-field';
+export * from './phone-field';
 export * from './email-field';
 export * from './select-field';
 export * from './password-field';

@@ -114,8 +114,8 @@ export function OnboardingInstructorOperationalProfileForm({
   };
 
   return (
-    <div className='space-y-6'>
-      <form className='space-y-6' onSubmit={handleSubmit(handleFormSubmit)}>
+    <div className='grid gap-4'>
+      <form className='grid gap-16' onSubmit={handleSubmit(handleFormSubmit)}>
         <TextField
           control={control}
           name='instagram'
@@ -123,8 +123,21 @@ export function OnboardingInstructorOperationalProfileForm({
           placeholder={t('auth:onboarding.fields.instagram.placeholder')}
         />
 
-        <section className='space-y-4'>
-          <label className='font-medium'>{t('auth:onboarding.availability')}</label>
+        <section className='grid gap-4'>
+          <section className='grid grid-flow-col items-start gap-8 justify-between'>
+            <p className='font-bold'>{t('auth:onboarding.availability')}</p>
+
+            <Button
+              size='small'
+              type='button'
+              color='primary'
+              variant='outlined'
+              onClick={() => appendAvailability({ day_of_week: 'monday', start_time: '09:00', end_time: '12:00' })}
+            >
+              <LuPlus />
+              {t('auth:onboarding.addAvailability')}
+            </Button>
+          </section>
 
           {availabilityFields.map((field, index) => (
             <div key={field.id} className='grid grid-cols-1 gap-4 lg:grid-cols-[1fr_1fr_1fr_auto] items-start'>
@@ -182,22 +195,23 @@ export function OnboardingInstructorOperationalProfileForm({
               </Button>
             </div>
           ))}
+        </section>
 
-          <div className='flex justify-end'>
+        <section className='grid gap-4'>
+          <section className='grid grid-flow-col items-start gap-8 justify-between'>
+            <p className='font-bold'>{t('auth:onboarding.instructorDisciplines')}</p>
+
             <Button
+              size='small'
               type='button'
               color='primary'
               variant='outlined'
-              onClick={() => appendAvailability({ day_of_week: 'monday', start_time: '09:00', end_time: '12:00' })}
+              onClick={() => appendDiscipline({ discipline_name: '', years_experience: 1 })}
             >
               <LuPlus />
-              {t('auth:onboarding.addAvailability')}
+              {t('auth:onboarding.addDiscipline')}
             </Button>
-          </div>
-        </section>
-
-        <section className='space-y-4'>
-          <label className='font-medium'>{t('auth:onboarding.instructorDisciplines')}</label>
+          </section>
 
           {disciplineFields.map((field, index) => (
             <div key={field.id} className='grid grid-cols-1 gap-4 lg:grid-cols-[1fr_1fr_auto] items-start'>
@@ -245,24 +259,12 @@ export function OnboardingInstructorOperationalProfileForm({
               </Button>
             </div>
           ))}
-
-          <div className='flex justify-end'>
-            <Button
-              type='button'
-              color='primary'
-              variant='outlined'
-              onClick={() => appendDiscipline({ discipline_name: '', years_experience: 1 })}
-            >
-              <LuPlus />
-              {t('auth:onboarding.addDiscipline')}
-            </Button>
-          </div>
         </section>
 
         {error ? <p className='text-sm text-alert-600'>{error}</p> : null}
 
-        <Button type='submit' isLoading={isLoading} color='primary' className='mt-4' fullWidth>
-          {isLoading ? t('common:loading') : t('auth:onboarding.continue')}
+        <Button type='submit' isLoading={isLoading} color='primary' className='mt-20' fullWidth>
+          {t('auth:onboarding.continue')}
         </Button>
       </form>
     </div>

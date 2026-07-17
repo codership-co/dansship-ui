@@ -1,13 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TFunction } from 'i18next';
 import { Button } from 'polpo/components';
+import { ChangeEvent, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { LuBuilding, LuCalendar, LuHouse, LuIdCard, LuUser } from 'react-icons/lu';
+import { LuBuilding, LuCalendar, LuHouse, LuIdCard, LuPhone, LuUser } from 'react-icons/lu';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
-import { DateField, SelectField, TextField } from '@components/form-fields';
-import { COUNTRY_CODE_OPTIONS, DOCUMENT_TYPE_OPTIONS } from '@core/constants';
+import { DateField, PhoneField, SelectField, TextField } from '@components/form-fields';
+import { PaymentProofContentType, PaymentProofContentTypesList } from '@core/api';
+import { DOCUMENT_TYPE_OPTIONS } from '@core/constants';
 
 export const createStudentProfileSchema = (t: TFunction) => {
   const tenYearsAgo = new Date();
@@ -38,6 +41,8 @@ interface OnboardingStudentProfileFormProps {
 export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: OnboardingStudentProfileFormProps) {
   const { t } = useTranslation();
   const schema = createStudentProfileSchema(t);
+  const [profilePhoto, setProfilePhoto] = useState<File>();
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const { handleSubmit, control } = useForm<StudentProfileFormValues>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -55,32 +60,95 @@ export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: Onb
     },
   });
 
+  const handleInputFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0] ?? null;
+
+    if (!file) return;
+
+    const isValidType = Object.values(PaymentProofContentType).includes(file.type as PaymentProofContentType);
+
+    if (!isValidType) {
+      toast.error(t('payments:proofInvalidTypeTitle'));
+      event.currentTarget.value = '';
+
+      return;
+    }
+
+    setImageUrl(URL.createObjectURL(file));
+    setProfilePhoto(file);
+    event.currentTarget.value = '';
+  };
+
+  const internalSubmit = (values: StudentProfileFormValues) => {
+    // TODO: upload profilePhoto and assign it to student profile
+
+    onSubmit(values);
+  };
+
   return (
     <div className='space-y-6'>
-      <form className='space-y-4' onSubmit={handleSubmit(onSubmit)}>
-        <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-start'>
-          <div className='space-y-2'>
-            <TextField
-              control={control}
-              label={t('auth:onboarding.fields.fullName.label')}
-              name='full_name'
-              placeholder={t('auth:onboarding.fields.fullName.placeholder')}
-              icon={<LuUser className='mr-2 h-4 w-4' />}
+      <form className='space-y-4' onSubmit={handleSubmit(internalSubmit)}>
+        <section className='grid lg:grid-cols-[auto_1fr] gap-4'>
+          <div className='relative grid justify-items-center gap-8 rounded-md border border-dashed border-gray-300 py-4 px-8'>
+            <section>
+              <section className='w-50 aspect-square bg-gray-300/50 border border-dashed border-gray-300 rounded-full grid place-content-center overflow-hidden'>
+                {imageUrl ? (
+                  <img src={imageUrl} alt='proof preview' className='w-full aspect-square inline-block object-cover' />
+                ) : (
+                  <label className='p-8 text-center'>{t('auth:onboarding.fields.profilePhoto.button')}</label>
+                )}
+              </section>
+            </section>
+            <section className='grid justify-items-center'>
+              <Button color='secondary' variant='flat'>
+                {profilePhoto
+                  ? t('auth:onboarding.fields.profilePhoto.buttonReplace')
+                  : t('auth:onboarding.fields.profilePhoto.button')}
+              </Button>
+            </section>
+            <input
+              type='file'
+              className='absolute w-full h-full top-0 left-0 cursor-pointer opacity-0'
+              accept={PaymentProofContentTypesList.join(',')}
+              onChange={handleInputFileUpload}
             />
           </div>
 
-          <div className='space-y-2'>
-            <DateField
-              control={control}
-              name='birth_date'
-              label={t('auth:onboarding.fields.birthDate.label')}
-              icon={<LuCalendar className='mr-2 h-4 w-4' />}
-              placeholder={t('auth:onboarding.fields.birthDate.placeholder')}
-            />
-          </div>
-        </div>
+          <section className='space-y-4'>
+            <div className='space-y-2'>
+              <TextField
+                control={control}
+                label={t('auth:onboarding.fields.fullName.label')}
+                name='full_name'
+                placeholder={t('auth:onboarding.fields.fullName.placeholder')}
+                icon={<LuUser className='mr-2 h-4 w-4' />}
+              />
+            </div>
 
-        <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-start'>
+            <div className='space-y-2'>
+              <DateField
+                control={control}
+                name='birth_date'
+                label={t('auth:onboarding.fields.birthDate.label')}
+                icon={<LuCalendar className='mr-2 h-4 w-4' />}
+                placeholder={t('auth:onboarding.fields.birthDate.placeholder')}
+              />
+            </div>
+
+            <PhoneField
+              control={control}
+              codeName='phone_country_code'
+              codePlaceholder={t('auth:onboarding.fields.phoneCode.placeholder')}
+              name='phone_number'
+              icon={<LuPhone className='mr-2 h-4 w-4' />}
+              type='tel'
+              label={t('auth:onboarding.fields.phoneNumber.label')}
+              placeholder={t('auth:onboarding.fields.phoneNumber.placeholder')}
+            />
+          </section>
+        </section>
+
+        <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-end'>
           <SelectField
             control={control}
             name='document_type'
@@ -103,25 +171,7 @@ export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: Onb
           </div>
         </div>
 
-        <div className='grid grid-cols-1 gap-4 lg:grid-cols-[auto_1fr] items-start'>
-          <SelectField
-            control={control}
-            name='phone_country_code'
-            label={t('auth:onboarding.fields.phoneCode.label')}
-            options={COUNTRY_CODE_OPTIONS}
-            placeholder={t('auth:onboarding.fields.phoneCode.placeholder')}
-          />
-          <TextField
-            control={control}
-            type='tel'
-            label={t('auth:onboarding.fields.phoneNumber.label')}
-            name='phone_number'
-            placeholder={t('auth:onboarding.fields.phoneNumber.placeholder')}
-            icon={<LuBuilding className='mr-2 h-4 w-4' />}
-          />
-        </div>
-
-        <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-start'>
+        <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-end'>
           <div className='space-y-2'>
             <TextField
               control={control}
@@ -145,7 +195,14 @@ export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: Onb
 
         {error ? <p className='text-sm text-alert-600'>{error}</p> : null}
 
-        <Button type='submit' isLoading={isLoading} color='primary' className='mt-4' fullWidth>
+        <Button
+          type='submit'
+          isLoading={isLoading}
+          disabled={!profilePhoto}
+          color='primary'
+          className='mt-12'
+          fullWidth
+        >
           {isLoading ? t('common:loading') : t('auth:onboarding.continue')}
         </Button>
       </form>

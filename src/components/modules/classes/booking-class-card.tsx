@@ -6,11 +6,8 @@ import { Link } from 'react-router';
 
 import { ProfilePicture } from '@components/ui';
 import { PublishedClass } from '@core/api';
-import { PageURLS } from '@core/constants';
+import { DEFAULT_ROOM_IMAGE, PageURLS } from '@core/constants';
 import { formatTimeDifference } from '@helpers';
-
-const image =
-  'https://content.arquitecturaydiseno.es/medio/2023/12/06/casa-meritxell-ribe-angli-05_5001cc3f_231206133301_1280x794.jpg';
 
 interface BookingClassCardProps {
   bookingClass: PublishedClass;
@@ -36,7 +33,7 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
       <section
         className='absolute -z-10 top-0 left-0 size-full rounded-2xl'
         style={{
-          background: `url('${image}') center center / cover`,
+          background: `url('${DEFAULT_ROOM_IMAGE}') center center / cover`,
         }}
       />
 
@@ -69,7 +66,7 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
             </section>
           </section>
           <Link
-            to={PageURLS.userId(bookingClass.instructor?.id ?? '')}
+            to={PageURLS.profile.user(bookingClass.instructor?.id ?? '')}
             className='grid gap-4 w-40 content-center justify-items-center text-center'
           >
             <ProfilePicture className='size-20 border-primary border-2' />

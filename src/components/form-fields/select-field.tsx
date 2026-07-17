@@ -1,3 +1,4 @@
+import { cn } from 'polpo/helpers';
 import { type Control, Controller, type FieldValues, type Path } from 'react-hook-form';
 
 import { Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
@@ -16,6 +17,7 @@ interface SelectFieldProps<T extends FieldValues = Record<string, unknown>> {
   disabled?: boolean;
   id?: string;
   hideLabel?: boolean;
+  className?: string;
 }
 
 export function SelectField<T extends FieldValues = Record<string, unknown>>({
@@ -27,6 +29,7 @@ export function SelectField<T extends FieldValues = Record<string, unknown>>({
   disabled,
   id,
   hideLabel = false,
+  className,
 }: SelectFieldProps<T>) {
   const fieldId = id || `field-${name}`;
 
@@ -38,7 +41,10 @@ export function SelectField<T extends FieldValues = Record<string, unknown>>({
         <div className='grid gap-2'>
           {!hideLabel ? <Label htmlFor={fieldId}>{label}</Label> : null}
           <Select value={field.value || ''} onValueChange={field.onChange} disabled={disabled}>
-            <SelectTrigger id={fieldId} className={error ? 'border-alert-600 focus-visible:ring-alert-600' : ''}>
+            <SelectTrigger
+              id={fieldId}
+              className={cn(error ? 'border-alert-600 focus-visible:ring-alert-600' : '', className)}
+            >
               <SelectValue placeholder={placeholder || 'Select an option'} />
             </SelectTrigger>
             <SelectContent>

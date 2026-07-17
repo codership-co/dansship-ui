@@ -3,7 +3,7 @@ import { Button } from 'polpo/components';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { z } from 'zod';
 
 import { EmailField, PasswordField } from '@components/form-fields';
@@ -24,24 +24,13 @@ const createLoginSchema = (t: (key: string) => string) =>
 
 export type LoginFormData = z.infer<ReturnType<typeof createLoginSchema>>;
 
-interface LoginFormProps {
-  defaultEmail?: string;
-  emailReadOnly?: boolean;
-  hideLinks?: boolean;
-  redirectTo?: string;
-  redirectState?: Record<string, unknown>;
-}
-
-export function LoginForm({
-  defaultEmail = '',
-  emailReadOnly = false,
-  hideLinks = false,
-  redirectTo,
-  redirectState,
-}: LoginFormProps = {}) {
+export function LoginForm() {
   const { t } = useTranslation();
   const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const location = useLocation();
+  const state = location.state;
+  const defaultEmail = state.email || '';
 
   const loginSchema = createLoginSchema(t);
 
@@ -66,7 +55,7 @@ export function LoginForm({
 
   const internalSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    await login(data, redirectTo ? { redirectTo, redirectState } : undefined);
+    await login(data);
     setIsLoading(false);
   };
 
@@ -78,9 +67,8 @@ export function LoginForm({
         name='email'
         label={t('auth:login.email')}
         placeholder={t('common:placeholder.email')}
-        disabled={emailReadOnly}
+        disabled={defaultEmail}
       />
-
       <PasswordField
         id='password'
         control={control}
@@ -89,20 +77,17 @@ export function LoginForm({
         autoComplete='current-password'
         placeholder={t('common:placeholder.password')}
       />
-
-      {!hideLinks ? (
+      {!defaultEmail ? (
         <div className='flex items-center justify-end'>
           <Link to={PageURLS.auth.forgotPassword} viewTransition className='text-sm text-primary hover:text-primary/90'>
             {t('auth:login.forgotPassword')}
           </Link>
         </div>
       ) : null}
-
       <Button type='submit' isLoading={isLoading} color='primary' className='w-full'>
-        {hideLinks ? t('auth:instructorOnboarding.completeProfile') : t('auth:login.signIn')}
+        {defaultEmail ? t('auth:instructorOnboarding.completeProfile') : t('auth:login.signIn')}
       </Button>
-
-      {!hideLinks ? (
+      {!defaultEmail ? (
         <div className='text-center text-sm'>
           <span className='text-gray-600'>{t('auth:login.noAccount')}</span>{' '}
           <Link to={PageURLS.auth.signup} viewTransition className='font-medium text-primary hover:text-primary/90'>

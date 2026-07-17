@@ -2,6 +2,7 @@ import { format, differenceInDays, isFuture } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 import { LuActivity, LuCalendarDays, LuTicket, LuClock, LuLayers } from 'react-icons/lu';
 
+import { Container, SectionEmpty } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui';
 import { type ActiveSubscription, DansshipAPI, type SubscriptionStatus } from '@core/api';
@@ -46,24 +47,14 @@ export function ActiveSubscriptionWidget() {
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className='flex justify-center p-8'>
-          <SpinnerLoader />
-        </CardContent>
-      </Card>
+      <Container>
+        <SpinnerLoader />
+      </Container>
     );
   }
 
   if (currentSubscriptions.length === 0) {
-    return (
-      <Card className='border-2 border-dashed border-secondary/60 shadow-none'>
-        <CardContent className='p-8 text-center'>
-          <h3 className='mb-2 text-lg font-semibold text-gray-900'>{t('subscriptions:noSubscriptions')}</h3>
-
-          <p className='text-sm text-gray-500'>{t('subscriptions:noSubscriptionsDesc')}</p>
-        </CardContent>
-      </Card>
-    );
+    return <SectionEmpty message={t('subscriptions:noSubscriptions')} label={t('subscriptions:noSubscriptionsDesc')} />;
   }
 
   const sorted = sortSubscriptions(currentSubscriptions);

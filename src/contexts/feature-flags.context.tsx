@@ -8,6 +8,7 @@ export enum FEATURE_FLAG {
   isForgotPasswordPageEnabled = 'isForgotPasswordPageEnabled',
   isResetPasswordPageEnabled = 'isResetPasswordPageEnabled',
   isVerifyEmailPageEnabled = 'isVerifyEmailPageEnabled',
+  isVerifyInstructorPageEnabled = 'isVerifyInstructorPageEnabled',
   isOnboardingPageEnabled = 'isOnboardingPageEnabled',
 
   // USER
@@ -79,6 +80,7 @@ interface AuthPages {
   isForgotPasswordPageEnabled: boolean | string;
   isResetPasswordPageEnabled: boolean | string;
   isVerifyEmailPageEnabled: boolean | string;
+  isVerifyInstructorPageEnabled: boolean | string;
   isOnboardingPageEnabled: boolean | string;
 }
 
@@ -116,6 +118,7 @@ export const FeatureFlagsProvider = ({ children }: FeatureFlagsProviderProps) =>
         isForgotPasswordPageEnabled: isAuthOn && authPages.isForgotPasswordPageEnabled === true,
         isResetPasswordPageEnabled: isAuthOn && authPages.isResetPasswordPageEnabled === true,
         isVerifyEmailPageEnabled: isAuthOn && authPages.isVerifyEmailPageEnabled === true,
+        isVerifyInstructorPageEnabled: isAuthOn && authPages.isVerifyInstructorPageEnabled === true,
         isOnboardingPageEnabled: isAuthOn && authPages.isOnboardingPageEnabled === true,
 
         // USER

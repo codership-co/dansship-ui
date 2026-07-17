@@ -1,9 +1,10 @@
-import { createBrowserRouter, RouteObject, RouterProvider } from 'react-router';
+import { createBrowserRouter, redirect, RouteObject, RouterProvider } from 'react-router';
 
 import { loggingMiddleware } from './middleware';
 
 import { RouterAuthLayout, RouterPageLayout, RouterRootLayout } from '@components/layouts';
 import { RootLoader } from '@components/loaders';
+import { PageURLS } from '@core/constants';
 import {
   Error404Page,
   HomePage,
@@ -30,7 +31,6 @@ import {
   SecureInstructorOnboardingPage,
   SecureLoginPage,
   SecureOnboardingPage,
-  SecureOnboardingInstructorPage,
   SecureProfileEditPage,
   SecurePaymentsResultPage,
   SecureResetPasswordPage,
@@ -62,19 +62,32 @@ const routes: Array<RouteObject> = [
           { path: 'forgot-password', Component: SecureForgotPasswordPage },
           { path: 'verify-email', Component: SecureVerifyEmailPage },
           { path: 'reset-password', Component: SecureResetPasswordPage },
-          { path: 'onboarding', Component: SecureOnboardingPage },
-          { path: 'instructor-onboarding', Component: SecureOnboardingInstructorPage },
+          { path: 'verify-instructor', Component: SecureInstructorOnboardingPage },
         ],
       },
       {
         Component: RouterAuthLayout,
-        children: [{ path: 'instructor-onboarding', Component: SecureInstructorOnboardingPage }],
+        children: [
+          {
+            path: 'instructor-onboarding',
+            loader: async ({ request }) => {
+              const url = new URL(request.url);
+              const searchParams = url.search;
+
+              throw redirect(`${PageURLS.auth.verifyInstructor}${searchParams}`, {
+                status: 302,
+              });
+            },
+          },
+        ],
       },
       {
         Component: RouterPageLayout,
         children: [
           { path: 'ui', Component: UiPage },
           { index: true, Component: HomePage, loader: HomeLoader },
+
+          { path: 'auth/onboarding', Component: SecureOnboardingPage },
 
           { path: 'figures', Component: SecureFiguresPage },
           { path: 'figures/:id', Component: SecureFiguresDetailsPage },
