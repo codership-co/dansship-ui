@@ -42,7 +42,7 @@ function AdminReportsPage() {
 }
 
 export const SecureAdminReportsPage = SecurityGuard(AdminReportsPage, {
-  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled, FEATURE_FLAG.isAdminReportsPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
   orPermissions: AdminPermissions.reports,
   requiresAuth: true,
   redirect: PageURLS.auth.login,

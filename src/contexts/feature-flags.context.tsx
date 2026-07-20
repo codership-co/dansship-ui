@@ -3,13 +3,9 @@ import { createContext, useContext } from 'react';
 export enum FEATURE_FLAG {
   // AUTH
   areAuthPagesEnabled = 'areAuthPagesEnabled',
-  isLoginPageEnabled = 'isLoginPageEnabled',
-  isSignupPageEnabled = 'isSignupPageEnabled',
-  isForgotPasswordPageEnabled = 'isForgotPasswordPageEnabled',
-  isResetPasswordPageEnabled = 'isResetPasswordPageEnabled',
-  isVerifyEmailPageEnabled = 'isVerifyEmailPageEnabled',
-  isVerifyInstructorPageEnabled = 'isVerifyInstructorPageEnabled',
-  isOnboardingPageEnabled = 'isOnboardingPageEnabled',
+
+  // ADMIN
+  areAdminPagesEnabled = 'areAdminPagesEnabled',
 
   // USER
   areUserPagesEnabled = 'areUserPagesEnabled',
@@ -25,22 +21,6 @@ export enum FEATURE_FLAG {
   isProfileEditPageEnabled = 'isProfileEditPageEnabled',
   isStudioRentalBrowsePageEnabled = 'isStudioRentalBrowsePageEnabled',
   isStudioRentalRequestsPageEnabled = 'isStudioRentalRequestsPageEnabled',
-
-  // ADMIN
-  areAdminPagesEnabled = 'areAdminPagesEnabled',
-  isAdminUserListPageEnabled = 'isAdminUserListPageEnabled',
-  isAdminPageEnabled = 'isAdminPageEnabled',
-  isAdminAgendaPageEnabled = 'isAdminAgendaPageEnabled',
-  isAdminAgendaConflictsPageEnabled = 'isAdminAgendaConflictsPageEnabled',
-  isAdminBookingsPageEnabled = 'isAdminBookingsPageEnabled',
-  isAdminFiguresPageEnabled = 'isAdminFiguresPageEnabled',
-  isAdminInventoryPageEnabled = 'isAdminInventoryPageEnabled',
-  isAdminMerchPageEnabled = 'isAdminMerchPageEnabled',
-  isAdminMerchPosPageEnabled = 'isAdminMerchPosPageEnabled',
-  isAdminPaymentsPageEnabled = 'isAdminPaymentsPageEnabled',
-  isAdminReportsPageEnabled = 'isAdminReportsPageEnabled',
-  isAdminScheduleBuilderPageEnabled = 'isAdminScheduleBuilderPageEnabled',
-  isAdminStudioRentalPageEnabled = 'isAdminStudioRentalPageEnabled',
 }
 
 interface UserPages {
@@ -58,33 +38,7 @@ interface UserPages {
   isStudioRentalRequestsPageEnabled: boolean | string;
 }
 
-interface AdminPages {
-  isAdminUserListPageEnabled: boolean | string;
-  isAdminPageEnabled: boolean | string;
-  isAdminAgendaPageEnabled: boolean | string;
-  isAdminAgendaConflictsPageEnabled: boolean | string;
-  isAdminBookingsPageEnabled: boolean | string;
-  isAdminFiguresPageEnabled: boolean | string;
-  isAdminInventoryPageEnabled: boolean | string;
-  isAdminMerchPageEnabled: boolean | string;
-  isAdminMerchPosPageEnabled: boolean | string;
-  isAdminPaymentsPageEnabled: boolean | string;
-  isAdminReportsPageEnabled: boolean | string;
-  isAdminScheduleBuilderPageEnabled: boolean | string;
-  isAdminStudioRentalPageEnabled: boolean | string;
-}
-
-interface AuthPages {
-  isLoginPageEnabled: boolean | string;
-  isSignupPageEnabled: boolean | string;
-  isForgotPasswordPageEnabled: boolean | string;
-  isResetPasswordPageEnabled: boolean | string;
-  isVerifyEmailPageEnabled: boolean | string;
-  isVerifyInstructorPageEnabled: boolean | string;
-  isOnboardingPageEnabled: boolean | string;
-}
-
-interface FeatureFlagsContextState extends UserPages, AdminPages, AuthPages {
+interface FeatureFlagsContextState extends UserPages {
   areUserPagesEnabled: boolean;
   areAuthPagesEnabled: boolean;
   areAdminPagesEnabled: boolean;
@@ -100,11 +54,7 @@ const envs = import.meta.env;
 
 export const FeatureFlagsProvider = ({ children }: FeatureFlagsProviderProps) => {
   const isAuthOn = envs.VITE_ARE_AUTH_PAGES_ENABLED === 'true';
-  const authPages = JSON.parse(envs.VITE_AUTH_PAGES) as AuthPages;
-
   const isAdminOn = envs.VITE_ARE_ADMIN_PAGES_ENABLED === 'true';
-  const adminPages = JSON.parse(envs.VITE_ADMIN_PAGES) as AdminPages;
-
   const isUserOn = envs.VITE_ARE_USER_PAGES_ENABLED === 'true';
   const userPages = JSON.parse(envs.VITE_USER_PAGES) as UserPages;
 
@@ -113,13 +63,9 @@ export const FeatureFlagsProvider = ({ children }: FeatureFlagsProviderProps) =>
       value={{
         // AUTH
         areAuthPagesEnabled: isAuthOn,
-        isLoginPageEnabled: isAuthOn && authPages.isLoginPageEnabled === true,
-        isSignupPageEnabled: isAuthOn && authPages.isSignupPageEnabled === true,
-        isForgotPasswordPageEnabled: isAuthOn && authPages.isForgotPasswordPageEnabled === true,
-        isResetPasswordPageEnabled: isAuthOn && authPages.isResetPasswordPageEnabled === true,
-        isVerifyEmailPageEnabled: isAuthOn && authPages.isVerifyEmailPageEnabled === true,
-        isVerifyInstructorPageEnabled: isAuthOn && authPages.isVerifyInstructorPageEnabled === true,
-        isOnboardingPageEnabled: isAuthOn && authPages.isOnboardingPageEnabled === true,
+
+        // ADMIN
+        areAdminPagesEnabled: isAdminOn,
 
         // USER
         areUserPagesEnabled: isUserOn,
@@ -135,22 +81,6 @@ export const FeatureFlagsProvider = ({ children }: FeatureFlagsProviderProps) =>
         isProfileEditPageEnabled: isUserOn && userPages.isProfileEditPageEnabled === true,
         isStudioRentalBrowsePageEnabled: isUserOn && userPages.isStudioRentalBrowsePageEnabled === true,
         isStudioRentalRequestsPageEnabled: isUserOn && userPages.isStudioRentalRequestsPageEnabled === true,
-
-        // ADMIN
-        areAdminPagesEnabled: isAdminOn,
-        isAdminUserListPageEnabled: isAdminOn && adminPages.isAdminUserListPageEnabled === true,
-        isAdminPageEnabled: isAdminOn && adminPages.isAdminPageEnabled === true,
-        isAdminAgendaPageEnabled: isAdminOn && adminPages.isAdminAgendaPageEnabled === true,
-        isAdminAgendaConflictsPageEnabled: isAdminOn && adminPages.isAdminAgendaConflictsPageEnabled === true,
-        isAdminBookingsPageEnabled: isAdminOn && adminPages.isAdminBookingsPageEnabled === true,
-        isAdminFiguresPageEnabled: isAdminOn && adminPages.isAdminFiguresPageEnabled === true,
-        isAdminInventoryPageEnabled: isAdminOn && adminPages.isAdminInventoryPageEnabled === true,
-        isAdminMerchPageEnabled: isAdminOn && adminPages.isAdminMerchPageEnabled === true,
-        isAdminMerchPosPageEnabled: isAdminOn && adminPages.isAdminMerchPosPageEnabled === true,
-        isAdminPaymentsPageEnabled: isAdminOn && adminPages.isAdminPaymentsPageEnabled === true,
-        isAdminReportsPageEnabled: isAdminOn && adminPages.isAdminReportsPageEnabled === true,
-        isAdminScheduleBuilderPageEnabled: isAdminOn && adminPages.isAdminScheduleBuilderPageEnabled === true,
-        isAdminStudioRentalPageEnabled: isAdminOn && adminPages.isAdminStudioRentalPageEnabled === true,
       }}
     >
       {children}

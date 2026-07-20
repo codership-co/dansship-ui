@@ -755,7 +755,7 @@ function AdminFiguresPage() {
 }
 
 export const SecureAdminFiguresPage = SecurityGuard(AdminFiguresPage, {
-  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled, FEATURE_FLAG.isAdminFiguresPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
   orPermissions: AdminPermissions.figures,
   requiresAuth: true,
   redirect: PageURLS.auth.login,

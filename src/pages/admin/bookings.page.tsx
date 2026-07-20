@@ -286,7 +286,7 @@ function AdminBookingsPage() {
 }
 
 export const SecureAdminBookingsPage = SecurityGuard(AdminBookingsPage, {
-  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled, FEATURE_FLAG.isAdminBookingsPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
   orPermissions: AdminPermissions.bookings,
   requiresAuth: true,
   redirect: PageURLS.auth.login,

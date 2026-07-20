@@ -61,7 +61,7 @@ function AdminMerchPosPage() {
 }
 
 export const SecureAdminMerchPosPage = SecurityGuard(AdminMerchPosPage, {
-  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled, FEATURE_FLAG.isAdminMerchPosPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
   orPermissions: AdminPermissions.merchPos,
   requiresAuth: true,
   redirect: PageURLS.auth.login,

@@ -336,7 +336,7 @@ function AdminAgendaPage() {
 }
 
 export const SecureAdminAgendaPage = SecurityGuard(AdminAgendaPage, {
-  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled, FEATURE_FLAG.isAdminAgendaPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
   orPermissions: AdminPermissions.scheduleBuilder,
   requiresAuth: true,
   redirect: PageURLS.auth.login,

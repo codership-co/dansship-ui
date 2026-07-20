@@ -273,7 +273,7 @@ function AdminStudioRentalPage() {
 }
 
 export const SecureAdminStudioRentalPage = SecurityGuard(AdminStudioRentalPage, {
-  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled, FEATURE_FLAG.isAdminStudioRentalPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
   orPermissions: AdminPermissions.studioRental,
   requiresAuth: true,
   redirect: PageURLS.auth.login,

@@ -38,7 +38,7 @@ export const Navbar = () => {
     () => DansshipAPI.subscriptions.getMySubscriptions(),
     isAuthenticated && !requireOnboarding,
   );
-  const { isLoginPageEnabled, isMyAccountBookingsPageEnabled, isMyAccountSubscriptionPageEnabled } = useFeatureFlags();
+  const { areAuthPagesEnabled, isMyAccountBookingsPageEnabled, isMyAccountSubscriptionPageEnabled } = useFeatureFlags();
 
   const hasActivePlan = (response?.data?.summary?.active_count ?? 0) > 0;
 
@@ -64,7 +64,7 @@ export const Navbar = () => {
         ...AdminPermissions.reports,
         ...AdminPermissions.studioRental,
       ],
-      featureFlags: [FEATURE_FLAG.isAdminPageEnabled],
+      featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
     },
   ];
 
@@ -105,7 +105,7 @@ export const Navbar = () => {
 
       <div className='ml-auto flex items-center justify-end gap-2 sm:gap-4'>
         <LanguageSelector variant='dropdown' />
-        {!isAuthenticated && isLoginPageEnabled && (
+        {!isAuthenticated && areAuthPagesEnabled && (
           <NavLink to={PageURLS.auth.login} state={{ from: location }}>
             <Button color='primary' size='small' className='hidden xs:block'>
               {t('nav:signIn')}

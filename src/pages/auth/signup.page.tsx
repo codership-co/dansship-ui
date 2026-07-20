@@ -18,5 +18,5 @@ function SignupPage() {
 export const SecureSignupPage = SecurityGuard(SignupPage, {
   redirect: PageURLS.home,
   requiresNoAuth: true,
-  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled, FEATURE_FLAG.isSignupPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled],
 });

@@ -17,7 +17,7 @@ function UserListPage() {
 }
 
 export const SecureAdminUserListPage = SecurityGuard(UserListPage, {
-  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled, FEATURE_FLAG.isAdminUserListPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
   orPermissions: AdminPermissions.users,
   requiresAuth: true,
   redirect: PageURLS.auth.login,
