@@ -365,7 +365,7 @@ function AdminAgendaConflictsPage() {
 }
 
 export const SecureAdminAgendaConflictsPage = SecurityGuard(AdminAgendaConflictsPage, {
-  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled, FEATURE_FLAG.isAdminAgendaConflictsPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
   orPermissions: AdminPermissions.scheduleBuilder,
   requiresAuth: true,
   redirect: PageURLS.auth.login,

@@ -36,7 +36,7 @@ function UserDetailsPage() {
 }
 
 export const SecureAdminUserDetailsPage = SecurityGuard(UserDetailsPage, {
-  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled, FEATURE_FLAG.isAdminUserListPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
   orPermissions: AdminPermissions.users,
   requiresAuth: true,
   redirect: PageURLS.auth.login,

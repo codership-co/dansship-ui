@@ -18,5 +18,5 @@ export function ForgotPasswordPage() {
 export const SecureForgotPasswordPage = SecurityGuard(ForgotPasswordPage, {
   redirect: PageURLS.home,
   requiresNoAuth: true,
-  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled, FEATURE_FLAG.isForgotPasswordPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled],
 });

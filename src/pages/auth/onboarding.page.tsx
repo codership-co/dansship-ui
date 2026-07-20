@@ -79,5 +79,5 @@ function OnboardingPage() {
 export const SecureOnboardingPage = SecurityGuard(OnboardingPage, {
   redirect: PageURLS.auth.login,
   requiresAuth: true,
-  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled, FEATURE_FLAG.isOnboardingPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled],
 });

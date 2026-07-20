@@ -25,7 +25,7 @@ function AdminPaymentsPage() {
 }
 
 export const SecureAdminPaymentsPage = SecurityGuard(AdminPaymentsPage, {
-  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled, FEATURE_FLAG.isAdminPaymentsPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
   orPermissions: AdminPermissions.payments,
   requiresAuth: true,
   redirect: PageURLS.auth.login,

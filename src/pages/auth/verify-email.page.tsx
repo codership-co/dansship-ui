@@ -136,5 +136,5 @@ function VerifyEmailPage() {
 export const SecureVerifyEmailPage = SecurityGuard(VerifyEmailPage, {
   redirect: PageURLS.home,
   requiresNoAuth: true,
-  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled, FEATURE_FLAG.isVerifyEmailPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled],
 });

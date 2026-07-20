@@ -1,9 +1,12 @@
+import { Accordion, AccordionItem } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { LuCalendarDays, LuGraduationCap, LuMail, LuShield, LuShieldCheck, LuUserCheck } from 'react-icons/lu';
+import { PiCaretLeft } from 'react-icons/pi';
 
-import { Container } from '@components/containers';
+import { Container, SectionHeading } from '@components/containers';
 import { Badge } from '@components/ui';
 import { useAuth } from '@contexts';
+import { formatDateTime } from '@helpers';
 
 export function ProfileAbout() {
   const { user } = useAuth();
@@ -11,122 +14,138 @@ export function ProfileAbout() {
 
   if (!user) return null;
 
-  const lastUpdated = user.updatedAt ? new Date(user.updatedAt).toLocaleDateString(i18n.language) : null;
   const instructorLastUpdated = user.instructorProfile?.updatedAt
     ? new Date(user.instructorProfile.updatedAt).toLocaleDateString(i18n.language)
     : null;
 
   return (
     <Container>
-      <section>
-        <h4>{t('profile:about')}</h4>
-        <label>{t('profile:accountScope')}</label>
-      </section>
+      <SectionHeading title={t('profile:profile')} subtitle={t('profile:accountScope')} />
 
-      <section className='grid gap-4'>
-        <p className='text-gray-600'>{user.instructorProfile?.bio || user.bio || t('profile:noBio')}</p>
+      <section className='grid gap-8'>
+        <p className='p-4 border-2 border-solid max-w-[70ch] border-primary/10 rounded-2xl m-0'>
+          {user.instructorProfile?.bio || user.bio || t('profile:noBio')}
+        </p>
 
-        <div className='grid grid-cols-1 gap-3 pt-2 sm:grid-cols-2'>
-          <div className='flex items-center gap-2 text-sm text-gray-600'>
-            <LuMail className='h-4 w-4 text-gray-400' />
-            <span>{user.email}</span>
+        <div className='grid grid-cols-[repeat(1,auto)] justify-start gap-x-12 gap-y-4 pt-2 sm:grid-cols-[repeat(2,auto)]'>
+          <div className='flex items-center gap-4'>
+            <LuMail className='size-8' />
+            <section className='grid'>
+              <p className='m-0'>{user.email}</p>
+              <small className='m-0'>{t('common:email')}</small>
+            </section>
           </div>
 
-          <div className='flex items-center gap-2 text-sm text-gray-600'>
-            <LuCalendarDays className='h-4 w-4 text-gray-400' />
-            <span>
-              {t('profile:memberSince')} {new Date(user.joinDate).toLocaleDateString(i18n.language)}
-            </span>
+          <div className='flex items-center gap-4'>
+            <LuCalendarDays className='size-8' />
+            <section className='grid'>
+              <p className='m-0'>{formatDateTime(user.joinDate, i18n.language)}</p>
+              <small className='m-0'>{t('profile:memberSince')}</small>
+            </section>
           </div>
 
-          <div className='flex items-center gap-2 text-sm text-gray-600'>
-            <LuShieldCheck className='h-4 w-4 text-gray-400' />
-            <span>{user.isActive ? t('common:active') : t('common:inactive')}</span>
+          <div className='flex items-center gap-4'>
+            <LuShieldCheck className='size-8' />
+            <section className='grid'>
+              <p className='m-0'>{user.isActive ? t('common:active') : t('common:inactive')}</p>
+              <small className='m-0'>{t('common:status')}</small>
+            </section>
           </div>
 
-          {lastUpdated && (
-            <div className='flex items-center gap-2 text-sm text-gray-600'>
-              <LuCalendarDays className='h-4 w-4 text-gray-400' />
-              <span>
-                {t('profile:lastUpdated')} {lastUpdated}
-              </span>
+          {user.updatedAt && (
+            <div className='flex items-center gap-4'>
+              <LuCalendarDays className='size-8' />
+              <section className='grid'>
+                <p className='m-0'>{formatDateTime(user.updatedAt, i18n.language)}</p>
+                <small className='m-0'>{t('profile:lastUpdated')}</small>
+              </section>
             </div>
           )}
         </div>
 
-        {!user.isCoach && !user.isInstructor && !user.isAdmin && (
-          <div className='space-y-2 rounded-md border border-gray-100 p-4'>
-            <div className='flex items-center gap-2 text-sm font-semibold text-gray-900'>
-              <LuGraduationCap className='h-4 w-4' />
-              {t('profile:studentSectionTitle')}
-            </div>
+        <Accordion className='gap-4' noSeparators multiple>
+          <AccordionItem
+            className='rounded-2xl overflow-hidden'
+            classNames={{
+              header: 'bg-primary/10 px-8 text-primary',
+              body: 'px-8 py-4 border-solid border-2 border-t-0 border-primary/10 rounded-bl-2xl rounded-br-2xl',
+            }}
+            title={t('profile:studentSectionTitle')}
+            startContent={<LuGraduationCap className='size-8' />}
+            icon={PiCaretLeft}
+            subtitle={t('profile:studentSectionDescription')}
+          >
+            :D
+          </AccordionItem>
 
-            <p className='text-sm text-gray-600'>{t('profile:studentSectionDescription')}</p>
-          </div>
-        )}
-
-        {(user.isCoach || user.isInstructor) && (
-          <div className='space-y-2 rounded-md border border-gray-100 p-4'>
-            <div className='flex items-center gap-2 text-sm font-semibold text-gray-900'>
-              <LuUserCheck className='h-4 w-4' />
-              {t('instructor:profile.title')}
-            </div>
-
-            <p className='text-sm text-gray-600'>{t('profile:instructorSectionDescription')}</p>
-
-            <div className='grid grid-cols-1 gap-3 pt-1 text-sm text-gray-600 sm:grid-cols-2'>
-              <div>
-                <p className='text-xs text-gray-500'>{t('instructor:biography')}</p>
-                <p>{user.instructorProfile?.bio || t('profile:noBio')}</p>
-              </div>
-
-              <div>
-                <p className='text-xs text-gray-500'>{t('instructor:profile.contactInfoLabel')}</p>
-                <p>{user.instructorProfile?.contactInfo || t('profile:notSet')}</p>
-              </div>
-
-              {instructorLastUpdated && (
+          {(user.isCoach || user.isInstructor) && (
+            <AccordionItem
+              className='rounded-2xl overflow-hidden'
+              classNames={{
+                header: 'bg-primary/10 px-8 text-primary',
+                body: 'px-8 py-4 border-solid border-2 border-t-0 border-primary/10 rounded-bl-2xl rounded-br-2xl',
+              }}
+              title={t('instructor:profile.title')}
+              startContent={<LuUserCheck className='size-8' />}
+              icon={PiCaretLeft}
+              subtitle={t('profile:instructorSectionDescription')}
+            >
+              <div className='grid grid-cols-1 gap-3 pt-1 text-sm text-gray-600 sm:grid-cols-2'>
                 <div>
-                  <p className='text-xs text-gray-500'>{t('profile:lastUpdated')}</p>
-                  <p>{instructorLastUpdated}</p>
+                  <p className='text-xs text-gray-500'>{t('instructor:biography')}</p>
+                  <p>{user.instructorProfile?.bio || t('profile:noBio')}</p>
                 </div>
-              )}
 
-              <div>
-                <p className='text-xs text-gray-500'>{t('profile:completion')}</p>
-                <p>{user.instructorProfile?.completionPercent ?? user.profileCompletionPercent ?? 100}%</p>
+                <div>
+                  <p className='text-xs text-gray-500'>{t('instructor:profile.contactInfoLabel')}</p>
+                  <p>{user.instructorProfile?.contactInfo || t('profile:notSet')}</p>
+                </div>
+
+                {instructorLastUpdated && (
+                  <div>
+                    <p className='text-xs text-gray-500'>{t('profile:lastUpdated')}</p>
+                    <p>{instructorLastUpdated}</p>
+                  </div>
+                )}
+
+                <div>
+                  <p className='text-xs text-gray-500'>{t('profile:completion')}</p>
+                  <p>{user.instructorProfile?.completionPercent ?? user.profileCompletionPercent ?? 100}%</p>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
+            </AccordionItem>
+          )}
 
-        {user.isAdmin && (
-          <div className='space-y-2 rounded-md border border-gray-100 p-4'>
-            <div className='flex items-center gap-2 text-sm font-semibold text-gray-900'>
-              <LuShield className='h-4 w-4' />
-              {t('profile:adminSectionTitle')}
-            </div>
+          {user.isAdmin && (
+            <AccordionItem
+              className='rounded-2xl overflow-hidden'
+              classNames={{
+                header: 'bg-primary/10 text-primary px-8',
+                body: 'px-8 py-4 border-solid border-2 border-t-0 border-primary/10 rounded-bl-2xl rounded-br-2xl',
+              }}
+              title={t('profile:adminSectionTitle')}
+              startContent={<LuShield className='size-8' />}
+              icon={PiCaretLeft}
+              subtitle={t('profile:adminSectionDescription')}
+            >
+              <section className='grid gap-4'>
+                <label>
+                  <span>{user.permissions.length}</span> {t('profile:permissionsCount')}
+                </label>
 
-            <p className='text-sm text-gray-600'>{t('profile:adminSectionDescription')}</p>
-
-            <div className='text-sm text-gray-600'>
-              <span className='font-medium text-gray-900'>{user.permissions.length}</span>{' '}
-              {t('profile:permissionsCount')}
-            </div>
-
-            {user.permissions.length > 0 && (
-              <div className='flex flex-wrap gap-2'>
-                {user.permissions.slice(0, 8).map(permission => (
-                  <Badge key={permission} variant='outline'>
-                    {permission}
-                  </Badge>
-                ))}
-
-                {user.permissions.length > 8 && <Badge variant='outline'>+{user.permissions.length - 8}</Badge>}
-              </div>
-            )}
-          </div>
-        )}
+                {user.permissions.length > 0 && (
+                  <div className='flex flex-wrap gap-2'>
+                    {user.permissions.map(permission => (
+                      <Badge key={permission} variant='outline'>
+                        {permission}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+              </section>
+            </AccordionItem>
+          )}
+        </Accordion>
       </section>
     </Container>
   );

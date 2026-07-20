@@ -470,7 +470,7 @@ function AdminScheduleBuilderPage() {
 }
 
 export const SecureAdminScheduleBuilderPage = SecurityGuard(AdminScheduleBuilderPage, {
-  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled, FEATURE_FLAG.isAdminScheduleBuilderPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
   orPermissions: AdminPermissions.scheduleBuilder,
   requiresAuth: true,
   redirect: PageURLS.auth.login,

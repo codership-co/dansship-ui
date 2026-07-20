@@ -137,5 +137,5 @@ function InstructorOnboardingPage() {
 }
 
 export const SecureInstructorOnboardingPage = SecurityGuard(InstructorOnboardingPage, {
-  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled, FEATURE_FLAG.isVerifyInstructorPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled],
 });

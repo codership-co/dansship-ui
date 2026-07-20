@@ -296,7 +296,7 @@ function AdminPage() {
 }
 
 export const SecureAdminPage = SecurityGuard(AdminPage, {
-  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled, FEATURE_FLAG.isAdminPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
   orPermissions: [
     ...AdminPermissions.users,
     ...AdminPermissions.bookings,

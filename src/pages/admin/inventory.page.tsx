@@ -45,7 +45,7 @@ function AdminInventoryPage() {
 }
 
 export const SecureAdminInventoryPage = SecurityGuard(AdminInventoryPage, {
-  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled, FEATURE_FLAG.isAdminInventoryPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
   orPermissions: AdminPermissions.inventory,
   requiresAuth: true,
   redirect: PageURLS.auth.login,

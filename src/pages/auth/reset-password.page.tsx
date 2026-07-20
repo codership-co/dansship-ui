@@ -31,5 +31,5 @@ function ResetPasswordPage() {
 export const SecureResetPasswordPage = SecurityGuard(ResetPasswordPage, {
   redirect: PageURLS.home,
   requiresNoAuth: true,
-  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled, FEATURE_FLAG.isResetPasswordPageEnabled],
+  featureFlags: [FEATURE_FLAG.areAuthPagesEnabled],
 });
