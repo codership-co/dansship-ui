@@ -1,20 +1,22 @@
 import { Tabs } from 'polpo/components';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
-  HealthProfileForm,
+  BasicProfileForm,
   CertificationsProfileForm,
+  HealthProfileForm,
   OperationalProfileForm,
   PreferencesProfileForm,
-  BasicProfileForm,
 } from '@components/forms';
+import { useAuth } from '@contexts';
 import {
   BasicProfilePayload,
   CertificationsProfilePayload,
   HealthProfilePayload,
-  ProfileDataKey,
   OperationalProfilePayload,
   PreferencesProfilePayload,
+  ProfileDataKey,
   User,
 } from '@core/api';
 
@@ -26,7 +28,7 @@ export interface ProfileEditData {
   [ProfileDataKey.CERTIFICATIONS]: CertificationsProfilePayload;
 }
 
-export function getDefaultProfileDataFromUser(user: User): ProfileEditData {
+function getDefaultProfileDataFromUser(user: User): ProfileEditData {
   return {
     [ProfileDataKey.PROFILE]: {
       full_name: user.fullName ?? '',
@@ -68,12 +70,13 @@ interface ProfileEditProps {
   isLoading: boolean;
   onChange: (key: ProfileDataKey, data: unknown) => void;
   error: string;
-  defaultData: ProfileEditData;
   showInstructor: boolean;
 }
 
 export function ProfileEdit({ onChange, isLoading, error, showInstructor }: ProfileEditProps) {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const defaultData = useMemo<ProfileEditData>(() => getDefaultProfileDataFromUser(user!), [user]);
 
   return (
     <section className='grid md:grid-cols-[auto_1fr] gap-8 md:items-start'>
@@ -104,6 +107,10 @@ export function ProfileEdit({ onChange, isLoading, error, showInstructor }: Prof
                 isLoading={isLoading}
                 error={error}
                 onSubmit={data => onChange(ProfileDataKey.PROFILE, data)}
+                defaultValues={{
+                  ...defaultData[ProfileDataKey.PROFILE],
+                  birth_date: new Date(defaultData[ProfileDataKey.PROFILE].birth_date ?? ''),
+                }}
               />
             </section>
           </Tabs.TabPanel>
@@ -117,6 +124,7 @@ export function ProfileEdit({ onChange, isLoading, error, showInstructor }: Prof
                 error={error}
                 onContinue={data => onChange(ProfileDataKey.HEALTH, data)}
                 onSkip={() => onChange(ProfileDataKey.HEALTH, {})}
+                defaultValues={defaultData[ProfileDataKey.HEALTH]}
               />
             </section>
           </Tabs.TabPanel>
@@ -129,6 +137,7 @@ export function ProfileEdit({ onChange, isLoading, error, showInstructor }: Prof
                 isLoading={isLoading}
                 error={error}
                 onComplete={data => onChange(ProfileDataKey.PREFERENCES, data)}
+                defaultValues={defaultData[ProfileDataKey.PREFERENCES]}
               />
             </section>
           </Tabs.TabPanel>
@@ -142,6 +151,7 @@ export function ProfileEdit({ onChange, isLoading, error, showInstructor }: Prof
                   isLoading={isLoading}
                   error={error}
                   onSubmit={data => onChange(ProfileDataKey.OPERATIONAL_PROFILE, data)}
+                  defaultValues={defaultData[ProfileDataKey.OPERATIONAL_PROFILE]}
                 />
               </section>
             </Tabs.TabPanel>

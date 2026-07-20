@@ -30,6 +30,7 @@ interface OnboardingPreferencesProfileFormProps {
   error: string | null;
   onComplete: (values: PreferencesProfileFormValues) => void;
   onSkip?: () => void;
+  defaultValues?: PreferencesProfileFormValues;
 }
 
 export function PreferencesProfileForm({
@@ -37,6 +38,7 @@ export function PreferencesProfileForm({
   error,
   onComplete,
   onSkip,
+  defaultValues,
 }: OnboardingPreferencesProfileFormProps) {
   const { t } = useTranslation();
   const schema = createPreferencesProfileSchema();
@@ -51,6 +53,7 @@ export function PreferencesProfileForm({
       disciplines: [],
       current_level: '',
       preferred_schedules: [],
+      ...defaultValues,
     },
   });
 
