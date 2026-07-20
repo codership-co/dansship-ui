@@ -63,11 +63,11 @@ export interface OnboardingStatus {
 
 export interface BasicProfilePayload {
   full_name: string;
-  birth_date?: string;
-  phone_country_code?: string;
-  phone_number?: string;
-  document_type?: string;
-  document_value?: string;
+  birth_date: string;
+  phone_country_code: string;
+  phone_number: string;
+  document_type: string;
+  document_value: string;
   city?: string;
   address?: string;
 }

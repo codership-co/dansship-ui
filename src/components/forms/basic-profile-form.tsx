@@ -36,9 +36,10 @@ interface OnboardingBasicProfileFormProps {
   isLoading: boolean;
   error: string | null;
   onSubmit: (values: BasicProfileFormValues) => void;
+  defaultValues?: BasicProfileFormValues;
 }
 
-export function BasicProfileForm({ isLoading, error, onSubmit }: OnboardingBasicProfileFormProps) {
+export function BasicProfileForm({ isLoading, error, onSubmit, defaultValues }: OnboardingBasicProfileFormProps) {
   const { t } = useTranslation();
   const schema = createBasicProfileSchema(t);
   const [profilePhoto, setProfilePhoto] = useState<File>();
@@ -57,6 +58,7 @@ export function BasicProfileForm({ isLoading, error, onSubmit }: OnboardingBasic
       document_value: '',
       city: '',
       address: '',
+      ...defaultValues,
     },
   });
 

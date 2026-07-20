@@ -14,7 +14,6 @@ import {
   ProfileAbout,
   ProfileEdit,
   ProfileEditData,
-  getDefaultProfileDataFromUser,
 } from '@components/modules';
 import { FEATURE_FLAG, useAuth, SecurityGuard, useOrPermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
@@ -36,7 +35,7 @@ function ProfilePage() {
   const hasInstructorPermissions = useOrPermissions([...InstructorPermissions.dashboard, PERMISSION.SCHEDULE_MANAGE]);
   const savedFigures = savedFiguresResponse?.data ?? [];
   const [editMode, setEditMode] = useState(false);
-  const [editableData, setEditableData] = useState<ProfileEditData>(() => getDefaultProfileDataFromUser(user!));
+  const [_editableData, setEditableData] = useState<Partial<ProfileEditData>>({});
 
   if (!user) {
     return <div className='text-center py-12'>{t('profile:notFound')}</div>;
@@ -49,7 +48,6 @@ function ProfilePage() {
       {editMode ? (
         <Section footerMargin>
           <ProfileEdit
-            defaultData={editableData}
             showInstructor={user.isCoach || user.isInstructor}
             isLoading={false}
             error=''

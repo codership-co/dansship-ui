@@ -30,9 +30,10 @@ interface HealthProfileFormProps {
   error: string | null;
   onContinue: (values: HealthDataFormValues) => void;
   onSkip: () => void;
+  defaultValues?: HealthDataFormValues;
 }
 
-export function HealthProfileForm({ isLoading, error, onContinue, onSkip }: HealthProfileFormProps) {
+export function HealthProfileForm({ isLoading, error, onContinue, onSkip, defaultValues }: HealthProfileFormProps) {
   const { t } = useTranslation();
   const schema = createHealthDataSchema(t);
 
@@ -47,6 +48,7 @@ export function HealthProfileForm({ isLoading, error, onContinue, onSkip }: Heal
       emergency_contact_phone_number: '',
       eps: '',
       existing_medical_conditions: '',
+      ...defaultValues,
     },
   });
 
