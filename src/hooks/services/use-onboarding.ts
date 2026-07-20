@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import { useAuth } from '@contexts';
-import { CompleteStepPayload, DansshipAPI, OnboardingStatus, OnboardingStepKey, OnboardingTrackKey } from '@core/api';
+import { CompleteStepPayload, DansshipAPI, OnboardingStatus, ProfileDataKey, ProfileTrackKey } from '@core/api';
 import { useCallablePromise } from '@hooks';
 
 export const parseNextStep = (nextStep: string | null): OnboardingCurrentStep | null => {
@@ -14,14 +14,14 @@ export const parseNextStep = (nextStep: string | null): OnboardingCurrentStep | 
   if (!track || !step) return null;
 
   return {
-    track: track as OnboardingTrackKey,
-    step: step as OnboardingStepKey,
+    track: track as ProfileTrackKey,
+    step: step as ProfileDataKey,
   };
 };
 
 export interface OnboardingCurrentStep {
-  track: OnboardingTrackKey;
-  step: OnboardingStepKey;
+  track: ProfileTrackKey;
+  step: ProfileDataKey;
 }
 
 interface MemoryRouterState {

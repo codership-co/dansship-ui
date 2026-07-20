@@ -6,7 +6,7 @@ import { Container, Section, SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { OnboardingInstructorTrack, OnboardingStudentTrack } from '@components/modules';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
-import { OnboardingTrackKey } from '@core/api';
+import { ProfileTrackKey } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { useOnboarding } from '@hooks';
 
@@ -70,8 +70,8 @@ function OnboardingPage() {
 
   return (
     <Section className='min-h-dvh' navbarPadding footerMargin>
-      {currentStep?.track === OnboardingTrackKey.STUDENT && <OnboardingStudentTrack />}
-      {currentStep?.track === OnboardingTrackKey.INSTRUCTOR && <OnboardingInstructorTrack />}
+      {currentStep?.track === ProfileTrackKey.STUDENT && <OnboardingStudentTrack />}
+      {currentStep?.track === ProfileTrackKey.INSTRUCTOR && <OnboardingInstructorTrack />}
     </Section>
   );
 }

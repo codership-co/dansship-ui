@@ -25,14 +25,14 @@ export const createHealthDataSchema = (t: TFunction) =>
 
 export type HealthDataFormValues = z.infer<ReturnType<typeof createHealthDataSchema>>;
 
-interface OnboardingHealthFormProps {
+interface HealthProfileFormProps {
   isLoading: boolean;
   error: string | null;
   onContinue: (values: HealthDataFormValues) => void;
   onSkip: () => void;
 }
 
-export function OnboardingHealthForm({ isLoading, error, onContinue, onSkip }: OnboardingHealthFormProps) {
+export function HealthProfileForm({ isLoading, error, onContinue, onSkip }: HealthProfileFormProps) {
   const { t } = useTranslation();
   const schema = createHealthDataSchema(t);
 

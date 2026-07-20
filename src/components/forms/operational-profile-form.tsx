@@ -8,12 +8,12 @@ import { z } from 'zod';
 
 import { SelectField, TextField } from '@components/form-fields';
 import { Label } from '@components/ui';
-import { DayOfWeek, OnboardingAvailabilitySlot } from '@core/api';
+import { DaysOfWeek, OnboardingAvailabilitySlot } from '@core/api';
 import { DAY_OF_WEEK_OPTIONS } from '@core/constants';
 
 const TIME_REGEX = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
-export const createInstructorOperationalProfileSchema = (t: TFunction) => {
+export const createOperationalProfileSchema = (t: TFunction) => {
   const slotSchema = z
     .object({
       day_of_week: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
@@ -45,39 +45,37 @@ export const createInstructorOperationalProfileSchema = (t: TFunction) => {
   });
 };
 
-export type InstructorOperationalProfileFormValues = z.infer<
-  ReturnType<typeof createInstructorOperationalProfileSchema>
->;
+export type OperationalProfileFormValues = z.infer<ReturnType<typeof createOperationalProfileSchema>>;
 
-interface OnboardingInstructorOperationalProfileFormProps {
+interface OnboardingOperationalProfileFormProps {
   isLoading: boolean;
   error: string | null;
   defaultValues?: {
     instagram?: string | null;
     availability?: Array<OnboardingAvailabilitySlot>;
-    disciplines?: InstructorOperationalProfileFormValues['disciplines'];
+    disciplines?: OperationalProfileFormValues['disciplines'];
   } | null;
   onSubmit: (values: {
     instagram: string;
     availability: Array<OnboardingAvailabilitySlot>;
-    disciplines: InstructorOperationalProfileFormValues['disciplines'];
+    disciplines: OperationalProfileFormValues['disciplines'];
   }) => void;
 }
 
 const toApiTime = (value: string) => (value.length === 5 ? `${value}:00` : value);
 const fromApiTime = (value: string) => value.slice(0, 5);
 
-export function OnboardingInstructorOperationalProfileForm({
+export function OperationalProfileForm({
   isLoading,
   error,
   defaultValues,
   onSubmit,
-}: OnboardingInstructorOperationalProfileFormProps) {
+}: OnboardingOperationalProfileFormProps) {
   const { t } = useTranslation();
-  const schema = createInstructorOperationalProfileSchema(t);
+  const schema = createOperationalProfileSchema(t);
 
-  const { control, handleSubmit } = useForm<InstructorOperationalProfileFormValues>({
-    resolver: zodResolver(schema) as Resolver<InstructorOperationalProfileFormValues>,
+  const { control, handleSubmit } = useForm<OperationalProfileFormValues>({
+    resolver: zodResolver(schema) as Resolver<OperationalProfileFormValues>,
     defaultValues: {
       instagram: defaultValues?.instagram ?? '',
       availability: defaultValues?.availability?.map(slot => ({
@@ -101,11 +99,11 @@ export function OnboardingInstructorOperationalProfileForm({
     remove: removeDiscipline,
   } = useFieldArray({ control, name: 'disciplines' });
 
-  const handleFormSubmit = (values: InstructorOperationalProfileFormValues) => {
+  const handleFormSubmit = (values: OperationalProfileFormValues) => {
     onSubmit({
       instagram: values.instagram.trim(),
       availability: values.availability.map(slot => ({
-        day_of_week: slot.day_of_week as DayOfWeek,
+        day_of_week: slot.day_of_week as DaysOfWeek,
         start_time: toApiTime(slot.start_time),
         end_time: toApiTime(slot.end_time),
       })),

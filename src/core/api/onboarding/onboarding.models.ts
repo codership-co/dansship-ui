@@ -1,4 +1,4 @@
-export enum OnboardingStepKey {
+export enum ProfileDataKey {
   PROFILE = 'student_profile',
   HEALTH = 'health_data',
   PREFERENCES = 'student_preferences',
@@ -6,15 +6,23 @@ export enum OnboardingStepKey {
   CERTIFICATIONS = 'certifications',
 }
 
-export enum OnboardingTrackKey {
+export enum ProfileTrackKey {
   STUDENT = 'student',
   INSTRUCTOR = 'instructor',
 }
 
-export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+export enum DaysOfWeek {
+  MONDAY = 'monday',
+  TUESDAY = 'tuesday',
+  WEDNESDAY = 'wednesday',
+  THURSDAY = 'thursday',
+  FRIDAY = 'friday',
+  SATURDAY = 'saturday',
+  SUNDAY = 'sunday',
+}
 
 export interface OnboardingAvailabilitySlot {
-  day_of_week: DayOfWeek;
+  day_of_week: DaysOfWeek;
   start_time: string;
   end_time: string;
 }
@@ -32,81 +40,95 @@ export interface InstructorCertificationPayload {
 }
 
 export interface OnboardingStep {
-  step_key: OnboardingStepKey;
+  step_key: ProfileDataKey;
   status: string;
   completed: boolean;
 }
 
 export interface OnboardingTrack {
-  track: OnboardingTrackKey;
+  track: ProfileTrackKey;
   completed: boolean;
-  pending_steps: Array<OnboardingStepKey>;
+  pending_steps: Array<ProfileDataKey>;
   steps: Array<OnboardingStep>;
 }
 
 export interface OnboardingStatus {
   required: boolean;
   completed: boolean;
-  next_step: OnboardingStepKey | null;
+  next_step: ProfileDataKey | null;
   tracks: Array<OnboardingTrack>;
 }
 
+// PROFILE STEPS
+
+export interface BasicProfilePayload {
+  full_name: string;
+  birth_date?: string;
+  phone_country_code?: string;
+  phone_number?: string;
+  document_type?: string;
+  document_value?: string;
+  city?: string;
+  address?: string;
+}
+
+export interface HealthProfilePayload {
+  emergency_contact_name?: string;
+  emergency_contact_relative?: string;
+  emergency_contact_phone_country_code?: string;
+  emergency_contact_phone_number?: string;
+  eps?: string;
+  existing_medical_conditions?: string;
+}
+
+export interface PreferencesProfilePayload {
+  heard_about_us?: string;
+  current_level?: string;
+  goals: Array<string>;
+  disciplines: Array<string>;
+  preferred_schedules: Array<string>;
+}
+
+export interface OperationalProfilePayload {
+  instagram: string;
+  availability: Array<OnboardingAvailabilitySlot>;
+  disciplines: Array<InstructorDisciplinePayload>;
+}
+
+export interface CertificationsProfilePayload {
+  documents: Array<InstructorCertificationPayload>;
+}
+
+// ONBOARDING PROFILE STEPS
+
 export interface CompleteStudentStepPayload {
-  stepKey: OnboardingStepKey.PROFILE;
-  track: OnboardingTrackKey;
-  payload: {
-    full_name: string;
-    birth_date?: string;
-    phone_country_code?: string;
-    phone_number?: string;
-    document_type?: string;
-    document_value?: string;
-    city?: string;
-    address?: string;
-  };
+  stepKey: ProfileDataKey.PROFILE;
+  track: ProfileTrackKey.STUDENT;
+  payload: BasicProfilePayload;
 }
 
 export interface CompleteHealthStepPayload {
-  stepKey: OnboardingStepKey.HEALTH;
-  track: OnboardingTrackKey;
-  payload: {
-    emergency_contact_name?: string;
-    emergency_contact_relative?: string;
-    emergency_contact_phone_country_code?: string;
-    emergency_contact_phone_number?: string;
-    eps?: string;
-    existing_medical_conditions?: string;
-  };
+  stepKey: ProfileDataKey.HEALTH;
+  track: ProfileTrackKey.STUDENT;
+  payload: HealthProfilePayload;
 }
 
 export interface CompletePreferencesStepPayload {
-  stepKey: OnboardingStepKey.PREFERENCES;
-  track: OnboardingTrackKey;
-  payload: {
-    heard_about_us?: string;
-    current_level?: string;
-    goals: Array<string>;
-    disciplines: Array<string>;
-    preferred_schedules: Array<string>;
-  };
+  stepKey: ProfileDataKey.PREFERENCES;
+  track: ProfileTrackKey.STUDENT;
+  payload: PreferencesProfilePayload;
 }
 
 export interface CompleteOperationalProfileStepPayload {
-  stepKey: OnboardingStepKey.OPERATIONAL_PROFILE;
-  track: OnboardingTrackKey.INSTRUCTOR;
-  payload: {
-    instagram: string;
-    availability: Array<OnboardingAvailabilitySlot>;
-    disciplines: Array<InstructorDisciplinePayload>;
-  };
+  stepKey: ProfileDataKey.OPERATIONAL_PROFILE;
+  track: ProfileTrackKey.INSTRUCTOR;
+  payload: OperationalProfilePayload;
 }
 
 export interface CompleteCertificationsStepPayload {
-  stepKey: OnboardingStepKey.CERTIFICATIONS;
-  track: OnboardingTrackKey.INSTRUCTOR;
-  payload: {
-    documents: Array<InstructorCertificationPayload>;
-  };
+  stepKey: ProfileDataKey.CERTIFICATIONS;
+  track: ProfileTrackKey.INSTRUCTOR;
+  payload: CertificationsProfilePayload;
 }
 
 export type CompleteStepPayload =

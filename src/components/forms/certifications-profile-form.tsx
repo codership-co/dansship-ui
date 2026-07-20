@@ -13,7 +13,7 @@ import { OptionalFileUpload } from '@components/forms/optional-file-upload';
 import { DansshipAPI, InstructorCertificationPayload, PaymentProofContentType } from '@core/api';
 import { useCallablePromise } from '@hooks';
 
-export const createInstructorCertificationsSchema = (t: TFunction) =>
+export const createCertificationsProfileSchema = (t: TFunction) =>
   z.object({
     documents: z.array(
       z.object({
@@ -31,25 +31,25 @@ export const createInstructorCertificationsSchema = (t: TFunction) =>
     ),
   });
 
-export type InstructorCertificationsFormValues = z.infer<ReturnType<typeof createInstructorCertificationsSchema>>;
+export type CertificationsProfileFormValues = z.infer<ReturnType<typeof createCertificationsProfileSchema>>;
 
-interface OnboardingInstructorCertificationsFormProps {
+interface OnboardingCertificationsProfileFormProps {
   isLoading: boolean;
   error: string | null;
   onComplete: (documents: Array<InstructorCertificationPayload>) => void;
-  onSkip: () => void;
-  onBack: () => void;
+  onSkip?: () => void;
+  onBack?: () => void;
 }
 
-export function OnboardingInstructorCertificationsForm({
+export function CertificationsProfileForm({
   isLoading,
   error,
   onComplete,
   onSkip,
   onBack,
-}: OnboardingInstructorCertificationsFormProps) {
+}: OnboardingCertificationsProfileFormProps) {
   const { t } = useTranslation();
-  const schema = createInstructorCertificationsSchema(t);
+  const schema = createCertificationsProfileSchema(t);
   const { call: uploadCertificationFile, isLoading: isUploading } = useCallablePromise((file: File) =>
     DansshipAPI.onboarding.uploadDocument(file),
   );
@@ -58,7 +58,7 @@ export function OnboardingInstructorCertificationsForm({
   );
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
 
-  const { control, handleSubmit, setValue, getValues } = useForm<InstructorCertificationsFormValues>({
+  const { control, handleSubmit, setValue, getValues } = useForm<CertificationsProfileFormValues>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     resolver: zodResolver(schema),
@@ -98,7 +98,7 @@ export function OnboardingInstructorCertificationsForm({
     }
   };
 
-  const handleFormSubmit = (values: InstructorCertificationsFormValues) => {
+  const handleFormSubmit = (values: CertificationsProfileFormValues) => {
     onComplete(
       values.documents.map(document => ({
         title: document.title,
@@ -129,7 +129,7 @@ export function OnboardingInstructorCertificationsForm({
   };
 
   return (
-    <div className='space-y-6' data-component='OnboardingInstructorCertificationsForm'>
+    <div className='space-y-6' data-component='OnboardingCertificationsProfileForm'>
       <form className='grid gap-8' onSubmit={handleSubmit(handleFormSubmit)}>
         <div className='flex items-center justify-between gap-2'>
           <label className='font-medium text-left'>{t('auth:onboarding.certifications')}</label>
@@ -203,32 +203,36 @@ export function OnboardingInstructorCertificationsForm({
 
         <div className='mt-20 grid gap-4'>
           <section className='grid grid-cols-2 gap-4'>
-            <Button
-              type='button'
-              variant='outlined'
-              color='primary'
-              onClick={onBack}
-              aria-label={t('common:back')}
-              fullWidth
-            >
-              <LuChevronLeft className='size-6' />
-              {t('common:back')}
-            </Button>
+            {onBack && (
+              <Button
+                type='button'
+                variant='outlined'
+                color='primary'
+                onClick={onBack}
+                aria-label={t('common:back')}
+                fullWidth
+              >
+                <LuChevronLeft className='size-6' />
+                {t('common:back')}
+              </Button>
+            )}
             <Button type='submit' fullWidth isLoading={isLoading || uploadingIndex !== null} color='primary'>
               {t('auth:onboarding.complete')}
             </Button>
           </section>
-          <Button
-            type='button'
-            onClick={onSkip}
-            variant='text'
-            color='tertiary'
-            isLoading={isLoading}
-            fullWidth
-            disabled={uploadingIndex !== null}
-          >
-            {t('auth:onboarding.omitStep')}
-          </Button>
+          {onSkip && (
+            <Button
+              type='button'
+              onClick={onSkip}
+              variant='text'
+              color='tertiary'
+              isLoading={isLoading}
+              fullWidth
+              disabled={uploadingIndex !== null}
+            >
+              {t('auth:onboarding.omitStep')}
+            </Button>
+          )}
         </div>
       </form>
     </div>

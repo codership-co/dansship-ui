@@ -12,7 +12,7 @@ import { DateField, PhoneField, SelectField, TextField } from '@components/form-
 import { PaymentProofContentType, PaymentProofContentTypesList } from '@core/api';
 import { DOCUMENT_TYPE_OPTIONS } from '@core/constants';
 
-export const createStudentProfileSchema = (t: TFunction) => {
+export const createBasicProfileSchema = (t: TFunction) => {
   const tenYearsAgo = new Date();
   tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10);
 
@@ -30,21 +30,21 @@ export const createStudentProfileSchema = (t: TFunction) => {
   });
 };
 
-type StudentProfileFormValues = z.infer<ReturnType<typeof createStudentProfileSchema>>;
+type BasicProfileFormValues = z.infer<ReturnType<typeof createBasicProfileSchema>>;
 
-interface OnboardingStudentProfileFormProps {
+interface OnboardingBasicProfileFormProps {
   isLoading: boolean;
   error: string | null;
-  onSubmit: (values: StudentProfileFormValues) => void;
+  onSubmit: (values: BasicProfileFormValues) => void;
 }
 
-export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: OnboardingStudentProfileFormProps) {
+export function BasicProfileForm({ isLoading, error, onSubmit }: OnboardingBasicProfileFormProps) {
   const { t } = useTranslation();
-  const schema = createStudentProfileSchema(t);
+  const schema = createBasicProfileSchema(t);
   const [profilePhoto, setProfilePhoto] = useState<File>();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  const { handleSubmit, control } = useForm<StudentProfileFormValues>({
+  const { handleSubmit, control } = useForm<BasicProfileFormValues>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     resolver: zodResolver(schema),
@@ -79,7 +79,7 @@ export function OnboardingStudentProfileForm({ isLoading, error, onSubmit }: Onb
     event.currentTarget.value = '';
   };
 
-  const internalSubmit = (values: StudentProfileFormValues) => {
+  const internalSubmit = (values: BasicProfileFormValues) => {
     // TODO: upload profilePhoto and assign it to student profile
 
     onSubmit(values);

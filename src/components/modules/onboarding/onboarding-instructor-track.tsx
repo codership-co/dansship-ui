@@ -3,9 +3,9 @@ import { IoRibbonOutline } from 'react-icons/io5';
 import { PiCalendarCheck } from 'react-icons/pi';
 
 import { SectionHeading } from '@components/containers';
-import { OnboardingInstructorCertificationsForm, OnboardingInstructorOperationalProfileForm } from '@components/forms';
+import { CertificationsProfileForm, OperationalProfileForm } from '@components/forms';
 import { FormStepperLayout } from '@components/layouts';
-import { OnboardingStepKey } from '@core/api';
+import { ProfileDataKey } from '@core/api';
 import { useInstructorOnboarding } from '@hooks';
 
 export const OnboardingInstructorTrack = () => {
@@ -38,10 +38,10 @@ export const OnboardingInstructorTrack = () => {
           {
             title: t('auth:onboarding.instructorSteps.first.title'),
             subtitle: t('auth:onboarding.instructorSteps.first.subtitle'),
-            step: OnboardingStepKey.OPERATIONAL_PROFILE,
+            step: ProfileDataKey.OPERATIONAL_PROFILE,
             Icon: PiCalendarCheck,
             form: (
-              <OnboardingInstructorOperationalProfileForm
+              <OperationalProfileForm
                 isLoading={isSubmittingStep}
                 error={error}
                 defaultValues={operationalProfileDraft}
@@ -52,15 +52,15 @@ export const OnboardingInstructorTrack = () => {
           {
             title: t('auth:onboarding.instructorSteps.second.title'),
             subtitle: t('auth:onboarding.instructorSteps.second.subtitle'),
-            step: OnboardingStepKey.CERTIFICATIONS,
+            step: ProfileDataKey.CERTIFICATIONS,
             Icon: IoRibbonOutline,
             form: (
-              <OnboardingInstructorCertificationsForm
+              <CertificationsProfileForm
                 isLoading={isSubmittingStep}
                 error={error}
                 onComplete={documents => submitCertificationsStep({ documents })}
                 onSkip={skipCertificationsStep}
-                onBack={() => goToStep(OnboardingStepKey.OPERATIONAL_PROFILE)}
+                onBack={() => goToStep(ProfileDataKey.OPERATIONAL_PROFILE)}
               />
             ),
           },
