@@ -14,7 +14,7 @@ import {
   SCHEDULE_OPTIONS,
 } from '@core/constants';
 
-export const createStudentPreferencesSchema = () =>
+export const createPreferencesProfileSchema = () =>
   z.object({
     heard_about_us: z.string().optional(),
     goals: z.array(z.string()),
@@ -23,25 +23,25 @@ export const createStudentPreferencesSchema = () =>
     preferred_schedules: z.array(z.string()),
   });
 
-export type StudentPreferencesFormValues = z.infer<ReturnType<typeof createStudentPreferencesSchema>>;
+export type PreferencesProfileFormValues = z.infer<ReturnType<typeof createPreferencesProfileSchema>>;
 
-interface OnboardingStudentPreferencesFormProps {
+interface OnboardingPreferencesProfileFormProps {
   isLoading: boolean;
   error: string | null;
-  onComplete: (values: StudentPreferencesFormValues) => void;
-  onSkip: () => void;
+  onComplete: (values: PreferencesProfileFormValues) => void;
+  onSkip?: () => void;
 }
 
-export function OnboardingStudentPreferencesForm({
+export function PreferencesProfileForm({
   isLoading,
   error,
   onComplete,
   onSkip,
-}: OnboardingStudentPreferencesFormProps) {
+}: OnboardingPreferencesProfileFormProps) {
   const { t } = useTranslation();
-  const schema = createStudentPreferencesSchema();
+  const schema = createPreferencesProfileSchema();
 
-  const { control, handleSubmit } = useForm<StudentPreferencesFormValues>({
+  const { control, handleSubmit } = useForm<PreferencesProfileFormValues>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     resolver: zodResolver(schema),
@@ -156,9 +156,11 @@ export function OnboardingStudentPreferencesForm({
           <Button type='submit' isLoading={isLoading} color='primary' fullWidth>
             {isLoading ? t('common:loading') : t('auth:onboarding.complete')}
           </Button>
-          <Button type='button' onClick={onSkip} color='tertiary' variant='text' isLoading={isLoading} fullWidth>
-            {t('auth:onboarding.omitStep')}
-          </Button>
+          {onSkip && (
+            <Button type='button' onClick={onSkip} color='tertiary' variant='text' isLoading={isLoading} fullWidth>
+              {t('auth:onboarding.omitStep')}
+            </Button>
+          )}
         </div>
       </form>
     </div>

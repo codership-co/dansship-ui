@@ -3,13 +3,9 @@ import { IoHeartCircleOutline, IoListCircleOutline } from 'react-icons/io5';
 import { PiUserCircle } from 'react-icons/pi';
 
 import { SectionHeading } from '@components/containers';
-import {
-  OnboardingHealthForm,
-  OnboardingStudentPreferencesForm,
-  OnboardingStudentProfileForm,
-} from '@components/forms';
+import { HealthProfileForm, PreferencesProfileForm, BasicProfileForm } from '@components/forms';
 import { FormStepperLayout } from '@components/layouts';
-import { OnboardingStepKey } from '@core/api';
+import { ProfileDataKey } from '@core/api';
 import { useStudentOnboarding } from '@hooks';
 
 export const OnboardingStudentTrack = () => {
@@ -39,10 +35,10 @@ export const OnboardingStudentTrack = () => {
           {
             title: t('auth:onboarding.steps.first.title'),
             subtitle: t('auth:onboarding.steps.first.subtitle'),
-            step: OnboardingStepKey.PROFILE,
+            step: ProfileDataKey.PROFILE,
             Icon: PiUserCircle,
             form: (
-              <OnboardingStudentProfileForm
+              <BasicProfileForm
                 isLoading={isSubmittingStep}
                 error={error}
                 onSubmit={data =>
@@ -57,10 +53,10 @@ export const OnboardingStudentTrack = () => {
           {
             title: t('auth:onboarding.steps.second.title'),
             subtitle: t('auth:onboarding.steps.second.subtitle'),
-            step: OnboardingStepKey.HEALTH,
+            step: ProfileDataKey.HEALTH,
             Icon: IoHeartCircleOutline,
             form: (
-              <OnboardingHealthForm
+              <HealthProfileForm
                 isLoading={isSubmittingStep}
                 error={error}
                 onContinue={submitHealthStep}
@@ -71,10 +67,10 @@ export const OnboardingStudentTrack = () => {
           {
             title: t('auth:onboarding.steps.third.title'),
             subtitle: t('auth:onboarding.steps.third.subtitle'),
-            step: OnboardingStepKey.PREFERENCES,
+            step: ProfileDataKey.PREFERENCES,
             Icon: IoListCircleOutline,
             form: (
-              <OnboardingStudentPreferencesForm
+              <PreferencesProfileForm
                 isLoading={isSubmittingStep}
                 error={error}
                 onComplete={submitPreferencesStep}

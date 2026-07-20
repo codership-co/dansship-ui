@@ -1,11 +1,11 @@
 import { useCallback } from 'react';
 
 import {
-  CompleteHealthStepPayload,
-  CompletePreferencesStepPayload,
-  CompleteStudentStepPayload,
-  OnboardingStepKey,
-  OnboardingTrackKey,
+  BasicProfilePayload,
+  HealthProfilePayload,
+  PreferencesProfilePayload,
+  ProfileDataKey,
+  ProfileTrackKey,
 } from '@core/api';
 import { useOnboarding } from '@hooks';
 
@@ -13,10 +13,10 @@ export const useStudentOnboarding = () => {
   const { currentStep, submitStep, isSubmittingStep, error } = useOnboarding();
 
   const submitProfileStep = useCallback(
-    (payload: CompleteStudentStepPayload['payload']) => {
+    (payload: BasicProfilePayload) => {
       void submitStep({
-        track: OnboardingTrackKey.STUDENT,
-        stepKey: OnboardingStepKey.PROFILE,
+        track: ProfileTrackKey.STUDENT,
+        stepKey: ProfileDataKey.PROFILE,
         payload,
       });
     },
@@ -24,10 +24,10 @@ export const useStudentOnboarding = () => {
   );
 
   const submitHealthStep = useCallback(
-    (payload: CompleteHealthStepPayload['payload']) => {
+    (payload: HealthProfilePayload) => {
       void submitStep({
-        track: OnboardingTrackKey.STUDENT,
-        stepKey: OnboardingStepKey.HEALTH,
+        track: ProfileTrackKey.STUDENT,
+        stepKey: ProfileDataKey.HEALTH,
         payload,
       });
     },
@@ -36,17 +36,17 @@ export const useStudentOnboarding = () => {
 
   const skipHealthStep = useCallback(() => {
     void submitStep({
-      track: OnboardingTrackKey.STUDENT,
-      stepKey: OnboardingStepKey.HEALTH,
+      track: ProfileTrackKey.STUDENT,
+      stepKey: ProfileDataKey.HEALTH,
       payload: {},
     });
   }, [submitStep]);
 
   const submitPreferencesStep = useCallback(
-    (payload: CompletePreferencesStepPayload['payload']) => {
+    (payload: PreferencesProfilePayload) => {
       void submitStep({
-        track: OnboardingTrackKey.STUDENT,
-        stepKey: OnboardingStepKey.PREFERENCES,
+        track: ProfileTrackKey.STUDENT,
+        stepKey: ProfileDataKey.PREFERENCES,
         payload,
       });
     },
@@ -55,8 +55,8 @@ export const useStudentOnboarding = () => {
 
   const skipPreferencesStep = useCallback(() => {
     void submitStep({
-      track: OnboardingTrackKey.STUDENT,
-      stepKey: OnboardingStepKey.PREFERENCES,
+      track: ProfileTrackKey.STUDENT,
+      stepKey: ProfileDataKey.PREFERENCES,
       payload: {
         goals: [],
         disciplines: [],

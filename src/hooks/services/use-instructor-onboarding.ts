@@ -1,33 +1,33 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import {
-  CompleteCertificationsStepPayload,
-  CompleteOperationalProfileStepPayload,
-  DayOfWeek,
-  OnboardingStepKey,
-  OnboardingTrackKey,
+  CertificationsProfilePayload,
+  DaysOfWeek,
+  OperationalProfilePayload,
+  ProfileDataKey,
+  ProfileTrackKey,
 } from '@core/api';
 import { useOnboarding } from '@hooks';
 
 const OPERATIONAL_PROFILE_DRAFT_KEY = 'instructor_operational_profile_draft';
 
-const readOperationalProfileDraft = (): CompleteOperationalProfileStepPayload['payload'] => {
-  const defaultOperationalProfile: CompleteOperationalProfileStepPayload['payload'] = {
+const readOperationalProfileDraft = (): OperationalProfilePayload => {
+  const defaultOperationalProfile: OperationalProfilePayload = {
     instagram: '',
-    availability: [{ day_of_week: 'monday' as DayOfWeek, start_time: '09:00', end_time: '12:00' }],
+    availability: [{ day_of_week: DaysOfWeek.MONDAY, start_time: '09:00', end_time: '12:00' }],
     disciplines: [{ discipline_name: '', years_experience: 1 }],
   };
 
   try {
     const raw = sessionStorage.getItem(OPERATIONAL_PROFILE_DRAFT_KEY);
 
-    return raw ? (JSON.parse(raw) as CompleteOperationalProfileStepPayload['payload']) : defaultOperationalProfile;
+    return raw ? (JSON.parse(raw) as OperationalProfilePayload) : defaultOperationalProfile;
   } catch {
     return defaultOperationalProfile;
   }
 };
 
-const writeOperationalProfileDraft = (payload: CompleteOperationalProfileStepPayload['payload']) => {
+const writeOperationalProfileDraft = (payload: OperationalProfilePayload) => {
   sessionStorage.setItem(OPERATIONAL_PROFILE_DRAFT_KEY, JSON.stringify(payload));
 };
 
@@ -38,25 +38,25 @@ const clearOperationalProfileDraft = () => {
 export const useInstructorOnboarding = () => {
   const { currentStep, visitedSteps, setMemoryRouter, submitStep, isSubmittingStep, error } = useOnboarding();
 
-  const [operationalProfileDraft, setOperationalProfileDraft] = useState<
-    CompleteOperationalProfileStepPayload['payload']
-  >(() => readOperationalProfileDraft());
+  const [operationalProfileDraft, setOperationalProfileDraft] = useState<OperationalProfilePayload>(() =>
+    readOperationalProfileDraft(),
+  );
 
   const canNavigateToStep = useCallback(
-    (step: OnboardingStepKey) => {
-      return visitedSteps.has(`${OnboardingTrackKey.INSTRUCTOR}:${step}`);
+    (step: ProfileDataKey) => {
+      return visitedSteps.has(`${ProfileTrackKey.INSTRUCTOR}:${step}`);
     },
     [visitedSteps],
   );
 
   const goToStep = useCallback(
-    (step: OnboardingStepKey) => {
+    (step: ProfileDataKey) => {
       if (!canNavigateToStep(step)) return;
 
       setMemoryRouter(prev => ({
         ...prev,
         currentStep: {
-          track: OnboardingTrackKey.INSTRUCTOR,
+          track: ProfileTrackKey.INSTRUCTOR,
           step,
         },
       }));
@@ -65,11 +65,11 @@ export const useInstructorOnboarding = () => {
   );
 
   const submitOperationalProfileStep = useCallback(
-    (payload: CompleteOperationalProfileStepPayload['payload']) => {
+    (payload: OperationalProfilePayload) => {
       try {
         void submitStep({
-          track: OnboardingTrackKey.INSTRUCTOR,
-          stepKey: OnboardingStepKey.OPERATIONAL_PROFILE,
+          track: ProfileTrackKey.INSTRUCTOR,
+          stepKey: ProfileDataKey.OPERATIONAL_PROFILE,
           payload,
         }).then(() => {
           writeOperationalProfileDraft(payload);
@@ -81,10 +81,10 @@ export const useInstructorOnboarding = () => {
   );
 
   const submitCertificationsStep = useCallback(
-    (payload: CompleteCertificationsStepPayload['payload']) => {
+    (payload: CertificationsProfilePayload) => {
       void submitStep({
-        track: OnboardingTrackKey.INSTRUCTOR,
-        stepKey: OnboardingStepKey.CERTIFICATIONS,
+        track: ProfileTrackKey.INSTRUCTOR,
+        stepKey: ProfileDataKey.CERTIFICATIONS,
         payload,
       });
     },
@@ -93,8 +93,8 @@ export const useInstructorOnboarding = () => {
 
   const skipCertificationsStep = useCallback(() => {
     void submitStep({
-      track: OnboardingTrackKey.INSTRUCTOR,
-      stepKey: OnboardingStepKey.CERTIFICATIONS,
+      track: ProfileTrackKey.INSTRUCTOR,
+      stepKey: ProfileDataKey.CERTIFICATIONS,
       payload: {
         documents: [],
       },
