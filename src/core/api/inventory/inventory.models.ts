@@ -12,12 +12,31 @@ export interface Room {
   capacity: number;
   room_type?: string;
   description?: string;
+  image_key?: string | null;
+  image_url?: string | null;
   is_active: boolean;
   created_at: string;
+  updated_at?: string;
 }
 
-export type CreateRoomPayload = Omit<Room, 'id' | 'is_active' | 'created_at'>;
+export type CreateRoomPayload = Omit<
+  Room,
+  'id' | 'is_active' | 'created_at' | 'updated_at' | 'image_key' | 'image_url'
+>;
 export type UpdateRoomPayload = Partial<CreateRoomPayload>;
+
+export interface RoomImageUploadRequest {
+  content_type: 'image/jpeg' | 'image/png' | 'image/webp';
+}
+
+export interface RoomImageUploadResponse {
+  upload_url: string;
+  file_key: string;
+}
+
+export interface RoomImageConfirmRequest {
+  file_key: string;
+}
 
 export interface ClassDefinition {
   id: string;

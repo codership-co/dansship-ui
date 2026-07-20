@@ -115,7 +115,7 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
       contentClassName='p-0 h-full overflow-auto grid grid-rows-[auto_1fr]'
     >
       <img
-        src={DEFAULT_ROOM_IMAGE}
+        src={selectedClass.room?.image_url || DEFAULT_ROOM_IMAGE}
         alt='Room class'
         className='aspect-16/8 object-cover [@media(min-height:1000px)]:aspect-16/10'
       />
@@ -127,7 +127,10 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
 
           <Container className='bg-secondary/20 py-8 xs:py-4 grid grid-flow-row xs:grid-flow-col justify-center xs:justify-between gap-4 xs:gap-8 items-center shadow-none'>
             <section className='grid justify-items-center'>
-              <ProfilePicture className='size-20 border-primary border-2' />
+              <ProfilePicture
+                className='size-20 border-primary border-2'
+                image={selectedClass.instructor?.photo_url || undefined}
+              />
             </section>
             <section className='grid content-center text-center xs:text-right'>
               <p className='m-0 font-bold'>{selectedClass.instructor?.full_name || t('bookings:instructorTBA')}</p>

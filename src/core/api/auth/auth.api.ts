@@ -14,6 +14,9 @@ import type {
   UpdatePreferredLanguagePayload,
   UpdateProfilePayload,
   User,
+  UserPhotoConfirmRequest,
+  UserPhotoUploadRequest,
+  UserPhotoUploadResponse,
   VerifyEmailPayload,
   VerifyEmailResponse,
 } from './auth.models';
@@ -116,5 +119,44 @@ export class AuthAPI {
       },
       mapAuthUserToUser,
     );
+  }
+
+  async getProfilePhotoUploadUrl(payload: UserPhotoUploadRequest) {
+    return this.httpClient.call<UserPhotoUploadResponse, UserPhotoUploadRequest>({
+      path: '/auth/profile/photo/upload-url',
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async confirmProfilePhotoUpload(payload: UserPhotoConfirmRequest) {
+    return this.httpClient.call<AuthUser, UserPhotoConfirmRequest, User>(
+      {
+        path: '/auth/profile/photo/confirm',
+        method: 'POST',
+        data: payload,
+      },
+      mapAuthUserToUser,
+    );
+  }
+
+  async uploadProfilePhoto(file: File) {
+    const { upload_url, file_key } = await this.getProfilePhotoUploadUrl({
+      content_type: file.type as UserPhotoUploadRequest['content_type'],
+    });
+
+    const uploadResponse = await fetch(upload_url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type,
+      },
+      body: file,
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('PROFILE_PHOTO_UPLOAD_FAILED');
+    }
+
+    return this.confirmProfilePhotoUpload({ file_key });
   }
 }

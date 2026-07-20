@@ -55,7 +55,7 @@ export function getMonday(d: Date, asDate: false): string;
 export function getMonday(d: Date, asDate = false): Date | string {
   const date = new Date(d);
   const day = date.getDay();
-  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
+  const diff = date.getDate() - day + (day === 0 ? -5 : 1);
   const finalDate = new Date(date.setDate(diff));
 
   if (asDate) {

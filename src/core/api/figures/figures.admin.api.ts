@@ -107,21 +107,24 @@ export class FiguresAdminAPI {
       content_type: file.type,
     });
 
-    if (response.data) {
-      const { upload_url, file_key } = response.data;
-      const uploadResponse = await this.httpClient.callNoError({
-        url: upload_url,
-        method: 'PUT',
-        data: file,
-        headers: {
-          'Content-Type': file.type,
-        },
-      });
-
-      if (uploadResponse.status === 200) {
-        return this.confirmAdminFigureImage(id, { file_key });
-      }
+    if (!response.data) {
+      return response;
     }
+
+    const { upload_url, file_key } = response.data;
+    const uploadResponse = await fetch(upload_url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type,
+      },
+      body: file,
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('FIGURE_IMAGE_UPLOAD_FAILED');
+    }
+
+    return this.confirmAdminFigureImage(id, { file_key });
   }
 
   async deleteAdminFigureImage(id: TFigureId, fileKey: string) {
