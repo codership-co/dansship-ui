@@ -2,6 +2,9 @@ import { addDays, differenceInMinutes, format, formatDistance, parseISO } from '
 
 import { getDateLocale } from '@hooks';
 
+const COLOMBIA_TIMEZONE = 'America/Bogota';
+const COLOMBIA_UTC_OFFSET_HOURS = 5;
+
 export const formatDate = (date: string | Date, lang = 'en'): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 
@@ -55,14 +58,15 @@ export function getMonday(d: Date, asDate: false): string;
 export function getMonday(d: Date, asDate = false): Date | string {
   const date = new Date(d);
   const day = date.getDay();
-  const diff = date.getDate() - day + (day === 0 ? -6 : 1);
-  const finalDate = new Date(date.setDate(diff));
+  const monday = new Date(date);
+  monday.setDate(date.getDate() - ((day + 6) % 7));
+  monday.setHours(0, 0, 0, 0);
 
   if (asDate) {
-    return finalDate;
+    return monday;
   }
 
-  return format(finalDate, 'yyyy-MM-dd');
+  return format(monday, 'yyyy-MM-dd');
 }
 
 export function addDaysToFormat(date: string, days: number) {
@@ -75,6 +79,25 @@ export function getNextMonday(mondayStr: string) {
 
 export function getPrevMonday(mondayStr: string) {
   return addDaysToFormat(mondayStr, -7);
+}
+
+export function toColombiaDateKey(value: Date | string): string {
+  const date = typeof value === 'string' ? new Date(value) : value;
+
+  return date.toLocaleDateString('en-CA', { timeZone: COLOMBIA_TIMEZONE });
+}
+
+export function colombiaDayStartUtc(isoDate: string): string {
+  const [year, month, day] = isoDate.split('-').map(Number);
+
+  return new Date(Date.UTC(year, month - 1, day, COLOMBIA_UTC_OFFSET_HOURS, 0, 0, 0)).toISOString();
+}
+
+export function getColombiaWeekRangeUtc(weekMonday: string) {
+  return {
+    startAt: colombiaDayStartUtc(weekMonday),
+    endAt: colombiaDayStartUtc(getNextMonday(weekMonday)),
+  };
 }
 
 export function formatTimeDifference(dateLeft: Date | string, dateRight: Date | string) {

@@ -32,6 +32,7 @@ interface CommonAuthContextState {
   login: (data: LoginPayload) => Promise<void>;
   signUp: (data: RegisterPayload) => Promise<void>;
   updateProfile: (data: UpdateProfilePayload) => Promise<void>;
+  uploadProfilePhoto: (file: File) => Promise<User | undefined>;
   forgotPassword: (data: ForgotPasswordPayload) => Promise<void>;
   resetPassword: (data: ResetPasswordPayload) => Promise<void>;
   verifyEmail: (data: VerifyEmailPayload) => Promise<VerifyEmailResponse | undefined>;
@@ -207,6 +208,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }
 
+  async function uploadProfilePhoto(file: File) {
+    try {
+      const data = await DansshipAPI.auth.uploadProfilePhoto(file);
+      setUser(data);
+      toast.success(t('auth:profilePhotoUpdateSuccess'));
+
+      return data;
+    } catch {
+      toast.error(t('auth:profilePhotoUpdateFailed'));
+    }
+  }
+
   async function logout() {
     try {
       await DansshipAPI.auth.logout();
@@ -311,6 +324,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         getProfile,
         signUp,
         updateProfile,
+        uploadProfilePhoto,
         logout,
         forgotPassword,
         resetPassword,

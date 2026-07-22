@@ -7,7 +7,6 @@ import { usePromise } from '../use-promise';
 
 import {
   AddClassPayload,
-  CreateWeekPayload,
   DansshipAPI,
   type EditPublishedClassPayload,
   ScheduleWeek,
@@ -25,9 +24,6 @@ export const useSchedules = (weekId: ScheduleWeek['id'] = '') => {
   );
   const { response: waitlistDefaults } = usePromise(() => DansshipAPI.schedulesAdmin.getWaitlistDefault());
 
-  const { call: createWeekPromise } = useCallablePromise((payload: CreateWeekPayload) =>
-    DansshipAPI.schedulesAdmin.createWeek(payload),
-  );
   const { call: publishWeekPromise } = useCallablePromise((weekId: string) =>
     DansshipAPI.schedulesAdmin.publishWeek(weekId),
   );
@@ -53,20 +49,6 @@ export const useSchedules = (weekId: ScheduleWeek['id'] = '') => {
       DansshipAPI.schedulesAdmin.updateWaitlistConfig(classId, payload),
   );
 
-  const createWeek = useCallback(
-    async (payload: CreateWeekPayload) => {
-      const { ok, data } = await createWeekPromise(payload);
-
-      if (ok) {
-        toast.success(t('schedules:weekCreated'));
-      } else {
-        toast.error(t('schedules:weekCreateFailed'));
-      }
-
-      return data;
-    },
-    [t, createWeekPromise],
-  );
   const publishWeek = useCallback(
     async (weekId: string) => {
       const { ok, data } = await publishWeekPromise(weekId);
@@ -172,7 +154,6 @@ export const useSchedules = (weekId: ScheduleWeek['id'] = '') => {
     activeWeekDetail: weekDetails?.data ?? null,
     isLoadingWeekDetails,
     waitlistDefaultConfig: waitlistDefaults?.data ?? null,
-    createWeek,
     publishWeek,
     addClass,
     updateClass,

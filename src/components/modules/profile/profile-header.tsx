@@ -14,20 +14,16 @@ import { DansshipAPI, PaymentProofContentType, PaymentProofContentTypesList } fr
 import { PageURLS } from '@core/constants';
 import { usePromise } from '@hooks';
 
-interface ProfileHeaderEditableData {
-  profilePhoto?: File;
-}
-
 interface ProfileHeaderProps {
   onEdit: () => void;
   editMode: boolean;
-  onChange: (data: ProfileHeaderEditableData) => void;
 }
 
-export function ProfileHeader({ editMode, onEdit, onChange }: ProfileHeaderProps) {
+export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
   const { t } = useTranslation();
-  const { user } = useAuth();
+  const { user, uploadProfilePhoto } = useAuth();
   const [imageURL, setImageURL] = useState<string>('');
+  const [isUploading, setIsUploading] = useState(false);
   const { response: savedFiguresResponse } = usePromise(() => DansshipAPI.figures.getSavedFigures());
   const { response: mySubscriptionsResponse } = usePromise(() => DansshipAPI.subscriptions.getMySubscriptions());
   const savedFigures = savedFiguresResponse?.data ?? [];
@@ -37,8 +33,9 @@ export function ProfileHeader({ editMode, onEdit, onChange }: ProfileHeaderProps
 
   const profileCompletion = user.profileCompletionPercent ?? 100;
   const bio = user.instructorProfile?.bio || user.bio;
+  const displayImage = imageURL || user.avatar || user.instructorProfile?.photoUrl || undefined;
 
-  const handleInputFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleInputFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
 
     if (!file) return;
@@ -53,8 +50,13 @@ export function ProfileHeader({ editMode, onEdit, onChange }: ProfileHeaderProps
     }
 
     setImageURL(URL.createObjectURL(file));
-    onChange({ profilePhoto: file });
-    event.currentTarget.value = '';
+    setIsUploading(true);
+    try {
+      await uploadProfilePhoto(file);
+    } finally {
+      setIsUploading(false);
+      event.currentTarget.value = '';
+    }
   };
 
   return (
@@ -63,13 +65,14 @@ export function ProfileHeader({ editMode, onEdit, onChange }: ProfileHeaderProps
         <section className='bg-white rounded-[0_100px_0_100px] md:rounded-[0_158px_0_158px] shadow-2xl grid md:grid-cols-[auto_1fr] lg:grid-cols-[auto_1fr_auto] lg:gap-8 mt-20 items-center overflow-hidden'>
           <section className='relative bg-accent h-full p-4 xl:p-6 flex overflow-hidden'>
             <ProfilePicture
-              image={imageURL}
+              image={displayImage}
               className='transition-all size-50 xl:size-80 border-10 bg-transparent border-accent m-auto'
             />
             <section
               className={cn(
                 !editMode && 'hidden',
                 editMode && 'absolute top-0 left-0 size-full bg-gray-400/50 grid place-content-center',
+                isUploading && 'pointer-events-none opacity-70',
               )}
             >
               <section className='rounded-full size-50 text-white bg-gray-300/50 shadow-sm grid place-content-center border border-solid'>

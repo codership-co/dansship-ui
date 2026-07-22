@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
+import { OptionalFileUpload } from '@components/forms/optional-file-upload';
 import {
   Dialog,
   DialogContent,
@@ -18,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@components/ui';
-import { Room } from '@core/api';
+import { PaymentProofContentType, Room } from '@core/api';
 
 const ROOM_TYPE_OPTIONS = ['pole', 'aerial', 'yoga'] as const;
 const EMPTY_OPTION = '__none__';
@@ -34,13 +35,15 @@ type RoomFormValues = z.infer<typeof roomSchema>;
 interface RoomModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (data: RoomFormValues) => void;
+  onSubmit: (data: RoomFormValues, imageFile?: File | null) => void;
   initialData?: Room | null;
   isLoading?: boolean;
 }
 
 export function RoomModal({ isOpen, onClose, onSubmit, initialData, isLoading }: RoomModalProps) {
   const { t } = useTranslation();
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const {
     register,
     handleSubmit,
@@ -61,18 +64,22 @@ export function RoomModal({ isOpen, onClose, onSubmit, initialData, isLoading }:
 
   useEffect(() => {
     if (isOpen) {
+      setImageFile(null);
+
       if (initialData) {
         reset({
           name: initialData.name,
           capacity: initialData.capacity,
           room_type: initialData.room_type || '',
         });
+        setPreviewUrl(initialData.image_url || null);
       } else {
         reset({
           name: '',
           capacity: 1,
           room_type: '',
         });
+        setPreviewUrl(null);
       }
     }
   }, [isOpen, initialData, reset]);
@@ -86,7 +93,7 @@ export function RoomModal({ isOpen, onClose, onSubmit, initialData, isLoading }:
 
         {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
         {/* @ts-ignore */}
-        <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
+        <form onSubmit={handleSubmit(values => onSubmit(values as RoomFormValues, imageFile))} className='space-y-4'>
           <div className='space-y-2'>
             <Label htmlFor='name'>{t('inventory:rooms.roomName')}</Label>
             <Input id='name' {...register('name')} placeholder={t('inventory:rooms.roomNamePlaceholder')} />
@@ -128,6 +135,19 @@ export function RoomModal({ isOpen, onClose, onSubmit, initialData, isLoading }:
             </Select>
             {errors.room_type && <p className='text-sm text-alert-500'>{errors.room_type.message}</p>}
           </div>
+
+          <OptionalFileUpload
+            value={imageFile}
+            previewUrl={previewUrl}
+            acceptedTypes={Object.values(PaymentProofContentType)}
+            isUploading={isLoading}
+            label={t('inventory:rooms.photo')}
+            helperText={t('inventory:rooms.photoHint')}
+            onChange={(file, nextPreviewUrl) => {
+              setImageFile(file);
+              setPreviewUrl(nextPreviewUrl);
+            }}
+          />
 
           <div className='flex justify-end space-x-2 pt-4'>
             <Button type='button' variant='outline' onClick={onClose} disabled={isLoading}>

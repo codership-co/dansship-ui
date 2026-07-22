@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { DateField, PhoneField, SelectField, TextField } from '@components/form-fields';
-import { PaymentProofContentType, PaymentProofContentTypesList } from '@core/api';
+import { DansshipAPI, PaymentProofContentType, PaymentProofContentTypesList } from '@core/api';
 import { DOCUMENT_TYPE_OPTIONS } from '@core/constants';
 
 export const createBasicProfileSchema = (t: TFunction) => {
@@ -81,8 +81,16 @@ export function BasicProfileForm({ isLoading, error, onSubmit, defaultValues }: 
     event.currentTarget.value = '';
   };
 
-  const internalSubmit = (values: BasicProfileFormValues) => {
-    // TODO: upload profilePhoto and assign it to student profile
+  const internalSubmit = async (values: BasicProfileFormValues) => {
+    if (profilePhoto) {
+      try {
+        await DansshipAPI.auth.uploadProfilePhoto(profilePhoto);
+      } catch {
+        toast.error(t('auth:profilePhotoUpdateFailed'));
+
+        return;
+      }
+    }
 
     onSubmit(values);
   };

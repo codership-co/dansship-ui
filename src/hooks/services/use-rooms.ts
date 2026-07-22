@@ -10,7 +10,7 @@ import { CreateRoomPayload, DansshipAPI, UpdateRoomPayload } from '@core/api';
 export const useRooms = () => {
   const { t } = useTranslation();
 
-  const { response: rooms, isLoading } = usePromise(() => DansshipAPI.inventoryAdmin.getRooms());
+  const { response: rooms, isLoading, reFetch } = usePromise(() => DansshipAPI.inventoryAdmin.getRooms());
   const { call: createRoomPromise, isLoading: isCreatingRoom } = useCallablePromise((payload: CreateRoomPayload) =>
     DansshipAPI.inventoryAdmin.createRoom(payload),
   );
@@ -23,31 +23,64 @@ export const useRooms = () => {
   const { call: reactivateRoomPromise, isLoading: isReactivatingRoom } = useCallablePromise((id: string) =>
     DansshipAPI.inventoryAdmin.reactivateRoom(id),
   );
+  const { call: uploadRoomImagePromise, isLoading: isUploadingRoomImage } = useCallablePromise(
+    (id: string, file: File) => DansshipAPI.inventoryAdmin.uploadRoomImage(id, file),
+  );
 
   const createRoom = useCallback(
-    async (payload: CreateRoomPayload) => {
-      const { ok } = await createRoomPromise(payload);
+    async (payload: CreateRoomPayload, imageFile?: File | null) => {
+      const { ok, data } = (await createRoomPromise(payload)) ?? {};
 
-      if (ok) {
-        toast.success(t('inventory:rooms.createSuccess'));
-      } else {
+      if (!ok || !data) {
         toast.error(t('inventory:rooms.createFailed'));
+
+        return;
       }
+
+      if (imageFile) {
+        const uploadResult = await uploadRoomImagePromise(data.id, imageFile);
+
+        if (!uploadResult?.ok) {
+          toast.error(t('inventory:rooms.imageUploadRetryHint'));
+          reFetch();
+
+          return data;
+        }
+      }
+
+      toast.success(t('inventory:rooms.createSuccess'));
+      reFetch();
+
+      return data;
     },
-    [t, createRoomPromise],
+    [t, createRoomPromise, uploadRoomImagePromise, reFetch],
   );
 
   const updateRoom = useCallback(
-    async (id: string, payload: UpdateRoomPayload) => {
-      const { ok } = await updateRoomPromise(id, payload);
+    async (id: string, payload: UpdateRoomPayload, imageFile?: File | null) => {
+      const { ok } = (await updateRoomPromise(id, payload)) ?? {};
 
-      if (ok) {
-        toast.success(t('inventory:rooms.updateSuccess'));
-      } else {
+      if (!ok) {
         toast.error(t('inventory:rooms.updateFailed'));
+
+        return;
       }
+
+      if (imageFile) {
+        const uploadResult = await uploadRoomImagePromise(id, imageFile);
+
+        if (!uploadResult?.ok) {
+          toast.error(t('inventory:rooms.imageUploadRetryHint'));
+          reFetch();
+
+          return;
+        }
+      }
+
+      toast.success(t('inventory:rooms.updateSuccess'));
+      reFetch();
     },
-    [t, updateRoomPromise],
+    [t, updateRoomPromise, uploadRoomImagePromise, reFetch],
   );
 
   const deleteRoom = useCallback(
@@ -56,11 +89,12 @@ export const useRooms = () => {
 
       if (ok) {
         toast.success(t('inventory:rooms.deactivateSuccess'));
+        reFetch();
       } else {
         toast.error(t('inventory:rooms.deactivateFailed'));
       }
     },
-    [t, deleteRoomPromise],
+    [t, deleteRoomPromise, reFetch],
   );
 
   const reactivateRoom = useCallback(
@@ -69,11 +103,12 @@ export const useRooms = () => {
 
       if (ok) {
         toast.success(t('inventory:rooms.reactivateSuccess'));
+        reFetch();
       } else {
         toast.error(t('inventory:rooms.reactivateFailed'));
       }
     },
-    [t, reactivateRoomPromise],
+    [t, reactivateRoomPromise, reFetch],
   );
 
   return {
@@ -84,7 +119,7 @@ export const useRooms = () => {
     deleteRoom,
     reactivateRoom,
     isCreating: isCreatingRoom,
-    isUpdating: isUpdatingRoom,
+    isUpdating: isUpdatingRoom || isUploadingRoomImage,
     isDeleting: isDeletingRoom,
     isReactivating: isReactivatingRoom,
   };

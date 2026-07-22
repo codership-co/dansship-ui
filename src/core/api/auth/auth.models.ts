@@ -10,6 +10,7 @@ export interface AuthUser {
   document_value?: string | null;
   city?: string | null;
   address?: string | null;
+  photo_url?: string | null;
   preferred_language?: 'en' | 'es';
   updated_at?: string;
   is_active?: boolean;
@@ -138,4 +139,17 @@ export interface UpdateProfilePayload {
   preferred_language?: string;
   full_name?: string;
   display_name?: string;
+}
+
+export interface UserPhotoUploadRequest {
+  content_type: 'image/jpeg' | 'image/png' | 'image/webp';
+}
+
+export interface UserPhotoUploadResponse {
+  upload_url: string;
+  file_key: string;
+}
+
+export interface UserPhotoConfirmRequest {
+  file_key: string;
 }

@@ -37,11 +37,11 @@ export function RoomsTab() {
     setSelectedRoom(null);
   };
 
-  const handleSubmit = async (data: Omit<Room, 'id' | 'is_active' | 'created_at'>) => {
+  const handleSubmit = async (data: Omit<Room, 'id' | 'is_active' | 'created_at'>, imageFile?: File | null) => {
     if (selectedRoom) {
-      await updateRoom(selectedRoom.id, data);
+      await updateRoom(selectedRoom.id, data, imageFile);
     } else {
-      await createRoom(data);
+      await createRoom(data, imageFile);
     }
 
     handleCloseModal();
@@ -85,6 +85,7 @@ export function RoomsTab() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>{t('inventory:rooms.photo')}</TableHead>
               <TableHead>{t('common:name')}</TableHead>
               <TableHead>{t('inventory:rooms.capacity')}</TableHead>
               <TableHead>{t('common:type')}</TableHead>
@@ -95,13 +96,20 @@ export function RoomsTab() {
           <TableBody>
             {rooms.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className='text-center py-4 text-gray-500'>
+                <TableCell colSpan={6} className='text-center py-4 text-gray-500'>
                   {t('inventory:rooms.empty')}
                 </TableCell>
               </TableRow>
             ) : (
               sortedRooms.map(room => (
                 <TableRow key={room.id} className={!room.is_active ? 'opacity-60 grayscale blur-[0.5px]' : undefined}>
+                  <TableCell>
+                    {room.image_url ? (
+                      <img src={room.image_url} alt='' className='size-12 rounded object-cover' />
+                    ) : (
+                      <span className='text-xs text-muted-foreground'>—</span>
+                    )}
+                  </TableCell>
                   <TableCell className='font-medium'>{room.name}</TableCell>
                   <TableCell>{room.capacity}</TableCell>
                   <TableCell>{room.room_type || '-'}</TableCell>

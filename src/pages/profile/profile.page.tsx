@@ -43,7 +43,7 @@ function ProfilePage() {
 
   return (
     <main className='min-h-dvh grid gap-8 md:gap-20 content-start'>
-      <ProfileHeader editMode={editMode} onEdit={() => setEditMode(p => !p)} onChange={() => null} />
+      <ProfileHeader editMode={editMode} onEdit={() => setEditMode(p => !p)} />
 
       {editMode ? (
         <Section footerMargin>

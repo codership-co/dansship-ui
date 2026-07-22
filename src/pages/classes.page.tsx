@@ -8,7 +8,7 @@ import { SpinnerLoader } from '@components/loaders';
 import { BookingCalendar, WeekSelector } from '@components/modules';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
 import { DansshipAPI } from '@core/api';
-import { addDaysToFormat, getMonday, getNextMonday } from '@helpers';
+import { addDaysToFormat, getColombiaWeekRangeUtc, getMonday } from '@helpers';
 import { usePromise } from '@hooks';
 
 async function findNearWeekWithClasses(weeksToSearch: number) {
@@ -16,10 +16,8 @@ async function findNearWeekWithClasses(weeksToSearch: number) {
 
   for (let i = 0; i < weeksToSearch; i++) {
     const weekCandidate = addDaysToFormat(baseWeek, i * 7);
-    const { data, ok } = await DansshipAPI.schedules.getPublishedClassesByRange(
-      `${weekCandidate}T00:00:00Z`,
-      `${getNextMonday(weekCandidate)}T00:00:00Z`,
-    );
+    const { startAt, endAt } = getColombiaWeekRangeUtc(weekCandidate);
+    const { data, ok } = await DansshipAPI.schedules.getPublishedClassesByRange(startAt, endAt);
 
     if (ok && data.length > 0) {
       return weekCandidate;
