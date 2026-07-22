@@ -9,7 +9,7 @@ import { Container, SectionEmpty } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { BookingClassCard, BookingDaySelector } from '@components/modules';
 import { DansshipAPI, MyBooking, PublishedClass } from '@core/api';
-import { BookingDay, getMonday, getNextMonday, hasOverlap, sortClassesByDay } from '@helpers';
+import { BookingDay, getColombiaWeekRangeUtc, getMonday, hasOverlap, sortClassesByDay } from '@helpers';
 import { useCallablePromise, useDateLocale } from '@hooks';
 
 interface BookingCalendarProps {
@@ -27,17 +27,18 @@ export function BookingCalendar({ week, hasActiveSubscription, myBookings }: Boo
   const [activeDay, setActiveDay] = useState<BookingDay>();
   const [classesByDay, setClassesByDay] = useState<Array<BookingDay>>([]);
 
-  const { call, isLoading, error } = useCallablePromise(async (startAt: string, endAt: string) => {
+  const { call, isLoading, error } = useCallablePromise(async (weekMonday: string) => {
+    const { startAt, endAt } = getColombiaWeekRangeUtc(weekMonday);
     const { data: classes } = await DansshipAPI.schedules.getPublishedClassesByRange(startAt, endAt);
 
     return {
       classes: classes ?? [],
-      classesByDay: sortClassesByDay(classes ?? [], startAt, endAt),
+      classesByDay: sortClassesByDay(classes ?? [], weekMonday),
     };
   });
 
   useEffect(() => {
-    call(`${week}T00:00:00Z`, `${getNextMonday(week)}T00:00:00Z`).then(({ classes, classesByDay }) => {
+    call(week).then(({ classes, classesByDay }) => {
       setClasses(classes);
       setClassesByDay(classesByDay);
       setActiveDay(classesByDay.find(day => day.classes.length));

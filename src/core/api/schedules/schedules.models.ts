@@ -49,10 +49,6 @@ export interface GetAgendaEventsPayload {
   room_id?: string;
 }
 
-export interface CreateWeekPayload {
-  week_start_date: string;
-}
-
 export interface AddClassPayload {
   class_definition_id: string;
   room_id: string;

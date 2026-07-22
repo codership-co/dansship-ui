@@ -1,4 +1,4 @@
-import { format } from 'date-fns';
+import { addDaysToFormat, toColombiaDateKey } from './date';
 
 import { MyBooking, PublishedClass } from '@core/api';
 
@@ -7,34 +7,22 @@ export interface BookingDay {
   classes: Array<PublishedClass>;
 }
 
-export const sortClassesByDay = (classes: Array<PublishedClass>, startAt: string, endAt: string) => {
-  const start = new Date(startAt);
-  const end = new Date(endAt);
-  const rangeDays: Record<string, Array<PublishedClass>> = {};
+export const sortClassesByDay = (classes: Array<PublishedClass>, weekMonday: string) => {
+  const rangeDays = Object.fromEntries(
+    Array.from({ length: 7 }, (_, offset) => [addDaysToFormat(weekMonday, offset), [] as Array<PublishedClass>]),
+  ) as Record<string, Array<PublishedClass>>;
 
-  while (start < end) {
-    const dateKey = format(start, 'yyyy-MM-dd');
-    rangeDays[dateKey] = [];
-    start.setDate(start.getDate() + 1);
+  for (const scheduledClass of classes) {
+    const dayKey = toColombiaDateKey(scheduledClass.start_time);
+
+    if (rangeDays[dayKey]) {
+      rangeDays[dayKey].push(scheduledClass);
+    }
   }
 
-  const classesByDay = classes.reduce((acc, scheduledClass) => {
-    const dayKey = format(new Date(scheduledClass.start_time), 'yyyy-MM-dd');
-
-    if (!acc[dayKey]) {
-      acc[dayKey] = [];
-    }
-
-    acc[dayKey].push(scheduledClass);
-
-    return acc;
-  }, rangeDays);
-
-  const orderedDays = Object.keys(classesByDay).sort((first, second) => first.localeCompare(second));
-
-  return orderedDays.map<BookingDay>(day => ({
-    day: day,
-    classes: classesByDay[day].sort(
+  return Object.entries(rangeDays).map<BookingDay>(([day, dayClasses]) => ({
+    day,
+    classes: dayClasses.sort(
       (first, second) => new Date(first.start_time).getTime() - new Date(second.start_time).getTime(),
     ),
   }));

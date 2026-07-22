@@ -5,7 +5,6 @@ import { DansshipAPIError } from '@core/api';
 import type {
   AddClassPayload,
   AgendaEvent,
-  CreateWeekPayload,
   EditPublishedClassPayload,
   GetAgendaEventsPayload,
   GetWaitlistDefaultResponse,
@@ -39,14 +38,6 @@ export class SchedulesAdminAPI {
       path: '/admin/agenda/events',
       method: 'GET',
       params: payload,
-    });
-  }
-
-  async createWeek(payload: CreateWeekPayload) {
-    return this.httpClient.callNoError<ScheduleWeek, CreateWeekPayload>({
-      path: '/admin/schedules/weeks',
-      method: 'POST',
-      data: payload,
     });
   }
 
