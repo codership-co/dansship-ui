@@ -31,7 +31,6 @@ import {
   SecureInstructorOnboardingPage,
   SecureLoginPage,
   SecureOnboardingPage,
-  SecureProfileEditPage,
   SecurePaymentsResultPage,
   SecureResetPasswordPage,
   SecureSignupPage,
@@ -99,7 +98,6 @@ const routes: Array<RouteObject> = [
             path: 'profile',
             children: [
               { index: true, Component: SecureProfilePage },
-              { path: 'edit', Component: SecureProfileEditPage },
               { path: 'subscription', Component: SecureSubscriptionPage },
               { path: 'bookings', Component: SecureBookingsPage },
             ],

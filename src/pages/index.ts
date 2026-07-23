@@ -7,7 +7,6 @@ export * from './legal.page';
 export * from './classes.page';
 export * from './figures.page';
 export * from './figure-saved.page';
-export * from './profile-edit.page';
 export * from './figures-details.page';
 export * from './figure-completed.page';
 export * from './studio-rental-browse.page';
