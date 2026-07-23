@@ -96,7 +96,6 @@ export const PageURLS = {
   profile: {
     root: '/profile',
     user: (id: string | number) => `/profile/${id}`,
-    edit: '/profile/edit',
     subscription: '/profile/subscription',
     bookings: '/profile/bookings',
   },
