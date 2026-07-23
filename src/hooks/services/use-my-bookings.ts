@@ -27,23 +27,29 @@ export const useMyBookings = () => {
 
       if (error) {
         if (error instanceof DansshipAPIError) {
-          const normalized = error.body;
+          const { error_code } = error.body;
 
-          if (
-            [DANSSHIP_ERROR_CODE.BOOKING_CLASS_FULL, DANSSHIP_ERROR_CODE.CLASS_FULL].includes(normalized.error_code)
-          ) {
+          if (error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_FULL || error_code === DANSSHIP_ERROR_CODE.CLASS_FULL) {
             toast.error(t('bookings:classFullDesc'));
-          } else if (normalized.error_code === DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP) {
+          } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP) {
             toast.error(t('bookings:timeOverlapDesc'));
+          } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_GROUP_NOT_COVERED) {
+            toast.error(t('bookings:classGroupNotCoveredDesc'));
+          } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_ELIGIBLE) {
+            toast.error(t('bookings:subscriptionNotEligibleDesc'));
           } else {
-            toast.error(t('bookings:bookingFailed'));
+            toast.error(t('bookings:bookingFailedDesc'));
           }
         } else {
           toast.error(t('bookings:bookingFailedDesc'));
         }
-      } else {
-        toast.success(t('bookings:bookSuccess'));
+
+        return false;
       }
+
+      toast.success(t('bookings:bookSuccess'));
+
+      return true;
     },
     [bookClassPromise, t],
   );
@@ -54,9 +60,13 @@ export const useMyBookings = () => {
 
       if (error) {
         toast.error(t('bookings:cancellationFailedDesc'));
-      } else {
-        toast.success(t('bookings:cancelSuccess'));
+
+        return false;
       }
+
+      toast.success(t('bookings:cancelSuccess'));
+
+      return true;
     },
     [cancelClassPromise, t],
   );
@@ -67,19 +77,27 @@ export const useMyBookings = () => {
 
       if (error) {
         if (error instanceof DansshipAPIError) {
-          const normalized = error.body;
+          const { error_code } = error.body;
 
-          if (normalized.error_code === DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP) {
+          if (error_code === DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP) {
             toast.error(t('bookings:timeOverlapDesc'));
+          } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_GROUP_NOT_COVERED) {
+            toast.error(t('bookings:classGroupNotCoveredDesc'));
+          } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_ELIGIBLE) {
+            toast.error(t('bookings:subscriptionNotEligibleDesc'));
           } else {
-            toast.error(t('bookings:waitlistFailed'));
+            toast.error(t('bookings:waitlistFailedDesc'));
           }
         } else {
           toast.error(t('bookings:waitlistFailedDesc'));
         }
-      } else {
-        toast.success(t('bookings:waitlistJoinSuccess'));
+
+        return false;
       }
+
+      toast.success(t('bookings:waitlistJoinSuccess'));
+
+      return true;
     },
     [joinWaitlistPromise, t],
   );
@@ -90,9 +108,13 @@ export const useMyBookings = () => {
 
       if (error) {
         toast.error(t('bookings:waitlistCancelFailed'));
-      } else {
-        toast.success(t('bookings:waitlistCancelSuccess'));
+
+        return false;
       }
+
+      toast.success(t('bookings:waitlistCancelSuccess'));
+
+      return true;
     },
     [cancelWaitlistPromise, t],
   );

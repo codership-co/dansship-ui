@@ -73,6 +73,10 @@
     "successTitle": "Reserva creada exitosamente",
     "errorTitle": "No se pudo crear la reserva",
     "errorDescription": "No se pudo crear la reserva.",
+    "classGroupNotCovered": "El usuario no tiene un plan activo que cubra este tipo de clase.",
+    "subscriptionNotEligible": "El usuario no tiene una suscripcion activa con clases disponibles.",
+    "timeOverlap": "El usuario ya tiene otra clase reservada en ese horario.",
+    "classFull": "Esta clase esta llena.",
     "validationUser": "Selecciona un usuario.",
     "validationClass": "Selecciona una clase.",
     "selectedClassSummary": "Clase seleccionada: {{className}} ({{enrolled}}/{{capacity}} reservados)"

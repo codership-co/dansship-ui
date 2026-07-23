@@ -6,6 +6,7 @@ export interface PublicPlan {
   currency: string;
   classes_included: number;
   validity_days: number;
+  features?: Array<string>;
   is_recommended?: boolean;
   recommended_order?: number | null;
 }

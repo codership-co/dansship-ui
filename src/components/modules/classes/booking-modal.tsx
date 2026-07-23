@@ -62,42 +62,38 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
   });
 
   const handleBook = async () => {
-    try {
-      await bookClass({ scheduled_class_id: selectedClass.id });
+    const ok = await bookClass({ scheduled_class_id: selectedClass.id });
+
+    if (ok) {
       onClose();
-    } catch {
-      // Error handled by hook
     }
   };
 
   const handleCancel = async () => {
     if (!selectedClass.user_booking_id) return;
 
-    try {
-      await cancelClass(selectedClass.user_booking_id);
+    const ok = await cancelClass(selectedClass.user_booking_id);
+
+    if (ok) {
       onClose();
-    } catch {
-      // Error handled by hook
     }
   };
 
   const handleWaitlistJoin = async () => {
-    try {
-      await joinWaitlist({ scheduled_class_id: selectedClass.id });
+    const ok = await joinWaitlist({ scheduled_class_id: selectedClass.id });
+
+    if (ok) {
       onClose();
-    } catch {
-      // Error handled by hook
     }
   };
 
   const handleWaitlistCancel = async () => {
     if (!selectedClass.user_booking_id) return;
 
-    try {
-      await cancelWaitlist(selectedClass.user_booking_id);
+    const ok = await cancelWaitlist(selectedClass.user_booking_id);
+
+    if (ok) {
       onClose();
-    } catch {
-      // Error handled by hook
     }
   };
 

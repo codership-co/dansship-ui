@@ -84,12 +84,8 @@ export function PlanCard({ plan, onSelectPlan, isFeatured, hoverable, className,
           )}
 
           <ul className='text-label grid gap-4 px-4'>
-            {[
-              t('subscriptions:classesIncluded', { count: plan.classes_included }),
-              t('subscriptions:validForDays', { count: plan.validity_days }),
-              t('subscriptions:accessAllClasses'),
-            ].map((item, i) => (
-              <li key={i} className='flex items-start gap-2.5 sm:gap-3'>
+            {(plan.features ?? []).map((item, i) => (
+              <li key={`${item}-${i}`} className='flex items-start gap-2.5 sm:gap-3'>
                 <FaCheckCircle className='mt-1 shrink-0 h-4 w-4' />
                 <span>{item}</span>
               </li>

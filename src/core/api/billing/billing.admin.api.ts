@@ -9,12 +9,20 @@ import type {
   GetDiscountsParams,
   GetPlansParams,
   Plan,
+  TaxType,
   UpdateDiscountPayload,
   UpdatePlanPayload,
 } from './billing.models';
 
 export class BillingAdminAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
+
+  async getTaxTypes() {
+    return this.httpClient.callNoError<Array<TaxType>>({
+      path: '/admin/tax-types',
+      method: 'GET',
+    });
+  }
 
   async getPlans(payload?: GetPlansParams) {
     return this.httpClient.callNoError<Array<Plan>>({

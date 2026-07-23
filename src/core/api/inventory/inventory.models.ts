@@ -38,6 +38,14 @@ export interface RoomImageConfirmRequest {
   file_key: string;
 }
 
+export interface ClassGroup {
+  id: string;
+  name: string;
+  description?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ClassDefinition {
   id: string;
   name: string;
@@ -46,6 +54,7 @@ export interface ClassDefinition {
   max_participants: number;
   default_room_type?: string;
   level?: string;
+  class_group_id: string;
   is_active: boolean;
   created_at: string;
 }

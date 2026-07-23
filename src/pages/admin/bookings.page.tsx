@@ -17,7 +17,7 @@ import {
   Textarea,
 } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
-import { type AdminBookClassPayload, DansshipAPI } from '@core/api';
+import { type AdminBookClassPayload, DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions } from '@core/permissions';
 import { getMonday, getNextMonday, getPrevMonday } from '@helpers';
@@ -51,13 +51,36 @@ function AdminBookingsPage() {
 
   const adminBookClass = useCallback(
     async (payload: AdminBookClassPayload) => {
-      const { ok } = await adminBookClassPromise(payload);
+      const { ok, error } = await adminBookClassPromise(payload);
 
       if (ok) {
         toast.success(t('admin:bookings.successTitle'));
+
+        return true;
+      }
+
+      if (error instanceof DansshipAPIError) {
+        const { error_code } = error.body;
+
+        if (error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_GROUP_NOT_COVERED) {
+          toast.error(t('admin:bookings.classGroupNotCovered'));
+        } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_ELIGIBLE) {
+          toast.error(t('admin:bookings.subscriptionNotEligible'));
+        } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP) {
+          toast.error(t('admin:bookings.timeOverlap'));
+        } else if (
+          error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_FULL ||
+          error_code === DANSSHIP_ERROR_CODE.CLASS_FULL
+        ) {
+          toast.error(t('admin:bookings.classFull'));
+        } else {
+          toast.error(t('admin:bookings.errorDescription'));
+        }
       } else {
         toast.error(t('admin:bookings.errorDescription'));
       }
+
+      return false;
     },
     [adminBookClassPromise, t],
   );
@@ -102,11 +125,15 @@ function AdminBookingsPage() {
       return;
     }
 
-    await adminBookClass({
+    const booked = await adminBookClass({
       user_id: selectedUserId,
       scheduled_class_id: selectedClassId,
       reason: reason.trim() ? reason.trim() : undefined,
     });
+
+    if (!booked) {
+      return;
+    }
 
     setSelectedClassId('');
     setReason('');
