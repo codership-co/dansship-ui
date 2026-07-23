@@ -13,8 +13,8 @@ export interface ScheduledClass {
   waitlist_max_size?: number | null;
 
   class_definition?: { id: string; name: string; duration_minutes: number; level?: string | null };
-  room?: { id: string; name: string };
-  instructor?: { id: string; user_id: string; email: string; full_name: string };
+  room?: { id: string; name: string; image_url?: string | null };
+  instructor?: { id: string; user_id: string; email: string; full_name: string; photo_url?: string | null };
 }
 
 export interface ScheduleWeek {
@@ -47,10 +47,6 @@ export interface GetAgendaEventsPayload {
   start_at: string;
   end_at: string;
   room_id?: string;
-}
-
-export interface CreateWeekPayload {
-  week_start_date: string;
 }
 
 export interface AddClassPayload {

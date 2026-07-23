@@ -4,11 +4,15 @@ import { DansshipAPIError } from '@core/api';
 
 import type {
   ClassDefinition,
+  ClassGroup,
   CreateClassDefinitionPayload,
   CreateRoomPayload,
   GetClassesParams,
   GetRoomsParams,
   Room,
+  RoomImageConfirmRequest,
+  RoomImageUploadRequest,
+  RoomImageUploadResponse,
   UpdateClassDefinitionPayload,
   UpdateRoomPayload,
 } from './inventory.models';
@@ -54,6 +58,47 @@ export class InventoryAdminApi {
     });
   }
 
+  async getRoomImageUploadUrl(id: string, payload: RoomImageUploadRequest) {
+    return this.httpClient.callNoError<RoomImageUploadResponse, RoomImageUploadRequest>({
+      path: `/admin/rooms/${id}/image/upload-url`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async confirmRoomImageUpload(id: string, payload: RoomImageConfirmRequest) {
+    return this.httpClient.callNoError<Room, RoomImageConfirmRequest>({
+      path: `/admin/rooms/${id}/image/confirm`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async uploadRoomImage(id: string, file: File) {
+    const response = await this.getRoomImageUploadUrl(id, {
+      content_type: file.type as RoomImageUploadRequest['content_type'],
+    });
+
+    if (!response.data) {
+      return response;
+    }
+
+    const { upload_url, file_key } = response.data;
+    const uploadResponse = await fetch(upload_url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type,
+      },
+      body: file,
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('ROOM_IMAGE_UPLOAD_FAILED');
+    }
+
+    return this.confirmRoomImageUpload(id, { file_key });
+  }
+
   async getClasses(payload?: GetClassesParams) {
     return this.httpClient.callNoError<Array<ClassDefinition>>({
       path: '/admin/class-catalog',
@@ -89,6 +134,13 @@ export class InventoryAdminApi {
     return this.httpClient.callNoError({
       path: `/admin/class-catalog/${id}/deactivate`,
       method: 'POST',
+    });
+  }
+
+  async getClassGroups() {
+    return this.httpClient.callNoError<Array<ClassGroup>>({
+      path: '/admin/class-groups',
+      method: 'GET',
     });
   }
 }

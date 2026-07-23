@@ -17,7 +17,7 @@ type ProfilePictureProps = {
 export function ProfilePicture({ className, image }: ProfilePictureProps) {
   const { user } = useAuth();
 
-  const imageUrl = image || user?.instructorProfile?.photoUrl || user?.avatar;
+  const imageUrl = image || user?.avatar || user?.instructorProfile?.photoUrl;
   const defaultImage = images[Math.floor(Math.random() * 4)];
 
   return (

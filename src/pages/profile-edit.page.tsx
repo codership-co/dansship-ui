@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { LuArrowLeft, LuSave } from 'react-icons/lu';
 import { useNavigate } from 'react-router';
 
+import { OptionalFileUpload } from '@components/forms/optional-file-upload';
 import { SpinnerLoader } from '@components/loaders';
 import {
   Button,
@@ -16,13 +17,12 @@ import {
   Textarea,
 } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
-import { DansshipAPI } from '@core/api';
+import { DansshipAPI, PaymentProofContentType } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { useInstructorProfile, usePromise } from '@hooks';
 
 interface InstructorProfileFormData {
   bio: string;
-  photo_url: string;
   contact_info: string;
 }
 
@@ -34,7 +34,7 @@ interface AccountProfileFormData {
 function ProfileEditPage() {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { user, updateProfile: updateAuthProfile } = useAuth();
+  const { user, updateProfile: updateAuthProfile, uploadProfilePhoto } = useAuth();
 
   const normalizedRoles = useMemo(() => (user?.roles ?? []).map(role => role.toLowerCase()), [user]);
   const isInstructor = useMemo(() => {
@@ -62,9 +62,11 @@ function ProfileEditPage() {
 
   const [formData, setFormData] = useState<InstructorProfileFormData>({
     bio: '',
-    photo_url: '',
     contact_info: '',
   });
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
+  const [profilePhotoPreviewUrl, setProfilePhotoPreviewUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -81,9 +83,9 @@ function ProfileEditPage() {
 
     setFormData({
       bio: profile?.bio ?? user.instructorProfile?.bio ?? '',
-      photo_url: profile?.photo_url ?? user.instructorProfile?.photoUrl ?? '',
       contact_info: profile?.contact_info ?? user.instructorProfile?.contactInfo ?? '',
     });
+    setProfilePhotoPreviewUrl(user.avatar || user.instructorProfile?.photoUrl || null);
   }, [profile, user]);
 
   const instructorLastUpdated = profile?.updated_at
@@ -91,23 +93,6 @@ function ProfileEditPage() {
     : user?.instructorProfile?.updatedAt
       ? new Date(user.instructorProfile.updatedAt).toLocaleString()
       : null;
-
-  const hasUrlError = useMemo(() => {
-    const value = formData.photo_url.trim();
-
-    if (!value) {
-      return false;
-    }
-
-    try {
-      // eslint-disable-next-line no-new
-      new URL(value);
-
-      return value.length > 500;
-    } catch {
-      return true;
-    }
-  }, [formData.photo_url]);
 
   const accountIsDirty = useMemo(() => {
     const baselineFullName = (user?.fullName || user?.name || user?.username || '').trim();
@@ -121,18 +106,12 @@ function ProfileEditPage() {
 
   const instructorIsDirty = useMemo(() => {
     const baselineBio = (profile?.bio ?? user?.instructorProfile?.bio ?? '').trim();
-    const baselinePhotoUrl = (profile?.photo_url ?? user?.instructorProfile?.photoUrl ?? '').trim();
     const baselineContactInfo = (profile?.contact_info ?? user?.instructorProfile?.contactInfo ?? '').trim();
 
-    return (
-      formData.bio.trim() !== baselineBio ||
-      formData.photo_url.trim() !== baselinePhotoUrl ||
-      formData.contact_info.trim() !== baselineContactInfo
-    );
+    return formData.bio.trim() !== baselineBio || formData.contact_info.trim() !== baselineContactInfo;
   }, [formData, profile, user]);
 
   const canSaveAccount = accountFormData.full_name.trim().length > 0;
-  const canSaveInstructor = !hasUrlError;
   const hasChanges = accountIsDirty || (canEditInstructorProfile && instructorIsDirty);
 
   const handleSave = async () => {
@@ -160,11 +139,10 @@ function ProfileEditPage() {
 
     const payload = {
       bio: formData.bio.trim() || null,
-      photo_url: formData.photo_url.trim() || null,
       contact_info: formData.contact_info.trim() || null,
     };
 
-    if (canEditInstructorProfile && canSaveInstructor && instructorIsDirty) {
+    if (canEditInstructorProfile && instructorIsDirty) {
       if (profile?.id) {
         await updateProfile(payload);
       } else {
@@ -199,10 +177,7 @@ function ProfileEditPage() {
             <LuArrowLeft className='w-4 h-4' />
             {t('common:cancel')}
           </Button>
-          <Button
-            onClick={handleSave}
-            disabled={isSaving || !hasChanges || !canSaveAccount || (canEditInstructorProfile && !canSaveInstructor)}
-          >
+          <Button onClick={handleSave} disabled={isSaving || isUploadingPhoto || !hasChanges || !canSaveAccount}>
             <LuSave className='w-4 h-4' />
             {isSaving ? t('common:saving') : t('common:saveChanges')}
           </Button>
@@ -292,25 +267,34 @@ function ProfileEditPage() {
                   />
                 </div>
 
-                <div className='space-y-2'>
-                  <Label htmlFor='photo_url'>{t('instructor:photoUrl')}</Label>
+                <OptionalFileUpload
+                  value={profilePhotoFile}
+                  previewUrl={profilePhotoPreviewUrl}
+                  acceptedTypes={Object.values(PaymentProofContentType)}
+                  isUploading={isUploadingPhoto}
+                  label={t('instructor:photoUrl')}
+                  onChange={async (file, nextPreviewUrl) => {
+                    setProfilePhotoFile(file);
+                    setProfilePhotoPreviewUrl(nextPreviewUrl);
 
-                  <Input
-                    id='photo_url'
-                    type='url'
-                    maxLength={500}
-                    value={formData.photo_url}
-                    onChange={event =>
-                      setFormData(prev => ({
-                        ...prev,
-                        photo_url: event.target.value,
-                      }))
+                    if (!file) {
+                      return;
                     }
-                    placeholder={t('instructor:profile.photoUrlPlaceholder')}
-                  />
 
-                  {hasUrlError && <p className='text-sm text-alert-600'>{t('instructor:profile.photoUrlInvalid')}</p>}
-                </div>
+                    setIsUploadingPhoto(true);
+
+                    try {
+                      const updatedUser = await uploadProfilePhoto(file);
+
+                      if (!updatedUser) {
+                        setProfilePhotoFile(null);
+                        setProfilePhotoPreviewUrl(user.avatar || user.instructorProfile?.photoUrl || null);
+                      }
+                    } finally {
+                      setIsUploadingPhoto(false);
+                    }
+                  }}
+                />
 
                 <div className='space-y-2'>
                   <Label htmlFor='contact_info'>{t('instructor:profile.contactInfoLabel')}</Label>
@@ -338,7 +322,7 @@ function ProfileEditPage() {
                   <Button
                     type='button'
                     onClick={handleSave}
-                    disabled={isSaving || !hasChanges || !canSaveAccount || !canSaveInstructor}
+                    disabled={isSaving || isUploadingPhoto || !hasChanges || !canSaveAccount}
                   >
                     <LuSave className='h-4 w-4' />
                     {isSaving ? t('common:saving') : t('common:saveChanges')}

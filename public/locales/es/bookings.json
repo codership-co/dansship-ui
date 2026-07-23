@@ -52,6 +52,9 @@
   "classFullDesc": "Esta clase ha alcanzado su capacidad maxima.",
   "bookingFailed": "Reserva Fallida",
   "bookingFailedDesc": "No se pudo reservar la clase.",
+  "timeOverlapDesc": "Ya tienes otra clase reservada en ese horario.",
+  "classGroupNotCoveredDesc": "Tu plan activo no cubre este tipo de clase.",
+  "subscriptionNotEligibleDesc": "No tienes una suscripcion activa con clases disponibles para esta reserva.",
   "cancelSuccess": "Reserva cancelada exitosamente.",
   "cancellationFailed": "Cancelacion Fallida",
   "cancellationFailedDesc": "No se pudo cancelar la reserva.",
@@ -60,5 +63,6 @@
   "waitlistFailedDesc": "No se pudo unir a la lista de espera.",
   "waitlistCancelSuccess": "Lugar en lista de espera cancelado.",
   "waitlistCancelFailed": "No se pudo cancelar el lugar en lista de espera.",
-  "calendarLoadError": "No se pudieron cargar las clases publicadas. Intenta de nuevo en un momento."
+  "calendarLoadError": "No se pudieron cargar las clases publicadas. Intenta de nuevo en un momento.",
+  "timeOverlapWarning": "Ya tienes otra clase en este horario."
 }

@@ -33,7 +33,7 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
       <section
         className='absolute -z-10 top-0 left-0 size-full rounded-2xl'
         style={{
-          background: `url('${DEFAULT_ROOM_IMAGE}') center center / cover`,
+          background: `url('${bookingClass.room?.image_url || DEFAULT_ROOM_IMAGE}') center center / cover`,
         }}
       />
 
@@ -69,7 +69,10 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
             to={PageURLS.profile.user(bookingClass.instructor?.id ?? '')}
             className='grid gap-4 w-40 content-center justify-items-center text-center'
           >
-            <ProfilePicture className='size-20 border-primary border-2' />
+            <ProfilePicture
+              className='size-20 border-primary border-2'
+              image={bookingClass.instructor?.photo_url || undefined}
+            />
             <p className='font-bold m-0 text-primary'>
               {bookingClass.instructor?.full_name || t('bookings:instructorTBA')}
             </p>

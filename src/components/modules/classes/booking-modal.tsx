@@ -62,42 +62,38 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
   });
 
   const handleBook = async () => {
-    try {
-      await bookClass({ scheduled_class_id: selectedClass.id });
+    const ok = await bookClass({ scheduled_class_id: selectedClass.id });
+
+    if (ok) {
       onClose();
-    } catch {
-      // Error handled by hook
     }
   };
 
   const handleCancel = async () => {
     if (!selectedClass.user_booking_id) return;
 
-    try {
-      await cancelClass(selectedClass.user_booking_id);
+    const ok = await cancelClass(selectedClass.user_booking_id);
+
+    if (ok) {
       onClose();
-    } catch {
-      // Error handled by hook
     }
   };
 
   const handleWaitlistJoin = async () => {
-    try {
-      await joinWaitlist({ scheduled_class_id: selectedClass.id });
+    const ok = await joinWaitlist({ scheduled_class_id: selectedClass.id });
+
+    if (ok) {
       onClose();
-    } catch {
-      // Error handled by hook
     }
   };
 
   const handleWaitlistCancel = async () => {
     if (!selectedClass.user_booking_id) return;
 
-    try {
-      await cancelWaitlist(selectedClass.user_booking_id);
+    const ok = await cancelWaitlist(selectedClass.user_booking_id);
+
+    if (ok) {
       onClose();
-    } catch {
-      // Error handled by hook
     }
   };
 
@@ -115,7 +111,7 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
       contentClassName='p-0 h-full overflow-auto grid grid-rows-[auto_1fr]'
     >
       <img
-        src={DEFAULT_ROOM_IMAGE}
+        src={selectedClass.room?.image_url || DEFAULT_ROOM_IMAGE}
         alt='Room class'
         className='aspect-16/8 object-cover [@media(min-height:1000px)]:aspect-16/10'
       />
@@ -127,7 +123,10 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
 
           <Container className='bg-secondary/20 py-8 xs:py-4 grid grid-flow-row xs:grid-flow-col justify-center xs:justify-between gap-4 xs:gap-8 items-center shadow-none'>
             <section className='grid justify-items-center'>
-              <ProfilePicture className='size-20 border-primary border-2' />
+              <ProfilePicture
+                className='size-20 border-primary border-2'
+                image={selectedClass.instructor?.photo_url || undefined}
+              />
             </section>
             <section className='grid content-center text-center xs:text-right'>
               <p className='m-0 font-bold'>{selectedClass.instructor?.full_name || t('bookings:instructorTBA')}</p>

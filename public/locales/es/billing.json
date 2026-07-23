@@ -65,5 +65,18 @@
   "planDeactivated": "Plan desactivado exitosamente",
   "planDeactivateFailed": "Error al desactivar el plan",
   "planReactivated": "Plan reactivado exitosamente",
-  "planReactivateFailed": "Error al reactivar el plan"
+  "planReactivateFailed": "Error al reactivar el plan",
+  "taxType": "Tipo de IVA",
+  "selectTaxType": "Seleccionar tipo de IVA",
+  "features": "Beneficios del plan",
+  "featuresHint": "Textos que se muestran en las tarjetas publicas del plan.",
+  "featurePlaceholder": "ej. Acceso a X clases",
+  "addFeature": "Agregar beneficio",
+  "noFeatures": "Sin beneficios. Agrega al menos uno para mostrarlo en la tarjeta.",
+  "classGroupAllowances": "Grupos de clase cubiertos",
+  "allowancesHint": "Deja el tope vacio para usar el total de clases del plan sin limite por grupo.",
+  "addAllowance": "Agregar grupo",
+  "selectClassGroup": "Seleccionar grupo",
+  "maxClassesOptional": "Tope (opc.)",
+  "noClassGroups": "No hay grupos de clase. Crealos con el script CLI antes de configurar planes."
 }

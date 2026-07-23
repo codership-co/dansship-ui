@@ -41,6 +41,7 @@ export const mapAuthUserToUser = (authUser: AuthUser): User => {
     documentValue: authUser.document_value ?? undefined,
     city: authUser.city ?? undefined,
     address: authUser.address ?? undefined,
+    avatar: authUser.photo_url ?? undefined,
     isAdmin: roles.includes(ROLE.ADMIN),
     isInstructor: roles.includes(ROLE.INSTRUCTOR),
     isCoach: roles.includes(ROLE.COACH),
