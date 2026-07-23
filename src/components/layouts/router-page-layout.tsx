@@ -1,13 +1,18 @@
-import { Outlet, useLocation } from 'react-router';
+import { Outlet, useLocation, useNavigation } from 'react-router';
 
+import { SpinnerLoader } from '@components/loaders';
 import { Footer, Navbar } from '@components/navigation';
-import { SecurityGuard } from '@contexts';
+import { SecurityGuard, useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
+import { useRouterLoading } from '@hooks';
 
 const SecurityOutlet = SecurityGuard(Outlet);
 
 export const RouterPageLayout = () => {
+  const { ready } = useAuth();
   const { pathname } = useLocation();
+  const { location } = useNavigation();
+  const isRouterLoading = useRouterLoading();
 
   return (
     <section className='relative min-h-dvh grid grid-rows-[1fr_auto]'>
@@ -20,7 +25,11 @@ export const RouterPageLayout = () => {
       )}
       <Navbar />
       <section className='h-full'>
-        <SecurityOutlet />
+        {(!ready || isRouterLoading) && !location?.pathname.startsWith('/auth') ? (
+          <SpinnerLoader />
+        ) : (
+          <SecurityOutlet />
+        )}
       </section>
       <Footer />
     </section>

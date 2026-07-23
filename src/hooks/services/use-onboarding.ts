@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 
 import { useAuth } from '@contexts';
 import { CompleteStepPayload, DansshipAPI, OnboardingStatus, ProfileDataKey, ProfileTrackKey } from '@core/api';
 import { useCallablePromise } from '@hooks';
 
-export const parseNextStep = (nextStep: string | null): OnboardingCurrentStep | null => {
+const parseNextStep = (nextStep: string | null): OnboardingCurrentStep | null => {
   if (!nextStep) return null;
 
   const [track, step] = nextStep.split(':');
@@ -30,22 +29,31 @@ interface MemoryRouterState {
   status: OnboardingStatus | null;
 }
 
+const handleMemoryRouter = (prev: MemoryRouterState, status: OnboardingStatus) => {
+  const nextStep = parseNextStep(status.next_step);
+  const newVisitedSteps = new Set(prev.visitedSteps);
+
+  if (nextStep) {
+    newVisitedSteps.add(`${nextStep.track}:${nextStep.step}`);
+  }
+
+  return {
+    ...prev,
+    status,
+    currentStep: nextStep,
+    visitedSteps: newVisitedSteps,
+  };
+};
+
 export const useOnboarding = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { getProfile, requireOnboarding } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
   const { call: getStatus, isLoading } = useCallablePromise(async () => {
     try {
       const data = await DansshipAPI.onboarding.getStatus();
-      const nextStep = parseNextStep(data.next_step);
-
-      setMemoryRouter({
-        status: data,
-        currentStep: nextStep,
-        visitedSteps: nextStep ? new Set([`${nextStep.track}:${nextStep.step}`]) : new Set(),
-      });
+      setMemoryRouter(prev => handleMemoryRouter(prev, data));
     } catch {
       setError(t('auth:onboarding.loadFailed'));
     }
@@ -63,22 +71,7 @@ export const useOnboarding = () => {
 
       try {
         const response = await DansshipAPI.onboarding.completeStep(data);
-        const nextStep = parseNextStep(response.next_step);
-
-        setMemoryRouter(prev => {
-          const newVisitedSteps = new Set(prev.visitedSteps);
-
-          if (nextStep) {
-            newVisitedSteps.add(`${nextStep.track}:${nextStep.step}`);
-          }
-
-          return {
-            ...prev,
-            status: response,
-            currentStep: nextStep,
-            visitedSteps: newVisitedSteps,
-          };
-        });
+        setMemoryRouter(prev => handleMemoryRouter(prev, response));
       } catch {
         setError(t('auth:onboarding.submitFailed'));
       }
@@ -92,9 +85,9 @@ export const useOnboarding = () => {
   useEffect(() => {
     if (!memoryRouter.status?.completed || !requireOnboarding) return;
 
-    //.then(user => { navigate(user?.baseProfileRedirect ?? PageURLS.home, { replace: true }); });
-    getProfile();
-  }, [getProfile, memoryRouter.status?.completed, navigate, requireOnboarding]);
+    void getStatus();
+    void getProfile();
+  }, [getProfile, getStatus, memoryRouter.status?.completed, requireOnboarding]);
 
   return {
     status: memoryRouter.status,
