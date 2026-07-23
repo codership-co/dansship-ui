@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { PlanModal } from './plan-modal';
+import { PlanModal, PlanModalSubmitData } from './plan-modal';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { Plan } from '@core/api';
-import { usePlans } from '@hooks';
+import { useClassGroups, usePlans, useTaxTypes } from '@hooks';
 
 function formatPlanPrice(amount: number, currency: string): string {
   try {
@@ -34,6 +34,8 @@ export function PlansTab() {
     isDeleting,
     isReactivating,
   } = usePlans();
+  const { classGroups, isLoading: isLoadingClassGroups } = useClassGroups();
+  const { taxTypes, defaultTaxTypeId, isLoading: isLoadingTaxTypes } = useTaxTypes();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [planToDeactivate, setPlanToDeactivate] = useState<Plan | null>(null);
@@ -49,7 +51,7 @@ export function PlansTab() {
     setSelectedPlan(null);
   };
 
-  const handleSubmit = async (data: Omit<Plan, 'id' | 'is_active' | 'created_at'>) => {
+  const handleSubmit = async (data: PlanModalSubmitData) => {
     if (selectedPlan) {
       await updatePlan(selectedPlan.id, data);
     } else {
@@ -85,7 +87,7 @@ export function PlansTab() {
     setPlanToReactivate(null);
   };
 
-  if (isLoading) {
+  if (isLoading || isLoadingClassGroups || isLoadingTaxTypes) {
     return (
       <div className='py-8 flex justify-center'>
         <SpinnerLoader />
@@ -99,8 +101,12 @@ export function PlansTab() {
     <div className='space-y-4'>
       <div className='flex justify-between items-center'>
         <h2 className='text-xl font-semibold'>{t('billing:plansTitle')}</h2>
-        <Button onClick={() => handleOpenModal()}>{t('billing:addPlan')}</Button>
+        <Button onClick={() => handleOpenModal()} disabled={classGroups.length === 0 || taxTypes.length === 0}>
+          {t('billing:addPlan')}
+        </Button>
       </div>
+
+      {classGroups.length === 0 && <p className='text-sm text-gray-500'>{t('billing:noClassGroups')}</p>}
 
       <div className='border rounded-md'>
         <Table>
@@ -173,6 +179,9 @@ export function PlansTab() {
         onClose={handleCloseModal}
         onSubmit={handleSubmit}
         initialData={selectedPlan}
+        classGroups={classGroups}
+        taxTypes={taxTypes}
+        defaultTaxTypeId={defaultTaxTypeId}
         isLoading={isCreating || isUpdating}
       />
 

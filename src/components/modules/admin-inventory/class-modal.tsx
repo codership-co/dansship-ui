@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@components/ui';
-import { ClassDefinition } from '@core/api';
+import { ClassDefinition, ClassGroup } from '@core/api';
 
 const CLASS_LEVEL_OPTIONS = ['beginner', 'intermediate', 'advanced'] as const;
 const ROOM_TYPE_OPTIONS = ['pole', 'aerial', 'yoga'] as const;
@@ -31,6 +31,7 @@ const classSchema = z.object({
   max_participants: z.coerce.number().min(1, 'Capacity must be at least 1'),
   level: z.string().optional(),
   default_room_type: z.string().optional(),
+  class_group_id: z.guid({ error: 'Class group is required' }),
 });
 
 type ClassFormValues = z.infer<typeof classSchema>;
@@ -40,10 +41,11 @@ interface ClassModalProps {
   onClose: () => void;
   onSubmit: (data: ClassFormValues) => Promise<void>;
   initialData?: ClassDefinition | null;
+  classGroups: Array<ClassGroup>;
   isLoading?: boolean;
 }
 
-export function ClassModal({ isOpen, onClose, onSubmit, initialData, isLoading }: ClassModalProps) {
+export function ClassModal({ isOpen, onClose, onSubmit, initialData, classGroups, isLoading }: ClassModalProps) {
   const { t } = useTranslation();
   const {
     register,
@@ -63,6 +65,7 @@ export function ClassModal({ isOpen, onClose, onSubmit, initialData, isLoading }
       max_participants: 10,
       level: '',
       default_room_type: '',
+      class_group_id: '',
     },
   });
 
@@ -76,6 +79,7 @@ export function ClassModal({ isOpen, onClose, onSubmit, initialData, isLoading }
           max_participants: initialData.max_participants,
           level: initialData.level || '',
           default_room_type: initialData.default_room_type || '',
+          class_group_id: initialData.class_group_id,
         });
       } else {
         reset({
@@ -85,10 +89,11 @@ export function ClassModal({ isOpen, onClose, onSubmit, initialData, isLoading }
           max_participants: 10,
           level: '',
           default_room_type: '',
+          class_group_id: classGroups[0]?.id ?? '',
         });
       }
     }
-  }, [isOpen, initialData, reset]);
+  }, [isOpen, initialData, reset, classGroups]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -115,6 +120,30 @@ export function ClassModal({ isOpen, onClose, onSubmit, initialData, isLoading }
               {...register('description')}
               placeholder={t('inventory:classes.descriptionPlaceholder')}
             />
+          </div>
+
+          <div className='space-y-2'>
+            <Label htmlFor='class_group_id'>{t('inventory:classes.classGroup')}</Label>
+            <Select
+              value={watch('class_group_id') || undefined}
+              onValueChange={val =>
+                setValue('class_group_id', val, {
+                  shouldValidate: true,
+                })
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder={t('inventory:classes.selectClassGroup')} />
+              </SelectTrigger>
+              <SelectContent>
+                {classGroups.map(group => (
+                  <SelectItem key={group.id} value={group.id}>
+                    {group.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.class_group_id && <p className='text-sm text-alert-500'>{errors.class_group_id.message}</p>}
           </div>
 
           <div className='grid grid-cols-2 gap-4'>
@@ -185,7 +214,7 @@ export function ClassModal({ isOpen, onClose, onSubmit, initialData, isLoading }
             <Button type='button' variant='outline' onClick={onClose} disabled={isLoading}>
               {t('common:cancel')}
             </Button>
-            <Button type='submit' disabled={isLoading}>
+            <Button type='submit' disabled={isLoading || classGroups.length === 0}>
               {isLoading ? t('common:saving') : t('common:save')}
             </Button>
           </div>

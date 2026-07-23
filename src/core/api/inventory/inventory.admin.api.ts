@@ -4,6 +4,7 @@ import { DansshipAPIError } from '@core/api';
 
 import type {
   ClassDefinition,
+  ClassGroup,
   CreateClassDefinitionPayload,
   CreateRoomPayload,
   GetClassesParams,
@@ -133,6 +134,13 @@ export class InventoryAdminApi {
     return this.httpClient.callNoError({
       path: `/admin/class-catalog/${id}/deactivate`,
       method: 'POST',
+    });
+  }
+
+  async getClassGroups() {
+    return this.httpClient.callNoError<Array<ClassGroup>>({
+      path: '/admin/class-groups',
+      method: 'GET',
     });
   }
 }

@@ -8,6 +8,8 @@ export * from './use-schedules';
 export * from './use-plans';
 export * from './use-rooms';
 export * from './use-classes';
+export * from './use-class-groups';
+export * from './use-tax-types';
 export * from './use-instructor-profile';
 export * from './use-my-bookings';
 export * from './use-onboarding';

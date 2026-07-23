@@ -7,7 +7,7 @@ import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { ClassDefinition } from '@core/api';
-import { useClasses } from '@hooks';
+import { useClassGroups, useClasses } from '@hooks';
 
 export function ClassesTab() {
   const { t } = useTranslation();
@@ -23,6 +23,7 @@ export function ClassesTab() {
     isDeleting,
     isReactivating,
   } = useClasses();
+  const { classGroups, isLoading: isLoadingClassGroups } = useClassGroups();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedClass, setSelectedClass] = useState<ClassDefinition | null>(null);
   const [classToDeactivate, setClassToDeactivate] = useState<ClassDefinition | null>(null);
@@ -64,7 +65,7 @@ export function ClassesTab() {
     await reactivateClass(id);
   };
 
-  if (isLoading) {
+  if (isLoading || isLoadingClassGroups) {
     return (
       <div className='py-8 flex justify-center'>
         <SpinnerLoader />
@@ -72,20 +73,26 @@ export function ClassesTab() {
     );
   }
 
+  const groupNameById = new Map(classGroups.map(group => [group.id, group.name]));
   const sortedClasses = [...classes].sort((a, b) => Number(b.is_active) - Number(a.is_active));
 
   return (
     <div className='space-y-4'>
       <div className='flex justify-between items-center'>
         <h2 className='text-xl font-semibold'>{t('inventory:classes.catalog')}</h2>
-        <Button onClick={() => handleOpenModal()}>{t('inventory:classes.addClass')}</Button>
+        <Button onClick={() => handleOpenModal()} disabled={classGroups.length === 0}>
+          {t('inventory:classes.addClass')}
+        </Button>
       </div>
+
+      {classGroups.length === 0 && <p className='text-sm text-gray-500'>{t('inventory:classes.noClassGroups')}</p>}
 
       <div className='border rounded-md'>
         <Table>
           <TableHeader>
             <TableRow>
               <TableHead>{t('common:name')}</TableHead>
+              <TableHead>{t('inventory:classes.classGroup')}</TableHead>
               <TableHead>{t('inventory:classes.durationHeader')}</TableHead>
               <TableHead>{t('inventory:classes.maxPax')}</TableHead>
               <TableHead>{t('common:level')}</TableHead>
@@ -96,7 +103,7 @@ export function ClassesTab() {
           <TableBody>
             {classes.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className='text-center py-4 text-gray-500'>
+                <TableCell colSpan={7} className='text-center py-4 text-gray-500'>
                   {t('inventory:classes.empty')}
                 </TableCell>
               </TableRow>
@@ -104,6 +111,7 @@ export function ClassesTab() {
               sortedClasses.map(cls => (
                 <TableRow key={cls.id} className={!cls.is_active ? 'opacity-60 grayscale blur-[0.5px]' : undefined}>
                   <TableCell className='font-medium'>{cls.name}</TableCell>
+                  <TableCell>{groupNameById.get(cls.class_group_id) || '-'}</TableCell>
                   <TableCell>{cls.duration_minutes}m</TableCell>
                   <TableCell>{cls.max_participants}</TableCell>
                   <TableCell>{cls.level || '-'}</TableCell>
@@ -151,6 +159,7 @@ export function ClassesTab() {
         onClose={handleCloseModal}
         onSubmit={handleSubmit}
         initialData={selectedClass}
+        classGroups={classGroups}
         isLoading={isCreating || isUpdating}
       />
 

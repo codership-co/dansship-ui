@@ -58,6 +58,7 @@ export enum DANSSHIP_ERROR_CODE {
   WAITLIST_FULL = 'WAITLIST_FULL', // CONFLICT = Waitlist is at maximum size; cannot add more students |
   BOOKING_TIME_OVERLAP = 'BOOKING_TIME_OVERLAP', // CONFLICT = Student already has a booking during the proposed time slot |
   BOOKING_SUBSCRIPTION_NOT_ELIGIBLE = 'BOOKING_SUBSCRIPTION_NOT_ELIGIBLE', // VALIDATION_ERROR = Student's subscription plan does not support this class or resource |
+  BOOKING_CLASS_GROUP_NOT_COVERED = 'BOOKING_CLASS_GROUP_NOT_COVERED', // VALIDATION_ERROR = Active subscription does not cover this class group |
   BOOKING_POLICY_NOT_FOUND = 'BOOKING_POLICY_NOT_FOUND', // RESOURCE_NOT_FOUND = Booking policy configuration does not exist |
 
   // Payments & Payment Intents

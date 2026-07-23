@@ -26,6 +26,9 @@ export enum PERMISSION {
   // CLASS CATALOG
   CLASS_CATALOG_MANAGE = 'manage:class_catalog',
 
+  // CLASS GROUP
+  CLASS_GROUP_MANAGE = 'manage:class_group',
+
   // DISCOUNT
   DISCOUNT_MANAGE = 'manage:discount',
 
@@ -96,6 +99,7 @@ export const AdminPermissions = {
   inventory: [
     PERMISSION.ROOM_MANAGE,
     PERMISSION.CLASS_CATALOG_MANAGE,
+    PERMISSION.CLASS_GROUP_MANAGE,
     PERMISSION.PLAN_MANAGE,
     PERMISSION.DISCOUNT_MANAGE,
   ],
