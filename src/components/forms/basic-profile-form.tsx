@@ -208,7 +208,6 @@ export function BasicProfileForm({ isLoading, error, onSubmit, defaultValues }: 
         <Button
           type='submit'
           isLoading={isLoading}
-          disabled={!profilePhoto}
           color='primary'
           className='mt-12'
           fullWidth
