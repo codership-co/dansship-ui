@@ -1,18 +1,26 @@
 import { Button } from 'polpo/components';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import { Container, Section, SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { OnboardingInstructorTrack, OnboardingStudentTrack } from '@components/modules';
-import { FEATURE_FLAG, SecurityGuard } from '@contexts';
+import { FEATURE_FLAG, OnboardingProvider, SecurityGuard } from '@contexts';
 import { ProfileTrackKey } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { useOnboarding } from '@hooks';
 
-function OnboardingPage() {
+function OnboardingPageContent() {
   const { t } = useTranslation();
   const { status, isLoading, currentStep } = useOnboarding();
+  const showCompletionScreen = status !== null && (!currentStep?.track || !status.required);
+
+  useEffect(() => {
+    if (!showCompletionScreen) return;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [showCompletionScreen]);
 
   if (isLoading && !status) {
     return (
@@ -24,7 +32,7 @@ function OnboardingPage() {
     );
   }
 
-  if (!currentStep?.track || !status?.required) {
+  if (showCompletionScreen) {
     return (
       <Section className='min-h-dvh' navbarPadding footerMargin>
         <SectionHeading
@@ -73,6 +81,14 @@ function OnboardingPage() {
       {currentStep?.track === ProfileTrackKey.STUDENT && <OnboardingStudentTrack />}
       {currentStep?.track === ProfileTrackKey.INSTRUCTOR && <OnboardingInstructorTrack />}
     </Section>
+  );
+}
+
+function OnboardingPage() {
+  return (
+    <OnboardingProvider>
+      <OnboardingPageContent />
+    </OnboardingProvider>
   );
 }
 
