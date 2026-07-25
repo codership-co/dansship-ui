@@ -1,4 +1,5 @@
 import { Button } from 'polpo/components';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
@@ -13,6 +14,13 @@ import { useOnboarding } from '@hooks';
 function OnboardingPageContent() {
   const { t } = useTranslation();
   const { status, isLoading, currentStep } = useOnboarding();
+  const showCompletionScreen = Boolean(status) && (!currentStep?.track || !status.required);
+
+  useEffect(() => {
+    if (!showCompletionScreen) return;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [showCompletionScreen]);
 
   if (isLoading && !status) {
     return (
@@ -24,7 +32,7 @@ function OnboardingPageContent() {
     );
   }
 
-  if (!currentStep?.track || !status?.required) {
+  if (showCompletionScreen) {
     return (
       <Section className='min-h-dvh' navbarPadding footerMargin>
         <SectionHeading
@@ -47,18 +55,18 @@ function OnboardingPageContent() {
                 {t('auth:onboarding:home')}
               </Button>
             </Link>
-            <Link to={PageURLS.profile.subscription}>
-              <Button color='secondary' size='small'>
+            <Link to={PageURLS.profile.subscription} viewTransition className='inline-flex'>
+              <Button color='secondary' variant='solid' size='small'>
                 {t('auth:onboarding:subscriptions')}
               </Button>
             </Link>
-            <Link to={PageURLS.profile.root}>
-              <Button color='tertiary' size='small'>
+            <Link to={PageURLS.profile.root} viewTransition className='inline-flex'>
+              <Button color='tertiary' variant='solid' size='small'>
                 {t('auth:onboarding:myProfle')}
               </Button>
             </Link>
-            <Link to={PageURLS.classes}>
-              <Button color='accent' size='small'>
+            <Link to={PageURLS.classes} viewTransition className='inline-flex'>
+              <Button color='accent' variant='solid' size='small'>
                 {t('auth:onboarding:schedule')}
               </Button>
             </Link>
