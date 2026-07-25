@@ -55,18 +55,18 @@ function OnboardingPageContent() {
                 {t('auth:onboarding:home')}
               </Button>
             </Link>
-            <Link to={PageURLS.profile.subscription} viewTransition className='inline-flex'>
-              <Button color='secondary' variant='solid' size='small'>
+            <Link to={PageURLS.profile.subscription}>
+              <Button color='secondary' size='small'>
                 {t('auth:onboarding:subscriptions')}
               </Button>
             </Link>
-            <Link to={PageURLS.profile.root} viewTransition className='inline-flex'>
-              <Button color='tertiary' variant='solid' size='small'>
+            <Link to={PageURLS.profile.root}>
+              <Button color='tertiary' size='small'>
                 {t('auth:onboarding:myProfle')}
               </Button>
             </Link>
-            <Link to={PageURLS.classes} viewTransition className='inline-flex'>
-              <Button color='accent' variant='solid' size='small'>
+            <Link to={PageURLS.classes}>
+              <Button color='accent' size='small'>
                 {t('auth:onboarding:schedule')}
               </Button>
             </Link>
