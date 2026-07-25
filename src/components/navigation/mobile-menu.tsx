@@ -208,6 +208,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                 key={item.to}
                 {...item}
                 variant='aside'
+                onNavigate={onClose}
                 className='animate-in fade-in slide-in-from-left duration-300 fill-mode-both'
                 style={{ animationDelay: `${50 * (i + 2)}ms` }}
               />
@@ -233,6 +234,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     key={item.to}
                     {...item}
                     variant='aside'
+                    onNavigate={onClose}
                     className='animate-in fade-in slide-in-from-left duration-300 fill-mode-both'
                     style={{ animationDelay: `${50 * (i + 3 + authenticatedPrimaryMenuItems.length)}ms` }}
                   />
@@ -250,6 +252,8 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
           color='primary'
           variant='text'
           onClick={() => {
+            onClose();
+
             if (isAuthenticated) {
               logout();
               navigate(PageURLS.home, { replace: true });

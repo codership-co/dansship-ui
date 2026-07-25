@@ -149,6 +149,7 @@ interface MenuItemProps extends NavItem {
   variant: 'navbar' | 'aside';
   className?: string;
   style?: React.CSSProperties;
+  onNavigate?: () => void;
 }
 
 export const MenuItem = ({
@@ -162,6 +163,7 @@ export const MenuItem = ({
   variant,
   className,
   style,
+  onNavigate,
 }: MenuItemProps) => {
   const { isAuthenticated } = useAuth();
   const havePermissions = usePermissions({ orPermissions, andPermissions });
@@ -190,7 +192,13 @@ export const MenuItem = ({
     );
 
   return (
-    <NavLink to={to} className={variant === 'navbar' ? navbarClassName : asideClassName} style={style} end>
+    <NavLink
+      to={to}
+      className={variant === 'navbar' ? navbarClassName : asideClassName}
+      style={style}
+      end
+      onClick={onNavigate}
+    >
       {Icon ? <Icon className='h-4 w-4' /> : null}
       {label}
     </NavLink>
