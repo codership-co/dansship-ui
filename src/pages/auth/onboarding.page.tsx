@@ -5,12 +5,12 @@ import { Link } from 'react-router';
 import { Container, Section, SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { OnboardingInstructorTrack, OnboardingStudentTrack } from '@components/modules';
-import { FEATURE_FLAG, SecurityGuard } from '@contexts';
+import { FEATURE_FLAG, OnboardingProvider, SecurityGuard } from '@contexts';
 import { ProfileTrackKey } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { useOnboarding } from '@hooks';
 
-function OnboardingPage() {
+function OnboardingPageContent() {
   const { t } = useTranslation();
   const { status, isLoading, currentStep } = useOnboarding();
 
@@ -73,6 +73,14 @@ function OnboardingPage() {
       {currentStep?.track === ProfileTrackKey.STUDENT && <OnboardingStudentTrack />}
       {currentStep?.track === ProfileTrackKey.INSTRUCTOR && <OnboardingInstructorTrack />}
     </Section>
+  );
+}
+
+function OnboardingPage() {
+  return (
+    <OnboardingProvider>
+      <OnboardingPageContent />
+    </OnboardingProvider>
   );
 }
 
