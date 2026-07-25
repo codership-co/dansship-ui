@@ -14,7 +14,7 @@ import { useOnboarding } from '@hooks';
 function OnboardingPageContent() {
   const { t } = useTranslation();
   const { status, isLoading, currentStep } = useOnboarding();
-  const showCompletionScreen = Boolean(status) && (!currentStep?.track || !status.required);
+  const showCompletionScreen = status != null && (!currentStep?.track || !status.required);
 
   useEffect(() => {
     if (!showCompletionScreen) return;
