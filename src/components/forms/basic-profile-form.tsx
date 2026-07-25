@@ -205,13 +205,7 @@ export function BasicProfileForm({ isLoading, error, onSubmit, defaultValues }: 
 
         {error ? <p className='text-sm text-alert-600'>{error}</p> : null}
 
-        <Button
-          type='submit'
-          isLoading={isLoading}
-          color='primary'
-          className='mt-12'
-          fullWidth
-        >
+        <Button type='submit' isLoading={isLoading} color='primary' className='mt-12' fullWidth>
           {isLoading ? t('common:loading') : t('auth:onboarding.continue')}
         </Button>
       </form>
