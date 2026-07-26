@@ -130,6 +130,7 @@ export const Navbar = () => {
           <NavLink to={PageURLS.profile.root} end>
             {({ isActive }) => (
               <ProfilePicture
+                useUserImage
                 className={cn(
                   'size-10 rounded-full cursor-pointer border-2 border-transparent hover:border-primary transition-[border]',
                   isActive && 'border-primary',

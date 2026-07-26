@@ -123,7 +123,7 @@ export function BookingCalendar({ week, hasActiveSubscription, myBookings }: Boo
         </Container>
       )}
 
-      <section className='grid gap-12 has-[:hover]:[&>.booking-card:not(:hover)]:grayscale-100 has-[:hover]:[&>.booking-card:not(:hover)]:opacity-50'>
+      <section className='grid gap-12 lg:has-[:hover]:[&>.booking-card:not(:hover)]:grayscale-100 lg:has-[:hover]:[&>.booking-card:not(:hover)]:opacity-50'>
         {activeDay?.classes.map((bookingClass, i) => {
           return (
             <section

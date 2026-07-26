@@ -2,11 +2,10 @@ import { format } from 'date-fns';
 import { Button } from 'polpo/components';
 import { cn } from 'polpo/helpers';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
 
 import { ProfilePicture } from '@components/ui';
 import { PublishedClass } from '@core/api';
-import { DEFAULT_ROOM_IMAGE, PageURLS } from '@core/constants';
+import { DEFAULT_ROOM_IMAGE } from '@core/constants';
 import { formatTimeDifference } from '@helpers';
 
 interface BookingClassCardProps {
@@ -65,10 +64,7 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
               <label>{t('bookings:room')}</label>
             </section>
           </section>
-          <Link
-            to={PageURLS.profile.user(bookingClass.instructor?.id ?? '')}
-            className='grid gap-4 w-40 content-center justify-items-center text-center'
-          >
+          <section className='grid gap-4 w-40 content-center justify-items-center text-center'>
             <ProfilePicture
               className='size-20 border-primary border-2'
               image={bookingClass.instructor?.photo_url || undefined}
@@ -76,7 +72,7 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
             <p className='font-bold m-0 text-primary'>
               {bookingClass.instructor?.full_name || t('bookings:instructorTBA')}
             </p>
-          </Link>
+          </section>
         </section>
         {hasOverlap(bookingClass) && !isBooked && !isWaitlisted && (
           <p className='text-warning-600'>⚠ {t('bookings:timeOverlapWarning')}</p>
