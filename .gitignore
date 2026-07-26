@@ -26,5 +26,7 @@ dist-ssr
 .vercel
 .env*
 .pnpm-store
+package-lock.json
+yarn.lock
 
 .tool-versions
