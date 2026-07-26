@@ -3,7 +3,7 @@ import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { LuChevronLeft, LuChevronRight } from 'react-icons/lu';
 
-import { getMonday, getNextMonday, getPrevMonday } from '@helpers';
+import { addDaysToFormat, getMonday, getNextMonday, getPrevMonday } from '@helpers';
 import { useDateLocale } from '@hooks';
 
 interface WeekSelectorProps {
@@ -18,6 +18,7 @@ export function WeekSelector({ week, setWeek, children, disablePastWeeks }: Week
   const locale = useDateLocale();
   const currentWeek = getMonday(new Date(), true);
   const parsedWeek = parseISO(week);
+  const weekEnd = parseISO(addDaysToFormat(week, 6));
 
   return (
     <div className='grid grid-cols-[auto_1fr_auto] items-end gap-2 sm:gap-4'>
@@ -34,7 +35,7 @@ export function WeekSelector({ week, setWeek, children, disablePastWeeks }: Week
       <section className='grid justify-items-center gap-4'>
         <label className='m-0 text-center'>
           {t('schedules:weekOf')}
-          {format(new Date(week), 'MMM d, yyyy', { locale })}
+          {format(parsedWeek, 'MMM d', { locale })} - {format(weekEnd, 'MMM d, yyyy', { locale })}
         </label>
         {children}
       </section>

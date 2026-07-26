@@ -1,6 +1,6 @@
 import { format, parseISO } from 'date-fns';
 import { AsideModal, Button } from 'polpo/components';
-import { toCapitalize } from 'polpo/helpers';
+import { cn, toCapitalize } from 'polpo/helpers';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
@@ -39,6 +39,7 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
 
   if (!selectedClass) return null;
 
+  const isPast = new Date(selectedClass.end_time) < new Date();
   const isFull = selectedClass.enrolled_count >= selectedClass.capacity;
 
   // Here we check if the user is already booked via the injected `user_booking_status` field.
@@ -102,6 +103,15 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
     navigate(PageURLS.profile.subscription);
   };
 
+  const handleInstructorClick = () => {
+    if (!selectedClass.instructor?.id) return;
+
+    onClose();
+    navigate(PageURLS.profile.user(selectedClass.instructor.id));
+  };
+
+  const showSubscriptionWarning = !hasActiveSubscription && !isBooked && !isWaitlisted && !isPast && !hasTimeOverlap;
+
   return (
     <AsideModal
       isOpen={isOpen}
@@ -121,18 +131,38 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
             {selectedClass.class_definition?.name || t('bookings:classDefault')}
           </h3>
 
-          <Container className='bg-secondary/20 py-8 xs:py-4 grid grid-flow-row xs:grid-flow-col justify-center xs:justify-between gap-4 xs:gap-8 items-center shadow-none'>
+          <section
+            role={selectedClass.instructor?.id ? 'button' : undefined}
+            tabIndex={selectedClass.instructor?.id ? 0 : undefined}
+            onClick={selectedClass.instructor?.id ? handleInstructorClick : undefined}
+            onKeyDown={
+              selectedClass.instructor?.id
+                ? event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      handleInstructorClick();
+                    }
+                  }
+                : undefined
+            }
+            className={cn(
+              'bg-secondary/20 px-8 py-8 xs:py-4 rounded-xl grid grid-flow-row xs:grid-flow-col justify-center xs:justify-between gap-4 xs:gap-8 items-center',
+              selectedClass.instructor?.id && 'cursor-pointer hover:bg-secondary/30 transition-colors',
+            )}
+          >
             <section className='grid justify-items-center'>
               <ProfilePicture
                 className='size-20 border-primary border-2'
                 image={selectedClass.instructor?.photo_url || undefined}
+                alt={selectedClass.instructor?.full_name || t('bookings:instructorTBA')}
+                useAuthFallback={false}
               />
             </section>
             <section className='grid content-center text-center xs:text-right'>
               <p className='m-0 font-bold'>{selectedClass.instructor?.full_name || t('bookings:instructorTBA')}</p>
               <label className='m-0 whitespace-nowrap'>{t('bookings:instructor')}</label>
             </section>
-          </Container>
+          </section>
 
           <Container className='bg-secondary/20 py-4 grid grid-flow-col justify-between gap-8 items-center shadow-none'>
             <section className='grid'>
@@ -175,7 +205,7 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
         </section>
 
         <section className='grid gap-4 px-8 pb-4'>
-          {!hasActiveSubscription && !isBooked && !isWaitlisted && (
+          {showSubscriptionWarning && (
             <label className='bg-alert-50 p-3 rounded text-alert-800 border border-alert-200'>
               {t('bookings:noSubscriptionWarning')}
             </label>
@@ -188,7 +218,11 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
           )}
 
           <section className='flex flex-col gap-2'>
-            {isBooked ? (
+            {isPast ? (
+              <label className='bg-gray-50 p-3 rounded text-gray-700 border border-gray-200 text-center'>
+                {t('bookings:classEnded')}
+              </label>
+            ) : isBooked ? (
               <Button color='alert' onClick={handleCancel} isLoading={isLoading}>
                 {isCancelingClass ? t('bookings:cancelling') : t('bookings:cancelBooking')}
               </Button>

@@ -11,22 +11,35 @@ import { formatTimeDifference } from '@helpers';
 interface BookingClassCardProps {
   bookingClass: PublishedClass;
   hasOverlap: (bookingClass: PublishedClass) => boolean;
-  onClick: (event: React.MouseEvent<HTMLElement>) => void;
+  onClick: () => void;
 }
 
 export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingClassCardProps) {
   const { t } = useTranslation();
   const isFull = bookingClass.enrolled_count >= bookingClass.capacity;
+  const isPast = new Date(bookingClass.end_time) < new Date();
+  const isUnavailable = isPast || isFull;
   const isBooked = bookingClass.user_booking_status === 'active';
   const isWaitlisted = bookingClass.user_booking_status === 'waitlisted';
+  const isBookButtonDisabled = isPast || isBooked || isWaitlisted || hasOverlap(bookingClass) || isFull;
 
   return (
     <section
       key={bookingClass.id}
+      role='button'
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          onClick();
+        }
+      }}
       className={cn(
-        'relative select-none rounded-2xl gap-3 px-4 py-4 pt-20 xs:pt-30 sm:pt-40 transition-all',
+        'relative select-none rounded-2xl gap-3 px-4 py-4 pt-20 xs:pt-30 sm:pt-40 transition-all cursor-pointer',
         'hover:scale-102 hover:shadow-[0_40px_30px_-30px_#00000055]',
         'group relative grid content-end',
+        isUnavailable && 'grayscale opacity-60',
       )}
     >
       <section
@@ -39,7 +52,7 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
       <p
         className={cn(
           'absolute block font-bold top-0 right-0 m-4 py-1 px-4 bg-accent-200 text-primary rounded-2xl',
-          isFull && 'bg-gray-100 text-gray-400',
+          isUnavailable && 'bg-gray-100 text-gray-400',
         )}
       >
         {isFull ? `${t('bookings:spotsFull')}` : `${bookingClass.enrolled_count} / ${bookingClass.capacity}`}
@@ -68,6 +81,8 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
             <ProfilePicture
               className='size-20 border-primary border-2'
               image={bookingClass.instructor?.photo_url || undefined}
+              alt={bookingClass.instructor?.full_name || t('bookings:instructorTBA')}
+              useAuthFallback={false}
             />
             <p className='font-bold m-0 text-primary'>
               {bookingClass.instructor?.full_name || t('bookings:instructorTBA')}
@@ -83,17 +98,19 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
         type='button'
         color='primary'
         variant='solid'
-        onClick={onClick}
-        className='absolute top-full right-8 -translate-y-1/2'
-        disabled={isBooked || isWaitlisted || hasOverlap(bookingClass)}
+        disabled={isBookButtonDisabled}
+        className={cn('absolute top-full right-8 -translate-y-1/2', isBookButtonDisabled && 'pointer-events-none')}
+        tabIndex={-1}
       >
-        {isFull
-          ? t('bookings:joinWaitlist')
-          : isWaitlisted
-            ? t('bookings:status.waitlisted')
-            : isBooked
-              ? `${t('bookings:booked')} ✓`
-              : t('bookings:bookClass')}
+        {isPast
+          ? t('bookings:classEnded')
+          : isFull
+            ? t('bookings:joinWaitlist')
+            : isWaitlisted
+              ? t('bookings:status.waitlisted')
+              : isBooked
+                ? `${t('bookings:booked')} ✓`
+                : t('bookings:bookClass')}
       </Button>
     </section>
   );
