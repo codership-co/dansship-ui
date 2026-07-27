@@ -66,7 +66,6 @@ export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
           <section className='relative bg-accent h-full p-4 xl:p-6 flex overflow-hidden'>
             <ProfilePicture
               image={displayImage}
-              useUserImage
               className='transition-all size-50 xl:size-80 border-10 bg-transparent border-accent m-auto'
             />
             <section

@@ -13,7 +13,7 @@ export function ProfilePicture({ className, image, alt, useAuthFallback = true }
   const { user } = useAuth();
 
   const imageUrl = image || (useAuthFallback ? user?.avatar || user?.instructorProfile?.photoUrl : undefined);
-  const defaultImage = images[Math.floor(Math.random() * 4)];
+  const defaultImage = '/assets/images/avatar/default.png';
 
   return (
     <section className={cn('bg-white size-24 rounded-full object-cover overflow-hidden', className)}>
