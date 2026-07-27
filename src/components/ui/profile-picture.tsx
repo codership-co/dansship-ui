@@ -5,18 +5,23 @@ import { useAuth } from '@contexts';
 type ProfilePictureProps = {
   className?: string;
   image?: string;
-  useUserImage?: boolean;
+  alt?: string;
+  useAuthFallback?: boolean;
 };
 
-export function ProfilePicture({ className, image, useUserImage }: ProfilePictureProps) {
+export function ProfilePicture({ className, image, alt, useAuthFallback = true }: ProfilePictureProps) {
   const { user } = useAuth();
 
-  const imageUrl = useUserImage ? user?.avatar || user?.instructorProfile?.photoUrl : image;
+  const imageUrl = image || (useAuthFallback ? user?.avatar || user?.instructorProfile?.photoUrl : undefined);
   const defaultImage = '/assets/images/avatar/default.png';
 
   return (
     <section className={cn('bg-white size-24 rounded-full object-cover overflow-hidden', className)}>
-      <img src={imageUrl || defaultImage} alt={user?.name} className='size-full object-cover inline-block' />
+      <img
+        src={imageUrl || defaultImage}
+        alt={alt || user?.name || 'Profile'}
+        className='size-full object-cover inline-block'
+      />
     </section>
   );
 }

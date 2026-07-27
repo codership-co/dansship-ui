@@ -1,6 +1,6 @@
 import { Button } from 'polpo/components';
 import { cn } from 'polpo/helpers';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdMenu } from 'react-icons/md';
 import { NavLink, NavLinkProps, useLocation } from 'react-router';
@@ -34,6 +34,10 @@ export const Navbar = () => {
   const location = useLocation();
   const { isAuthenticated, requireOnboarding } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location.pathname]);
   const { response } = usePromise(
     () => DansshipAPI.subscriptions.getMySubscriptions(),
     isAuthenticated && !requireOnboarding,
@@ -130,7 +134,6 @@ export const Navbar = () => {
           <NavLink to={PageURLS.profile.root} end>
             {({ isActive }) => (
               <ProfilePicture
-                useUserImage
                 className={cn(
                   'size-10 rounded-full cursor-pointer border-2 border-transparent hover:border-primary transition-[border]',
                   isActive && 'border-primary',

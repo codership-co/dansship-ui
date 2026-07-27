@@ -45,21 +45,10 @@ export function BookingCalendar({ week, hasActiveSubscription, myBookings }: Boo
     });
   }, [call, week]);
 
-  const handleClassClick = useCallback(
-    (cls: PublishedClass) => {
-      // Prevent modal from opening if class overlaps with existing booking
-      const isBooked = cls.user_booking_status === 'active';
-      const isWaitlisted = cls.user_booking_status === 'waitlisted';
-
-      if (!isBooked && !isWaitlisted && hasOverlap(cls, myBookings)) {
-        return;
-      }
-
-      setSelectedClass(cls);
-      setIsModalOpen(true);
-    },
-    [myBookings],
-  );
+  const handleClassClick = useCallback((cls: PublishedClass) => {
+    setSelectedClass(cls);
+    setIsModalOpen(true);
+  }, []);
 
   if (isLoading) {
     return (
@@ -123,7 +112,7 @@ export function BookingCalendar({ week, hasActiveSubscription, myBookings }: Boo
         </Container>
       )}
 
-      <section className='grid gap-12 lg:has-[:hover]:[&>.booking-card:not(:hover)]:grayscale-100 lg:has-[:hover]:[&>.booking-card:not(:hover)]:opacity-50'>
+      <section className='grid gap-12'>
         {activeDay?.classes.map((bookingClass, i) => {
           return (
             <section
