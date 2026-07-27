@@ -94,7 +94,11 @@
   "instructions": {
     "transfer": {
       "title": "Instrucciones de transferencia",
-      "description": "Completa la transferencia y conserva el comprobante para subirlo."
+      "description": "Completa la transferencia y conserva el comprobante para subirlo.",
+      "brebTitle": "BreB",
+      "brebKeyLabel": "Llave",
+      "nequiQrTitle": "Nequi QR Code",
+      "brebQrTitle": "Breb QR Code"
     },
     "cash": {
       "title": "Instrucciones de pago en efectivo",

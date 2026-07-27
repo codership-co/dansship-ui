@@ -7,6 +7,7 @@ import { MdOutlinePayments } from 'react-icons/md';
 import { toast } from 'sonner';
 
 import { CheckoutFormValues } from '@components/forms/checkout-review-plan-form';
+import { TransferPaymentInstructions } from '@components/modules/payments/transfer-payment-instructions';
 import {
   type CreatePaymentIntentPayload,
   DansshipAPI,
@@ -16,7 +17,7 @@ import {
   PaymentProofContentTypesList,
   PublicPlan,
 } from '@core/api';
-import { formatPrice } from '@helpers';
+import { cn, formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
 
 interface CheckoutPaymentProofFormProps {
@@ -129,7 +130,7 @@ export function CheckoutPaymentProofForm({
   return (
     <div className='grid grid-rows-[1fr_auto] h-full'>
       <section className='grid gap-8 content-start'>
-        <section className='grid lg:grid-cols-2 gap-8'>
+        <section className={cn('grid gap-8', isCardMethod && 'lg:grid-cols-2')}>
           <div className='rounded-md border border-secondary bg-secondary-400/40 py-2 px-4'>
             <label className='block'>{plan.name}</label>
             <label className='block'>
@@ -140,11 +141,15 @@ export function CheckoutPaymentProofForm({
             </label>
           </div>
 
-          <div className='rounded-md border border-primary/20 bg-primary/5 p-3 text-sm text-gray-700'>
-            <p className='font-semibold text-primary'>{t(`payments:instructions.${paymentMethod}.title`)}</p>
-            <p className='mt-1'>{t(`payments:instructions.${paymentMethod}.description`)}</p>
-          </div>
+          {isCardMethod ? (
+            <div className='rounded-md border border-primary/20 bg-primary/5 p-3 text-sm text-gray-700'>
+              <p className='font-semibold text-primary'>{t(`payments:instructions.${paymentMethod}.title`)}</p>
+              <p className='mt-1'>{t(`payments:instructions.${paymentMethod}.description`)}</p>
+            </div>
+          ) : null}
         </section>
+
+        {requiresProof ? <TransferPaymentInstructions /> : null}
 
         {requiresProof ? (
           <div className='grid lg:grid-cols-2 gap-8 rounded-md border border-dashed border-gray-300 p-3'>
