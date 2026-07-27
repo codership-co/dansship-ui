@@ -13,6 +13,7 @@ import {
   PaymentMethod,
   PaymentProofContentType,
   PaymentProofContentTypesList,
+  PaymentStatus,
 } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { cn, formatDateTime, formatPrice } from '@helpers';
@@ -95,6 +96,11 @@ function PaymentsResultPage() {
     input.click();
   };
 
+  const canUploadProof =
+    intent?.payment_method_type === PaymentMethod.TRANSFER &&
+    intent.status !== PaymentStatus.APPROVED &&
+    intent.status !== PaymentStatus.REJECTED;
+
   return (
     <section className='grid gap-20'>
       {intent && (
@@ -175,8 +181,10 @@ function PaymentsResultPage() {
                   <small className='m-0 block font-code px-4 py-2'>{intent.id}</small>
                 </section>
 
-                <section className='flex gap-4 items-center justify-end mt-4'>
-                  {intent.payment_method_type === PaymentMethod.TRANSFER && (
+                <section
+                  className={cn('flex gap-4 items-center mt-4', canUploadProof ? 'justify-end' : 'justify-center')}
+                >
+                  {canUploadProof && (
                     <Button
                       size='small'
                       color='primary'
