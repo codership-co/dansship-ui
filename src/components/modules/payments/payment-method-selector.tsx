@@ -10,17 +10,17 @@ interface PaymentMethodSelectorProps {
 }
 
 const PaymentMethods = {
-  [PaymentMethod.CARD]: {
-    Icon: LuCreditCard,
-    title: 'payments:method.card',
-    description: 'payments:methodDesc.card',
-    helperText: 'payments:methodHelper.card',
-  },
   [PaymentMethod.TRANSFER]: {
     Icon: LuLandmark,
     title: 'payments:method.transfer',
     description: 'payments:methodDesc.transfer',
     helperText: 'payments:methodHelper.transfer',
+  },
+  [PaymentMethod.CARD]: {
+    Icon: LuCreditCard,
+    title: 'payments:method.card',
+    description: 'payments:methodDesc.card',
+    helperText: 'payments:methodHelper.card',
   },
 };
 
