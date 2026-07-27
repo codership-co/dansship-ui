@@ -90,7 +90,7 @@ function ClassesPage() {
             week={week}
             myBookings={response.myBookings}
             hasActiveSubscription={response.hasActiveSubscription}
-            onBookingChange={reFetch}
+            onBookingChange={() => void reFetch()}
           />
         )}
       </section>
