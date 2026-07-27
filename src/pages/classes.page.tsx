@@ -33,7 +33,7 @@ function ClassesPage() {
   const currentWeek = getMonday(new Date());
   const [week, setWeek] = useState(() => currentWeek);
 
-  const { response, isLoading } = usePromise(async () => {
+  const { response, isLoading, reFetch } = usePromise(async () => {
     if (!isAuthenticated) {
       const nearestWeek = await findNearWeekWithClasses(8);
 
@@ -79,17 +79,18 @@ function ClassesPage() {
           </WeekSelector>
         </Container>
 
-        {isLoading && (
+        {isLoading && !response && (
           <Container>
             <SpinnerLoader />
           </Container>
         )}
 
-        {!isLoading && (
+        {response && (
           <BookingCalendar
             week={week}
-            myBookings={response?.myBookings ?? []}
-            hasActiveSubscription={response?.hasActiveSubscription ?? false}
+            myBookings={response.myBookings}
+            hasActiveSubscription={response.hasActiveSubscription}
+            onBookingChange={reFetch}
           />
         )}
       </section>

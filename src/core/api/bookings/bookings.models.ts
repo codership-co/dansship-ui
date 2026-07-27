@@ -22,6 +22,10 @@ export interface BookClassPayload {
   scheduled_class_id: string;
 }
 
+export interface BookingCancelPayload {
+  cancellation_reason?: string;
+}
+
 export interface AdminBookClassPayload extends BookClassPayload {
   user_id: string;
   reason?: string;
