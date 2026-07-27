@@ -16,9 +16,10 @@ interface BookingCalendarProps {
   week: string;
   hasActiveSubscription: boolean;
   myBookings: Array<MyBooking>;
+  onBookingChange?: () => void | Promise<void>;
 }
 
-export function BookingCalendar({ week, hasActiveSubscription, myBookings }: BookingCalendarProps) {
+export function BookingCalendar({ week, hasActiveSubscription, myBookings, onBookingChange }: BookingCalendarProps) {
   const { t } = useTranslation();
   const locale = useDateLocale();
   const [selectedClass, setSelectedClass] = useState<PublishedClass | null>(null);
@@ -37,20 +38,36 @@ export function BookingCalendar({ week, hasActiveSubscription, myBookings }: Boo
     };
   });
 
+  const refreshClasses = useCallback(
+    async (weekMonday: string) => {
+      const { classes: nextClasses, classesByDay: nextClassesByDay } = await call(weekMonday);
+
+      setClasses(nextClasses);
+      setClassesByDay(nextClassesByDay);
+      setActiveDay(previousDay => {
+        const sameDay = nextClassesByDay.find(day => day.day === previousDay?.day);
+
+        return sameDay ?? nextClassesByDay.find(day => day.classes.length);
+      });
+    },
+    [call],
+  );
+
   useEffect(() => {
-    call(week).then(({ classes, classesByDay }) => {
-      setClasses(classes);
-      setClassesByDay(classesByDay);
-      setActiveDay(classesByDay.find(day => day.classes.length));
-    });
-  }, [call, week]);
+    void refreshClasses(week);
+  }, [refreshClasses, week]);
+
+  const handleBookingChange = useCallback(async () => {
+    await refreshClasses(week);
+    await onBookingChange?.();
+  }, [onBookingChange, refreshClasses, week]);
 
   const handleClassClick = useCallback((cls: PublishedClass) => {
     setSelectedClass(cls);
     setIsModalOpen(true);
   }, []);
 
-  if (isLoading) {
+  if (isLoading && classes.length === 0) {
     return (
       <Container>
         <SpinnerLoader />
@@ -135,6 +152,7 @@ export function BookingCalendar({ week, hasActiveSubscription, myBookings }: Boo
         onClose={() => setIsModalOpen(false)}
         selectedClass={selectedClass}
         hasActiveSubscription={hasActiveSubscription}
+        onBookingChange={handleBookingChange}
       />
     </section>
   );

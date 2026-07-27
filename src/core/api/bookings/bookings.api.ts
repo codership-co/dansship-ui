@@ -2,7 +2,13 @@ import { HttpClient } from 'polpo-http-client';
 
 import { DansshipAPIError } from '@core/api';
 
-import type { BookClassPayload, Booking, MarkAttendancePayload, MyBooking } from './bookings.models';
+import type {
+  BookClassPayload,
+  Booking,
+  BookingCancelPayload,
+  MarkAttendancePayload,
+  MyBooking,
+} from './bookings.models';
 
 export class BookingsAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
@@ -22,10 +28,11 @@ export class BookingsAPI {
     });
   }
 
-  async cancelBooking(id: string) {
-    return this.httpClient.callNoError<Booking>({
+  async cancelBooking(id: string, payload: BookingCancelPayload = {}) {
+    return this.httpClient.callNoError<Booking, BookingCancelPayload>({
       path: `/bookings/${id}/cancel`,
       method: 'PUT',
+      data: payload,
     });
   }
 

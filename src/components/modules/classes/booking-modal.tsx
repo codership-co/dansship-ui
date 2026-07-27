@@ -17,9 +17,16 @@ interface BookingModalProps {
   onClose: () => void;
   selectedClass: PublishedClass | null;
   hasActiveSubscription: boolean;
+  onBookingChange?: () => void | Promise<void>;
 }
 
-export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscription }: BookingModalProps) {
+export function BookingModal({
+  isOpen,
+  onClose,
+  selectedClass,
+  hasActiveSubscription,
+  onBookingChange,
+}: BookingModalProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -66,6 +73,7 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
     const ok = await bookClass({ scheduled_class_id: selectedClass.id });
 
     if (ok) {
+      await onBookingChange?.();
       onClose();
     }
   };
@@ -76,6 +84,7 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
     const ok = await cancelClass(selectedClass.user_booking_id);
 
     if (ok) {
+      await onBookingChange?.();
       onClose();
     }
   };
@@ -84,6 +93,7 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
     const ok = await joinWaitlist({ scheduled_class_id: selectedClass.id });
 
     if (ok) {
+      await onBookingChange?.();
       onClose();
     }
   };
@@ -94,6 +104,7 @@ export function BookingModal({ isOpen, onClose, selectedClass, hasActiveSubscrip
     const ok = await cancelWaitlist(selectedClass.user_booking_id);
 
     if (ok) {
+      await onBookingChange?.();
       onClose();
     }
   };
