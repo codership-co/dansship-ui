@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { LuTrash2, LuPlus } from 'react-icons/lu';
@@ -10,7 +10,6 @@ import { Container } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { Button, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Input } from '@components/ui';
 import { DansshipAPI, UpdateAvailabilityPayload } from '@core/api';
-import { getMonday, getNextMonday, getPrevMonday } from '@helpers';
 import { useCallablePromise, usePromise } from '@hooks';
 
 const DAYS_OF_WEEK = [
@@ -46,9 +45,8 @@ const availabilitySchema = z.object({
 type AvailabilityFormValues = z.infer<typeof availabilitySchema>;
 
 export function AvailabilityForm() {
-  const { t, i18n } = useTranslation();
-  const [currentWeek, setCurrentWeek] = useState(() => getMonday(new Date()));
-  const { response: availability, isLoading } = usePromise(() => DansshipAPI.instructors.getAvailability(currentWeek));
+  const { t } = useTranslation();
+  const { response: availability, isLoading } = usePromise(() => DansshipAPI.instructors.getAvailability());
 
   const { call: updateAvailabilityPromise, isLoading: isSaving } = useCallablePromise(
     (payload: UpdateAvailabilityPayload) => DansshipAPI.instructors.updateAvailability(payload),
@@ -93,7 +91,6 @@ export function AvailabilityForm() {
       reset({
         slots: availability.data.slots.map(s => ({
           day_of_week: s.day_of_week,
-          // Strip seconds if backend returns HH:MM:SS
           start_time: s.start_time.slice(0, 5),
           end_time: s.end_time.slice(0, 5),
         })),
@@ -101,22 +98,16 @@ export function AvailabilityForm() {
     } else {
       reset({ slots: [] });
     }
-  }, [availability, reset, currentWeek]);
+  }, [availability, reset]);
 
   const onSubmit = async (data: AvailabilityFormValues) => {
-    // Re-append :00 for seconds to match standard backend time formats if needed, or rely on backend parsing HH:MM
     const formattedSlots = data.slots.map(s => ({
       ...s,
       start_time: s.start_time.length === 5 ? `${s.start_time}:00` : s.start_time,
       end_time: s.end_time.length === 5 ? `${s.end_time}:00` : s.end_time,
     }));
 
-    await updateAvailability({
-      week_start_date: currentWeek,
-      slots: formattedSlots,
-    });
-
-    // Reset dirty state
+    await updateAvailability({ slots: formattedSlots });
     reset(data);
   };
 
@@ -128,19 +119,6 @@ export function AvailabilityForm() {
       </section>
 
       <section>
-        {/* Week Selector */}
-        <div className='mb-6 flex items-center space-x-4'>
-          <Button variant='outline' onClick={() => setCurrentWeek(getPrevMonday(currentWeek))}>
-            {t('instructor:availability.previousWeek')}
-          </Button>
-
-          <div className='text-lg font-semibold'>Week of {new Date(currentWeek).toLocaleDateString(i18n.language)}</div>
-
-          <Button variant='outline' onClick={() => setCurrentWeek(getNextMonday(currentWeek))}>
-            {t('instructor:availability.nextWeek')}
-          </Button>
-        </div>
-
         {isLoading ? (
           <div className='flex justify-center p-8'>
             <SpinnerLoader />

@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
@@ -9,59 +9,85 @@ import {
   AddClassPayload,
   DansshipAPI,
   type EditPublishedClassPayload,
-  ScheduleWeek,
   type UpdateClassPayload,
   type UpdateWaitlistConfigPayload,
 } from '@core/api';
 
-export const useSchedules = (weekId: ScheduleWeek['id'] = '') => {
+interface UseSchedulesOptions {
+  weekStartDate?: string;
+}
+
+export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
   const { t } = useTranslation();
 
-  const { response: weeks, isLoading: isLoadingWeeks } = usePromise(() => DansshipAPI.schedulesAdmin.getWeeks());
-  const { response: weekDetails, isLoading: isLoadingWeekDetails } = usePromise(
-    () => DansshipAPI.schedulesAdmin.getWeekDetail(weekId),
-    weekId !== '',
-  );
+  const {
+    response: weeks,
+    isLoading: isLoadingWeeks,
+    reFetch: reFetchWeeks,
+  } = usePromise(() => DansshipAPI.schedulesAdmin.getWeeks());
+
+  const weekId = useMemo(() => {
+    if (!weekStartDate) {
+      return '';
+    }
+
+    return weeks?.data?.find(week => week.week_start_date === weekStartDate)?.id ?? '';
+  }, [weekStartDate, weeks]);
+
+  const {
+    response: weekDetails,
+    isLoading: isLoadingWeekDetails,
+    reFetch: reFetchWeekDetails,
+  } = usePromise(() => DansshipAPI.schedulesAdmin.getWeekDetail(weekId), weekId !== '', [weekId]);
   const { response: waitlistDefaults } = usePromise(() => DansshipAPI.schedulesAdmin.getWaitlistDefault());
 
-  const { call: publishWeekPromise } = useCallablePromise((weekId: string) =>
-    DansshipAPI.schedulesAdmin.publishWeek(weekId),
+  const { call: publishWeekPromise } = useCallablePromise((targetWeekId: string) =>
+    DansshipAPI.schedulesAdmin.publishWeek(targetWeekId),
   );
   const { call: addClassPromise, isLoading: isAdding } = useCallablePromise((payload: AddClassPayload) =>
     DansshipAPI.schedulesAdmin.addClass(payload),
   );
   const { call: updateClassPromise, isLoading: isUpdating } = useCallablePromise(
-    (weekId: string, classId: string, payload: UpdateClassPayload) =>
-      DansshipAPI.schedulesAdmin.updateClass(weekId, classId, payload),
+    (targetWeekId: string, classId: string, payload: UpdateClassPayload) =>
+      DansshipAPI.schedulesAdmin.updateClass(targetWeekId, classId, payload),
   );
-  const { call: removeClassPromise, isLoading: isRemoving } = useCallablePromise((weekId: string, classId: string) =>
-    DansshipAPI.schedulesAdmin.removeClass(weekId, classId),
+  const { call: removeClassPromise, isLoading: isRemoving } = useCallablePromise(
+    (targetWeekId: string, classId: string) => DansshipAPI.schedulesAdmin.removeClass(targetWeekId, classId),
   );
   const { call: editPublishedClassPromise, isLoading: isEditing } = useCallablePromise(
-    (weekId: string, classId: string, payload: EditPublishedClassPayload) =>
-      DansshipAPI.schedulesAdmin.editPublishedClass(weekId, classId, payload),
+    (targetWeekId: string, classId: string, payload: EditPublishedClassPayload) =>
+      DansshipAPI.schedulesAdmin.editPublishedClass(targetWeekId, classId, payload),
   );
   const { call: cancelPublishedClassPromise, isLoading: isCanceling } = useCallablePromise(
-    (weekId: string, classId: string) => DansshipAPI.schedulesAdmin.cancelPublishedClass(weekId, classId),
+    (targetWeekId: string, classId: string) => DansshipAPI.schedulesAdmin.cancelPublishedClass(targetWeekId, classId),
   );
   const { call: updateWaitlistConfigPromise, isLoading: isUpdatingWaitlist } = useCallablePromise(
     (classId: string, payload: UpdateWaitlistConfigPayload) =>
       DansshipAPI.schedulesAdmin.updateWaitlistConfig(classId, payload),
   );
 
+  const refreshScheduleData = useCallback(async () => {
+    await reFetchWeeks();
+
+    if (weekId) {
+      await reFetchWeekDetails();
+    }
+  }, [reFetchWeekDetails, reFetchWeeks, weekId]);
+
   const publishWeek = useCallback(
-    async (weekId: string) => {
-      const { ok, data } = await publishWeekPromise(weekId);
+    async (targetWeekId: string) => {
+      const { ok, data } = await publishWeekPromise(targetWeekId);
 
       if (ok) {
         toast.success(t('schedules:publishedSuccess'));
+        await refreshScheduleData();
       } else {
         toast.error(t('schedules:publishFailed'));
       }
 
       return data;
     },
-    [t, publishWeekPromise],
+    [t, publishWeekPromise, refreshScheduleData],
   );
   const addClass = useCallback(
     async (payload: AddClassPayload) => {
@@ -69,69 +95,74 @@ export const useSchedules = (weekId: ScheduleWeek['id'] = '') => {
 
       if (ok) {
         toast.success(t('schedules:classAdded'));
+        await refreshScheduleData();
       } else {
         toast.error(t('schedules:classAddFailed'));
       }
 
       return data;
     },
-    [t, addClassPromise],
+    [t, addClassPromise, refreshScheduleData],
   );
   const updateClass = useCallback(
-    async (weekId: string, classId: string, payload: UpdateClassPayload) => {
-      const { ok, data } = await updateClassPromise(weekId, classId, payload);
+    async (targetWeekId: string, classId: string, payload: UpdateClassPayload) => {
+      const { ok, data } = await updateClassPromise(targetWeekId, classId, payload);
 
       if (ok) {
         toast.success(t('schedules:classUpdated'));
+        await refreshScheduleData();
       } else {
         toast.error(t('schedules:classUpdateFailed'));
       }
 
       return data;
     },
-    [t, updateClassPromise],
+    [t, updateClassPromise, refreshScheduleData],
   );
   const removeClass = useCallback(
-    async (weekId: string, classId: string) => {
-      const { ok, data } = await removeClassPromise(weekId, classId);
+    async (targetWeekId: string, classId: string) => {
+      const { ok, data } = await removeClassPromise(targetWeekId, classId);
 
       if (ok) {
         toast.success(t('schedules:classRemoved'));
+        await refreshScheduleData();
       } else {
         toast.error(t('schedules:classRemoveFailed'));
       }
 
       return data;
     },
-    [t, removeClassPromise],
+    [t, removeClassPromise, refreshScheduleData],
   );
   const editPublishedClass = useCallback(
-    async (weekId: string, classId: string, payload: EditPublishedClassPayload) => {
-      const { ok, data } = await editPublishedClassPromise(weekId, classId, payload);
+    async (targetWeekId: string, classId: string, payload: EditPublishedClassPayload) => {
+      const { ok, data } = await editPublishedClassPromise(targetWeekId, classId, payload);
 
       if (ok) {
         toast.success(t('schedules:classUpdated'));
+        await refreshScheduleData();
       } else {
         toast.error(t('schedules:classUpdateFailed'));
       }
 
       return data;
     },
-    [t, editPublishedClassPromise],
+    [t, editPublishedClassPromise, refreshScheduleData],
   );
   const cancelPublishedClass = useCallback(
-    async (weekId: string, classId: string) => {
-      const { ok, data } = await cancelPublishedClassPromise(weekId, classId);
+    async (targetWeekId: string, classId: string) => {
+      const { ok, data } = await cancelPublishedClassPromise(targetWeekId, classId);
 
       if (ok) {
         toast.success(t('schedules:classCancelled'));
+        await refreshScheduleData();
       } else {
         toast.error(t('schedules:classCancelFailed'));
       }
 
       return data;
     },
-    [t, cancelPublishedClassPromise],
+    [t, cancelPublishedClassPromise, refreshScheduleData],
   );
   const updateWaitlistConfig = useCallback(
     async (classId: string, payload: UpdateWaitlistConfigPayload) => {
@@ -139,17 +170,19 @@ export const useSchedules = (weekId: ScheduleWeek['id'] = '') => {
 
       if (ok) {
         toast.success(t('schedules:waitlistConfigUpdated'));
+        await refreshScheduleData();
       } else {
         toast.error(t('schedules:waitlistConfigFailed'));
       }
 
       return data;
     },
-    [t, updateWaitlistConfigPromise],
+    [t, updateWaitlistConfigPromise, refreshScheduleData],
   );
 
   return {
     weeks: weeks?.data ?? [],
+    weekId,
     isLoadingWeeks,
     activeWeekDetail: weekDetails?.data ?? null,
     isLoadingWeekDetails,
@@ -167,5 +200,7 @@ export const useSchedules = (weekId: ScheduleWeek['id'] = '') => {
     isCancellingPublishedClass: isCanceling,
     isUpdatingWaitlistConfig: isUpdatingWaitlist,
     isRemovingClass: isRemoving,
+    reFetchWeeks,
+    reFetchWeekDetails,
   };
 };

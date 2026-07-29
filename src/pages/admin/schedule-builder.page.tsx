@@ -63,21 +63,14 @@ function AdminScheduleBuilderPage() {
   const [dayColumnMinWidth, setDayColumnMinWidth] = useState<number>(150);
   const [agendaRoomFilter, setAgendaRoomFilter] = useState<string>('all');
 
-  const { response: weeks, isLoading: isLoadingWeeks } = usePromise(() => DansshipAPI.schedulesAdmin.getWeeks());
-
   const selectedWeekDate = format(currentDate, 'yyyy-MM-dd');
-  const weekObj = useMemo(
-    () =>
-      weeks?.data?.find(
-        (w: { id: string; week_start_date: string; status: string }) => w.week_start_date === selectedWeekDate,
-      ),
-    [weeks, selectedWeekDate],
-  );
-  const selectedWeekId = weekObj?.id ?? '';
 
   // Data hooks
   const {
+    weeks,
+    weekId: selectedWeekId,
     activeWeekDetail,
+    isLoadingWeeks,
     isLoadingWeekDetails,
     waitlistDefaultConfig,
     publishWeek,
@@ -93,7 +86,8 @@ function AdminScheduleBuilderPage() {
     isCancellingPublishedClass,
     isUpdatingWaitlistConfig,
     isRemovingClass,
-  } = useSchedules(selectedWeekId);
+  } = useSchedules({ weekStartDate: selectedWeekDate });
+  const weekObj = useMemo(() => weeks.find(w => w.week_start_date === selectedWeekDate), [weeks, selectedWeekDate]);
   const { rooms } = useRooms();
   const { classes } = useClasses();
 
@@ -109,12 +103,15 @@ function AdminScheduleBuilderPage() {
     response: agendaEvents,
     isLoading: isLoadingAgendaEvents,
     error: agendaEventsError,
-  } = usePromise(() =>
-    DansshipAPI.schedulesAdmin.getAgendaEvents({
-      start_at: toUtcWeekRange(selectedWeekDate).startAt,
-      end_at: toUtcWeekRange(selectedWeekDate).endAt,
-      room_id: agendaRoomId,
-    }),
+  } = usePromise(
+    () =>
+      DansshipAPI.schedulesAdmin.getAgendaEvents({
+        start_at: toUtcWeekRange(selectedWeekDate).startAt,
+        end_at: toUtcWeekRange(selectedWeekDate).endAt,
+        room_id: agendaRoomId,
+      }),
+    true,
+    [selectedWeekDate, agendaRoomId],
   );
 
   const roomNameById = useMemo(() => {
