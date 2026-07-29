@@ -25,7 +25,7 @@ function SubscriptionPage() {
   const { t } = useTranslation();
   const locale = useDateLocale();
   const { response: mySubscriptionsResponse } = usePromise(() => DansshipAPI.subscriptions.getMySubscriptions());
-  const { response: publicPlans } = usePromise(() => DansshipAPI.subscriptions.getPublicPlans());
+  const { response: availablePlans } = usePromise(() => DansshipAPI.subscriptions.getActivePlans());
 
   const subscriptions = useMemo(
     () => mySubscriptionsResponse?.data?.subscriptions ?? [],
@@ -49,7 +49,7 @@ function SubscriptionPage() {
 
       <Section>
         <SectionHeading title={t('subscriptions:store.availablePlans')} />
-        <PlanSelector plans={publicPlans?.data ?? []} />
+        <PlanSelector plans={availablePlans?.data ?? []} />
       </Section>
 
       <Section footerMargin>
