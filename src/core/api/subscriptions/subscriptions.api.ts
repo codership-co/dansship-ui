@@ -25,6 +25,16 @@ export class SubscriptionsAPI {
     );
   }
 
+  async getActivePlans() {
+    return this.httpClient.callNoError<Array<PublicPlan>>(
+      {
+        path: '/plans',
+        method: 'GET',
+      },
+      plans => plans.map(normalizePlan),
+    );
+  }
+
   async purchaseSubscription(payload: PurchaseSubscriptionPayload) {
     return this.httpClient.callNoError<ActiveSubscription, PurchaseSubscriptionPayload>({
       path: '/subscriptions',
