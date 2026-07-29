@@ -87,7 +87,7 @@ export function PlanSelector({ plans }: PlanSelectorProps) {
 
   return (
     <div className='bg-white rounded-2xl mt-16 mx-6 lg:mx-0 lg:px-8 shadow'>
-      <div className='grid grid-cols-1 gap-8 lg:grid-cols-3'>
+      <div className='grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3'>
         {displayPlans.map(plan => (
           <PlanCard
             key={plan.id}

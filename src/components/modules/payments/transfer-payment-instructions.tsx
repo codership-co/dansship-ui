@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 
-const NEQUI_QR_PLACEHOLDER = '/assets/manifest/icon-512.png';
-const BREB_QR_PLACEHOLDER = '/assets/images/logo.png';
+const NEQUI_QR_PLACEHOLDER = '/assets/images/payments/nequi-qr.png';
+// TODO: change to breb-qr.png
+const BREB_QR_PLACEHOLDER = '/assets/images/payments/nequi-qr.png';
 const BREB_KEY = '@bolddanshsip';
 
 export function TransferPaymentInstructions() {
