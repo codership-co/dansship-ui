@@ -4,7 +4,7 @@
     "subtitle": "Consulta disponibilidad por hora y crea una solicitud agrupada.",
     "room": "Sala",
     "roomPlaceholder": "Selecciona una sala",
-    "roomHint": "Selecciona una sala y un rango para cargar disponibilidad.",
+    "roomHint": "Selecciona una sala y un rango para cargar la disponibilidad.",
     "roomsLoading": "Cargando salas disponibles...",
     "roomsLoadError": "No se pudieron cargar las salas.",
     "selectedRoom": "Sala seleccionada:",
@@ -15,43 +15,43 @@
     "endAt": "Fin",
     "loading": "Cargando disponibilidad...",
     "loadError": "No se pudo cargar la disponibilidad.",
-    "availableSlots": "Slots disponibles",
+    "availableSlots": "Franjas disponibles",
     "selectedCount": "{{count}} seleccionados",
-    "noSlots": "No hay slots disponibles para este rango.",
+    "noSlots": "No hay franjas disponibles para este rango.",
     "createRequest": "Crear solicitud",
     "creating": "Creando..."
   },
   "status": {
     "draft": "Borrador",
     "pendingPayment": "Pago pendiente",
-    "pendingApproval": "Aprobacion pendiente",
+    "pendingApproval": "Aprobación pendiente",
     "confirmed": "Confirmada",
     "cancelled": "Cancelada"
   },
   "myRequests": {
     "title": "Mis solicitudes de renta",
-    "subtitle": "Revisa estado de aprobacion y pago de tus solicitudes.",
+    "subtitle": "Revisa el estado de aprobación y pago de tus solicitudes.",
     "loading": "Cargando solicitudes...",
     "loadError": "No se pudieron cargar tus solicitudes.",
-    "empty": "Aun no tienes solicitudes de renta.",
+    "empty": "Aún no tienes solicitudes de renta.",
     "total": "Total",
     "createdAt": "Creada",
-    "slots": "{{count}} slots",
+    "slots": "{{count}} franjas",
     "cancel": "Cancelar solicitud"
   },
   "admin": {
     "title": "Admin de renta de estudio",
     "subtitle": "Gestiona aprobaciones y reglas de disponibilidad.",
     "tabs": {
-      "approval": "Cola de aprobacion",
+      "approval": "Cola de aprobación",
       "rules": "Reglas de disponibilidad"
     },
     "approval": {
       "loading": "Cargando aprobaciones pendientes...",
-      "loadError": "No se pudo cargar la cola de aprobacion.",
+      "loadError": "No se pudo cargar la cola de aprobación.",
       "empty": "No hay aprobaciones pendientes.",
       "total": "Total",
-      "slots": "{{count}} slots",
+      "slots": "{{count}} franjas",
       "approve": "Aprobar",
       "reject": "Rechazar"
     },
@@ -67,8 +67,8 @@
       "empty": "No hay reglas para esta sala.",
       "type": "Tipo",
       "time": "Horario",
-      "dayOfWeek": "Dia de la semana",
-      "allDays": "Todos los dias"
+      "dayOfWeek": "Día de la semana",
+      "allDays": "Todos los días"
     }
   },
   "toast": {

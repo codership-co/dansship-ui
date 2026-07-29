@@ -15,7 +15,7 @@
   "create": {
     "title": "Crear Plan de Entrenamiento",
     "planName": "Nombre del Plan",
-    "planNamePlaceholder": "ej., Programa de Dominio de Invertidas",
+    "planNamePlaceholder": "p. ej., Programa de Dominio de Invertidas",
     "duration": "Duración (semanas)",
     "schedule": "Horario",
     "summary": "Resumen del Plan",
@@ -55,10 +55,10 @@
     "saveButton": "Guardar Plan de Entrenamiento"
   },
   "figureSelector": {
-    "title": "Agregar Figuras",
+    "title": "Añadir Figuras",
     "searchPlaceholder": "Buscar figuras...",
-    "addToDay": "Agregar al Dia",
-    "dayOption": "Dia {{day}}"
+    "addToDay": "Añadir al Día",
+    "dayOption": "Día {{day}}"
   },
   "toast": {
     "updateSuccess": "Plan de entrenamiento actualizado exitosamente",

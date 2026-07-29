@@ -15,12 +15,12 @@
     "difficulty": "Ordenar por Dificultad"
   },
   "catalog": {
-    "mobileTitle": "Catalogo de Figuras",
-    "mobileSubtitle": "Movimientos basicos y avanzados para apoyar tu progreso con fluidez y control.",
+    "mobileTitle": "Catálogo de Figuras",
+    "mobileSubtitle": "Movimientos básicos y avanzados para desarrollar fluidez y control en tu progreso.",
     "hero": {
       "titleLine1": "La Biblioteca",
       "titleLine2": "del Movimiento",
-      "subtitle": "Explora nuestra coleccion curada de figuras de pole, organizada por mecanica, entradas y puntos de contacto."
+      "subtitle": "Explora nuestra colección curada de figuras de pole, organizada por mecánica, entradas y puntos de contacto."
     },
     "filterTitle": "Filtrar Biblioteca",
     "searchLabelDesktop": "Buscar figuras",
@@ -32,7 +32,7 @@
       "difficulty": "Dificultad"
     },
     "resultsFound": "{{count}} figuras encontradas",
-    "loadingMore": "Cargando mas figuras...",
-    "cardDescriptionFallback": "Un movimiento clave para desarrollar control, fuerza y expresion."
+    "loadingMore": "Cargando más figuras...",
+    "cardDescriptionFallback": "Un movimiento clave para desarrollar control, fuerza y expresión."
   }
 }

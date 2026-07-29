@@ -5,7 +5,7 @@
     "completed": "Completado",
     "wantToTry": "Quiero Intentar",
     "markComplete": "Marcar como Completado",
-    "addToTryList": "Añadir a Lista de Intentos"
+    "addToTryList": "Añadir a la Lista por Probar"
   },
   "addToCombo": {
     "title": "Añadir a Combo",
@@ -20,7 +20,7 @@
     },
     "toast": {
       "success": "Figura agregada al combo exitosamente",
-      "error": "Error al agregar figura al combo"
+      "error": "Error al agregar la figura al combo"
     }
   },
   "details": {
@@ -54,16 +54,16 @@
     },
     "levels": {
       "struggling": "Aún Difícil",
-      "holding": "Puede Mantener Posición",
+      "holding": "Puede Mantener la Posición",
       "consistent": "Rendimiento Consistente",
       "mastered": "Totalmente Dominado"
     },
     "descriptions": {
-      "struggling": "Necesita más práctica para realizar el movimiento",
-      "holding": "Puede mantener la posición por 5+ segundos",
-      "consistent": "Puede realizar consistentemente con buena forma",
-      "mastered": "Control completo y ejecución perfecta"
+      "struggling": "Necesitas más práctica para ejecutar el movimiento",
+      "holding": "Puedes mantener la posición durante 5 o más segundos",
+      "consistent": "Puedes ejecutarla de forma consistente con buena técnica",
+      "mastered": "Dominio total y ejecución perfecta"
     }
   },
-  "notFound": "La figura no fue encontrada"
+  "notFound": "No se encontró la figura"
 }

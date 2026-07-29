@@ -2,7 +2,7 @@
   "title": "Dansship: una nueva experiencia de bienestar",
   "subtitle": "Un espacio para mujeres que quieren experimentar nuevas formas de bienestar con clases de danza, pole y flexibilidad, mientras siguen su progreso para lograr mejores resultados.",
   "buttons": {
-    "explore": "Empezar a Explorar",
+    "explore": "Empezar a explorar",
     "share": "Compartir una Figura",
     "join": "Comienza tu experiencia"
   },
@@ -18,14 +18,14 @@
     },
     "flexibility": {
       "title": "Entrenamiento de flexibilidad",
-      "description": "Mejora movilidad y consciencia corporal con rutinas enfocadas en flexibilidad."
+      "description": "Mejora la movilidad y la conciencia corporal con rutinas enfocadas en flexibilidad."
     }
   },
   "experience": {
     "title": "Más que un estudio",
     "progress": {
       "title": "Sigue tu progreso en pole",
-      "description": "Usa herramientas de progreso para seguir hitos, mantener constancia y celebrar tu evolución."
+      "description": "Usa herramientas de progreso para hacer seguimiento de tus hitos, mantener la constancia y celebrar tu evolución."
     },
     "community": {
       "title": "Comunidad que acompaña",
@@ -39,7 +39,7 @@
   "features": {
     "discover": {
       "title": "Descubre Figuras",
-      "description": "Explora una amplia colección de figuras de pole, desde nivel principiante hasta avanzado"
+      "description": "Explora una amplia colección de figuras de pole, desde el nivel principiante hasta el avanzado."
     },
     "share": {
       "title": "Comparte tu Progreso",
@@ -57,7 +57,7 @@
       "kicker": "Dale a tu cuerpo una \n<Primary>segunda oportunidad</Primary> y <Brand>mueve</Brand> <Primary>el alma</Primary>",
       "titleLine1": "Donde el cuerpo encuentra su ritmo",
       "titleLine2": "y el alma se eleva",
-      "description": "Pole dance, baile, artes aéreas y clases complementarias en un espacio donde descubrirás de lo que eres capaz.",
+      "description": "Pole dance, baile, artes aéreas y clases complementarias en un espacio donde descubrirás de qué eres capaz.",
       "bookClass": "Reserva tu primera clase",
       "trackProgress": "Ver horarios"
     },
@@ -84,7 +84,7 @@
     "progress": {
       "kicker": "Compañero Digital",
       "title": "Cada logro merece ser recordado",
-      "subtitle": "Registra tus avances, guarda tus figuras favoritas y celebra cada logro desde la App Dansship.",
+      "subtitle": "Registra tus avances, guarda tus figuras favoritas y celebra cada logro con la app Dansship.",
       "imageAlt": "Atleta de pole entrenando",
       "weeklyLabel": "Progreso semanal",
       "search": {
@@ -96,11 +96,11 @@
         "description": "Crea tu propia colección de movimientos y construye el camino hacia tus próximos objetivos."
       },
       "actions": {
-        "viewAllFigures": "Descubre la App Dansship"
+        "viewAllFigures": "Descubre la app Dansship"
       },
       "log": {
         "title": "Sigue tu evolución",
-        "description": "Registra fotos, videos y avances para mirar atrás y recordar todo lo que has logrado."
+        "description": "Registra fotos, vídeos y avances para recordar todo lo que has logrado."
       }
     },
     "membership": {

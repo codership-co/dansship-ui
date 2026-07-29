@@ -60,11 +60,11 @@
         "5plus": "5+ veces por semana"
       },
       "styleOptions": {
-        "contemporary": "Contemporaneo",
-        "athletic": "Atletico",
-        "exotic": "Exotico",
-        "russianExotic": "Exotico Ruso",
-        "artistic": "Artistico"
+        "contemporary": "Contemporáneo",
+        "athletic": "Atlético",
+        "exotic": "Exótico",
+        "russianExotic": "Exótico Ruso",
+        "artistic": "Artístico"
       }
     },
     "achievements": {
@@ -86,9 +86,9 @@
       "locations": "Lugares de Enseñanza",
       "add": "Añadir",
       "placeholders": {
-        "certification": "ej., IPSF Nivel 1",
-        "specialization": "ej., Entrenamiento de Flexibilidad",
-        "location": "ej., Nombre del Estudio"
+        "certification": "p. ej., IPSF Nivel 1",
+        "specialization": "p. ej., Entrenamiento de Flexibilidad",
+        "location": "p. ej., Nombre del Estudio"
       }
     },
     "previewTitle": "Vista Previa del Perfil"
@@ -96,18 +96,18 @@
   "identityTitle": "Identidad",
   "identityDescription": "El nombre completo es obligatorio. El nombre público se puede personalizar.",
   "displayName": "Nombre público",
-  "displayNamePlaceholder": "Cómo aparecerá tu nombre públicamente",
+  "displayNamePlaceholder": "Cómo se mostrará tu nombre público",
   "noEditableInstructorFields": "No hay campos específicos de instructor disponibles para tus roles actuales.",
   "fetchFailed": "Error al obtener el perfil",
   "completion": "Completitud del perfil",
   "about": "Acerca de",
-  "accountScope": "Información de identidad y cuenta compartida en todos tus roles.",
+  "accountScope": "Información de identidad y de cuenta compartida entre todos tus roles.",
   "noBio": "Aún no hay una biografía disponible.",
   "lastUpdated": "Última actualización",
   "studentSectionTitle": "Perfil de estudiante",
-  "studentSectionDescription": "Actividad de aprendizaje y suscripciones vinculadas a tu cuenta de usuario.",
+  "studentSectionDescription": "Actividad de aprendizaje y suscripciones asociadas a tu cuenta.",
   "instructorSectionDescription": "Información pública de enseñanza mostrada a los estudiantes.",
-  "notSet": "No configurado",
+  "notSet": "Sin configurar",
   "adminSectionTitle": "Acceso de administrador",
   "adminSectionDescription": "Las capacidades administrativas se gestionan mediante roles y permisos.",
   "permissionsCount": "permisos asignados"
