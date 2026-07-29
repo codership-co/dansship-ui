@@ -24,6 +24,9 @@ export interface Plan {
   features: Array<string>;
   class_group_allowances: Array<PlanClassGroupAllowance>;
   is_active: boolean;
+  is_recommended: boolean;
+  show_on_landing: boolean;
+  recommended_order?: number | null;
   created_at: string;
 }
 

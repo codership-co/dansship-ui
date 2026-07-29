@@ -78,5 +78,16 @@
   "addAllowance": "Agregar grupo",
   "selectClassGroup": "Seleccionar grupo",
   "maxClassesOptional": "Tope (opc.)",
-  "noClassGroups": "No hay grupos de clase. Crealos con el script CLI antes de configurar planes."
+  "noClassGroups": "No hay grupos de clase. Crealos con el script CLI antes de configurar planes.",
+  "landingVisibility": "Visibilidad en landing",
+  "showOnLanding": "Mostrar en landing",
+  "showOnLandingHint": "Incluye este plan en la seccion publica de membresias.",
+  "showOnLandingBadge": "Landing",
+  "isRecommended": "Plan recomendado",
+  "isRecommendedHint": "Destaca este plan como la mejor opcion. Solo puede haber uno recomendado.",
+  "isRecommendedBadge": "Recomendado",
+  "landing": "Landing",
+  "landingOrder": "Orden en landing",
+  "landingOrderPlaceholder": "ej. 1",
+  "landingOrderHint": "Opcional. Menor numero aparece primero entre los planes visibles en landing."
 }

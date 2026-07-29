@@ -17,6 +17,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Switch,
 } from '@components/ui';
 import { ClassGroup, Plan, TaxType } from '@core/api';
 
@@ -31,6 +32,9 @@ const planSchema = z.object({
   classes_included: z.coerce.number().min(1, 'Must include at least 1 class'),
   validity_days: z.coerce.number().min(1, 'Must be valid for at least 1 day'),
   features: z.array(z.object({ value: z.string().min(1, 'Feature is required') })),
+  show_on_landing: z.boolean(),
+  is_recommended: z.boolean(),
+  recommended_order: z.string().optional(),
   class_group_allowances: z
     .array(
       z.object({
@@ -52,6 +56,9 @@ export type PlanModalSubmitData = {
   classes_included: number;
   validity_days: number;
   features: Array<string>;
+  show_on_landing: boolean;
+  is_recommended: boolean;
+  recommended_order?: number | null;
   class_group_allowances: Array<{
     class_group_id: string;
     max_classes?: number | null;
@@ -67,6 +74,16 @@ interface PlanModalProps {
   taxTypes: Array<TaxType>;
   defaultTaxTypeId: string;
   isLoading?: boolean;
+}
+
+function parseRecommendedOrder(value?: string): number | null {
+  if (value === undefined || value === null || value.trim() === '') {
+    return null;
+  }
+
+  const parsed = Number(value);
+
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 }
 
 function parseMaxClasses(value?: string): number | null {
@@ -111,6 +128,9 @@ export function PlanModal({
       classes_included: 1,
       validity_days: 30,
       features: [],
+      show_on_landing: false,
+      is_recommended: false,
+      recommended_order: '',
       class_group_allowances: [],
     },
   });
@@ -142,6 +162,12 @@ export function PlanModal({
         classes_included: initialData.classes_included,
         validity_days: initialData.validity_days,
         features: (initialData.features ?? []).map(value => ({ value })),
+        show_on_landing: initialData.show_on_landing ?? false,
+        is_recommended: initialData.is_recommended ?? false,
+        recommended_order:
+          initialData.recommended_order !== null && initialData.recommended_order !== undefined
+            ? String(initialData.recommended_order)
+            : '',
         class_group_allowances:
           initialData.class_group_allowances?.length > 0
             ? initialData.class_group_allowances.map(item => ({
@@ -166,6 +192,9 @@ export function PlanModal({
         classes_included: 1,
         validity_days: 30,
         features: [],
+        show_on_landing: false,
+        is_recommended: false,
+        recommended_order: '',
         class_group_allowances: [
           {
             class_group_id: classGroups[0]?.id ?? '',
@@ -186,6 +215,9 @@ export function PlanModal({
       classes_included: values.classes_included,
       validity_days: values.validity_days,
       features: values.features.map(item => item.value.trim()).filter(Boolean),
+      show_on_landing: values.show_on_landing,
+      is_recommended: values.is_recommended,
+      recommended_order: parseRecommendedOrder(values.recommended_order),
       class_group_allowances: values.class_group_allowances.map(item => ({
         class_group_id: item.class_group_id,
         max_classes: parseMaxClasses(item.max_classes),
@@ -366,6 +398,54 @@ export function PlanModal({
             {errors.class_group_allowances && (
               <p className='text-sm text-alert-500'>{errors.class_group_allowances.message as string}</p>
             )}
+          </div>
+
+          <div className='space-y-4 rounded-lg border p-4'>
+            <h3 className='text-sm font-medium'>{t('billing:landingVisibility')}</h3>
+
+            <div className='flex items-center justify-between gap-4'>
+              <div className='space-y-1'>
+                <Label htmlFor='show_on_landing'>{t('billing:showOnLanding')}</Label>
+                <p className='text-xs text-gray-500'>{t('billing:showOnLandingHint')}</p>
+              </div>
+              <Switch
+                id='show_on_landing'
+                checked={watch('show_on_landing')}
+                onCheckedChange={checked =>
+                  setValue('show_on_landing', checked, {
+                    shouldValidate: true,
+                  })
+                }
+              />
+            </div>
+
+            <div className='flex items-center justify-between gap-4'>
+              <div className='space-y-1'>
+                <Label htmlFor='is_recommended'>{t('billing:isRecommended')}</Label>
+                <p className='text-xs text-gray-500'>{t('billing:isRecommendedHint')}</p>
+              </div>
+              <Switch
+                id='is_recommended'
+                checked={watch('is_recommended')}
+                onCheckedChange={checked =>
+                  setValue('is_recommended', checked, {
+                    shouldValidate: true,
+                  })
+                }
+              />
+            </div>
+
+            <div className='space-y-2'>
+              <Label htmlFor='recommended_order'>{t('billing:landingOrder')}</Label>
+              <Input
+                id='recommended_order'
+                type='number'
+                min={1}
+                placeholder={t('billing:landingOrderPlaceholder')}
+                {...register('recommended_order')}
+              />
+              <p className='text-xs text-gray-500'>{t('billing:landingOrderHint')}</p>
+            </div>
           </div>
 
           <div className='flex justify-end space-x-2 pt-4'>

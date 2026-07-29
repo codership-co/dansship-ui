@@ -116,6 +116,7 @@ export function PlansTab() {
               <TableHead>{t('billing:price')}</TableHead>
               <TableHead>{t('billing:classes')}</TableHead>
               <TableHead>{t('billing:validity')}</TableHead>
+              <TableHead>{t('billing:landing')}</TableHead>
               <TableHead>{t('common:status')}</TableHead>
               <TableHead className='text-right'>{t('common:actions')}</TableHead>
             </TableRow>
@@ -123,7 +124,7 @@ export function PlansTab() {
           <TableBody>
             {plans.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className='text-center py-4 text-gray-500'>
+                <TableCell colSpan={7} className='text-center py-4 text-gray-500'>
                   {t('billing:noPlansFound')}
                 </TableCell>
               </TableRow>
@@ -135,6 +136,23 @@ export function PlansTab() {
                   <TableCell>{plan.classes_included}</TableCell>
                   <TableCell>
                     {plan.validity_days} {t('billing:daysUnit')}
+                  </TableCell>
+                  <TableCell>
+                    <div className='flex flex-wrap gap-1'>
+                      {plan.show_on_landing && (
+                        <span className='px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800'>
+                          {t('billing:showOnLandingBadge')}
+                        </span>
+                      )}
+                      {plan.is_recommended && (
+                        <span className='px-2 py-1 rounded-full text-xs bg-amber-100 text-amber-800'>
+                          {t('billing:isRecommendedBadge')}
+                        </span>
+                      )}
+                      {!plan.show_on_landing && !plan.is_recommended && (
+                        <span className='text-xs text-gray-400'>—</span>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <span
