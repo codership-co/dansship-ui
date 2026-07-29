@@ -1,6 +1,5 @@
 import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
-import { FaCheckCircle } from 'react-icons/fa';
 
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui';
 import { PublicPlan } from '@core/api';
@@ -85,10 +84,7 @@ export function PlanCard({ plan, onSelectPlan, isFeatured, hoverable, className,
 
           <ul className='text-label grid gap-4 px-4'>
             {(plan.features ?? []).map((item, i) => (
-              <li key={`${item}-${i}`} className='flex items-start gap-2.5 sm:gap-3'>
-                <FaCheckCircle className='mt-1 shrink-0 h-4 w-4' />
-                <span>{item}</span>
-              </li>
+              <li key={`${item}-${i}`}>{item}</li>
             ))}
           </ul>
         </CardContent>
