@@ -94,7 +94,7 @@ export const StudentPermissions = {
 };
 
 export const AdminPermissions = {
-  users: [PERMISSION.USER_MANAGE, PERMISSION.USER_READ],
+  users: [PERMISSION.USER_MANAGE],
   scheduleBuilder: [PERMISSION.SCHEDULE_MANAGE],
   inventory: [
     PERMISSION.ROOM_MANAGE,
