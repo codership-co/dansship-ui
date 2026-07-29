@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 
@@ -14,20 +14,6 @@ import {
   setPendingPlanCheckoutIntent,
 } from '@helpers';
 
-const orderPlansForDisplay = (plans: Array<PublicPlan>): Array<PublicPlan> => {
-  const recommendedPlans = plans.filter(plan => plan.is_recommended === true);
-
-  if (recommendedPlans.length !== 1 || plans.length < 3) {
-    return plans;
-  }
-
-  const featuredPlan = recommendedPlans[0];
-  const remainingPlans = plans.filter(plan => plan.id !== featuredPlan.id);
-  const middleIndex = Math.floor(remainingPlans.length / 2);
-
-  return [...remainingPlans.slice(0, middleIndex), featuredPlan, ...remainingPlans.slice(middleIndex)];
-};
-
 interface PlanSelectorProps {
   plans: Array<PublicPlan>;
 }
@@ -40,8 +26,6 @@ export function PlanSelector({ plans }: PlanSelectorProps) {
 
   const [selectedPlan, setSelectedPlan] = useState<PublicPlan | null>(null);
   const [isOpen, setOpen] = useState(false);
-
-  const displayPlans = useMemo(() => orderPlansForDisplay(plans), [plans]);
 
   const handleSelectPlan = (plan: PublicPlan) => {
     if (!isAuthenticated) {
@@ -76,7 +60,7 @@ export function PlanSelector({ plans }: PlanSelectorProps) {
     setSelectedPlan(pendingPlan);
   }, [isAuthenticated, plans]);
 
-  if (displayPlans.length === 0) {
+  if (plans.length === 0) {
     return (
       <div className='rounded-3xl bg-secondary/50 p-12 text-center'>
         <h4>{t('subscriptions:noPlansAvailable')}</h4>
@@ -88,7 +72,7 @@ export function PlanSelector({ plans }: PlanSelectorProps) {
   return (
     <div className='bg-white rounded-2xl mt-16 mx-6 lg:mx-0 lg:px-8 shadow'>
       <div className='grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3'>
-        {displayPlans.map(plan => (
+        {plans.map(plan => (
           <PlanCard
             key={plan.id}
             plan={plan}
