@@ -4,7 +4,7 @@ import {
   type AcceptInstructorInvitePayload,
   type AcceptInstructorInviteResponse,
   type AvailabilityApiItem,
-  type AvailabilityWeek,
+  type InstructorAvailability,
   type ClassRosterResponse,
   type CreateInstructorProfilePayload,
   DAY_TO_INDEX,
@@ -54,15 +54,13 @@ export class InstructorsAPI {
     });
   }
 
-  async getAvailability(week: string) {
-    return this.httpClient.callNoError<Array<AvailabilityApiItem>, object, AvailabilityWeek>(
+  async getAvailability() {
+    return this.httpClient.callNoError<Array<AvailabilityApiItem>, object, InstructorAvailability>(
       {
         path: '/instructors/availability',
         method: 'GET',
-        params: { week },
       },
       data => ({
-        week,
         slots: data.map(item => ({
           day_of_week: DAY_TO_INDEX[item.day_of_week],
           start_time: item.start_time,
@@ -73,12 +71,11 @@ export class InstructorsAPI {
   }
 
   async updateAvailability(payload: UpdateAvailabilityPayload) {
-    return this.httpClient.callNoError<Array<AvailabilityApiItem>, object, AvailabilityWeek>(
+    return this.httpClient.callNoError<Array<AvailabilityApiItem>, object, InstructorAvailability>(
       {
         path: '/instructors/availability',
         method: 'POST',
         data: {
-          week_start_date: payload.week_start_date,
           slots: payload.slots.map(slot => ({
             day_of_week: INDEX_TO_DAY[slot.day_of_week],
             start_time: slot.start_time,
@@ -87,7 +84,6 @@ export class InstructorsAPI {
         },
       },
       data => ({
-        week: payload.week_start_date,
         slots: data.map(item => ({
           day_of_week: DAY_TO_INDEX[item.day_of_week],
           start_time: item.start_time,

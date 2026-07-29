@@ -22,6 +22,7 @@ export function AssignedSchedule() {
   const { response: instructorSchedule, isLoading: isLoadingInstructorSchedule } = usePromise(
     () => DansshipAPI.instructors.getInstructorWeeklySchedule(week),
     Boolean(week),
+    [week],
   );
 
   return (

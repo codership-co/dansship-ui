@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 export const useCallablePromise = <Result, Args extends Array<unknown> = []>(
   promise: (...args: Args) => Promise<Result>,
@@ -6,11 +6,13 @@ export const useCallablePromise = <Result, Args extends Array<unknown> = []>(
   const [data, setData] = useState<Result | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
+  const promiseRef = useRef(promise);
+  promiseRef.current = promise;
 
   const call = useCallback(async (...args: Args): Promise<Result> => {
     try {
       setIsLoading(true);
-      const response = await promise(...args);
+      const response = await promiseRef.current(...args);
       setIsLoading(false);
       setData(response);
       setError(null);
@@ -21,7 +23,6 @@ export const useCallablePromise = <Result, Args extends Array<unknown> = []>(
       setError(error as Error);
       throw error;
     }
-    //eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return {

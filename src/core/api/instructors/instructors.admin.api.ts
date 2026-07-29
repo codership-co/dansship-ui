@@ -3,7 +3,7 @@ import { HttpClient } from 'polpo-http-client';
 import {
   type AdminInstructorListItem,
   type AvailabilityApiItem,
-  type AvailabilityWeek,
+  type InstructorAvailability,
   DAY_TO_INDEX,
   type InstructorDeactivateResponse,
   type InstructorInviteResponse,
@@ -35,15 +35,13 @@ export class InstructorsAdminAPI {
     });
   }
 
-  async getAdminAvailability(id: string, week: string) {
-    return this.httpClient.callNoError<Array<AvailabilityApiItem>, object, AvailabilityWeek>(
+  async getAdminAvailability(id: string) {
+    return this.httpClient.callNoError<Array<AvailabilityApiItem>, object, InstructorAvailability>(
       {
         path: `/admin/instructors/${id}/availability`,
         method: 'GET',
-        params: { week },
       },
       data => ({
-        week,
         slots: data.map(item => ({
           day_of_week: DAY_TO_INDEX[item.day_of_week],
           start_time: item.start_time,

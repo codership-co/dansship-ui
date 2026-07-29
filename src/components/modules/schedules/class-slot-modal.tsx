@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { addMinutes, format, parseISO, isValid, startOfWeek } from 'date-fns';
+import { addMinutes, format, parseISO, isValid } from 'date-fns';
 import { useEffect, useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -49,7 +49,10 @@ const classSlotSchema = z
     date: z.string().min(1, 'Date is required'),
     start_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Format HH:MM required'),
     end_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Format HH:MM required'),
-    capacity: z.coerce.number().optional(),
+    capacity: z.preprocess(
+      value => (value === '' || value === null || value === undefined ? undefined : Number(value)),
+      z.number().int().min(1, 'Capacity must be at least 1').optional(),
+    ),
     waitlist_max_size: z.preprocess(
       value => (value === '' || value === null ? undefined : Number(value)),
       z.number().int().min(1, 'Waitlist max size must be at least 1').optional(),
@@ -132,17 +135,26 @@ export function ClassSlotModal({
   const watchEndTime = watch('end_time');
   const watchDate = watch('date');
   const watchInstructorId = watch('instructor_id');
+  const watchRoomId = watch('room_id');
+  const watchCapacity = watch('capacity');
   const selectedClassDefinition = classes.find(cls => cls.id === watchClassDefId);
+  const selectedRoom = rooms.find(room => room.id === watchRoomId);
+
+  const effectiveCapacity = useMemo(() => {
+    if (typeof watchCapacity === 'number' && !Number.isNaN(watchCapacity)) {
+      return watchCapacity;
+    }
+
+    return selectedClassDefinition?.max_participants ?? null;
+  }, [watchCapacity, selectedClassDefinition]);
 
   const selectedDateStr = watchDate || defaultDate;
   const isDateValid = selectedDateStr && isValid(parseISO(selectedDateStr));
 
-  const weekStartDate = isDateValid
-    ? format(startOfWeek(parseISO(selectedDateStr), { weekStartsOn: 1 }), 'yyyy-MM-dd')
-    : '';
-
-  const { response: availabilityData, isLoading: isLoadingAvailability } = usePromise(() =>
-    DansshipAPI.instructorsAdmin.getAdminAvailability(watchInstructorId, weekStartDate),
+  const { response: availabilityData, isLoading: isLoadingAvailability } = usePromise(
+    () => DansshipAPI.instructorsAdmin.getAdminAvailability(watchInstructorId),
+    Boolean(watchInstructorId),
+    [watchInstructorId],
   );
 
   const availabilityStatus = useMemo(() => {
@@ -200,9 +212,7 @@ export function ClassSlotModal({
         // Auto-select room if default exists
         if (selectedDef.default_room_type) {
           const matchRoom = rooms.find(
-            r =>
-              r.room_type?.toLowerCase() === selectedDef.default_room_type?.toLowerCase() &&
-              r.capacity >= selectedDef.max_participants,
+            r => r.room_type?.toLowerCase() === selectedDef.default_room_type?.toLowerCase(),
           );
 
           if (matchRoom) setValue('room_id', matchRoom.id);
@@ -293,7 +303,7 @@ export function ClassSlotModal({
                   .filter(c => c.is_active)
                   .map(c => (
                     <SelectItem key={c.id} value={c.id}>
-                      {c.name} ({c.duration_minutes}m)
+                      {c.name} ({c.duration_minutes}m • {c.max_participants})
                     </SelectItem>
                   ))}
               </SelectContent>
@@ -422,18 +432,53 @@ export function ClassSlotModal({
 
           <div className='space-y-2'>
             <Label htmlFor='capacity'>{t('schedules:capacityOverride')}</Label>
+
+            <div className='grid grid-cols-2 gap-4'>
+              <div className='space-y-1'>
+                <p className='text-xs text-muted-foreground'>{t('schedules:classCapacity')}</p>
+                <Input
+                  id='class_capacity_display'
+                  type='number'
+                  value={selectedClassDefinition?.max_participants ?? ''}
+                  readOnly
+                  disabled
+                  placeholder={t('schedules:selectClassForCapacity')}
+                />
+              </div>
+
+              <div className='space-y-1'>
+                <p className='text-xs text-muted-foreground'>{t('schedules:roomCapacity')}</p>
+                <Input
+                  id='room_capacity_display'
+                  type='number'
+                  value={selectedRoom?.capacity ?? ''}
+                  readOnly
+                  disabled
+                  placeholder='—'
+                />
+              </div>
+            </div>
+
             <Input
               id='capacity'
               type='number'
+              min={1}
               placeholder={t('schedules:leaveBlankDefault')}
               {...register('capacity')}
             />
             {errors.capacity && <p className='text-sm text-alert-500'>{errors.capacity.message}</p>}
+
+            <div className='rounded-md border border-border bg-muted/40 px-3 py-2 text-sm'>
+              <span className='font-medium'>{t('schedules:effectiveCapacity')}: </span>
+              <span>{effectiveCapacity ?? '—'}</span>
+            </div>
+
             <p className='text-xs text-gray-500'>
               {selectedClassDefinition
                 ? t('schedules:capacityDefaultHelp', { max: selectedClassDefinition.max_participants })
                 : t('schedules:capacityDefaultHelpGeneric')}
             </p>
+            <p className='text-xs text-gray-500'>{t('schedules:capacityEffectiveHelp')}</p>
           </div>
 
           <div className='space-y-2'>

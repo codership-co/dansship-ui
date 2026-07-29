@@ -45,14 +45,11 @@ export interface AvailabilitySlot {
   end_time: string;
 }
 
-export interface AvailabilityWeek {
-  // 'YYYY-MM-DD' representing the start of the week
-  week: string;
+export interface InstructorAvailability {
   slots: Array<AvailabilitySlot>;
 }
 
 export interface UpdateAvailabilityPayload {
-  week_start_date: string;
   slots: Array<AvailabilitySlot>;
 }
 
@@ -62,7 +59,6 @@ export interface AvailabilityApiItem {
   day_of_week: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
   start_time: string;
   end_time: string;
-  week_start_date: string;
   created_at: string;
 }
 
