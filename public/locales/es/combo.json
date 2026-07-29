@@ -3,14 +3,14 @@
   "difficulty": "Dificultad General",
   "duration": "Duración Estimada",
   "figures": "Figuras Incluidas",
-  "prerequisites": "Prerrequisitos",
+  "prerequisites": "Requisitos previos",
   "description": "Descripción",
   "tips": "Consejos y Notas",
   "addToTraining": "Añadir al Plan de Entrenamiento",
   "status": {
-    "title": "Estado de Progreso",
-    "notstarted": "No Iniciado",
-    "inprogress": "En Progreso",
+    "title": "Estado del progreso",
+    "notstarted": "No iniciado",
+    "inprogress": "En progreso",
     "completed": "Completado"
   },
   "edit": {

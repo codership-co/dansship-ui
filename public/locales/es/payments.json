@@ -1,18 +1,18 @@
 {
   "checkoutTitle": "Compra de plan",
-  "selectMethod": "Como deseas pagar?",
-  "selectedMethod": "Metodo de pago",
+  "selectMethod": "¿Cómo deseas pagar?",
+  "selectedMethod": "Método de pago",
   "confirmationTitle": "Confirma tu compra",
   "confirmPurchase": "Confirmar compra",
   "intentCreatedTitle": "Compra registrada",
-  "intentCreatedDesc": "Tu pago quedo pendiente de revision manual.",
+  "intentCreatedDesc": "Tu pago quedó pendiente de revisión manual.",
   "reference": "Referencia",
   "discount": "Descuento",
   "subtotal": "Subtotal",
   "total": "Total",
   "name": "Nombre",
   "moreDetails": "Más Detalles",
-  "intentDetailsNotFound": "No pudimos encontrar el pago con este id,\nintentalo de nuevo.",
+  "intentDetailsNotFound": "No pudimos encontrar el pago con este ID,\ninténtalo de nuevo.",
   "retryIntentDetails": "Volver a buscar",
   "iva": "IVA",
   "intentStatus": "Estado",
@@ -22,7 +22,7 @@
   "ammount": "Monto pagado",
   "startDate": "Fecha de inicio",
   "createdAt": "Fecha de compra",
-  "methodLabel": "Metodo de pago",
+  "methodLabel": "Método de pago",
   "planLabel": "Plan",
   "planFallback": "Plan",
   "userLabel": "Usuario",
@@ -39,12 +39,12 @@
   "proofViewFailed": "No se pudo abrir el comprobante",
   "proofViewFailedDesc": "Intenta de nuevo en unos momentos.",
   "proofInvalidTypeTitle": "Archivo no compatible",
-  "proofInvalidTypeDesc": "Solo se permiten imagenes JPG, PNG o WEBP.",
+  "proofInvalidTypeDesc": "Solo se permiten imágenes JPG, PNG o WEBP.",
   "proofRequiredTitle": "Comprobante requerido",
-  "proofRequiredDesc": "Este metodo de pago requiere un comprobante de imagen antes de confirmar tu compra.",
+  "proofRequiredDesc": "Este método de pago requiere un comprobante de imagen antes de confirmar tu compra.",
   "proofRequiredInline": "Sube una imagen del comprobante para continuar.",
   "proofUploadInCheckoutTitle": "Sube el comprobante ahora",
-  "proofUploadInCheckoutDesc": "Adjunta tu comprobante para completar este checkout en un solo paso.",
+  "proofUploadInCheckoutDesc": "Adjunta tu comprobante para completar esta compra en un solo paso.",
   "cancelIntent": "Cancelar",
   "cancelSuccess": "Intento de pago cancelado",
   "cancelFailed": "Error al cancelar",
@@ -59,11 +59,11 @@
     "historyTitle": "Estado de tu compra"
   },
   "inProgressEmptyState": "No tienes pagos en proceso.",
-  "historicalEmptyState": "Aun no tienes pagos historicos.",
-  "emptyState": "Aun no tienes pagos.",
+  "historicalEmptyState": "Aún no tienes pagos históricos.",
+  "emptyState": "Aún no tienes pagos.",
   "steps": {
     "review": "Resumen",
-    "method": "Metodo",
+    "method": "Método",
     "confirm": "Confirmar"
   },
   "method": {
@@ -71,62 +71,62 @@
     "cash": "Efectivo",
     "nequi": "Nequi",
     "daviplata": "Daviplata",
-    "card": "Tarjeta de credito/debito ó PSE"
+    "card": "Tarjeta de crédito/débito o PSE"
   },
   "methodDesc": {
     "transfer": "Transfiere a nuestra cuenta bancaria y sube el recibo.",
     "cash": "Paga directamente en la recepción de Dansship antes de tu clase.",
-    "card": "Paga con tarjeta de debito, credito ó con PSE mediante Bold"
+    "card": "Paga con tarjeta de débito, crédito o con PSE mediante Bold"
   },
   "methodHelper": {
-    "transfer": "Nequi, Daviplata, Bre-B ó cuenta bancaria.",
+    "transfer": "Nequi, Daviplata, Bre-B o cuenta bancaria.",
     "cash": "",
-    "card": "Tarjeta debito/credito, PSE."
+    "card": "Tarjeta débito/crédito, PSE."
   },
   "purchaseType": {
     "plan": "Plan",
-    "merch": "Merch",
+    "merch": "Mercancía",
     "workshop": "Taller",
     "event": "Evento",
-    "private_class": "Clase Privada",
-    "studio_rental": "Alquiler de Estudio"
+    "private_class": "Clase privada",
+    "studio_rental": "Alquiler de estudio"
   },
   "instructions": {
     "transfer": {
       "title": "Instrucciones de transferencia",
       "description": "Completa la transferencia y conserva el comprobante para subirlo.",
-      "brebTitle": "BreB",
+      "brebTitle": "Bre-B",
       "brebKeyLabel": "Llave",
-      "nequiQrTitle": "Nequi QR Code",
-      "brebQrTitle": "Breb QR Code"
+      "nequiQrTitle": "Código QR Nequi",
+      "brebQrTitle": "Código QR Bre-B"
     },
     "cash": {
       "title": "Instrucciones de pago en efectivo",
-      "description": "Paga en el estudio y comparte el comprobante si el staff lo solicita."
+      "description": "Paga en el estudio y comparte el comprobante si el personal lo solicita."
     },
     "nequi": {
       "title": "Instrucciones de pago Nequi",
-      "description": "Envia el pago a la cuenta Nequi configurada y sube la captura."
+      "description": "Envía el pago a la cuenta Nequi configurada y sube la captura."
     },
     "daviplata": {
       "title": "Instrucciones de pago Daviplata",
-      "description": "Envia el pago a la cuenta Daviplata configurada y sube la captura."
+      "description": "Envía el pago a la cuenta Daviplata configurada y sube la captura."
     },
     "card": {
       "title": "Pago con tarjeta (Bold)",
-      "description": "Al confirmar se abrira el checkout embebido de Bold para completar tu pago con seguridad."
+      "description": "Al confirmar, se abrirá el proceso de pago embebido de Bold para completar tu pago con seguridad."
     }
   },
   "status": {
     "pending": "Pendiente",
-    "pending_manual_review": "Pendiente de revision",
+    "pending_manual_review": "Pendiente de revisión",
     "approved": "Aprobado",
     "rejected": "Rechazado",
     "cancelled": "Cancelado",
     "expired": "Expirado"
   },
   "admin": {
-    "pageTitle": "Revision de Pagos",
+    "pageTitle": "Revisión de Pagos",
     "pageSubtitle": "Revisa y aprueba intentos de pago offline.",
     "title": "Pagos",
     "empty": "No se encontraron intentos de pago.",
@@ -136,14 +136,14 @@
     "noProof": "Sin comprobante",
     "reviewTitle": "Revisar pago",
     "notesLabel": "Notas del admin",
-    "notesPlaceholder": "Notas opcionales para esta revision",
+    "notesPlaceholder": "Notas opcionales para esta revisión",
     "approve": "Aprobar",
     "reject": "Rechazar",
     "reviewSuccess": "Pago revisado exitosamente",
     "reviewFailed": "Error al revisar",
     "reviewFailedDesc": "No se pudo revisar el intento de pago.",
     "rejectConfirmTitle": "Rechazar pago",
-    "rejectConfirmDesc": "Estas seguro de que deseas rechazar este pago?",
+    "rejectConfirmDesc": "¿Estás seguro de que deseas rechazar este pago?",
     "filter": {
       "all": "Todos los estados",
       "status": "Filtrar por estado"

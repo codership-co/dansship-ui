@@ -1,19 +1,19 @@
 {
   "inventory": {
-    "title": "Gestion de Inventario y Facturacion",
-    "subtitle": "Administra salas, catalogo de clases, planes y descuentos.",
+    "title": "Gestión de Inventario y Facturación",
+    "subtitle": "Administra salas, catálogo de clases, planes y descuentos.",
     "tabs": {
       "rooms": "Salas",
-      "classCatalog": "Catalogo de Clases",
+      "classCatalog": "Catálogo de Clases",
       "plans": "Planes",
       "discounts": "Descuentos"
     }
   },
   "users": {
-    "title": "Gestion de Usuarios",
-    "subtitle": "Consulta usuarios y abre el detalle de uno para revisar su informacion.",
+    "title": "Gestión de Usuarios",
+    "subtitle": "Consulta usuarios y abre el detalle de uno para revisar su información.",
     "searchLabel": "Buscar por correo",
-    "searchPlaceholder": "Buscar por correo (min. 3 caracteres)",
+    "searchPlaceholder": "Buscar por correo (mín. 3 caracteres)",
     "loading": "Cargando usuarios...",
     "empty": "No hay usuarios para mostrar.",
     "noUsersFound": "No se encontraron usuarios con ese correo.",
@@ -28,36 +28,36 @@
     "viewUser": "Ver usuario",
     "details": {
       "title": "Detalle de Usuario",
-      "subtitle": "Informacion completa del usuario seleccionado.",
+      "subtitle": "Información completa del usuario seleccionado.",
       "loading": "Cargando usuario...",
       "notFound": "No se pudo cargar este usuario.",
       "backToList": "Volver a usuarios",
-      "alias": "Gusta ser llamado(a) como...",
+      "alias": "Prefiere ser llamado(a) como...",
       "birthDate": "Fecha de nacimiento",
       "phoneNumber": "Número de teléfono",
       "documentNumber": "Número de documento",
       "actionsMenu": "Acciones del usuario",
       "convertToInstructor": "Convertir en Instructor",
       "deactivateInstructor": "Quitar rol de Instructor",
-      "inviteInstructorSuccess": "Enviamos un correo a {{email}} para que continue con su perfil de instructor.",
+      "inviteInstructorSuccess": "Enviamos un correo a {{email}} para que continúe con su perfil de instructor.",
       "inviteInstructorFailed": "No se pudo invitar al usuario como instructor.",
       "deactivateInstructorSuccess": "El acceso de instructor fue desactivado.",
       "deactivateInstructorFailed": "No se pudo desactivar el acceso de instructor."
     }
   },
   "reports": {
-    "title": "Reportes y Configuracion de la Plataforma",
+    "title": "Reportes y Configuración de la Plataforma",
     "subtitle": "Consulta KPIs operativos y configura el comportamiento de la plataforma.",
     "tabs": {
       "dashboard": "Panel Operativo",
-      "notifications": "Configuracion de Notificaciones"
+      "notifications": "Configuración de Notificaciones"
     }
   },
   "bookings": {
     "title": "Reservar Clases para Usuarios",
-    "subtitle": "Ayuda a los usuarios a reservar clases manteniendo todas las reglas de reserva y suscripcion.",
+    "subtitle": "Ayuda a los usuarios a reservar clases manteniendo todas las reglas de reserva y suscripción.",
     "userSearchLabel": "Buscar usuario por correo",
-    "userSearchPlaceholder": "escribe el correo del usuario",
+    "userSearchPlaceholder": "Escribe el correo del usuario",
     "userSearchHint": "Ingresa al menos 3 caracteres para buscar usuarios.",
     "userLabel": "Usuario",
     "userSelectPlaceholder": "Seleccionar usuario",
@@ -74,9 +74,9 @@
     "errorTitle": "No se pudo crear la reserva",
     "errorDescription": "No se pudo crear la reserva.",
     "classGroupNotCovered": "El usuario no tiene un plan activo que cubra este tipo de clase.",
-    "subscriptionNotEligible": "El usuario no tiene una suscripcion activa con clases disponibles.",
+    "subscriptionNotEligible": "El usuario no tiene una suscripción activa con clases disponibles.",
     "timeOverlap": "El usuario ya tiene otra clase reservada en ese horario.",
-    "classFull": "Esta clase esta llena.",
+    "classFull": "Esta clase está llena.",
     "validationUser": "Selecciona un usuario.",
     "validationClass": "Selecciona una clase.",
     "selectedClassSummary": "Clase seleccionada: {{className}} ({{enrolled}}/{{capacity}} reservados)"

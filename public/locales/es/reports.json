@@ -1,15 +1,15 @@
 {
-  "reportingRange": "Periodo de Reporte:",
+  "reportingRange": "Período de Reporte:",
   "dateFrom": "Fecha desde",
   "dateTo": "Fecha hasta",
   "applyDateRange": "Aplicar",
-  "invalidDateRange": "La fecha inicial debe ser menor o igual que la fecha final",
-  "occupancyTitle": "Ocupacion de Clases (Tasa de Llenado)",
+  "invalidDateRange": "La fecha inicial debe ser anterior o igual a la fecha final",
+  "occupancyTitle": "Ocupación de Clases (Tasa de Llenado)",
   "occupancy": {
     "classHeader": "Clase",
-    "enrolledCap": "Inscritos / Cap",
+    "enrolledCap": "Inscritos / Cap.",
     "fillRate": "Tasa de Llenado",
-    "summaryTitle": "Resumen de Ocupacion por Clase",
+    "summaryTitle": "Resumen de Ocupación por Clase",
     "summaryAverage": "Llenado Promedio",
     "summarySessions": "Sesiones",
     "summaryClasses": "Tipos de Clase",
@@ -21,7 +21,7 @@
     "detailSearchPlaceholder": "Escribe para filtrar filas",
     "detailSortLabel": "Ordenar filas",
     "sort": {
-      "mostRecent": "Mas recientes primero",
+      "mostRecent": "Más recientes primero",
       "highestFill": "Mayor tasa de llenado",
       "lowestFill": "Menor tasa de llenado",
       "className": "Nombre de clase (A-Z)"
@@ -32,14 +32,14 @@
       "roomHeader": "Sala"
     }
   },
-  "attendanceTitle": "Asistencia y No Shows",
+  "attendanceTitle": "Asistencia e Inasistencias",
   "attendance": {
     "week": "Semana",
     "attended": "Asistieron",
     "noShow": "No Asistieron",
     "rate": "Tasa"
   },
-  "revenueTitle": "Ingresos por Suscripciones (Operativo)",
+  "revenueTitle": "Ingresos por Suscripciones (Operativos)",
   "revenue": {
     "plan": "Plan",
     "sold": "Vendidos",
@@ -47,6 +47,6 @@
     "discounts": "Descuentos",
     "netRevenue": "Ingreso Neto",
     "noPermissionTitle": "Acceso financiero restringido",
-    "noPermissionDescription": "No tienes permisos para ver informacion financiera sensible."
+    "noPermissionDescription": "No tienes permisos para ver información financiera sensible."
   }
 }
