@@ -24,7 +24,7 @@ export const RouterPageLayout = () => {
         />
       )}
       <Navbar />
-      <section className='h-full'>
+      <section className='relative z-10 h-full'>
         {(!ready || isRouterLoading) && !location?.pathname.startsWith('/auth') ? (
           <SpinnerLoader />
         ) : (

@@ -16,7 +16,7 @@ export const HomeMemberships = () => {
   const plansPath = isAuthenticated ? PageURLS.profile.subscription : PageURLS.auth.login;
 
   return (
-    <Section id='planes' verticalPadding footerMargin>
+    <Section id='planes' verticalPadding>
       <SectionHeading
         className='mx-auto max-w-2xl'
         centered

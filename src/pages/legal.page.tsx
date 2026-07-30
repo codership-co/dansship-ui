@@ -15,7 +15,7 @@ function LegalPage() {
   const { t } = useTranslation();
 
   return (
-    <Section navbarPadding footerMargin className='min-h-dvh'>
+    <Section navbarPadding className='min-h-dvh'>
       <SectionHeading intro={t('legal:intro')} title={t('legal:title')} subtitle={t('legal:subtitle')} />
 
       <section className='grid md:grid-cols-[auto_1fr] gap-8 md:items-start'>

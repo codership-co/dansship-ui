@@ -52,7 +52,7 @@ function SubscriptionPage() {
         <PlanSelector plans={availablePlans?.data ?? []} />
       </Section>
 
-      <Section footerMargin>
+      <Section>
         <SectionHeading title={t('subscriptions:store.history')} />
 
         <Tabs defaultOpenTab='inProgressPayments'>

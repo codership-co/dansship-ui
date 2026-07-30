@@ -13,8 +13,8 @@ export function Footer() {
   const { t } = useTranslation();
 
   return (
-    <footer className='drop-shadow-[0_0.5rem_1em_#00000033]'>
-      <GroovyLayout background='var(--color-accent)' marginTop={0}>
+    <footer className='relative z-0 drop-shadow-[0_0.5rem_1em_#00000033]'>
+      <GroovyLayout background='var(--color-accent)' marginTop={1}>
         <Section className='text-accent-foreground py-12'>
           <Logotype className='h-8 text-primary' />
           <div className='flex flex-col gap-6 md:flex-row md:items-center md:justify-between'>

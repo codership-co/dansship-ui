@@ -7,7 +7,6 @@ interface SectionProps extends HTMLAttributes<HTMLElement> {
   fullOnMobile?: boolean;
   verticalPadding?: boolean;
   navbarPadding?: boolean;
-  footerMargin?: boolean;
 }
 
 export function Section({
@@ -18,7 +17,6 @@ export function Section({
   fullOnMobile,
   verticalPadding,
   navbarPadding,
-  footerMargin,
   ...props
 }: SectionProps) {
   return (
@@ -30,7 +28,6 @@ export function Section({
         fullOnMobile && 'sm:px-6',
         verticalPadding && 'py-8 sm:py-16',
         navbarPadding && 'pt-30 sm:pt-35',
-        footerMargin && 'mb-60',
         className,
       )}
       {...props}
