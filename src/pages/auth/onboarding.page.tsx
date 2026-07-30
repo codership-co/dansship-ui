@@ -24,7 +24,7 @@ function OnboardingPageContent() {
 
   if (isLoading && !status) {
     return (
-      <Section className='min-h-dvh' navbarPadding footerMargin>
+      <Section className='min-h-dvh' navbarPadding>
         <Container>
           <SpinnerLoader />
         </Container>
@@ -34,7 +34,7 @@ function OnboardingPageContent() {
 
   if (showCompletionScreen) {
     return (
-      <Section className='min-h-dvh' navbarPadding footerMargin>
+      <Section className='min-h-dvh' navbarPadding>
         <SectionHeading
           intro={t('auth:onboarding.completeIntro')}
           title={t('auth:onboarding.completeTitle')}
@@ -77,7 +77,7 @@ function OnboardingPageContent() {
   }
 
   return (
-    <Section className='min-h-dvh' navbarPadding footerMargin>
+    <Section className='min-h-dvh' navbarPadding>
       {currentStep?.track === ProfileTrackKey.STUDENT && <OnboardingStudentTrack />}
       {currentStep?.track === ProfileTrackKey.INSTRUCTOR && <OnboardingInstructorTrack />}
     </Section>

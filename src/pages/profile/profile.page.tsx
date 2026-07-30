@@ -46,7 +46,7 @@ function ProfilePage() {
       <ProfileHeader editMode={editMode} onEdit={() => setEditMode(p => !p)} />
 
       {editMode ? (
-        <Section footerMargin>
+        <Section>
           <ProfileEdit
             showInstructor={user.isCoach || user.isInstructor}
             isLoading={false}
@@ -60,7 +60,7 @@ function ProfilePage() {
           />
         </Section>
       ) : (
-        <Section className={cn(editMode && 'hidden')} footerMargin>
+        <Section className={cn(editMode && 'hidden')}>
           <Tabs defaultOpenTab={ProfileTabs.ABOUT}>
             <Tabs.TabList
               className='overflow-x-auto w-full grid-cols-1 sm:grid-cols-[1fr_1fr] grid-flow-dense md:grid-cols-none md:grid-flow-col'

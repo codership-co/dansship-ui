@@ -60,7 +60,7 @@ function ClassesPage() {
   });
 
   return (
-    <Section className='min-h-dvh' navbarPadding footerMargin>
+    <Section className='min-h-dvh' navbarPadding>
       <SectionHeading title={t('classes:title')} subtitle={t('classes:subtitle')} />
 
       <section className='grid gap-8'>

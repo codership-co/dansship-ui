@@ -244,7 +244,7 @@ function PaymentsResultPage() {
         </Section>
       )}
 
-      <Section contentClassName='grid gap-20' footerMargin>
+      <Section contentClassName='grid gap-20'>
         <UserPaymentHistory title={t('payments:result.historyTitle')} />
       </Section>
     </section>
