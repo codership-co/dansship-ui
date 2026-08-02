@@ -6,6 +6,7 @@ import { Container, SectionEmpty } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui';
 import { type ActiveSubscription, DansshipAPI, type SubscriptionStatus } from '@core/api';
+import { resolvePlanDisplayName } from '@helpers';
 import { useDateLocale, usePromise } from '@hooks';
 
 function statusBadgeVariant(status: SubscriptionStatus): 'default' | 'secondary' | 'destructive' | 'outline' {
@@ -75,7 +76,7 @@ export function ActiveSubscriptionWidget() {
         </CardHeader>
 
         <CardContent className='pl-8'>
-          <div className='grid grid-cols-1 gap-6 md:grid-cols-3'>
+          <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
             <div className='flex flex-col'>
               <div className='mb-2 flex items-center text-gray-500'>
                 <LuTicket className='mr-2 h-4 w-4' />
@@ -83,6 +84,15 @@ export function ActiveSubscriptionWidget() {
               </div>
 
               <span className='text-3xl font-extrabold text-gray-900'>{summary?.total_remaining_classes}</span>
+            </div>
+
+            <div className='flex flex-col'>
+              <div className='mb-2 flex items-center text-gray-500'>
+                <LuTicket className='mr-2 h-4 w-4' />
+                <span className='text-sm font-medium'>{t('subscriptions:totalBonusClasses')}</span>
+              </div>
+
+              <span className='text-3xl font-extrabold text-gray-900'>{summary?.total_bonus_classes ?? 0}</span>
             </div>
 
             <div className='flex flex-col'>
@@ -124,7 +134,7 @@ export function ActiveSubscriptionWidget() {
           return (
             <Card key={sub.id} className='relative overflow-hidden border-accent shadow-sm'>
               <CardHeader>
-                <CardTitle className='text-lg'>{sub.plan_name_snapshot}</CardTitle>
+                <CardTitle className='text-lg'>{resolvePlanDisplayName(sub.plan_name_snapshot, t)}</CardTitle>
 
                 <CardDescription className='mt-1'>
                   {sub.class_count_snapshot} {t('subscriptions:classesPackage')}
@@ -173,6 +183,20 @@ export function ActiveSubscriptionWidget() {
                     </p>
                   </div>
                 </div>
+
+                {(sub.bonus_classes_remaining ?? 0) > 0 && (
+                  <div className='rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-sm'>
+                    <p className='font-medium text-primary'>
+                      {t('subscriptions:bonusClassesRemaining')}: {sub.bonus_classes_remaining}
+                    </p>
+                    {sub.bonus_expires_at && (
+                      <p className='mt-1 text-gray-600'>
+                        {t('subscriptions:bonusExpires')}:{' '}
+                        {format(new Date(sub.bonus_expires_at), 'MMM d, yyyy', { locale })}
+                      </p>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           );

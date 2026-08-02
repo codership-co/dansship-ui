@@ -5,6 +5,7 @@ import { Badge, Button } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { BookingStatus, DansshipAPI, MyBooking } from '@core/api';
 import { PageURLS } from '@core/constants';
+import { resolvePlanDisplayName } from '@helpers';
 import { useMyBookings, usePromise } from '@hooks';
 
 const statusLabel = (status: BookingStatus, t: (key: string) => string) => {
@@ -44,8 +45,9 @@ const formatDateTime = (value: string, locale?: string) =>
 const canCancel = (booking: MyBooking) => {
   const startsAt = new Date(booking.scheduled_class.start_time).getTime();
   const isFuture = startsAt > Date.now();
+  const planAllowsCancel = booking.is_cancellable !== false;
 
-  return isFuture && (booking.status === 'active' || booking.status === 'waitlisted');
+  return isFuture && planAllowsCancel && (booking.status === 'active' || booking.status === 'waitlisted');
 };
 
 function BookingsPage() {
@@ -98,7 +100,7 @@ function BookingsPage() {
                     </p>
                     {booking.plan_name && (
                       <p className='text-xs text-primary font-medium mt-1'>
-                        {t('subscriptions:planUsed', { name: booking.plan_name })}
+                        {t('subscriptions:planUsed', { name: resolvePlanDisplayName(booking.plan_name, t) })}
                       </p>
                     )}
                   </div>

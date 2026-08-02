@@ -29,12 +29,19 @@ export function normalizeSubscription(subscription: ActiveSubscription): ActiveS
   return {
     ...subscription,
     remaining_classes: toNumber(subscription.remaining_classes),
+    bonus_classes_remaining: toNumber(subscription.bonus_classes_remaining ?? 0),
     original_price: toNumber(subscription.original_price),
     final_price: toNumber(subscription.final_price),
     class_count_snapshot: toNumber(subscription.class_count_snapshot),
     price_snapshot: toNumber(subscription.price_snapshot),
+    benefit_value_snapshot:
+      subscription.benefit_value_snapshot !== null && subscription.benefit_value_snapshot !== undefined
+        ? toNumber(subscription.benefit_value_snapshot)
+        : null,
     discount_value_snapshot:
-      subscription.discount_value_snapshot !== null ? toNumber(subscription.discount_value_snapshot) : null,
+      subscription.discount_value_snapshot !== null && subscription.discount_value_snapshot !== undefined
+        ? toNumber(subscription.discount_value_snapshot)
+        : null,
     plan: subscription.plan ? normalizePlan(subscription.plan) : subscription.plan,
   };
 }

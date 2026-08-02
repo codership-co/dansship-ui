@@ -9,6 +9,7 @@
   "unknown": "Desconocido",
   "leaveWaitlist": "Salir de la Lista de Espera",
   "cancelBooking": "Cancelar Reserva",
+  "cancellationNotAllowed": "Esta reserva no se puede cancelar.",
   "status": {
     "active": "Reservado",
     "waitlisted": "En lista de espera",
@@ -43,6 +44,7 @@
   "capacity": "Capacidad",
   "full": "(Lleno)",
   "noSubscriptionWarning": "Debes tener una suscripción activa con créditos disponibles para reservar esta clase.",
+  "trialClassNote": "Esta será tu clase de prueba gratuita. No podrá cancelarse una vez reservada.",
   "buyPlan": "Comprar un plan",
   "cancelling": "Cancelando...",
   "leaving": "Saliendo...",

@@ -64,6 +64,9 @@ export class PaymentsAPI {
         original_price: toNumber(data.original_price),
         tax_amount: toNumber(data.tax_amount),
         tax_rate_percentage: toNumber(data.tax_rate_percentage),
+        bonus_classes_granted: data.bonus_classes_granted ?? null,
+        bonus_expires_days: data.bonus_expires_days ?? null,
+        bonus_benefit_name: data.bonus_benefit_name ?? null,
       }),
     );
   }

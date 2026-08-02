@@ -1,8 +1,10 @@
 import { useTranslation } from 'react-i18next';
 
-const NEQUI_QR_PLACEHOLDER = '/assets/images/payments/nequi-qr.png';
-// TODO: change to breb-qr.png
-const BREB_QR_PLACEHOLDER = '/assets/images/payments/nequi-qr.png';
+/*
+ * const NEQUI_QR_PLACEHOLDER = '/assets/images/payments/nequi-qr.png';
+ * TODO: change to breb-qr.png
+ */
+const BREB_QR_PLACEHOLDER = '/assets/images/payments/breb-qr.png';
 const BREB_KEY = '@bolddanshsip';
 
 export function TransferPaymentInstructions() {
@@ -14,14 +16,14 @@ export function TransferPaymentInstructions() {
       <p className='mt-1 mb-4'>{t('payments:instructions.transfer.description')}</p>
 
       <div className='grid gap-4 sm:grid-cols-3'>
-        <article className='grid justify-items-center gap-2 rounded-lg border border-white/60 bg-white/70 p-4 text-center'>
+        {/* <article className='grid justify-items-center gap-2 rounded-lg border border-white/60 bg-white/70 p-4 text-center'>
           <p className='m-0 font-semibold text-primary'>{t('payments:instructions.transfer.nequiQrTitle')}</p>
           <img
             src={NEQUI_QR_PLACEHOLDER}
             alt={t('payments:instructions.transfer.nequiQrTitle')}
             className='size-32 object-contain'
           />
-        </article>
+        </article> */}
 
         <article className='rounded-lg border border-white/60 bg-white/70 p-4'>
           <p className='m-0 mb-2 font-semibold text-primary'>{t('payments:instructions.transfer.brebTitle')}</p>

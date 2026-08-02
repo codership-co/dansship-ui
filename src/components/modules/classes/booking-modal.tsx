@@ -16,7 +16,8 @@ interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedClass: PublishedClass | null;
-  hasActiveSubscription: boolean;
+  canBookClasses: boolean;
+  isTrialEligible?: boolean;
   onBookingChange?: () => void | Promise<void>;
 }
 
@@ -24,7 +25,8 @@ export function BookingModal({
   isOpen,
   onClose,
   selectedClass,
-  hasActiveSubscription,
+  canBookClasses,
+  isTrialEligible = false,
   onBookingChange,
 }: BookingModalProps) {
   const { t } = useTranslation();
@@ -121,7 +123,8 @@ export function BookingModal({
     navigate(PageURLS.profile.user(selectedClass.instructor.id));
   };
 
-  const showSubscriptionWarning = !hasActiveSubscription && !isBooked && !isWaitlisted && !isPast && !hasTimeOverlap;
+  const showSubscriptionWarning = !canBookClasses && !isBooked && !isWaitlisted && !isPast && !hasTimeOverlap;
+  const showTrialNote = Boolean(isTrialEligible && canBookClasses && !isBooked && !isWaitlisted && !isPast);
 
   return (
     <AsideModal
@@ -222,6 +225,12 @@ export function BookingModal({
             </label>
           )}
 
+          {showTrialNote && (
+            <label className='bg-primary/5 p-3 rounded text-primary border border-primary/20'>
+              {t('bookings:trialClassNote')}
+            </label>
+          )}
+
           {hasTimeOverlap && !isBooked && !isWaitlisted && (
             <label className='bg-warning-50 p-3 rounded text-warning-800 border border-warning-200'>
               {t('bookings:timeOverlapWarning')}
@@ -234,14 +243,20 @@ export function BookingModal({
                 {t('bookings:classEnded')}
               </label>
             ) : isBooked ? (
-              <Button color='alert' onClick={handleCancel} isLoading={isLoading}>
-                {isCancelingClass ? t('bookings:cancelling') : t('bookings:cancelBooking')}
-              </Button>
+              selectedClass.user_booking_is_cancellable === false ? (
+                <label className='bg-gray-50 p-3 rounded text-gray-700 border border-gray-200 text-center'>
+                  {t('bookings:cancellationNotAllowed')}
+                </label>
+              ) : (
+                <Button color='alert' onClick={handleCancel} isLoading={isLoading}>
+                  {isCancelingClass ? t('bookings:cancelling') : t('bookings:cancelBooking')}
+                </Button>
+              )
             ) : isWaitlisted ? (
               <Button color='primary' variant='outlined' onClick={handleWaitlistCancel} isLoading={isLoading}>
                 {isCancelingWaitlist ? t('bookings:leaving') : t('bookings:leaveWaitlist')}
               </Button>
-            ) : !hasActiveSubscription ? (
+            ) : !canBookClasses ? (
               <Button color='primary' onClick={handleBuyPlan}>
                 {t('bookings:buyPlan')}
               </Button>

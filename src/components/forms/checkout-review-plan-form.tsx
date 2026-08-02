@@ -43,6 +43,9 @@ export interface PaymentData {
   baseAmount: number;
   originalPrice: number;
   taxAmount: number;
+  bonusClassesGranted: number | null;
+  bonusExpiresDays: number | null;
+  bonusBenefitName: string | null;
 }
 
 export const DefaultPaymentData: PaymentData = {
@@ -57,6 +60,9 @@ export const DefaultPaymentData: PaymentData = {
   originalPrice: 0,
   taxAmount: 0,
   applied: false,
+  bonusClassesGranted: null,
+  bonusExpiresDays: null,
+  bonusBenefitName: null,
 };
 
 interface CheckoutReviewPlanFormInputProps {
@@ -108,7 +114,13 @@ export const CheckoutReviewPlanFormInput = ({
           rejection_reason,
           tax_amount,
           tax_rate_percentage,
+          bonus_classes_granted,
+          bonus_expires_days,
+          bonus_benefit_name,
         } = data;
+
+        const isPercentage = discount_type === 'percentage_discount' || discount_type === 'percentage';
+        const isFixed = discount_type === 'fixed_discount' || discount_type === 'fixed_amount';
 
         setPaymentData({
           isValid: is_valid,
@@ -121,12 +133,14 @@ export const CheckoutReviewPlanFormInput = ({
           originalPrice: original_price,
           taxAmount: tax_amount,
           taxContext: `${tax_rate_percentage}%`,
-          discountContext:
-            discount_type === 'percentage'
-              ? `${discount_value}%`
-              : discount_type === 'fixed_amount'
-                ? formatPrice(discount_value, plan.currency)
-                : '',
+          discountContext: isPercentage
+            ? `${discount_value}%`
+            : isFixed
+              ? formatPrice(discount_value, plan.currency)
+              : '',
+          bonusClassesGranted: bonus_classes_granted,
+          bonusExpiresDays: bonus_expires_days,
+          bonusBenefitName: bonus_benefit_name,
         });
       }
     });
@@ -185,6 +199,15 @@ export const CheckoutReviewPlanFormInput = ({
             <div className='mb-2 flex items-center justify-between'>
               <span className='text-gray-500'>{t('subscriptions:discountCode')}</span>
               <span>{isLoading ? <Spinner /> : paymentData.discountContext}</span>
+            </div>
+          )}
+
+          {paymentData.bonusClassesGranted !== null && paymentData.bonusClassesGranted > 0 && (
+            <div className='mb-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary'>
+              {t('subscriptions:bonusClassesCheckoutNote', {
+                count: paymentData.bonusClassesGranted,
+                days: paymentData.bonusExpiresDays ?? 14,
+              })}
             </div>
           )}
 

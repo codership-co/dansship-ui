@@ -1,7 +1,6 @@
 export * from './use-figure-details';
 export * from './use-merch-pos';
 export * from './use-figures';
-export * from './use-discounts';
 export * from './use-instructor-roster';
 export * from './use-admin-figures';
 export * from './use-schedules';

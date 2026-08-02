@@ -122,7 +122,7 @@ export interface PaymentPreviewRequest {
 export interface PaymentPreviewResponse {
   base_amount: string;
   discount_applied: boolean;
-  discount_type: 'percentage' | 'fixed_amount' | null;
+  discount_type: 'percentage_discount' | 'fixed_discount' | 'percentage' | 'fixed_amount' | null;
   discount_value: string | null;
   final_price: string;
   is_valid: boolean;
@@ -131,12 +131,15 @@ export interface PaymentPreviewResponse {
   tax_amount: string;
   tax_rate_percentage: string;
   tax_type_name: string;
+  bonus_classes_granted?: number | null;
+  bonus_expires_days?: number | null;
+  bonus_benefit_name?: string | null;
 }
 
 export interface PaymentPreviewMappedResponse {
   base_amount: number;
   discount_applied: boolean;
-  discount_type: 'percentage' | 'fixed_amount' | null;
+  discount_type: 'percentage_discount' | 'fixed_discount' | 'percentage' | 'fixed_amount' | null;
   discount_value: number;
   final_price: number;
   is_valid: boolean;
@@ -145,4 +148,7 @@ export interface PaymentPreviewMappedResponse {
   tax_amount: number;
   tax_rate_percentage: number;
   tax_type_name: string;
+  bonus_classes_granted: number | null;
+  bonus_expires_days: number | null;
+  bonus_benefit_name: string | null;
 }

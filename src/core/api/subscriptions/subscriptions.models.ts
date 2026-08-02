@@ -28,8 +28,10 @@ export type SubscriptionStatus = 'pending_payment' | 'active' | 'expired' | 'can
 
 export interface SubscriptionSummary {
   total_remaining_classes: number;
+  total_bonus_classes?: number;
   active_count: number;
   next_expiration: string | null;
+  trial_eligible?: boolean;
 }
 
 export interface MySubscriptionsResponse {
@@ -47,11 +49,19 @@ export interface ActiveSubscription {
   price_snapshot: number;
   expiration_policy_snapshot: string;
 
-  discount_name_snapshot: string | null;
-  discount_value_snapshot: number | null;
-  discount_type_snapshot: string | null;
+  benefit_definition_id?: string | null;
+  benefit_name_snapshot?: string | null;
+  benefit_value_snapshot?: number | null;
+  benefit_type_snapshot?: string | null;
+
+  /** @deprecated Prefer benefit_*_snapshot */
+  discount_name_snapshot?: string | null;
+  discount_value_snapshot?: number | null;
+  discount_type_snapshot?: string | null;
 
   remaining_classes: number;
+  bonus_classes_remaining?: number;
+  bonus_expires_at?: string | null;
   start_date: string;
   expiration_date: string;
   original_price: number;
