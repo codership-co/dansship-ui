@@ -23,12 +23,13 @@ import {
 } from '@core/api';
 import { AUTH_SESSION_KEY, PageURLS } from '@core/constants';
 import { type PERMISSION } from '@core/permissions';
-import { getPendingPlanCheckoutIntent, getRedirectPathByRole } from '@helpers';
+import { getPendingPlanCheckoutIntent, isValidReturnPath, resolvePostLoginPath } from '@helpers';
 import { useEventListener } from '@hooks';
 import { Error404Page, UnauthorizedPage, UnavailablePage } from '@pages';
 
 interface CommonAuthContextState {
   ready: boolean;
+  pendingPostLoginPath: string | null;
   login: (data: LoginPayload) => Promise<void>;
   signUp: (data: RegisterPayload) => Promise<void>;
   updateProfile: (data: UpdateProfilePayload) => Promise<void>;
@@ -82,6 +83,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const location = useLocation();
   const [ready, setReady] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [pendingPostLoginPath, setPendingPostLoginPath] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEventListener('auth:session-expired' as keyof WindowEventMap, () => {
@@ -130,19 +132,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }
 
+  useEffect(() => {
+    if (!pendingPostLoginPath) {
+      return;
+    }
+
+    if (location.pathname !== PageURLS.auth.login) {
+      setPendingPostLoginPath(null);
+    }
+  }, [location.pathname, pendingPostLoginPath]);
+
   async function login(payload: LoginPayload) {
     try {
       const data = await DansshipAPI.auth.login(payload);
       localStorage.setItem(AUTH_SESSION_KEY, '1');
       toast.success(t('auth:loginSuccess'));
-      setUser(data);
 
-      if (fromPath && fromPath !== PageURLS.auth.login) {
-        navigate(fromPath, { replace: true });
-      } else {
-        const redirectPath = getRedirectPathByRole(data.roles);
-        navigate(redirectPath, { replace: true });
-      }
+      const redirectPath = isValidReturnPath(fromPath) ? fromPath : await resolvePostLoginPath(data);
+
+      setPendingPostLoginPath(redirectPath);
+      setUser(data);
+      navigate(redirectPath, { replace: true });
     } catch (error) {
       if (error instanceof DansshipAPIError) {
         if (error.body.error_code === DANSSHIP_ERROR_CODE.EMAIL_NOT_VERIFIED) {
@@ -320,6 +330,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       value={{
         ...(user ? { isAuthenticated: true, user } : { isAuthenticated: false, user: null }),
         ready,
+        pendingPostLoginPath,
         login,
         getProfile,
         signUp,
@@ -347,6 +358,41 @@ export const useAuth = (): AuthContextState => {
 
   return context;
 };
+
+function AuthenticatedHomeRedirect() {
+  const { user, pendingPostLoginPath } = useAuth();
+  const [path, setPath] = useState<string | null>(pendingPostLoginPath);
+
+  useEffect(() => {
+    if (pendingPostLoginPath) {
+      setPath(pendingPostLoginPath);
+
+      return;
+    }
+
+    if (!user) {
+      return;
+    }
+
+    let cancelled = false;
+
+    void resolvePostLoginPath(user).then(resolved => {
+      if (!cancelled) {
+        setPath(resolved);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user, pendingPostLoginPath]);
+
+  if (!path) {
+    return null;
+  }
+
+  return <Navigate to={path} replace />;
+}
 
 export const useAndPermissions = (permissions: Array<PERMISSION>): boolean => {
   const { user, isAuthenticated } = useAuth();
@@ -409,7 +455,11 @@ export function SecurityGuard(
     return useMemo(() => {
       const { pathname } = location;
 
-      if ((requiresAuth && !isAuthenticated) || (requiresNoAuth && isAuthenticated)) {
+      if (requiresNoAuth && isAuthenticated) {
+        return <AuthenticatedHomeRedirect />;
+      }
+
+      if (requiresAuth && !isAuthenticated) {
         return redirect ? <Navigate to={redirect} state={{ from: location }} /> : <Error404Page />;
       }
 

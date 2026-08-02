@@ -34,8 +34,11 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
     return () => clearTimeout(timer);
   }, [searchInput]);
 
-  const { response: searchedUsers, isLoading: isSearchingUsers } = usePromise(() =>
-    DansshipAPI.instructors.searchUsersByEmail(debouncedSearch),
+  const trimmedSearch = debouncedSearch.trim();
+  const { response: searchedUsers, isLoading: isSearchingUsers } = usePromise(
+    () => DansshipAPI.instructors.searchUsersByEmail(trimmedSearch),
+    trimmedSearch.length > 2,
+    [trimmedSearch],
   );
 
   useEffect(() => {
@@ -126,7 +129,7 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
               {isAdding ? t('instructor:roster.adding') : t('instructor:roster.manualAdd')}
             </Button>
 
-            {isDropdownOpen && debouncedSearch.length > 2 && (
+            {isDropdownOpen && trimmedSearch.length > 2 && (
               <div className='absolute left-0 top-11 z-20 w-80 max-h-60 overflow-auto rounded-md border border-gray-200 bg-white shadow-lg'>
                 {!isSearchingUsers && (!searchedUsers?.ok || searchedUsers?.data?.length === 0) ? (
                   <div className='px-4 py-3 text-sm text-gray-500'>{t('common:noUsersFound')}</div>

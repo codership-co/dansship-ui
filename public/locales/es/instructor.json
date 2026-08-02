@@ -61,5 +61,19 @@
     "createFailed": "Error al crear el perfil",
     "updateSuccess": "Perfil actualizado exitosamente",
     "updateFailed": "Error al actualizar el perfil"
+  },
+  "home": {
+    "title": "Mi Horario",
+    "subtitle": "Revisa tu próxima clase, lista de alumnos y asistencia.",
+    "nextClass": "Próxima clase",
+    "viewRoster": "Ver lista",
+    "inProgress": "En curso",
+    "todayAt": "Hoy a las {{time}}",
+    "startsIn": "Empieza {{relative}}",
+    "emptyTitle": "No tienes clases asignadas esta semana",
+    "emptyDescription": "Cuando te asignen clases, aparecerán aquí para que puedas ver el horario y tomar asistencia.",
+    "jumpedWeekBanner": "No tienes clases esta semana — mostrando la semana del {{week}}.",
+    "dismissBanner": "Cerrar",
+    "nextAvailable": "Próximo disponible"
   }
 }

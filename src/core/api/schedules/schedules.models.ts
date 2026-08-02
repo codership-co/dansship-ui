@@ -75,3 +75,10 @@ export interface EditPublishedClassPayload {
   instructor_id?: string | null;
   capacity?: number;
 }
+
+export interface UpcomingWeekResponse<TClass = ScheduledClass> {
+  requested_week_start: string;
+  resolved_week_start: string;
+  jumped: boolean;
+  classes: Array<TClass>;
+}

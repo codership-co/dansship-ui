@@ -100,6 +100,9 @@ export const PageURLS = {
     subscription: '/profile/subscription',
     bookings: '/profile/bookings',
   },
+  instructor: {
+    root: '/instructor',
+  },
   admin: {
     root: '/admin',
     agenda: '/admin/agenda',

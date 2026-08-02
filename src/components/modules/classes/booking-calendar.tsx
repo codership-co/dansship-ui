@@ -17,6 +17,8 @@ interface BookingCalendarProps {
   canBookClasses: boolean;
   isTrialEligible?: boolean;
   myBookings: Array<MyBooking>;
+  /** When provided, hydrate from these classes and skip the range fetch for this week. */
+  initialClasses?: Array<PublishedClass> | null;
   onBookingChange?: () => void | Promise<void>;
 }
 
@@ -25,6 +27,7 @@ export function BookingCalendar({
   canBookClasses,
   isTrialEligible = false,
   myBookings,
+  initialClasses = null,
   onBookingChange,
 }: BookingCalendarProps) {
   const { t } = useTranslation();
@@ -61,8 +64,22 @@ export function BookingCalendar({
   );
 
   useEffect(() => {
+    if (initialClasses !== null) {
+      const nextClassesByDay = sortClassesByDay(initialClasses, week);
+
+      setClasses(initialClasses);
+      setClassesByDay(nextClassesByDay);
+      setActiveDay(previousDay => {
+        const sameDay = nextClassesByDay.find(day => day.day === previousDay?.day);
+
+        return sameDay ?? nextClassesByDay.find(day => day.classes.length);
+      });
+
+      return;
+    }
+
     void refreshClasses(week);
-  }, [refreshClasses, week]);
+  }, [initialClasses, refreshClasses, week]);
 
   const handleBookingChange = useCallback(async () => {
     await refreshClasses(week);
