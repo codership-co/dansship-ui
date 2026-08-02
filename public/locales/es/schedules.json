@@ -19,6 +19,7 @@
   "saveClassError": "No se pudo guardar la clase. Revisa la sala, el instructor y el horario seleccionados.",
   "unnamedClass": "Clase sin nombre",
   "instructorDefault": "Instructor",
+  "instructorTBA": "Instructor por confirmar",
   "roomNotAvailable": "Sala no disponible",
   "addAnotherAtTime": "Agregar otra clase en este horario",
   "instructorLabel": "Instructor: ",

@@ -280,7 +280,7 @@ export function ScheduleGrid({
                 } else {
                   // It's a ScheduledClass
                   className = cls.class_definition?.name || t('schedules:unnamedClass');
-                  classInstructor = cls.instructor?.email || t('schedules:instructorDefault');
+                  classInstructor = cls.instructor?.email || t('schedules:instructorTBA');
                   classRoom = cls.room?.name || t('schedules:roomNotAvailable');
                   id = cls.id;
                 }

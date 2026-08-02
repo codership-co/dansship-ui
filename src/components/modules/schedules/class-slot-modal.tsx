@@ -41,11 +41,13 @@ const getOneHourAfter = (time: string): string => {
   return format(addMinutes(dateObj, 60), 'HH:mm');
 };
 
+const UNASSIGNED_INSTRUCTOR = '__tba__';
+
 const classSlotSchema = z
   .object({
     class_definition_id: z.string().min(1, 'Select a class'),
     room_id: z.string().min(1, 'Select a room'),
-    instructor_id: z.string().min(1, 'Select an instructor'),
+    instructor_id: z.string().optional().default(''),
     date: z.string().min(1, 'Date is required'),
     start_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Format HH:MM required'),
     end_time: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, 'Format HH:MM required'),
@@ -122,7 +124,7 @@ export function ClassSlotModal({
     defaultValues: {
       class_definition_id: '',
       room_id: '',
-      instructor_id: '',
+      instructor_id: UNASSIGNED_INSTRUCTOR,
       date: defaultDate || '',
       start_time: defaultTime || '09:00',
       end_time: getOneHourAfter(defaultTime || '09:00'),
@@ -153,7 +155,7 @@ export function ClassSlotModal({
 
   const { response: availabilityData, isLoading: isLoadingAvailability } = usePromise(
     () => DansshipAPI.instructorsAdmin.getAdminAvailability(watchInstructorId),
-    Boolean(watchInstructorId),
+    Boolean(watchInstructorId && watchInstructorId !== UNASSIGNED_INSTRUCTOR),
     [watchInstructorId],
   );
 
@@ -231,7 +233,7 @@ export function ClassSlotModal({
         reset({
           class_definition_id: initialData.class_definition_id,
           room_id: initialData.room_id,
-          instructor_id: initialData.instructor_id,
+          instructor_id: initialData.instructor_id || UNASSIGNED_INSTRUCTOR,
           date: format(localStartDate, 'yyyy-MM-dd'),
           start_time: format(localStartDate, 'HH:mm'),
           end_time: format(localEndDate, 'HH:mm'),
@@ -242,7 +244,7 @@ export function ClassSlotModal({
         reset({
           class_definition_id: '',
           room_id: '',
-          instructor_id: '',
+          instructor_id: UNASSIGNED_INSTRUCTOR,
           date: defaultDate || '',
           start_time: defaultTime || '09:00',
           end_time: getOneHourAfter(defaultTime || '09:00'),
@@ -339,13 +341,14 @@ export function ClassSlotModal({
             <div className='space-y-2'>
               <Label>{t('schedules:instructor')}</Label>
               <Select
-                value={watchInstructorId}
+                value={watchInstructorId || UNASSIGNED_INSTRUCTOR}
                 onValueChange={val => setValue('instructor_id', val, { shouldValidate: true })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder={t('schedules:selectInstructor')} />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value={UNASSIGNED_INSTRUCTOR}>{t('schedules:instructorTBA')}</SelectItem>
                   {instructors
                     .filter(i => i.id !== null)
                     .map(i => (
@@ -356,25 +359,28 @@ export function ClassSlotModal({
                 </SelectContent>
               </Select>
 
-              {watchInstructorId && isLoadingAvailability && (
+              {watchInstructorId && watchInstructorId !== UNASSIGNED_INSTRUCTOR && isLoadingAvailability && (
                 <div className='flex items-center text-xs text-muted-foreground mt-1'>
                   <LuLoaderCircle className='w-3 h-3 mr-1 animate-spin' />
                   {t('instructor:availability.checking', 'Checking availability...')}
                 </div>
               )}
 
-              {watchInstructorId && !isLoadingAvailability && availabilityStatus && (
-                <div
-                  className={`flex items-start text-xs mt-1 ${availabilityStatus.isAvailable ? 'text-green-600' : 'text-amber-600'}`}
-                >
-                  {availabilityStatus.isAvailable ? (
-                    <LuCircleCheck className='w-3 h-3 mr-1 shrink-0 mt-0.5' />
-                  ) : (
-                    <LuOctagonAlert className='w-3 h-3 mr-1 shrink-0 mt-0.5' />
-                  )}
-                  <span>{availabilityStatus.message}</span>
-                </div>
-              )}
+              {watchInstructorId &&
+                watchInstructorId !== UNASSIGNED_INSTRUCTOR &&
+                !isLoadingAvailability &&
+                availabilityStatus && (
+                  <div
+                    className={`flex items-start text-xs mt-1 ${availabilityStatus.isAvailable ? 'text-green-600' : 'text-amber-600'}`}
+                  >
+                    {availabilityStatus.isAvailable ? (
+                      <LuCircleCheck className='w-3 h-3 mr-1 shrink-0 mt-0.5' />
+                    ) : (
+                      <LuOctagonAlert className='w-3 h-3 mr-1 shrink-0 mt-0.5' />
+                    )}
+                    <span>{availabilityStatus.message}</span>
+                  </div>
+                )}
 
               {errors.instructor_id && <p className='text-sm text-alert-500'>{errors.instructor_id.message}</p>}
             </div>
