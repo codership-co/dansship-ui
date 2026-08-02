@@ -38,11 +38,24 @@
       "documentNumber": "Número de documento",
       "actionsMenu": "Acciones del usuario",
       "convertToInstructor": "Convertir en Instructor",
-      "deactivateInstructor": "Quitar rol de Instructor",
+      "deactivateUser": "Desactivar acceso de usuario",
+      "deactivateUserConfirmTitle": "¿Desactivar acceso de este usuario?",
+      "deactivateUserConfirmDescription": "El usuario {{email}} no podrá iniciar sesión en la plataforma. Su perfil de instructor y el progreso de onboarding se conservarán.",
+      "deactivateUserSuccess": "El acceso del usuario fue desactivado.",
+      "deactivateUserFailed": "No se pudo desactivar el acceso del usuario.",
+      "reactivateUser": "Reactivar acceso de usuario",
+      "reactivateUserSuccess": "El acceso del usuario fue reactivado.",
+      "reactivateUserFailed": "No se pudo reactivar el acceso del usuario.",
+      "deactivateInstructor": "Desactivar rol de instructor",
+      "deactivateInstructorConfirmTitle": "¿Desactivar rol de instructor?",
+      "deactivateInstructorConfirmDescription": "El usuario {{email}} dejará de aparecer como instructor activo, pero podrá seguir iniciando sesión como estudiante.",
+      "reactivateInstructor": "Reactivar rol de instructor",
       "inviteInstructorSuccess": "Enviamos un correo a {{email}} para que continúe con su perfil de instructor.",
       "inviteInstructorFailed": "No se pudo invitar al usuario como instructor.",
-      "deactivateInstructorSuccess": "El acceso de instructor fue desactivado.",
-      "deactivateInstructorFailed": "No se pudo desactivar el acceso de instructor."
+      "deactivateInstructorSuccess": "El rol de instructor fue desactivado.",
+      "deactivateInstructorFailed": "No se pudo desactivar el rol de instructor.",
+      "reactivateInstructorSuccess": "El rol de instructor fue reactivado.",
+      "reactivateInstructorFailed": "No se pudo reactivar el rol de instructor."
     }
   },
   "reports": {

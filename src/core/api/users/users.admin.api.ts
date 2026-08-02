@@ -2,7 +2,13 @@ import { HttpClient } from 'polpo-http-client';
 
 import { DansshipAPIError } from '@core/api';
 
-import type { AdminUserDetailsResponse, UserResponse, UsersSearchParams } from './users.models';
+import type {
+  AdminUserDetailsResponse,
+  UserDeactivateResponse,
+  UserReactivateResponse,
+  UserResponse,
+  UsersSearchParams,
+} from './users.models';
 
 export class UsersAdminAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
@@ -19,6 +25,20 @@ export class UsersAdminAPI {
     return this.httpClient.callNoError<AdminUserDetailsResponse>({
       path: `/admin/users/${userId}`,
       method: 'GET',
+    });
+  }
+
+  async deactivateUser(userId: string) {
+    return this.httpClient.callNoError<UserDeactivateResponse>({
+      path: `/admin/users/${userId}/deactivate`,
+      method: 'POST',
+    });
+  }
+
+  async reactivateUser(userId: string) {
+    return this.httpClient.callNoError<UserReactivateResponse>({
+      path: `/admin/users/${userId}/reactivate`,
+      method: 'POST',
     });
   }
 }

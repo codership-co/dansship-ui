@@ -2,6 +2,14 @@ export interface UsersSearchParams {
   email?: string;
 }
 
+export interface UserDeactivateResponse {
+  deactivated: boolean;
+}
+
+export interface UserReactivateResponse {
+  reactivated: boolean;
+}
+
 export interface UserResponse {
   id: string;
   full_name: string;

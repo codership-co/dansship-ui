@@ -7,6 +7,7 @@ import {
   DAY_TO_INDEX,
   type InstructorDeactivateResponse,
   type InstructorInviteResponse,
+  type InstructorReactivateResponse,
 } from './instructors.models';
 
 import { DansshipAPIError } from '@core/api';
@@ -31,6 +32,13 @@ export class InstructorsAdminAPI {
   async deactivateInstructor(userId: string) {
     return this.httpClient.callNoError<InstructorDeactivateResponse>({
       path: `/admin/instructors/${userId}/deactivate`,
+      method: 'POST',
+    });
+  }
+
+  async reactivateInstructor(userId: string) {
+    return this.httpClient.callNoError<InstructorReactivateResponse>({
+      path: `/admin/instructors/${userId}/reactivate`,
       method: 'POST',
     });
   }

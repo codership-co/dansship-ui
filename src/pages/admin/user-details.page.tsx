@@ -25,6 +25,9 @@ function UserDetailsPage() {
             userId={userId}
             userEmail={user.email}
             roleNames={user.roles}
+            isActive={user.is_active}
+            hasInstructorProfile={user.has_instructor_profile}
+            onboardingPendingSteps={user.onboarding_pending_steps}
             onChanged={() => void reFetch()}
           />
         ) : null
