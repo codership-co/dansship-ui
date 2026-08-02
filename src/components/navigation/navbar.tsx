@@ -14,7 +14,7 @@ import { ProfilePicture } from '@components/ui';
 import { FEATURE_FLAG, useAuth, useEnabledFeatureFlag, useFeatureFlags, usePermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { AdminPermissions, PERMISSION } from '@core/permissions';
+import { AdminPermissions, InstructorPermissions, PERMISSION } from '@core/permissions';
 import { usePromise } from '@hooks';
 
 import type { IconType } from 'react-icons';
@@ -47,6 +47,13 @@ export const Navbar = () => {
   const hasActivePlan = (response?.data?.summary?.active_count ?? 0) > 0;
 
   const navLinks: Array<NavItem> = [
+    {
+      to: PageURLS.instructor.root,
+      label: t('nav:mySchedule'),
+      requireAuthentication: true,
+      orPermissions: [...InstructorPermissions.dashboard, PERMISSION.SCHEDULE_MANAGE],
+      featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isProfilePageEnabled],
+    },
     { to: PageURLS.classes, label: t('nav:menuScheduleClass'), featureFlags: [FEATURE_FLAG.isClassesPageEnabled] },
     {
       to: isAuthenticated ? PageURLS.profile.subscription : '/#planes',

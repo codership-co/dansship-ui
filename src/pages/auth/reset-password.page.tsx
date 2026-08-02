@@ -4,7 +4,6 @@ import { useLocation } from 'react-router';
 import { ResetPasswordForm } from '@components/forms';
 import { AuthFormLayout } from '@components/layouts';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
-import { PageURLS } from '@core/constants';
 
 function ResetPasswordPage() {
   const { t } = useTranslation();
@@ -29,7 +28,6 @@ function ResetPasswordPage() {
 }
 
 export const SecureResetPasswordPage = SecurityGuard(ResetPasswordPage, {
-  redirect: PageURLS.home,
   requiresNoAuth: true,
   featureFlags: [FEATURE_FLAG.areAuthPagesEnabled],
 });

@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { LoginForm } from '@components/forms';
 import { AuthFormLayout } from '@components/layouts';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
-import { PageURLS } from '@core/constants';
 
 function LoginPage() {
   const { t } = useTranslation();
@@ -16,7 +15,6 @@ function LoginPage() {
 }
 
 export const SecureLoginPage = SecurityGuard(LoginPage, {
-  redirect: PageURLS.home,
   requiresNoAuth: true,
   featureFlags: [FEATURE_FLAG.areAuthPagesEnabled],
 });

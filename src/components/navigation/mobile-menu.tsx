@@ -20,7 +20,7 @@ import { LanguageSelector } from '@components/navigation/language-selector';
 import { Isotype, Logotype } from '@components/svg';
 import { FEATURE_FLAG, useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
-import { AdminPermissions } from '@core/permissions';
+import { AdminPermissions, InstructorPermissions, PERMISSION } from '@core/permissions';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -40,6 +40,14 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       requireAuthentication: true,
       featureFlags: [FEATURE_FLAG.isProfilePageEnabled],
       icon: LuUser,
+    },
+    {
+      to: PageURLS.instructor.root,
+      label: t('nav:mySchedule'),
+      requireAuthentication: true,
+      orPermissions: [...InstructorPermissions.dashboard, PERMISSION.SCHEDULE_MANAGE],
+      featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isProfilePageEnabled],
+      icon: GrSchedules,
     },
     {
       to: PageURLS.classes,

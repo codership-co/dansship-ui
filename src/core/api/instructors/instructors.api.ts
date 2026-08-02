@@ -18,7 +18,7 @@ import {
 
 import { DansshipAPIError } from '@core/api';
 
-import type { ScheduledClass } from '../schedules/schedules.models';
+import type { ScheduledClass, UpcomingWeekResponse } from '../schedules/schedules.models';
 
 export class InstructorsAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
@@ -120,6 +120,16 @@ export class InstructorsAPI {
     return this.httpClient.callNoError<Array<ScheduledClass>>({
       path: `/instructors/schedules/weeks/${weekStartDate}/classes`,
       method: 'GET',
+    });
+  }
+
+  async getUpcomingWeek(fromWeek?: string) {
+    return this.httpClient.callNoError<UpcomingWeekResponse>({
+      path: '/instructors/schedules/upcoming-week',
+      method: 'GET',
+      params: {
+        ...(fromWeek ? { from: fromWeek } : {}),
+      },
     });
   }
 }

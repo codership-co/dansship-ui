@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { SignUpForm } from '@components/forms';
 import { AuthFormLayout } from '@components/layouts';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
-import { PageURLS } from '@core/constants';
 
 function SignupPage() {
   const { t } = useTranslation();
@@ -16,7 +15,6 @@ function SignupPage() {
 }
 
 export const SecureSignupPage = SecurityGuard(SignupPage, {
-  redirect: PageURLS.home,
   requiresNoAuth: true,
   featureFlags: [FEATURE_FLAG.areAuthPagesEnabled],
 });

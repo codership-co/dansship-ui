@@ -71,5 +71,7 @@
   "waitlistCancelSuccess": "Lugar en lista de espera cancelado.",
   "waitlistCancelFailed": "No se pudo cancelar el lugar en lista de espera.",
   "calendarLoadError": "No se pudieron cargar las clases publicadas. Intenta de nuevo en un momento.",
-  "timeOverlapWarning": "Ya tienes otra clase en este horario."
+  "timeOverlapWarning": "Ya tienes otra clase en este horario.",
+  "jumpedWeekBanner": "No hay clases esta semana — mostrando la semana del {{week}}.",
+  "dismissBanner": "Cerrar"
 }

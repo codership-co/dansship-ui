@@ -5,7 +5,6 @@ import { useLocation, useSearchParams } from 'react-router';
 import { VerificationStatus, VerifyEmailForm, VerifyEmailFormData } from '@components/forms';
 import { AuthFormLayout } from '@components/layouts';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
-import { PageURLS } from '@core/constants';
 import { useCountdown } from '@hooks';
 
 function VerifyEmailPage() {
@@ -134,7 +133,6 @@ function VerifyEmailPage() {
 }
 
 export const SecureVerifyEmailPage = SecurityGuard(VerifyEmailPage, {
-  redirect: PageURLS.home,
   requiresNoAuth: true,
   featureFlags: [FEATURE_FLAG.areAuthPagesEnabled],
 });

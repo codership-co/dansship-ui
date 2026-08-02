@@ -92,6 +92,7 @@ export interface AdminInstructorListItem {
   id: string | null;
   user_id: string;
   email: string;
+  full_name?: string;
 }
 
 export interface InstructorInviteResponse {

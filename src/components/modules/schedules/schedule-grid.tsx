@@ -20,6 +20,8 @@ interface ScheduleGridProps {
   onAddAtTime?: (date: string, time: string) => void;
   dayColumnMinWidth?: number;
   scheduleStatus?: ScheduleStatus;
+  /** Emphasizes a specific scheduled class in the grid (e.g. next upcoming). */
+  highlightedClassId?: string | null;
 }
 
 // 6 AM to 9 PM
@@ -155,6 +157,7 @@ export function ScheduleGrid({
   onAddAtTime,
   dayColumnMinWidth = 150,
   scheduleStatus,
+  highlightedClassId,
 }: ScheduleGridProps) {
   const { t } = useTranslation();
   const locale = useDateLocale();
@@ -286,11 +289,15 @@ export function ScheduleGrid({
                 }
 
                 const isClassPast = scheduleStatus === 'published' && classStart <= new Date();
+                const isHighlighted = Boolean(highlightedClassId && id === highlightedClassId);
 
                 let bgClass =
                   'bg-secondary/40 border-secondary hover:bg-secondary/60 hover:border-primary/40 text-primary';
 
-                if (eventType === 'space_rental_external') {
+                if (isHighlighted) {
+                  bgClass =
+                    'bg-primary/15 border-primary ring-2 ring-primary/40 hover:bg-primary/25 hover:border-primary text-primary';
+                } else if (eventType === 'space_rental_external') {
                   bgClass = 'bg-blue-100 border-blue-300 hover:bg-blue-200 hover:border-blue-400 text-blue-900';
                 } else if (eventType === 'internal_reserved_use') {
                   bgClass =

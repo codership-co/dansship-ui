@@ -354,7 +354,7 @@ export function ClassSlotModal({
                       .filter(i => i.id !== null)
                       .map(i => (
                         <SelectItem key={i.id} value={i.id ?? ''}>
-                          {i.email}
+                          {i.full_name?.trim() || i.email}
                         </SelectItem>
                       ))}
                   </SelectContent>
