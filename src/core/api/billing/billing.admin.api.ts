@@ -2,17 +2,7 @@ import { HttpClient } from 'polpo-http-client';
 
 import { DansshipAPIError } from '@core/api';
 
-import type {
-  CreateDiscountPayload,
-  CreatePlanPayload,
-  Discount,
-  GetDiscountsParams,
-  GetPlansParams,
-  Plan,
-  TaxType,
-  UpdateDiscountPayload,
-  UpdatePlanPayload,
-} from './billing.models';
+import type { CreatePlanPayload, GetPlansParams, Plan, TaxType, UpdatePlanPayload } from './billing.models';
 
 export class BillingAdminAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
@@ -58,44 +48,6 @@ export class BillingAdminAPI {
   async reactivatePlan(id: string) {
     return this.httpClient.callNoError<Plan>({
       path: `/admin/plans/${id}/reactivate`,
-      method: 'POST',
-    });
-  }
-
-  async getDiscounts(payload?: GetDiscountsParams) {
-    return this.httpClient.callNoError<Array<Discount>>({
-      path: '/admin/discounts',
-      method: 'GET',
-      params: payload,
-    });
-  }
-
-  async createDiscount(payload: CreateDiscountPayload) {
-    return this.httpClient.callNoError<Discount, CreateDiscountPayload>({
-      path: '/admin/discounts',
-      method: 'POST',
-      data: payload,
-    });
-  }
-
-  async updateDiscount(id: string, payload: UpdateDiscountPayload) {
-    return this.httpClient.callNoError<Discount, UpdateDiscountPayload>({
-      path: `/admin/discounts/${id}`,
-      method: 'PATCH',
-      data: payload,
-    });
-  }
-
-  async deleteDiscount(id: string) {
-    return this.httpClient.callNoError({
-      path: `/admin/discounts/${id}/deactivate`,
-      method: 'POST',
-    });
-  }
-
-  async reactivateDiscount(id: string) {
-    return this.httpClient.callNoError<Discount>({
-      path: `/admin/discounts/${id}/reactivate`,
       method: 'POST',
     });
   }

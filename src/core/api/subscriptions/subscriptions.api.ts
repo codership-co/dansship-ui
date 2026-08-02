@@ -16,13 +16,7 @@ export class SubscriptionsAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async getPublicPlans() {
-    return this.httpClient.callNoError<Array<PublicPlan>>(
-      {
-        path: '/landing/plans/top',
-        method: 'GET',
-      },
-      plans => plans.map(normalizePlan),
-    );
+    return this.getActivePlans();
   }
 
   async getActivePlans() {
@@ -51,7 +45,13 @@ export class SubscriptionsAPI {
       },
       data => ({
         subscriptions: (data.subscriptions ?? []).map(normalizeSubscription),
-        summary: data.summary ?? { total_remaining_classes: 0, active_count: 0, next_expiration: null },
+        summary: data.summary ?? {
+          total_remaining_classes: 0,
+          total_bonus_classes: 0,
+          active_count: 0,
+          next_expiration: null,
+          trial_eligible: false,
+        },
       }),
     );
   }

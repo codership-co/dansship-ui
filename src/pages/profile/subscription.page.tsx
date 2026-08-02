@@ -9,6 +9,7 @@ import { Badge } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { DansshipAPI, PaymentStatus, SubscriptionStatus } from '@core/api';
 import { PageURLS } from '@core/constants';
+import { resolvePlanDisplayName } from '@helpers';
 import { useDateLocale, usePromise } from '@hooks';
 
 function statusBadgeVariant(status: SubscriptionStatus) {
@@ -79,7 +80,9 @@ function SubscriptionPage() {
                     <h4>{t('subscriptions:store.historicalSubscriptions')}</h4>
                     <div className='flex flex-wrap items-start justify-between gap-2'>
                       <div>
-                        <p className='font-semibold text-gray-900'>{subscription.plan_name_snapshot}</p>
+                        <p className='font-semibold text-gray-900'>
+                          {resolvePlanDisplayName(subscription.plan_name_snapshot, t)}
+                        </p>
 
                         <p className='text-sm text-gray-600'>
                           {t('subscriptions:store.startedAt')}:{' '}

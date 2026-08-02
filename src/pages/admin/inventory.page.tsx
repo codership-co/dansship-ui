@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { RoomsTab, ClassesTab, PlansTab, DiscountsTab } from '@components/modules';
+import { RoomsTab, ClassesTab, PlansTab } from '@components/modules';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { PageURLS } from '@core/constants';
@@ -21,7 +21,6 @@ function AdminInventoryPage() {
           <TabsTrigger value='rooms'>{t('admin:inventory.tabs.rooms')}</TabsTrigger>
           <TabsTrigger value='classes'>{t('admin:inventory.tabs.classCatalog')}</TabsTrigger>
           <TabsTrigger value='plans'>{t('admin:inventory.tabs.plans')}</TabsTrigger>
-          <TabsTrigger value='discounts'>{t('admin:inventory.tabs.discounts')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value='rooms' className='bg-white p-6 rounded-lg shadow-sm border border-gray-100'>
@@ -34,10 +33,6 @@ function AdminInventoryPage() {
 
         <TabsContent value='plans' className='bg-white p-6 rounded-lg shadow-sm border border-gray-100'>
           <PlansTab />
-        </TabsContent>
-
-        <TabsContent value='discounts' className='bg-white p-6 rounded-lg shadow-sm border border-gray-100'>
-          <DiscountsTab />
         </TabsContent>
       </Tabs>
     </div>

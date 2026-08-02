@@ -14,12 +14,19 @@ import { useCallablePromise, useDateLocale } from '@hooks';
 
 interface BookingCalendarProps {
   week: string;
-  hasActiveSubscription: boolean;
+  canBookClasses: boolean;
+  isTrialEligible?: boolean;
   myBookings: Array<MyBooking>;
   onBookingChange?: () => void | Promise<void>;
 }
 
-export function BookingCalendar({ week, hasActiveSubscription, myBookings, onBookingChange }: BookingCalendarProps) {
+export function BookingCalendar({
+  week,
+  canBookClasses,
+  isTrialEligible = false,
+  myBookings,
+  onBookingChange,
+}: BookingCalendarProps) {
   const { t } = useTranslation();
   const locale = useDateLocale();
   const [selectedClass, setSelectedClass] = useState<PublishedClass | null>(null);
@@ -151,7 +158,8 @@ export function BookingCalendar({ week, hasActiveSubscription, myBookings, onBoo
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         selectedClass={selectedClass}
-        hasActiveSubscription={hasActiveSubscription}
+        canBookClasses={canBookClasses}
+        isTrialEligible={isTrialEligible}
         onBookingChange={handleBookingChange}
       />
     </section>

@@ -39,7 +39,8 @@ function ClassesPage() {
 
       return {
         nearestWeek,
-        hasActiveSubscription: false,
+        canBookClasses: false,
+        isTrialEligible: false,
         myBookings: [],
       };
     }
@@ -51,10 +52,14 @@ function ClassesPage() {
     ]);
 
     const totalRemainingClasses = mySubscriptions?.summary?.total_remaining_classes ?? 0;
+    const totalBonusClasses = mySubscriptions?.summary?.total_bonus_classes ?? 0;
+    const isTrialEligible = mySubscriptions?.summary?.trial_eligible ?? false;
+    const hasCredits = totalRemainingClasses + totalBonusClasses > 0;
 
     return {
       nearestWeek,
-      hasActiveSubscription: totalRemainingClasses > 0,
+      canBookClasses: hasCredits || isTrialEligible,
+      isTrialEligible: isTrialEligible && !hasCredits,
       myBookings: myBookings ?? [],
     };
   });
@@ -89,7 +94,8 @@ function ClassesPage() {
           <BookingCalendar
             week={week}
             myBookings={response.myBookings}
-            hasActiveSubscription={response.hasActiveSubscription}
+            canBookClasses={response.canBookClasses}
+            isTrialEligible={response.isTrialEligible}
             onBookingChange={() => void reFetch()}
           />
         )}

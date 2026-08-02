@@ -12,8 +12,8 @@ interface PaymentMethodSelectorProps {
 const PaymentMethods = {
   [PaymentMethod.TRANSFER]: {
     Icon: LuLandmark,
-    title: 'payments:method.transfer',
-    description: 'payments:methodDesc.transfer',
+    title: 'payments:method.breb',
+    description: 'payments:methodDesc.breb',
     helperText: 'payments:methodHelper.transfer',
   },
   [PaymentMethod.CARD]: {

@@ -10,6 +10,7 @@ export interface Booking {
   created_at: string;
   subscription_id?: string | null;
   plan_name?: string | null;
+  is_cancellable?: boolean;
 
   scheduled_class?: ScheduledClass;
 }
@@ -40,6 +41,7 @@ export interface AdminBookingUser {
 export interface PublishedClass extends ScheduledClass {
   user_booking_status?: BookingStatus | null;
   user_booking_id?: string | null;
+  user_booking_is_cancellable?: boolean | null;
 }
 
 export interface MarkAttendancePayload {
