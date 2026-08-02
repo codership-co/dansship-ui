@@ -24,6 +24,16 @@ interface ClassSlotFormData {
   waitlist_max_size?: number;
 }
 
+const UNASSIGNED_INSTRUCTOR = '__tba__';
+
+function resolveInstructorId(instructorId: string): string | null {
+  if (!instructorId || instructorId === UNASSIGNED_INSTRUCTOR) {
+    return null;
+  }
+
+  return instructorId;
+}
+
 function formatAgendaTimeRange(event: AgendaEvent): string {
   const startTime = new Date(event.start_time);
   const endTime = new Date(event.end_time);
@@ -209,9 +219,10 @@ function AdminScheduleBuilderPage() {
 
       if (editingClass && isPublished) {
         // Published schedule: use restricted published-edit endpoint
+        const resolvedInstructorId = resolveInstructorId(data.instructor_id);
         const publishedPayload = {
           room_id: data.room_id,
-          instructor_id: data.instructor_id,
+          ...(resolvedInstructorId ? { instructor_id: resolvedInstructorId } : {}),
           capacity: data.capacity || undefined,
         };
         await editPublishedClass(selectedWeekId, editingClass.id, publishedPayload);
@@ -222,10 +233,11 @@ function AdminScheduleBuilderPage() {
         });
       } else {
         // Draft schedule: full create/update
+        const resolvedInstructorId = resolveInstructorId(data.instructor_id);
         const payload = {
           class_definition_id: data.class_definition_id,
           room_id: data.room_id,
-          instructor_id: data.instructor_id,
+          instructor_id: resolvedInstructorId,
           start_time: startIso,
           end_time: endIso,
           capacity: data.capacity || undefined,

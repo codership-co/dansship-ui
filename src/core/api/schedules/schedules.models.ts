@@ -5,7 +5,7 @@ export interface ScheduledClass {
   schedule_week_id: string;
   class_definition_id: string;
   room_id: string;
-  instructor_id: string;
+  instructor_id: string | null;
   start_time: string;
   end_time: string;
   capacity: number;
@@ -14,7 +14,7 @@ export interface ScheduledClass {
 
   class_definition?: { id: string; name: string; duration_minutes: number; level?: string | null };
   room?: { id: string; name: string; image_url?: string | null };
-  instructor?: { id: string; user_id: string; email: string; full_name: string; photo_url?: string | null };
+  instructor?: { id: string; user_id: string; email: string; full_name: string; photo_url?: string | null } | null;
 }
 
 export interface ScheduleWeek {
@@ -52,7 +52,7 @@ export interface GetAgendaEventsPayload {
 export interface AddClassPayload {
   class_definition_id: string;
   room_id: string;
-  instructor_id: string;
+  instructor_id?: string | null;
   start_time: string;
   end_time: string;
   capacity?: number;
@@ -72,6 +72,6 @@ export interface GetWaitlistDefaultResponse {
 
 export interface EditPublishedClassPayload {
   room_id?: string;
-  instructor_id?: string;
+  instructor_id?: string | null;
   capacity?: number;
 }
