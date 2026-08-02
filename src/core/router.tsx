@@ -8,6 +8,7 @@ import { PageURLS } from '@core/constants';
 import {
   Error404Page,
   HomePage,
+  SecurePlansPage,
   SecureAdminUserListPage,
   SecureAdminUserDetailsPage,
   SecureAdminAgendaConflictsPage,
@@ -85,6 +86,7 @@ const routes: Array<RouteObject> = [
         Component: RouterPageLayout,
         children: [
           { index: true, Component: HomePage, loader: HomeLoader },
+          { path: 'plans', Component: SecurePlansPage },
           { path: 'legal', Component: SecureLegalPage },
           { path: 'ui', Component: UiPage },
 

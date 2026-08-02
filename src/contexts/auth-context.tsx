@@ -430,8 +430,8 @@ export function SecurityGuard(
         return <Navigate to={PageURLS.auth.onboarding} state={{ from: location }} />;
       }
 
-      if (isAuthenticated && getPendingPlanCheckoutIntent() && pathname !== PageURLS.home) {
-        return <Navigate to={PageURLS.home} state={{ from: location }} />;
+      if (isAuthenticated && getPendingPlanCheckoutIntent() && pathname !== PageURLS.plans) {
+        return <Navigate to={PageURLS.plans} state={{ from: location }} />;
       }
 
       return <Component />;

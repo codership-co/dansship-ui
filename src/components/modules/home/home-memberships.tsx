@@ -4,16 +4,12 @@ import { Link, useLoaderData } from 'react-router';
 
 import { Section, SectionHeading } from '@components/containers';
 import { PlanSelector } from '@components/modules';
-import { useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
 import { HomeLoaderData } from '@pages';
 
 export const HomeMemberships = () => {
   const { t } = useTranslation();
-  const { isAuthenticated } = useAuth();
   const { publicPlans } = useLoaderData<HomeLoaderData>();
-
-  const plansPath = isAuthenticated ? PageURLS.profile.subscription : PageURLS.auth.login;
 
   return (
     <Section id='planes' verticalPadding>
@@ -35,7 +31,7 @@ export const HomeMemberships = () => {
         <p className='text-center mx-auto mt-8 max-w-2xl text-[0.92rem] text-muted-foreground'>
           {t('home:stitch.membership.helpText')}
         </p>
-        <Link to={plansPath}>
+        <Link to={PageURLS.plans}>
           <Button color='primary' className='mx-auto'>
             {t('home:stitch.membership.viewAllPlans')}
           </Button>
