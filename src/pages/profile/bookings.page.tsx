@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ConfirmDialog } from '@components/modals';
 import { Badge, Button } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { BookingStatus, DansshipAPI, MyBooking } from '@core/api';
@@ -58,6 +59,7 @@ function BookingsPage() {
     error: myBookingsError,
   } = usePromise(() => DansshipAPI.bookings.getMyBookings());
   const { cancelClass, cancelWaitlist, isCancelingClass, isCancelingWaitlist } = useMyBookings();
+  const [bookingToCancel, setBookingToCancel] = useState<MyBooking | null>(null);
 
   const sortedBookings = useMemo(
     () =>
@@ -68,6 +70,20 @@ function BookingsPage() {
   );
 
   const isSubmitting = isCancelingClass || isCancelingWaitlist;
+  const isWaitlistCancellation = bookingToCancel?.status === 'waitlisted';
+
+  const handleConfirmCancel = async () => {
+    if (!bookingToCancel) return;
+
+    const ok =
+      bookingToCancel.status === 'waitlisted'
+        ? await cancelWaitlist(bookingToCancel.id)
+        : await cancelClass(bookingToCancel.id);
+
+    if (ok) {
+      setBookingToCancel(null);
+    }
+  };
 
   return (
     <div className='max-w-6xl mx-auto py-10 px-4 pt-20'>
@@ -113,9 +129,7 @@ function BookingsPage() {
                       variant='outline'
                       size='sm'
                       disabled={isSubmitting}
-                      onClick={() =>
-                        booking.status === 'waitlisted' ? cancelWaitlist(booking.id) : cancelClass(booking.id)
-                      }
+                      onClick={() => setBookingToCancel(booking)}
                     >
                       {booking.status === 'waitlisted' ? t('bookings:leaveWaitlist') : t('bookings:cancelBooking')}
                     </Button>
@@ -126,6 +140,30 @@ function BookingsPage() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={Boolean(bookingToCancel)}
+        onOpenChange={open => {
+          if (!open) {
+            setBookingToCancel(null);
+          }
+        }}
+        onConfirm={handleConfirmCancel}
+        title={isWaitlistCancellation ? t('bookings:leaveWaitlistTitle') : t('bookings:cancelBookingTitle')}
+        description={isWaitlistCancellation ? t('bookings:leaveWaitlistConfirm') : t('bookings:cancelBookingConfirm')}
+        confirmLabel={
+          isSubmitting
+            ? isWaitlistCancellation
+              ? t('bookings:leaving')
+              : t('bookings:cancelling')
+            : isWaitlistCancellation
+              ? t('bookings:leaveWaitlist')
+              : t('bookings:cancelBooking')
+        }
+        cancelLabel={t('common:keep')}
+        confirmVariant='destructive'
+        isLoading={isSubmitting}
+      />
     </div>
   );
 }

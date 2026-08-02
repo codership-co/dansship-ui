@@ -59,7 +59,8 @@ function ClassesPage() {
     return {
       nearestWeek,
       canBookClasses: hasCredits || isTrialEligible,
-      isTrialEligible: isTrialEligible && !hasCredits,
+      // Trial is claimed before paid credits on the first booking.
+      isTrialEligible,
       myBookings: myBookings ?? [],
     };
   });
