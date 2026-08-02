@@ -103,6 +103,10 @@ export interface InstructorDeactivateResponse {
   user_id: string;
 }
 
+export interface InstructorReactivateResponse {
+  reactivated: boolean;
+}
+
 export interface AcceptInstructorInvitePayload {
   token: string;
 }
