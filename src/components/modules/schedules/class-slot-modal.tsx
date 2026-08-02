@@ -272,8 +272,8 @@ export function ClassSlotModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className='max-w-md'>
-        <DialogHeader>
+      <DialogContent className='flex max-h-[90vh] max-w-md flex-col gap-4 overflow-hidden'>
+        <DialogHeader className='shrink-0'>
           <DialogTitle>
             {isPublishedEdit
               ? t('schedules:editPublishedClass')
@@ -284,233 +284,235 @@ export function ClassSlotModal({
         </DialogHeader>
 
         {isPublishedEdit && (
-          <div className='rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800'>
+          <div className='shrink-0 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800'>
             {t('schedules:publishedEditInfo')}
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className='space-y-4'>
-          <div className='space-y-2'>
-            <Label>{t('schedules:class')}</Label>
-            <Select
-              value={watchClassDefId}
-              onValueChange={val => setValue('class_definition_id', val, { shouldValidate: true })}
-              disabled={isPublishedEdit}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder={t('schedules:selectClassCatalog')} />
-              </SelectTrigger>
-              <SelectContent>
-                {classes
-                  .filter(c => c.is_active)
-                  .map(c => (
-                    <SelectItem key={c.id} value={c.id}>
-                      {c.name} ({c.duration_minutes}m • {c.max_participants})
-                    </SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
-            {errors.class_definition_id && (
-              <p className='text-sm text-alert-500'>{errors.class_definition_id.message}</p>
-            )}
-          </div>
-
-          <div className='grid grid-cols-2 gap-4'>
+        <form onSubmit={handleSubmit(onSubmit)} className='flex min-h-0 flex-1 flex-col'>
+          <div className='min-h-0 flex-1 space-y-4 overflow-y-auto pr-1'>
             <div className='space-y-2'>
-              <Label>{t('schedules:room')}</Label>
+              <Label>{t('schedules:class')}</Label>
               <Select
-                value={watch('room_id')}
-                onValueChange={val => setValue('room_id', val, { shouldValidate: true })}
+                value={watchClassDefId}
+                onValueChange={val => setValue('class_definition_id', val, { shouldValidate: true })}
+                disabled={isPublishedEdit}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={t('schedules:selectRoom')} />
+                  <SelectValue placeholder={t('schedules:selectClassCatalog')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {rooms
-                    .filter(r => r.is_active)
-                    .map(r => (
-                      <SelectItem key={r.id} value={r.id}>
-                        {r.name} ({r.room_type ? `${r.room_type} • ` : ''}Max {r.capacity})
+                  {classes
+                    .filter(c => c.is_active)
+                    .map(c => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.name} ({c.duration_minutes}m • {c.max_participants})
                       </SelectItem>
                     ))}
                 </SelectContent>
               </Select>
-              {errors.room_id && <p className='text-sm text-alert-500'>{errors.room_id.message}</p>}
+              {errors.class_definition_id && (
+                <p className='text-sm text-alert-500'>{errors.class_definition_id.message}</p>
+              )}
             </div>
 
-            <div className='space-y-2'>
-              <Label>{t('schedules:instructor')}</Label>
-              <Select
-                value={watchInstructorId || UNASSIGNED_INSTRUCTOR}
-                onValueChange={val => setValue('instructor_id', val, { shouldValidate: true })}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t('schedules:selectInstructor')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={UNASSIGNED_INSTRUCTOR}>{t('schedules:instructorTBA')}</SelectItem>
-                  {instructors
-                    .filter(i => i.id !== null)
-                    .map(i => (
-                      <SelectItem key={i.id} value={i.id ?? ''}>
-                        {i.email}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
+            <div className='grid grid-cols-2 gap-4'>
+              <div className='space-y-2'>
+                <Label>{t('schedules:room')}</Label>
+                <Select
+                  value={watch('room_id')}
+                  onValueChange={val => setValue('room_id', val, { shouldValidate: true })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('schedules:selectRoom')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {rooms
+                      .filter(r => r.is_active)
+                      .map(r => (
+                        <SelectItem key={r.id} value={r.id}>
+                          {r.name} ({r.room_type ? `${r.room_type} • ` : ''}Max {r.capacity})
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
+                {errors.room_id && <p className='text-sm text-alert-500'>{errors.room_id.message}</p>}
+              </div>
 
-              {watchInstructorId && watchInstructorId !== UNASSIGNED_INSTRUCTOR && isLoadingAvailability && (
-                <div className='flex items-center text-xs text-muted-foreground mt-1'>
-                  <LuLoaderCircle className='w-3 h-3 mr-1 animate-spin' />
-                  {t('instructor:availability.checking', 'Checking availability...')}
-                </div>
-              )}
+              <div className='space-y-2'>
+                <Label>{t('schedules:instructor')}</Label>
+                <Select
+                  value={watchInstructorId || UNASSIGNED_INSTRUCTOR}
+                  onValueChange={val => setValue('instructor_id', val, { shouldValidate: true })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('schedules:selectInstructor')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={UNASSIGNED_INSTRUCTOR}>{t('schedules:instructorTBA')}</SelectItem>
+                    {instructors
+                      .filter(i => i.id !== null)
+                      .map(i => (
+                        <SelectItem key={i.id} value={i.id ?? ''}>
+                          {i.email}
+                        </SelectItem>
+                      ))}
+                  </SelectContent>
+                </Select>
 
-              {watchInstructorId &&
-                watchInstructorId !== UNASSIGNED_INSTRUCTOR &&
-                !isLoadingAvailability &&
-                availabilityStatus && (
-                  <div
-                    className={`flex items-start text-xs mt-1 ${availabilityStatus.isAvailable ? 'text-green-600' : 'text-amber-600'}`}
-                  >
-                    {availabilityStatus.isAvailable ? (
-                      <LuCircleCheck className='w-3 h-3 mr-1 shrink-0 mt-0.5' />
-                    ) : (
-                      <LuOctagonAlert className='w-3 h-3 mr-1 shrink-0 mt-0.5' />
-                    )}
-                    <span>{availabilityStatus.message}</span>
+                {watchInstructorId && watchInstructorId !== UNASSIGNED_INSTRUCTOR && isLoadingAvailability && (
+                  <div className='flex items-center text-xs text-muted-foreground mt-1'>
+                    <LuLoaderCircle className='w-3 h-3 mr-1 animate-spin' />
+                    {t('instructor:availability.checking', 'Checking availability...')}
                   </div>
                 )}
 
-              {errors.instructor_id && <p className='text-sm text-alert-500'>{errors.instructor_id.message}</p>}
-            </div>
-          </div>
+                {watchInstructorId &&
+                  watchInstructorId !== UNASSIGNED_INSTRUCTOR &&
+                  !isLoadingAvailability &&
+                  availabilityStatus && (
+                    <div
+                      className={`flex items-start text-xs mt-1 ${availabilityStatus.isAvailable ? 'text-green-600' : 'text-amber-600'}`}
+                    >
+                      {availabilityStatus.isAvailable ? (
+                        <LuCircleCheck className='w-3 h-3 mr-1 shrink-0 mt-0.5' />
+                      ) : (
+                        <LuOctagonAlert className='w-3 h-3 mr-1 shrink-0 mt-0.5' />
+                      )}
+                      <span>{availabilityStatus.message}</span>
+                    </div>
+                  )}
 
-          <div className='space-y-2'>
-            <Label htmlFor='date'>{t('common:date')}</Label>
-            <Input id='date' type='date' {...register('date')} disabled={isPublishedEdit} />
-            {errors.date && <p className='text-sm text-alert-500'>{errors.date.message}</p>}
-          </div>
-
-          <div className='grid grid-cols-2 gap-4'>
-            <div className='space-y-2'>
-              <Label>{t('schedules:startTime')}</Label>
-              <Select
-                value={watch('start_time')}
-                onValueChange={val => setValue('start_time', val, { shouldValidate: true })}
-                disabled={isPublishedEdit}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t('schedules:selectStartTime')} />
-                </SelectTrigger>
-                <SelectContent>
-                  {TIME_OPTIONS.map(time => (
-                    <SelectItem key={time} value={time}>
-                      {time}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.start_time && <p className='text-sm text-alert-500'>{errors.start_time.message}</p>}
+                {errors.instructor_id && <p className='text-sm text-alert-500'>{errors.instructor_id.message}</p>}
+              </div>
             </div>
 
             <div className='space-y-2'>
-              <Label>{t('schedules:endTime')}</Label>
-              <Select
-                value={watch('end_time')}
-                onValueChange={val => setValue('end_time', val, { shouldValidate: true })}
-                disabled={isPublishedEdit}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder={t('schedules:selectEndTime')} />
-                </SelectTrigger>
-                <SelectContent>
-                  {TIME_OPTIONS.map(time => (
-                    <SelectItem key={time} value={time}>
-                      {time}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {errors.end_time && <p className='text-sm text-alert-500'>{errors.end_time.message}</p>}
+              <Label htmlFor='date'>{t('common:date')}</Label>
+              <Input id='date' type='date' {...register('date')} disabled={isPublishedEdit} />
+              {errors.date && <p className='text-sm text-alert-500'>{errors.date.message}</p>}
             </div>
-          </div>
-
-          <div className='space-y-2'>
-            <Label htmlFor='capacity'>{t('schedules:capacityOverride')}</Label>
 
             <div className='grid grid-cols-2 gap-4'>
-              <div className='space-y-1'>
-                <p className='text-xs text-muted-foreground'>{t('schedules:classCapacity')}</p>
-                <Input
-                  id='class_capacity_display'
-                  type='number'
-                  value={selectedClassDefinition?.max_participants ?? ''}
-                  readOnly
-                  disabled
-                  placeholder={t('schedules:selectClassForCapacity')}
-                />
+              <div className='space-y-2'>
+                <Label>{t('schedules:startTime')}</Label>
+                <Select
+                  value={watch('start_time')}
+                  onValueChange={val => setValue('start_time', val, { shouldValidate: true })}
+                  disabled={isPublishedEdit}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('schedules:selectStartTime')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TIME_OPTIONS.map(time => (
+                      <SelectItem key={time} value={time}>
+                        {time}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.start_time && <p className='text-sm text-alert-500'>{errors.start_time.message}</p>}
               </div>
 
-              <div className='space-y-1'>
-                <p className='text-xs text-muted-foreground'>{t('schedules:roomCapacity')}</p>
-                <Input
-                  id='room_capacity_display'
-                  type='number'
-                  value={selectedRoom?.capacity ?? ''}
-                  readOnly
-                  disabled
-                  placeholder='—'
-                />
+              <div className='space-y-2'>
+                <Label>{t('schedules:endTime')}</Label>
+                <Select
+                  value={watch('end_time')}
+                  onValueChange={val => setValue('end_time', val, { shouldValidate: true })}
+                  disabled={isPublishedEdit}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t('schedules:selectEndTime')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {TIME_OPTIONS.map(time => (
+                      <SelectItem key={time} value={time}>
+                        {time}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.end_time && <p className='text-sm text-alert-500'>{errors.end_time.message}</p>}
               </div>
             </div>
 
-            <Input
-              id='capacity'
-              type='number'
-              min={1}
-              placeholder={t('schedules:leaveBlankDefault')}
-              {...register('capacity')}
-            />
-            {errors.capacity && <p className='text-sm text-alert-500'>{errors.capacity.message}</p>}
+            <div className='space-y-2'>
+              <Label htmlFor='capacity'>{t('schedules:capacityOverride')}</Label>
 
-            <div className='rounded-md border border-border bg-muted/40 px-3 py-2 text-sm'>
-              <span className='font-medium'>{t('schedules:effectiveCapacity')}: </span>
-              <span>{effectiveCapacity ?? '—'}</span>
+              <div className='grid grid-cols-2 gap-4'>
+                <div className='space-y-1'>
+                  <p className='text-xs text-muted-foreground'>{t('schedules:classCapacity')}</p>
+                  <Input
+                    id='class_capacity_display'
+                    type='number'
+                    value={selectedClassDefinition?.max_participants ?? ''}
+                    readOnly
+                    disabled
+                    placeholder={t('schedules:selectClassForCapacity')}
+                  />
+                </div>
+
+                <div className='space-y-1'>
+                  <p className='text-xs text-muted-foreground'>{t('schedules:roomCapacity')}</p>
+                  <Input
+                    id='room_capacity_display'
+                    type='number'
+                    value={selectedRoom?.capacity ?? ''}
+                    readOnly
+                    disabled
+                    placeholder='—'
+                  />
+                </div>
+              </div>
+
+              <Input
+                id='capacity'
+                type='number'
+                min={1}
+                placeholder={t('schedules:leaveBlankDefault')}
+                {...register('capacity')}
+              />
+              {errors.capacity && <p className='text-sm text-alert-500'>{errors.capacity.message}</p>}
+
+              <div className='rounded-md border border-border bg-muted/40 px-3 py-2 text-sm'>
+                <span className='font-medium'>{t('schedules:effectiveCapacity')}: </span>
+                <span>{effectiveCapacity ?? '—'}</span>
+              </div>
+
+              <p className='text-xs text-gray-500'>
+                {selectedClassDefinition
+                  ? t('schedules:capacityDefaultHelp', { max: selectedClassDefinition.max_participants })
+                  : t('schedules:capacityDefaultHelpGeneric')}
+              </p>
+              <p className='text-xs text-gray-500'>{t('schedules:capacityEffectiveHelp')}</p>
             </div>
 
-            <p className='text-xs text-gray-500'>
-              {selectedClassDefinition
-                ? t('schedules:capacityDefaultHelp', { max: selectedClassDefinition.max_participants })
-                : t('schedules:capacityDefaultHelpGeneric')}
-            </p>
-            <p className='text-xs text-gray-500'>{t('schedules:capacityEffectiveHelp')}</p>
-          </div>
-
-          <div className='space-y-2'>
-            <Label htmlFor='waitlist_max_size'>{t('schedules:waitlistMaxSize')}</Label>
-            <Input
-              id='waitlist_max_size'
-              type='number'
-              min={1}
-              placeholder={t('schedules:leaveBlankStudioDefault')}
-              {...register('waitlist_max_size')}
-            />
-            {errors.waitlist_max_size && <p className='text-sm text-alert-500'>{errors.waitlist_max_size.message}</p>}
-            <p className='text-xs text-gray-500'>
-              {typeof waitlistDefaultMaxSize === 'number'
-                ? t('schedules:waitlistDefaultHelp', { size: waitlistDefaultMaxSize })
-                : t('schedules:waitlistDefaultHelpNoLimit')}
-            </p>
-          </div>
-
-          {submitError && (
-            <div className='rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive'>
-              {submitError}
+            <div className='space-y-2'>
+              <Label htmlFor='waitlist_max_size'>{t('schedules:waitlistMaxSize')}</Label>
+              <Input
+                id='waitlist_max_size'
+                type='number'
+                min={1}
+                placeholder={t('schedules:leaveBlankStudioDefault')}
+                {...register('waitlist_max_size')}
+              />
+              {errors.waitlist_max_size && <p className='text-sm text-alert-500'>{errors.waitlist_max_size.message}</p>}
+              <p className='text-xs text-gray-500'>
+                {typeof waitlistDefaultMaxSize === 'number'
+                  ? t('schedules:waitlistDefaultHelp', { size: waitlistDefaultMaxSize })
+                  : t('schedules:waitlistDefaultHelpNoLimit')}
+              </p>
             </div>
-          )}
 
-          <div className='flex justify-between items-center pt-4'>
+            {submitError && (
+              <div className='rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive'>
+                {submitError}
+              </div>
+            )}
+          </div>
+
+          <div className='flex shrink-0 items-center justify-between border-t pt-4 mt-4'>
             {initialData ? (
               <Button
                 type='button'
