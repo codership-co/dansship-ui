@@ -18,6 +18,8 @@ interface ConfirmDialogProps {
   cancelLabel?: string;
   confirmVariant?: 'default' | 'destructive';
   isLoading?: boolean;
+  /** Renders above polpo AsideModal (z-index 1000). */
+  elevated?: boolean;
 }
 
 export function ConfirmDialog({
@@ -30,10 +32,14 @@ export function ConfirmDialog({
   cancelLabel = 'Cancel',
   confirmVariant = 'default',
   isLoading = false,
+  elevated = false,
 }: ConfirmDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className='sm:max-w-106.25'>
+      <DialogContent
+        className={elevated ? 'z-[1002] sm:max-w-106.25' : 'sm:max-w-106.25'}
+        overlayClassName={elevated ? 'z-[1001]' : undefined}
+      >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
           {description ? <DialogDescription>{description}</DialogDescription> : null}

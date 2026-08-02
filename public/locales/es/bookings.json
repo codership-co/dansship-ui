@@ -9,6 +9,10 @@
   "unknown": "Desconocido",
   "leaveWaitlist": "Salir de la Lista de Espera",
   "cancelBooking": "Cancelar Reserva",
+  "cancelBookingTitle": "¿Cancelar reserva?",
+  "cancelBookingConfirm": "Esta acción liberará tu lugar en la clase. ¿Deseas continuar?",
+  "leaveWaitlistTitle": "¿Salir de la lista de espera?",
+  "leaveWaitlistConfirm": "Perderás tu lugar en la lista de espera. ¿Deseas continuar?",
   "cancellationNotAllowed": "Esta reserva no se puede cancelar.",
   "status": {
     "active": "Reservado",
