@@ -61,14 +61,21 @@ export function hasUpcomingActiveBookings(bookings: Array<MyBooking>, now = new 
 /**
  * Resolves the post-login destination for the user's primary role.
  * Students with upcoming active/waitlisted bookings go to bookings; otherwise classes.
+ * Skips bookings lookup when onboarding is incomplete (API returns ONBOARDING_REQUIRED).
  * Soft-fails to classes if the bookings request errors.
  */
-export async function resolvePostLoginPath(user: Pick<User, 'roles'>): Promise<string> {
+export async function resolvePostLoginPath(
+  user: Pick<User, 'roles' | 'requiresOnboarding' | 'onboardingCompleted'>,
+): Promise<string> {
   const roles = (user.roles ?? []).map(role => role.toLowerCase());
   const syncPath = getRedirectPathByRole(user.roles);
 
   if (roles.includes('admin') || roles.includes('instructor')) {
     return syncPath;
+  }
+
+  if (user.requiresOnboarding && !user.onboardingCompleted) {
+    return PageURLS.classes;
   }
 
   try {

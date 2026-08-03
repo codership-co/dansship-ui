@@ -2,6 +2,9 @@ import { init, browserTracingIntegration, replayIntegration } from '@sentry/reac
 
 const dsn = import.meta.env.VITE_SENTRY_DSN?.trim();
 
+/** Instagram / Facebook in-app browser bridge noise — not Dansship app failures. */
+const IGNORE_ERRORS = [/webkit\.messageHandlers/i, /Java object is gone/i, /Error invoking postMessage/i];
+
 if (import.meta.env.PROD && dsn) {
   const apiUrl = import.meta.env.VITE_DANSSHIP_API_URL;
 
@@ -19,6 +22,23 @@ if (import.meta.env.PROD && dsn) {
         block: ['.sentry-block', '[data-sentry-block]'],
       }),
     ],
+    ignoreErrors: IGNORE_ERRORS,
+    beforeSend(event) {
+      const frames = event.exception?.values?.flatMap(value => value.stacktrace?.frames ?? []) ?? [];
+      const isInAppBrowserBridge = frames.some(
+        frame =>
+          frame.filename?.includes('iabjs://') ||
+          frame.function === 'sendDataToNative' ||
+          frame.function === 'sendPageHideMessage' ||
+          frame.function === 'sendBeforeUnloadMessage',
+      );
+
+      if (isInAppBrowserBridge) {
+        return null;
+      }
+
+      return event;
+    },
     tracesSampleRate: 0.1,
     tracePropagationTargets: ['localhost', apiUrl].filter(Boolean),
     replaysSessionSampleRate: 0.1,
