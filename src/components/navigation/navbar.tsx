@@ -56,8 +56,8 @@ export const Navbar = () => {
     },
     { to: PageURLS.classes, label: t('nav:menuScheduleClass'), featureFlags: [FEATURE_FLAG.isClassesPageEnabled] },
     {
-      to: isAuthenticated ? PageURLS.profile.subscription : '/#planes',
-      label: isAuthenticated ? t('nav:menuPlans') : t('nav:navPlans'),
+      to: PageURLS.plans,
+      label: t('nav:navPlans'),
       featureFlags: [FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
     },
     { to: PageURLS.figures, label: t('nav:menuFigures'), featureFlags: [FEATURE_FLAG.isFiguresPageEnabled] },

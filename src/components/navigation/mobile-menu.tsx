@@ -56,8 +56,8 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       icon: LuFootprints,
     },
     {
-      to: PageURLS.profile.subscription,
-      label: isAuthenticated ? t('nav:menuPlans') : t('nav:navPlans'),
+      to: PageURLS.plans,
+      label: t('nav:navPlans'),
       featureFlags: [FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
       icon: LuBellElectric,
     },
