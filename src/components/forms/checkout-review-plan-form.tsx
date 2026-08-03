@@ -12,6 +12,7 @@ import { z } from 'zod';
 import { DateField, TextField } from '@components/form-fields';
 import { Spinner } from '@components/loaders';
 import { DansshipAPI, PaymentPreviewRequest, PublicPlan } from '@core/api';
+import { captureUnexpectedException, withSentrySpan } from '@core/sentry';
 import { formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
 
@@ -98,51 +99,59 @@ export const CheckoutReviewPlanFormInput = ({
   const discountCode = useDebounce(watch('discount_code'), 800);
 
   const getPaymentPreview = useCallback(async () => {
-    previewPayment({
-      plan_id: plan.id,
-      discount_code: discountCode ? discountCode.toUpperCase() : undefined,
-    }).then(({ data, ok }) => {
-      if (ok) {
-        const {
-          base_amount,
-          discount_applied,
-          discount_type,
-          discount_value,
-          final_price,
-          is_valid,
-          original_price,
-          rejection_reason,
-          tax_amount,
-          tax_rate_percentage,
-          bonus_classes_granted,
-          bonus_expires_days,
-          bonus_benefit_name,
-        } = data;
+    void withSentrySpan('checkout.preview', 'ui.action', { plan_id: plan.id }, async () => {
+      const { data, ok, error } = await previewPayment({
+        plan_id: plan.id,
+        discount_code: discountCode ? discountCode.toUpperCase() : undefined,
+      });
 
-        const isPercentage = discount_type === 'percentage_discount' || discount_type === 'percentage';
-        const isFixed = discount_type === 'fixed_discount' || discount_type === 'fixed_amount';
-
-        setPaymentData({
-          isValid: is_valid,
-          discountCode: discountCode.toUpperCase(),
-          error: rejection_reason || '',
-          applied: discount_applied,
-          discountValue: discount_value,
-          finalPrice: final_price,
-          baseAmount: base_amount,
-          originalPrice: original_price,
-          taxAmount: tax_amount,
-          taxContext: `${tax_rate_percentage}%`,
-          discountContext: isPercentage
-            ? `${discount_value}%`
-            : isFixed
-              ? formatPrice(discount_value, plan.currency)
-              : '',
-          bonusClassesGranted: bonus_classes_granted,
-          bonusExpiresDays: bonus_expires_days,
-          bonusBenefitName: bonus_benefit_name,
+      if (!ok) {
+        captureUnexpectedException(error ?? new Error('Payment preview failed'), {
+          tags: { flow: 'checkout.preview', plan_id: plan.id },
         });
+
+        return;
       }
+
+      const {
+        base_amount,
+        discount_applied,
+        discount_type,
+        discount_value,
+        final_price,
+        is_valid,
+        original_price,
+        rejection_reason,
+        tax_amount,
+        tax_rate_percentage,
+        bonus_classes_granted,
+        bonus_expires_days,
+        bonus_benefit_name,
+      } = data;
+
+      const isPercentage = discount_type === 'percentage_discount' || discount_type === 'percentage';
+      const isFixed = discount_type === 'fixed_discount' || discount_type === 'fixed_amount';
+
+      setPaymentData({
+        isValid: is_valid,
+        discountCode: discountCode.toUpperCase(),
+        error: rejection_reason || '',
+        applied: discount_applied,
+        discountValue: discount_value,
+        finalPrice: final_price,
+        baseAmount: base_amount,
+        originalPrice: original_price,
+        taxAmount: tax_amount,
+        taxContext: `${tax_rate_percentage}%`,
+        discountContext: isPercentage
+          ? `${discount_value}%`
+          : isFixed
+            ? formatPrice(discount_value, plan.currency)
+            : '',
+        bonusClassesGranted: bonus_classes_granted,
+        bonusExpiresDays: bonus_expires_days,
+        bonusBenefitName: bonus_benefit_name,
+      });
     });
   }, [discountCode, plan.currency, plan.id, previewPayment]);
 

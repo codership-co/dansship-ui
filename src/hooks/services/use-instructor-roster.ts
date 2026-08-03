@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { useCallablePromise } from '../use-callable-promise';
 
 import { DansshipAPI, type ManualAddStudentPayload, type MarkAttendancePayload } from '@core/api';
+import { captureUnexpectedException, withSentrySpan } from '@core/sentry';
 
 export const useInstructorRoster = () => {
   const { t } = useTranslation();
@@ -15,13 +16,27 @@ export const useInstructorRoster = () => {
 
   const markAttendance = useCallback(
     async (bookingId: string, payload: MarkAttendancePayload) => {
-      const { ok } = await markAttendancePromise(bookingId, payload);
+      await withSentrySpan(
+        'instructor.mark_attendance',
+        'ui.action',
+        { booking_id: bookingId, attendance_status: payload.status },
+        async () => {
+          const { ok, error } = await markAttendancePromise(bookingId, payload);
 
-      if (ok) {
-        toast.success(t('instructor:roster.attendanceUpdated'));
-      } else {
-        toast.error(t('instructor:roster.updateAttendanceFailed'));
-      }
+          if (ok) {
+            toast.success(t('instructor:roster.attendanceUpdated'));
+          } else {
+            toast.error(t('instructor:roster.updateAttendanceFailed'));
+            captureUnexpectedException(error ?? new Error('Mark attendance failed'), {
+              tags: {
+                flow: 'instructor.mark_attendance',
+                booking_id: bookingId,
+                attendance_status: payload.status,
+              },
+            });
+          }
+        },
+      );
     },
     [t, markAttendancePromise],
   );
@@ -32,13 +47,23 @@ export const useInstructorRoster = () => {
 
   const manualAddStudent = useCallback(
     async (classId: string, payload: ManualAddStudentPayload) => {
-      const { ok } = await manualAddStudentPromise(classId, payload);
+      await withSentrySpan(
+        'instructor.manual_add',
+        'ui.action',
+        { class_id: classId, user_id: payload.user_id },
+        async () => {
+          const { ok, error } = await manualAddStudentPromise(classId, payload);
 
-      if (ok) {
-        toast.success(t('instructor:roster.studentAddedSuccess'));
-      } else {
-        toast.error(t('instructor:roster.studentAddFailed'));
-      }
+          if (ok) {
+            toast.success(t('instructor:roster.studentAddedSuccess'));
+          } else {
+            toast.error(t('instructor:roster.studentAddFailed'));
+            captureUnexpectedException(error ?? new Error('Manual add student failed'), {
+              tags: { flow: 'instructor.manual_add', class_id: classId, user_id: payload.user_id },
+            });
+          }
+        },
+      );
     },
     [t, manualAddStudentPromise],
   );

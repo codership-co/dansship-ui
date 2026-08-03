@@ -12,6 +12,7 @@ import { Container } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@components/ui';
 import { DansshipAPI, ScheduledClass } from '@core/api';
+import { captureUnexpectedException } from '@core/sentry';
 import { getMonday, getRelativeTime } from '@helpers';
 import { useDateLocale, usePromise } from '@hooks';
 
@@ -69,6 +70,17 @@ export function AssignedSchedule() {
     }
 
     hasAppliedUpcoming.current = true;
+
+    if (!upcomingResponse.ok) {
+      captureUnexpectedException(upcomingResponse.error ?? new Error('Instructor upcoming week failed'), {
+        tags: { flow: 'instructor.upcoming_week' },
+      });
+      setInitialClasses(null);
+      setWeekReady(true);
+
+      return;
+    }
+
     const upcoming = upcomingResponse.data;
 
     if (upcoming) {
@@ -119,9 +131,13 @@ export function AssignedSchedule() {
   };
 
   const goToNextAvailable = async () => {
-    const { data, ok } = await DansshipAPI.instructors.getUpcomingWeek(currentWeek);
+    const { data, ok, error } = await DansshipAPI.instructors.getUpcomingWeek(currentWeek);
 
     if (!ok || !data) {
+      captureUnexpectedException(error ?? new Error('Instructor next available week failed'), {
+        tags: { flow: 'instructor.upcoming_week' },
+      });
+
       return;
     }
 

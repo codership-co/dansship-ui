@@ -6,6 +6,7 @@ import { LuCircleCheck, LuSearch, LuCircleX } from 'react-icons/lu';
 import { SpinnerLoader } from '@components/loaders';
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Input } from '@components/ui';
 import { DansshipAPI, InstructorUserSearchResult } from '@core/api';
+import { captureUnexpectedException } from '@core/sentry';
 import { useDateLocale, usePromise, useInstructorRoster } from '@hooks';
 
 interface ClassRosterProps {
@@ -25,6 +26,16 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { response: roster, isLoading } = usePromise(() => DansshipAPI.instructors.getClassRoster(classId));
+
+  useEffect(() => {
+    if (!roster || roster.ok) {
+      return;
+    }
+
+    captureUnexpectedException(roster.error ?? new Error('Instructor roster load failed'), {
+      tags: { flow: 'instructor.roster.load', class_id: classId },
+    });
+  }, [roster, classId]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

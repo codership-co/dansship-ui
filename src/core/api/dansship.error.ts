@@ -1,3 +1,4 @@
+import { addBreadcrumb, withScope, captureException } from '@sentry/react';
 import { HttpClientError, LoggerParams, RequestState } from 'polpo-http-client';
 
 export enum DANSSHIP_ERROR_CATEGORY {
@@ -140,9 +141,68 @@ export async function getResponseError(response: Response, message: string) {
   return new DansshipAPIError(body, response.status, body.message ?? message);
 }
 
+const SKIP_API_ERROR_CODES = new Set<DANSSHIP_ERROR_CODE>([
+  DANSSHIP_ERROR_CODE.UNAUTHORIZED,
+  DANSSHIP_ERROR_CODE.EMAIL_NOT_VERIFIED,
+  DANSSHIP_ERROR_CODE.TOO_MANY_REQUESTS,
+  DANSSHIP_ERROR_CODE.AUTH_TOKEN_EXPIRED,
+  DANSSHIP_ERROR_CODE.AUTH_TOKEN_INVALID,
+  DANSSHIP_ERROR_CODE.AUTH_TOKEN_MISSING,
+  DANSSHIP_ERROR_CODE.BOOKING_CLASS_FULL,
+  DANSSHIP_ERROR_CODE.CLASS_FULL,
+  DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP,
+  DANSSHIP_ERROR_CODE.BOOKING_CLASS_GROUP_NOT_COVERED,
+  DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_ELIGIBLE,
+  DANSSHIP_ERROR_CODE.WAITLIST_FULL,
+  DANSSHIP_ERROR_CODE.VALIDATION_FAILED,
+  DANSSHIP_ERROR_CODE.FORBIDDEN,
+  DANSSHIP_ERROR_CODE.PERMISSION_DENIED,
+]);
+
 export async function logger({ state, response }: LoggerParams) {
-  if (state === RequestState.REJECTED) {
-    // eslint-disable-next-line no-console
-    console.error(response);
+  if (state !== RequestState.REJECTED) {
+    return;
   }
+
+  // eslint-disable-next-line no-console
+  console.error(response);
+
+  const rejected = response as { status?: number; error?: unknown } | null;
+  const error = rejected?.error;
+  const status = rejected?.status ?? (error instanceof DansshipAPIError ? error.status : undefined);
+
+  if (error instanceof DansshipAPIError && SKIP_API_ERROR_CODES.has(error.body.error_code)) {
+    addBreadcrumb({
+      category: 'api.expected_error',
+      message: error.body.error_code,
+      level: 'info',
+      data: { status, path: error.body.path },
+    });
+
+    return;
+  }
+
+  withScope(scope => {
+    if (status !== undefined) {
+      scope.setTag('http.status_code', String(status));
+    }
+
+    if (error instanceof DansshipAPIError) {
+      scope.setTag('error_code', error.body.error_code);
+
+      if (error.body.request_id) {
+        scope.setTag('request_id', error.body.request_id);
+      }
+
+      if (error.body.trace_id) {
+        scope.setTag('trace_id', error.body.trace_id);
+      }
+
+      captureException(error);
+
+      return;
+    }
+
+    captureException(error instanceof Error ? error : new Error('API request rejected'));
+  });
 }

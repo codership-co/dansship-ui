@@ -23,6 +23,7 @@ import {
 } from '@core/api';
 import { AUTH_SESSION_KEY, PageURLS } from '@core/constants';
 import { type PERMISSION } from '@core/permissions';
+import { addSentryBreadcrumb, clearSentryUser, setSentryUser } from '@core/sentry';
 import { getPendingPlanCheckoutIntent, isValidReturnPath, resolvePostLoginPath } from '@helpers';
 import { useEventListener } from '@hooks';
 import { Error404Page, UnauthorizedPage, UnavailablePage } from '@pages';
@@ -89,6 +90,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEventListener('auth:session-expired' as keyof WindowEventMap, () => {
     clearSessionArtifacts();
     setUser(null);
+    clearSentryUser();
+    addSentryBreadcrumb('auth.session-expired', 'Session expired');
     toast.error(t('auth:sessionExpired'));
 
     if (location.pathname !== PageURLS.auth.login) {
@@ -99,6 +102,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEventListener('auth:logout' as keyof WindowEventMap, () => {
     clearSessionArtifacts();
     setUser(null);
+    clearSentryUser();
   });
 
   useEffect(() => {
@@ -125,10 +129,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     try {
       const data = await DansshipAPI.auth.getProfile();
       setUser(data);
+      setSentryUser(data);
 
       return data;
     } catch {
       setUser(null);
+      clearSentryUser();
     }
   }
 
@@ -152,6 +158,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       setPendingPostLoginPath(redirectPath);
       setUser(data);
+      setSentryUser(data);
       navigate(redirectPath, { replace: true });
     } catch (error) {
       if (error instanceof DansshipAPIError) {
@@ -235,6 +242,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       await DansshipAPI.auth.logout();
     } finally {
       setUser(null);
+      clearSentryUser();
       window.dispatchEvent(new CustomEvent('auth:logout'));
       toast.success(t('auth:logoutSuccess'));
     }
@@ -314,6 +322,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       );
     }
   }
+
+  useEffect(() => {
+    if (user) {
+      setSentryUser(user);
+    } else {
+      clearSentryUser();
+    }
+  }, [user]);
 
   useEffect(() => {
     if (!user?.preferredLanguage) {

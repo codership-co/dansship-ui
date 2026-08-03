@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { useCallablePromise } from '../use-callable-promise';
 
 import { BookClassPayload, DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError } from '@core/api';
+import { captureUnexpectedException, withSentrySpan } from '@core/sentry';
 
 export const useMyBookings = () => {
   const { t } = useTranslation();
@@ -23,98 +24,133 @@ export const useMyBookings = () => {
 
   const bookClass = useCallback(
     async (payload: BookClassPayload) => {
-      const { error } = await bookClassPromise(payload);
+      return withSentrySpan('booking.create', 'ui.action', { class_id: payload.scheduled_class_id }, async () => {
+        const { error } = await bookClassPromise(payload);
 
-      if (error) {
-        if (error instanceof DansshipAPIError) {
-          const { error_code } = error.body;
+        if (error) {
+          if (error instanceof DansshipAPIError) {
+            const { error_code } = error.body;
 
-          if (error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_FULL || error_code === DANSSHIP_ERROR_CODE.CLASS_FULL) {
-            toast.error(t('bookings:classFullDesc'));
-          } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP) {
-            toast.error(t('bookings:timeOverlapDesc'));
-          } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_GROUP_NOT_COVERED) {
-            toast.error(t('bookings:classGroupNotCoveredDesc'));
-          } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_ELIGIBLE) {
-            toast.error(t('bookings:subscriptionNotEligibleDesc'));
+            if (
+              error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_FULL ||
+              error_code === DANSSHIP_ERROR_CODE.CLASS_FULL
+            ) {
+              toast.error(t('bookings:classFullDesc'));
+            } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP) {
+              toast.error(t('bookings:timeOverlapDesc'));
+            } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_GROUP_NOT_COVERED) {
+              toast.error(t('bookings:classGroupNotCoveredDesc'));
+            } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_ELIGIBLE) {
+              toast.error(t('bookings:subscriptionNotEligibleDesc'));
+            } else {
+              toast.error(t('bookings:bookingFailedDesc'));
+            }
+
+            captureUnexpectedException(error, {
+              skipIfExpected: 'booking',
+              tags: { flow: 'booking.create', class_id: payload.scheduled_class_id },
+            });
           } else {
             toast.error(t('bookings:bookingFailedDesc'));
+            captureUnexpectedException(error, {
+              tags: { flow: 'booking.create', class_id: payload.scheduled_class_id },
+            });
           }
-        } else {
-          toast.error(t('bookings:bookingFailedDesc'));
+
+          return false;
         }
 
-        return false;
-      }
+        toast.success(t('bookings:bookSuccess'));
 
-      toast.success(t('bookings:bookSuccess'));
-
-      return true;
+        return true;
+      });
     },
     [bookClassPromise, t],
   );
 
   const cancelClass = useCallback(
     async (id: string) => {
-      const { error } = await cancelClassPromise(id);
+      return withSentrySpan('booking.cancel', 'ui.action', { booking_id: id }, async () => {
+        const { error } = await cancelClassPromise(id);
 
-      if (error) {
-        toast.error(t('bookings:cancellationFailedDesc'));
+        if (error) {
+          toast.error(t('bookings:cancellationFailedDesc'));
+          captureUnexpectedException(error, {
+            skipIfExpected: 'booking',
+            tags: { flow: 'booking.cancel', booking_id: id },
+          });
 
-        return false;
-      }
+          return false;
+        }
 
-      toast.success(t('bookings:cancelSuccess'));
+        toast.success(t('bookings:cancelSuccess'));
 
-      return true;
+        return true;
+      });
     },
     [cancelClassPromise, t],
   );
 
   const joinWaitlist = useCallback(
     async (payload: BookClassPayload) => {
-      const { error } = await joinWaitlistPromise(payload);
+      return withSentrySpan('booking.waitlist', 'ui.action', { class_id: payload.scheduled_class_id }, async () => {
+        const { error } = await joinWaitlistPromise(payload);
 
-      if (error) {
-        if (error instanceof DansshipAPIError) {
-          const { error_code } = error.body;
+        if (error) {
+          if (error instanceof DansshipAPIError) {
+            const { error_code } = error.body;
 
-          if (error_code === DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP) {
-            toast.error(t('bookings:timeOverlapDesc'));
-          } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_GROUP_NOT_COVERED) {
-            toast.error(t('bookings:classGroupNotCoveredDesc'));
-          } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_ELIGIBLE) {
-            toast.error(t('bookings:subscriptionNotEligibleDesc'));
+            if (error_code === DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP) {
+              toast.error(t('bookings:timeOverlapDesc'));
+            } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_GROUP_NOT_COVERED) {
+              toast.error(t('bookings:classGroupNotCoveredDesc'));
+            } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_ELIGIBLE) {
+              toast.error(t('bookings:subscriptionNotEligibleDesc'));
+            } else {
+              toast.error(t('bookings:waitlistFailedDesc'));
+            }
+
+            captureUnexpectedException(error, {
+              skipIfExpected: 'booking',
+              tags: { flow: 'booking.waitlist', class_id: payload.scheduled_class_id },
+            });
           } else {
             toast.error(t('bookings:waitlistFailedDesc'));
+            captureUnexpectedException(error, {
+              tags: { flow: 'booking.waitlist', class_id: payload.scheduled_class_id },
+            });
           }
-        } else {
-          toast.error(t('bookings:waitlistFailedDesc'));
+
+          return false;
         }
 
-        return false;
-      }
+        toast.success(t('bookings:waitlistJoinSuccess'));
 
-      toast.success(t('bookings:waitlistJoinSuccess'));
-
-      return true;
+        return true;
+      });
     },
     [joinWaitlistPromise, t],
   );
 
   const cancelWaitlist = useCallback(
     async (id: string) => {
-      const { error } = await cancelWaitlistPromise(id);
+      return withSentrySpan('booking.waitlist_cancel', 'ui.action', { booking_id: id }, async () => {
+        const { error } = await cancelWaitlistPromise(id);
 
-      if (error) {
-        toast.error(t('bookings:waitlistCancelFailed'));
+        if (error) {
+          toast.error(t('bookings:waitlistCancelFailed'));
+          captureUnexpectedException(error, {
+            skipIfExpected: 'booking',
+            tags: { flow: 'booking.waitlist_cancel', booking_id: id },
+          });
 
-        return false;
-      }
+          return false;
+        }
 
-      toast.success(t('bookings:waitlistCancelSuccess'));
+        toast.success(t('bookings:waitlistCancelSuccess'));
 
-      return true;
+        return true;
+      });
     },
     [cancelWaitlistPromise, t],
   );

@@ -14,6 +14,7 @@ import { useCallablePromise } from '../hooks/use-callable-promise';
 import { useAuth } from './auth-context';
 
 import { CompleteStepPayload, DansshipAPI, OnboardingStatus, ProfileDataKey, ProfileTrackKey } from '@core/api';
+import { addSentryBreadcrumb, captureUnexpectedException } from '@core/sentry';
 
 const parseNextStep = (nextStep: string | null): OnboardingCurrentStep | null => {
   if (!nextStep) return null;
@@ -81,8 +82,9 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
     try {
       const data = await DansshipAPI.onboarding.getStatus();
       setMemoryRouter(prev => handleMemoryRouter(prev, data));
-    } catch {
+    } catch (loadError) {
       setError(t('auth:onboarding.loadFailed'));
+      captureUnexpectedException(loadError, { tags: { flow: 'onboarding.load' } });
     }
   });
 
@@ -95,14 +97,21 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
   const { call: submitStep, isLoading: completeOnboardingStepIsLoading } = useCallablePromise(
     async (data: CompleteStepPayload) => {
       setError(null);
+      addSentryBreadcrumb('onboarding.step', 'Submitting onboarding step', {
+        track: data.track,
+        step: data.stepKey,
+      });
 
       try {
         const response = await DansshipAPI.onboarding.completeStep(data);
         setMemoryRouter(prev => handleMemoryRouter(prev, response));
 
         return response;
-      } catch {
+      } catch (submitError) {
         setError(t('auth:onboarding.submitFailed'));
+        captureUnexpectedException(submitError, {
+          tags: { flow: 'onboarding.submit', track: String(data.track), step: String(data.stepKey) },
+        });
         throw new Error('ONBOARDING_STEP_SUBMIT_FAILED');
       }
     },

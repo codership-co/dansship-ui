@@ -10,6 +10,7 @@ import { Container } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { Button, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Input } from '@components/ui';
 import { DansshipAPI, UpdateAvailabilityPayload } from '@core/api';
+import { captureUnexpectedException, withSentrySpan } from '@core/sentry';
 import { useCallablePromise, usePromise } from '@hooks';
 
 const DAYS_OF_WEEK = [
@@ -54,13 +55,18 @@ export function AvailabilityForm() {
 
   const updateAvailability = useCallback(
     async (payload: UpdateAvailabilityPayload) => {
-      const { ok } = await updateAvailabilityPromise(payload);
+      await withSentrySpan('instructor.availability.save', 'ui.action', {}, async () => {
+        const { ok, error } = await updateAvailabilityPromise(payload);
 
-      if (ok) {
-        toast.success(t('instructor:availability.updateSuccess'));
-      } else {
-        toast.error(t('instructor:availability.updateFailed'));
-      }
+        if (ok) {
+          toast.success(t('instructor:availability.updateSuccess'));
+        } else {
+          toast.error(t('instructor:availability.updateFailed'));
+          captureUnexpectedException(error ?? new Error('Availability update failed'), {
+            tags: { flow: 'instructor.availability.save' },
+          });
+        }
+      });
     },
     [t, updateAvailabilityPromise],
   );
