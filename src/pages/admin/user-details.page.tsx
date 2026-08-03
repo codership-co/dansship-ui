@@ -28,7 +28,9 @@ function UserDetailsPage() {
             isActive={user.is_active}
             hasInstructorProfile={user.has_instructor_profile}
             instructorOnboardingCompleted={user.instructor_onboarding_completed ?? false}
-            instructorBusinessStatus={user.instructor_profile?.business_status ?? null}
+            instructorBusinessStatus={
+              user.instructor_business_status ?? user.instructor_profile?.business_status ?? null
+            }
             onChanged={() => void reFetch()}
           />
         ) : null

@@ -55,5 +55,6 @@ export interface AdminUserDetailsResponse {
   permissions: Array<string>;
   has_instructor_profile: boolean;
   instructor_onboarding_completed?: boolean;
+  instructor_business_status?: string | null;
   instructor_profile: AdminUserInstructorProfile | null;
 }
