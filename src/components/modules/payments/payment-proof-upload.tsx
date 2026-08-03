@@ -66,8 +66,8 @@ export function PaymentProofUpload({ intentId, currentProofUrl, onUploaded, mode
   };
 
   return (
-    <div className='space-y-3'>
-      <div className='rounded-md border border-dashed border-gray-300 p-3'>
+    <div className='space-y-3' data-sentry-mask>
+      <div className='rounded-md border border-dashed border-gray-300 p-3' data-sentry-block>
         <label className='flex cursor-pointer items-center gap-2 text-sm text-gray-700'>
           {isUploading ? <Spinner /> : <LuUpload className='h-4 w-4' />}
           <span>{isUploading ? t('payments:proofUploading') : t('payments:uploadProof')}</span>
@@ -85,7 +85,7 @@ export function PaymentProofUpload({ intentId, currentProofUrl, onUploaded, mode
       </div>
 
       {previewUrl ? (
-        <div className='space-y-2'>
+        <div className='space-y-2' data-sentry-block>
           <img
             src={previewUrl}
             alt={t('payments:proofPreviewAlt')}

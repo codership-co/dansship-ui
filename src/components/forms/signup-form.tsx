@@ -56,7 +56,7 @@ export function SignUpForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(internalSubmit)} className='space-y-6'>
+    <form onSubmit={handleSubmit(internalSubmit)} className='space-y-6' data-sentry-mask>
       <EmailField
         id='email'
         control={control}

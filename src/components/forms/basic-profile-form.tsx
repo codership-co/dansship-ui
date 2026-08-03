@@ -96,10 +96,13 @@ export function BasicProfileForm({ isLoading, error, onSubmit, defaultValues }: 
   };
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-6' data-sentry-mask>
       <form className='space-y-4' onSubmit={handleSubmit(internalSubmit)}>
         <section className='grid lg:grid-cols-[auto_1fr] gap-4'>
-          <div className='relative grid justify-items-center gap-8 rounded-md border border-dashed border-gray-300 py-4 px-8'>
+          <div
+            className='relative grid justify-items-center gap-8 rounded-md border border-dashed border-gray-300 py-4 px-8'
+            data-sentry-block
+          >
             <section>
               <section className='w-50 aspect-square bg-gray-300/50 border border-dashed border-gray-300 rounded-full grid place-content-center overflow-hidden'>
                 {imageUrl ? (

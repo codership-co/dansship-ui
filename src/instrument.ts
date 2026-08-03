@@ -11,8 +11,12 @@ if (import.meta.env.PROD && dsn) {
     integrations: [
       browserTracingIntegration(),
       replayIntegration({
-        maskAllText: true,
+        // Readable UI copy for debugging; inputs stay masked by default.
+        maskAllText: false,
+        maskAllInputs: true,
         blockAllMedia: true,
+        mask: ['.sentry-mask', '[data-sentry-mask]'],
+        block: ['.sentry-block', '[data-sentry-block]'],
       }),
     ],
     tracesSampleRate: 0.1,

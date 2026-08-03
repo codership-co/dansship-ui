@@ -60,7 +60,7 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(internalSubmit)} className='grid gap-6'>
+    <form onSubmit={handleSubmit(internalSubmit)} className='grid gap-6' data-sentry-mask>
       <EmailField
         id='email'
         control={control}

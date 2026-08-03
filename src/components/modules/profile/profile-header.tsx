@@ -60,10 +60,10 @@ export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
   };
 
   return (
-    <section>
+    <section data-sentry-mask>
       <Section navbarPadding className='bg-primary' contentClassName='pb-8 md:pb-15'>
         <section className='bg-white rounded-[0_100px_0_100px] md:rounded-[0_158px_0_158px] shadow-2xl grid md:grid-cols-[auto_1fr] lg:grid-cols-[auto_1fr_auto] lg:gap-8 mt-20 items-center overflow-hidden'>
-          <section className='relative bg-accent h-full p-4 xl:p-6 flex overflow-hidden'>
+          <section className='relative bg-accent h-full p-4 xl:p-6 flex overflow-hidden' data-sentry-block>
             <ProfilePicture
               image={displayImage}
               className='transition-all size-50 xl:size-80 border-10 bg-transparent border-accent m-auto'
