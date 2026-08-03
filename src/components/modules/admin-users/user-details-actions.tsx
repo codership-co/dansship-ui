@@ -16,7 +16,8 @@ interface UserDetailsActionsProps {
   roleNames: Array<string>;
   isActive: boolean;
   hasInstructorProfile: boolean;
-  onboardingPendingSteps: Array<string>;
+  instructorOnboardingCompleted: boolean;
+  instructorBusinessStatus: string | null;
   onChanged: () => void;
 }
 
@@ -28,7 +29,8 @@ export function UserDetailsActions({
   roleNames,
   isActive,
   hasInstructorProfile,
-  onboardingPendingSteps,
+  instructorOnboardingCompleted,
+  instructorBusinessStatus,
   onChanged,
 }: UserDetailsActionsProps) {
   const { t } = useTranslation();
@@ -53,18 +55,16 @@ export function UserDetailsActions({
   );
 
   const isInstructor = useMemo(() => roleNames.some(role => normalizeRoleName(role) === 'instructor'), [roleNames]);
-  const hasCompletedInstructorOnboarding = useMemo(
-    () => hasInstructorProfile && !onboardingPendingSteps.some(step => step.startsWith('instructor:')),
-    [hasInstructorProfile, onboardingPendingSteps],
-  );
-  const canInviteInstructor = useMemo(
-    () => !hasInstructorProfile || !hasCompletedInstructorOnboarding,
-    [hasInstructorProfile, hasCompletedInstructorOnboarding],
-  );
+  const canInviteInstructor = !hasInstructorProfile;
+  const canResendInstructorInvite =
+    hasInstructorProfile && !instructorOnboardingCompleted && instructorBusinessStatus === 'invited';
   const canDeactivateUser = isActive;
   const canReactivateUser = !isActive;
-  const canDeactivateInstructor = hasCompletedInstructorOnboarding && isInstructor;
-  const canReactivateInstructor = hasCompletedInstructorOnboarding && !isInstructor;
+  const canDeactivateInstructor = instructorOnboardingCompleted && isInstructor;
+  const canReactivateInstructor =
+    instructorOnboardingCompleted &&
+    !isInstructor &&
+    (instructorBusinessStatus === 'inactive' || instructorBusinessStatus === 'invited');
   const isLoading =
     isInviting || isDeactivatingUser || isReactivatingUser || isDeactivatingInstructor || isReactivatingInstructor;
 
@@ -169,7 +169,12 @@ export function UserDetailsActions({
   };
 
   const hasActions =
-    canInviteInstructor || canDeactivateUser || canReactivateUser || canDeactivateInstructor || canReactivateInstructor;
+    canInviteInstructor ||
+    canResendInstructorInvite ||
+    canDeactivateUser ||
+    canReactivateUser ||
+    canDeactivateInstructor ||
+    canReactivateInstructor;
 
   if (!hasActions) {
     return null;
@@ -261,7 +266,7 @@ export function UserDetailsActions({
               </button>
             ) : null}
 
-            {canInviteInstructor && !hasCompletedInstructorOnboarding ? (
+            {canInviteInstructor ? (
               <button
                 type='button'
                 className='rounded-md px-3 py-2 text-left text-sm hover:bg-accent disabled:opacity-50'
@@ -269,6 +274,17 @@ export function UserDetailsActions({
                 onClick={() => void handleInviteInstructor()}
               >
                 {t('admin:users.details.convertToInstructor')}
+              </button>
+            ) : null}
+
+            {canResendInstructorInvite ? (
+              <button
+                type='button'
+                className='rounded-md px-3 py-2 text-left text-sm hover:bg-accent disabled:opacity-50'
+                disabled={isLoading}
+                onClick={() => void handleInviteInstructor()}
+              >
+                {t('admin:users.details.resendInstructorInvite')}
               </button>
             ) : null}
           </div>
