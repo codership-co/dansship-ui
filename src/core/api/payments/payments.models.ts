@@ -58,6 +58,15 @@ export interface AdminPaymentReviewPayload {
   admin_notes?: string;
 }
 
+export interface BoldFallbackSyncResponse {
+  intent: PaymentIntent;
+  outcome: string;
+  event_type?: string | null;
+  bold_payment_id?: string | null;
+  notifications_count: number;
+  message: string;
+}
+
 export interface PaymentEntityReference {
   id: string;
   name?: string | null;

@@ -51,7 +51,11 @@ export function AdminPaymentList() {
     [statusFilter],
   );
 
-  const { response: payments, isLoading } = usePromise(() => DansshipAPI.paymentsAdmin.getAdminPayments(filters));
+  const {
+    response: payments,
+    isLoading,
+    reFetch,
+  } = usePromise(() => DansshipAPI.paymentsAdmin.getAdminPayments(filters));
   const items = payments?.data?.items ?? [];
   const total = payments?.data?.total ?? 0;
 
@@ -65,11 +69,12 @@ export function AdminPaymentList() {
 
       if (ok) {
         toast.success(t('payments:admin.reviewSuccess'));
+        await reFetch();
       } else {
         toast.error(t('payments:admin.reviewFailedDesc'));
       }
     },
-    [reviewPaymentPromise, t],
+    [reFetch, reviewPaymentPromise, t],
   );
 
   if (isLoading) {
@@ -189,6 +194,9 @@ export function AdminPaymentList() {
         }}
         onReview={reviewPayment}
         isReviewing={isReviewing}
+        onSynced={() => {
+          void reFetch();
+        }}
       />
     </>
   );

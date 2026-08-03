@@ -148,6 +148,11 @@
     "reviewFailedDesc": "No se pudo revisar el intento de pago.",
     "rejectConfirmTitle": "Rechazar pago",
     "rejectConfirmDesc": "¿Estás seguro de que deseas rechazar este pago?",
+    "syncBold": "Consultar Bold",
+    "syncBoldSuccess": "Estado actualizado desde Bold",
+    "syncBoldNoChange": "Bold no reportó un estado terminal",
+    "syncBoldFailed": "No se pudo consultar Bold",
+    "syncBoldFailedDesc": "Intenta de nuevo en unos momentos.",
     "filter": {
       "all": "Todos los estados",
       "status": "Filtrar por estado"
