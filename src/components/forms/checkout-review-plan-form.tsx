@@ -34,6 +34,7 @@ export type CheckoutFormValues = z.infer<ReturnType<typeof createCheckoutSchema>
 
 export interface PaymentData {
   discountCode: string;
+  discountBenefitCode: string | null;
   taxContext: string;
   discountContext: string;
   error: string;
@@ -53,6 +54,7 @@ export const DefaultPaymentData: PaymentData = {
   taxContext: '',
   discountContext: '',
   discountCode: '',
+  discountBenefitCode: null,
   error: '',
   isValid: false,
   discountValue: 0,
@@ -127,6 +129,7 @@ export const CheckoutReviewPlanFormInput = ({
         bonus_classes_granted,
         bonus_expires_days,
         bonus_benefit_name,
+        discount_benefit_code,
       } = data;
 
       const isPercentage = discount_type === 'percentage_discount' || discount_type === 'percentage';
@@ -135,6 +138,7 @@ export const CheckoutReviewPlanFormInput = ({
       setPaymentData({
         isValid: is_valid,
         discountCode: discountCode.toUpperCase(),
+        discountBenefitCode: discount_benefit_code,
         error: rejection_reason || '',
         applied: discount_applied,
         discountValue: discount_value,
@@ -206,7 +210,13 @@ export const CheckoutReviewPlanFormInput = ({
           </div>
           {paymentData.applied && (
             <div className='mb-2 flex items-center justify-between'>
-              <span className='text-gray-500'>{t('subscriptions:discountCode')}</span>
+              <span className='text-gray-500'>
+                {paymentData.discountBenefitCode === 'FIRST_PLAN_PCT_10'
+                  ? t('subscriptions:discountFirstPlan')
+                  : paymentData.discountCode
+                    ? t('subscriptions:discountCode')
+                    : t('subscriptions:discount')}
+              </span>
               <span>{isLoading ? <Spinner /> : paymentData.discountContext}</span>
             </div>
           )}

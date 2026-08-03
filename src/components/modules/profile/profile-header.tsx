@@ -36,7 +36,8 @@ export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
   const displayImage = imageURL || user.avatar || user.instructorProfile?.photoUrl || undefined;
 
   const handleInputFileUpload = async (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] ?? null;
+    const input = event.currentTarget;
+    const file = input.files?.[0] ?? null;
 
     if (!file) return;
 
@@ -44,7 +45,7 @@ export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
 
     if (!isValidType) {
       toast.error(t('payments:proofInvalidTypeTitle'));
-      event.currentTarget.value = '';
+      input.value = '';
 
       return;
     }
@@ -55,7 +56,8 @@ export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
       await uploadProfilePhoto(file);
     } finally {
       setIsUploading(false);
-      event.currentTarget.value = '';
+      // Retain the input ref before await — React clears currentTarget after the event handler yields.
+      input.value = '';
     }
   };
 

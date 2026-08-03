@@ -11,7 +11,8 @@ import { ClassRoster } from './class-roster';
 import { Container } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@components/ui';
-import { DansshipAPI, ScheduledClass } from '@core/api';
+import { useAuth } from '@contexts';
+import { DansshipAPI, DansshipAPIError, DANSSHIP_ERROR_CODE, ScheduledClass } from '@core/api';
 import { captureUnexpectedException } from '@core/sentry';
 import { getMonday, getRelativeTime } from '@helpers';
 import { useDateLocale, usePromise } from '@hooks';
@@ -51,20 +52,30 @@ function getUpcomingStatusKey(cls: ScheduledClass, now = new Date()): 'inProgres
 export function AssignedSchedule() {
   const { t, i18n } = useTranslation();
   const locale = useDateLocale();
+  const { user } = useAuth();
+  const hasInstructorProfile = Boolean(user?.hasInstructorProfile ?? user?.isInstructor ?? user?.isCoach);
   const currentWeek = getMonday(new Date());
   const [week, setWeek] = useState(currentWeek);
   const [selectedClass, setSelectedClass] = useState<ScheduledClass | null>(null);
   const [initialClasses, setInitialClasses] = useState<Array<ScheduledClass> | null>(null);
   const [nearestWeek, setNearestWeek] = useState<string | null>(null);
   const [showJumpedBanner, setShowJumpedBanner] = useState(false);
-  const [weekReady, setWeekReady] = useState(false);
+  const [weekReady, setWeekReady] = useState(!hasInstructorProfile);
   const hasAppliedUpcoming = useRef(false);
 
-  const { response: upcomingResponse, isLoading: isResolvingUpcoming } = usePromise(() =>
-    DansshipAPI.instructors.getUpcomingWeek(currentWeek),
+  const { response: upcomingResponse, isLoading: isResolvingUpcoming } = usePromise(
+    () => DansshipAPI.instructors.getUpcomingWeek(currentWeek),
+    hasInstructorProfile,
   );
 
   useEffect(() => {
+    if (!hasInstructorProfile) {
+      setInitialClasses([]);
+      setWeekReady(true);
+
+      return;
+    }
+
     if (!upcomingResponse || hasAppliedUpcoming.current) {
       return;
     }
@@ -72,10 +83,17 @@ export function AssignedSchedule() {
     hasAppliedUpcoming.current = true;
 
     if (!upcomingResponse.ok) {
-      captureUnexpectedException(upcomingResponse.error ?? new Error('Instructor upcoming week failed'), {
-        tags: { flow: 'instructor.upcoming_week' },
-      });
-      setInitialClasses(null);
+      const error = upcomingResponse.error;
+      const isMissingProfile =
+        error instanceof DansshipAPIError && error.body.error_code === DANSSHIP_ERROR_CODE.SCHEDULE_RESOURCE_NOT_FOUND;
+
+      if (!isMissingProfile) {
+        captureUnexpectedException(error ?? new Error('Instructor upcoming week failed'), {
+          tags: { flow: 'instructor.upcoming_week' },
+        });
+      }
+
+      setInitialClasses([]);
       setWeekReady(true);
 
       return;
@@ -89,13 +107,13 @@ export function AssignedSchedule() {
       setNearestWeek(upcoming.resolved_week_start);
       setShowJumpedBanner(upcoming.jumped);
     } else {
-      setInitialClasses(null);
+      setInitialClasses([]);
     }
 
     setWeekReady(true);
-  }, [upcomingResponse]);
+  }, [hasInstructorProfile, upcomingResponse]);
 
-  const shouldFetchWeek = weekReady && initialClasses === null;
+  const shouldFetchWeek = hasInstructorProfile && weekReady && initialClasses === null;
 
   const { response: instructorSchedule, isLoading: isLoadingInstructorSchedule } = usePromise(
     () => DansshipAPI.instructors.getInstructorWeeklySchedule(week),
@@ -114,29 +132,41 @@ export function AssignedSchedule() {
   const nextClass = useMemo(() => findNextAssignedClass(classes), [classes]);
   const nextClassStatus = useMemo(() => (nextClass ? getUpcomingStatusKey(nextClass) : null), [nextClass]);
 
-  const isLoading = isResolvingUpcoming || !weekReady || (shouldFetchWeek && isLoadingInstructorSchedule);
+  const isLoading =
+    hasInstructorProfile && (isResolvingUpcoming || !weekReady || (shouldFetchWeek && isLoadingInstructorSchedule));
 
   const openRoster = (cls: ScheduledClass) => setSelectedClass(cls);
 
   const handleSetWeek = (nextWeek: string) => {
+    if (!hasInstructorProfile) return;
+
     setInitialClasses(null);
     setWeek(nextWeek);
     setShowJumpedBanner(false);
   };
 
   const goToCurrentWeek = () => {
+    if (!hasInstructorProfile) return;
+
     setInitialClasses(null);
     setWeek(currentWeek);
     setShowJumpedBanner(false);
   };
 
   const goToNextAvailable = async () => {
+    if (!hasInstructorProfile) return;
+
     const { data, ok, error } = await DansshipAPI.instructors.getUpcomingWeek(currentWeek);
 
     if (!ok || !data) {
-      captureUnexpectedException(error ?? new Error('Instructor next available week failed'), {
-        tags: { flow: 'instructor.upcoming_week' },
-      });
+      const isMissingProfile =
+        error instanceof DansshipAPIError && error.body.error_code === DANSSHIP_ERROR_CODE.SCHEDULE_RESOURCE_NOT_FOUND;
+
+      if (!isMissingProfile) {
+        captureUnexpectedException(error ?? new Error('Instructor next available week failed'), {
+          tags: { flow: 'instructor.upcoming_week' },
+        });
+      }
 
       return;
     }
@@ -211,7 +241,7 @@ export function AssignedSchedule() {
         </Container>
       )}
 
-      {weekReady && (
+      {weekReady && hasInstructorProfile && (
         <Container>
           <WeekSelector week={week} setWeek={handleSetWeek}>
             <Button
@@ -243,6 +273,13 @@ export function AssignedSchedule() {
           <div className='flex justify-center p-12'>
             <SpinnerLoader />
           </div>
+        ) : !hasInstructorProfile ? (
+          <Container>
+            <div className='rounded-xl border border-dashed border-secondary p-8 text-center grid gap-2'>
+              <p className='m-0 font-medium text-primary'>{t('instructor:home.noProfileTitle')}</p>
+              <p className='m-0 text-muted-foreground'>{t('instructor:home.noProfileDescription')}</p>
+            </div>
+          </Container>
         ) : classes.length === 0 ? (
           <Container>
             <div className='rounded-xl border border-dashed border-secondary p-8 text-center grid gap-2'>

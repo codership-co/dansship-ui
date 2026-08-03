@@ -134,6 +134,7 @@ export interface PaymentPreviewResponse {
   bonus_classes_granted?: number | null;
   bonus_expires_days?: number | null;
   bonus_benefit_name?: string | null;
+  discount_benefit_code?: string | null;
 }
 
 export interface PaymentPreviewMappedResponse {
@@ -151,4 +152,5 @@ export interface PaymentPreviewMappedResponse {
   bonus_classes_granted: number | null;
   bonus_expires_days: number | null;
   bonus_benefit_name: string | null;
+  discount_benefit_code: string | null;
 }

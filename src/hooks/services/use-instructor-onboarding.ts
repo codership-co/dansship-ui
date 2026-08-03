@@ -66,16 +66,16 @@ export const useInstructorOnboarding = () => {
 
   const submitOperationalProfileStep = useCallback(
     (payload: OperationalProfilePayload) => {
-      try {
-        void submitStep({
-          track: ProfileTrackKey.INSTRUCTOR,
-          stepKey: ProfileDataKey.OPERATIONAL_PROFILE,
-          payload,
-        }).then(() => {
-          writeOperationalProfileDraft(payload);
-          setOperationalProfileDraft(payload);
-        });
-      } catch {}
+      void submitStep({
+        track: ProfileTrackKey.INSTRUCTOR,
+        stepKey: ProfileDataKey.OPERATIONAL_PROFILE,
+        payload,
+      }).then(result => {
+        if (!result) return;
+
+        writeOperationalProfileDraft(payload);
+        setOperationalProfileDraft(payload);
+      });
     },
     [submitStep],
   );
