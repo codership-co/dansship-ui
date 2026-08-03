@@ -17,6 +17,7 @@ import { FormStepperLayout } from '@components/layouts';
 import { PlanCard } from '@components/modules';
 import { PaymentMethod, type PublicPlan } from '@core/api';
 import { PageURLS } from '@core/constants';
+import { addSentryBreadcrumb } from '@core/sentry';
 import { cn } from '@helpers';
 
 export enum CheckoutStep {
@@ -67,11 +68,15 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
     finalPrice: plan.price,
   });
 
-  const handleSubmit = useCallback(async (data: CheckoutFormValues, paymentData: PaymentData) => {
-    setCheckoutData(data);
-    setPaymentData(paymentData);
-    setStep(CheckoutStep.METHOD);
-  }, []);
+  const handleSubmit = useCallback(
+    async (data: CheckoutFormValues, nextPaymentData: PaymentData) => {
+      setCheckoutData(data);
+      setPaymentData(nextPaymentData);
+      addSentryBreadcrumb('checkout.step', 'Moved to payment method step', { plan_id: plan.id });
+      setStep(CheckoutStep.METHOD);
+    },
+    [plan.id],
+  );
 
   return (
     <section className='bg-transparent shadow-none border-0 p-0 max-w-none w-auto h-auto m-auto'>
@@ -127,7 +132,13 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
                     color='primary'
                     className='flex items-center'
                     disabled={!paymentMethod}
-                    onClick={() => setStep(CheckoutStep.CONFIRM)}
+                    onClick={() => {
+                      addSentryBreadcrumb('checkout.step', 'Moved to confirm step', {
+                        plan_id: plan.id,
+                        payment_method: paymentMethod ?? undefined,
+                      });
+                      setStep(CheckoutStep.CONFIRM);
+                    }}
                   >
                     {t('common:next')}
                     <LuArrowRight />

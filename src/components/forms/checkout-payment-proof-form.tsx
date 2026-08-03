@@ -17,6 +17,7 @@ import {
   PaymentProofContentTypesList,
   PublicPlan,
 } from '@core/api';
+import { addSentryBreadcrumb, captureUnexpectedException, withSentrySpan } from '@core/sentry';
 import { cn, formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
 
@@ -72,40 +73,76 @@ export function CheckoutPaymentProofForm({
     };
 
     if (isCardMethod) {
-      const { data, ok } = await createBoldCheckout(payload);
+      const { data, ok, error } = await withSentrySpan(
+        'checkout.bold',
+        'ui.action',
+        { plan_id: plan.id, payment_method: paymentMethod },
+        () => createBoldCheckout(payload),
+      );
 
       if (!ok) {
         toast.error(t('payments:createFailedDesc'));
+        captureUnexpectedException(error ?? new Error('Bold checkout intent create failed'), {
+          tags: { flow: 'checkout.bold', plan_id: plan.id },
+        });
 
         return;
       }
 
       try {
         onClose();
+        addSentryBreadcrumb('checkout.bold', 'Opening Bold embedded checkout', { plan_id: plan.id });
 
-        void openBoldEmbeddedCheckout(data.checkout).catch(() => {
+        void openBoldEmbeddedCheckout(data.checkout).catch(boldError => {
           toast.error(t('payments:boldLoadFailed'));
+          captureUnexpectedException(boldError, {
+            tags: { flow: 'checkout.bold.open', plan_id: plan.id },
+          });
         });
-      } catch {
+      } catch (boldError) {
         toast.error(t('payments:boldLoadFailed'));
+        captureUnexpectedException(boldError, {
+          tags: { flow: 'checkout.bold.open', plan_id: plan.id },
+        });
       }
 
       return;
     }
 
-    const { data: intent, ok } = await createIntent(payload);
+    const {
+      data: intent,
+      ok,
+      error,
+    } = await withSentrySpan(
+      'checkout.createIntent',
+      'ui.action',
+      { plan_id: plan.id, payment_method: paymentMethod },
+      () => createIntent(payload),
+    );
 
-    if (ok) {
-      if (requiresProof && selectedProofFile) {
-        try {
-          await uploadProof(intent.id, selectedProofFile);
-        } catch {
-          toast.error(t('payments:proofUploadFailed'));
-        }
-      }
+    if (!ok) {
+      toast.error(t('payments:createFailedDesc'));
+      captureUnexpectedException(error ?? new Error('Payment intent create failed'), {
+        tags: { flow: 'checkout.createIntent', plan_id: plan.id },
+      });
 
-      onSubmit(intent.id);
+      return;
     }
+
+    if (requiresProof && selectedProofFile) {
+      try {
+        await withSentrySpan('checkout.proofUpload', 'ui.action', { plan_id: plan.id, intent_id: intent.id }, () =>
+          uploadProof(intent.id, selectedProofFile),
+        );
+      } catch (uploadError) {
+        toast.error(t('payments:proofUploadFailed'));
+        captureUnexpectedException(uploadError, {
+          tags: { flow: 'checkout.proofUpload', plan_id: plan.id, intent_id: intent.id },
+        });
+      }
+    }
+
+    onSubmit(intent.id);
   };
 
   const handleInputFileUpload = (event: ChangeEvent<HTMLInputElement>) => {

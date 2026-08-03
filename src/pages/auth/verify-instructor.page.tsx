@@ -8,6 +8,7 @@ import { SpinnerLoader } from '@components/loaders';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
+import { addSentryBreadcrumb, captureUnexpectedException } from '@core/sentry';
 
 enum InviteStatus {
   IDLE = 'idle',
@@ -28,23 +29,32 @@ function InstructorOnboardingPage() {
   const handleAcceptInvite = useCallback(async () => {
     if (!token) {
       setStatus(InviteStatus.FAILED);
+      addSentryBreadcrumb('instructor.invite.accept', 'Missing invite token', undefined, 'warning');
 
       return;
     }
 
     setStatus(InviteStatus.ACCEPTING);
+    addSentryBreadcrumb('instructor.invite.accept', 'Accepting instructor invite');
 
     try {
       const data = await DansshipAPI.instructors.acceptInvite({ token });
 
       if (!data.email || !data.accepted) {
         setStatus(InviteStatus.FAILED);
+        captureUnexpectedException(new Error('Instructor invite accept returned unsuccessful response'), {
+          tags: { flow: 'instructor.invite.accept', invite_status: 'failed' },
+        });
       } else {
         setEmail(data.email);
         setStatus(InviteStatus.ACCEPTED);
+        addSentryBreadcrumb('instructor.invite.accept', 'Invite accepted', { invite_status: 'accepted' });
       }
-    } catch {
+    } catch (error) {
       setStatus(InviteStatus.FAILED);
+      captureUnexpectedException(error, {
+        tags: { flow: 'instructor.invite.accept', invite_status: 'failed' },
+      });
     }
   }, [token]);
 

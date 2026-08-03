@@ -1,3 +1,4 @@
+import { wrapCreateBrowserRouterV7 } from '@sentry/react';
 import { createBrowserRouter, redirect, RouteObject, RouterProvider } from 'react-router';
 
 import { loggingMiddleware } from './middleware';
@@ -152,7 +153,8 @@ const routes: Array<RouteObject> = [
   },
 ];
 
-const myRouter = createBrowserRouter(routes);
+const sentryCreateBrowserRouter = wrapCreateBrowserRouterV7(createBrowserRouter);
+const myRouter = sentryCreateBrowserRouter(routes);
 
 export const Router = () => {
   return <RouterProvider router={myRouter} useTransitions />;
