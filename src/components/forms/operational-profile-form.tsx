@@ -30,7 +30,28 @@ export const createOperationalProfileSchema = (t: TFunction) => {
       .string()
       .min(1, { message: t('auth:onboarding.validationRequired') })
       .max(255),
-    availability: z.array(slotSchema).min(1, { message: t('auth:onboarding.validationMinAvailability') }),
+    availability: z
+      .array(slotSchema)
+      .min(1, { message: t('auth:onboarding.validationMinAvailability') })
+      .superRefine((slots, ctx) => {
+        const seen = new Set<string>();
+
+        slots.forEach((slot, index) => {
+          const key = `${slot.day_of_week}|${slot.start_time}`;
+
+          if (seen.has(key)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: t('auth:onboarding.validationDuplicateAvailability'),
+              path: [index, 'start_time'],
+            });
+
+            return;
+          }
+
+          seen.add(key);
+        });
+      }),
     disciplines: z
       .array(
         z.object({
