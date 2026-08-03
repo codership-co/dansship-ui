@@ -56,15 +56,17 @@ export function UserDetailsActions({
 
   const isInstructor = useMemo(() => roleNames.some(role => normalizeRoleName(role) === 'instructor'), [roleNames]);
   const canInviteInstructor = !hasInstructorProfile;
-  const canResendInstructorInvite =
-    hasInstructorProfile && !instructorOnboardingCompleted && instructorBusinessStatus === 'invited';
+  const isPendingInstructorActivation =
+    hasInstructorProfile &&
+    !isInstructor &&
+    !instructorOnboardingCompleted &&
+    instructorBusinessStatus !== 'active' &&
+    instructorBusinessStatus !== 'inactive';
+  const canResendInstructorInvite = isPendingInstructorActivation;
   const canDeactivateUser = isActive;
   const canReactivateUser = !isActive;
   const canDeactivateInstructor = instructorOnboardingCompleted && isInstructor;
-  const canReactivateInstructor =
-    instructorOnboardingCompleted &&
-    !isInstructor &&
-    (instructorBusinessStatus === 'inactive' || instructorBusinessStatus === 'invited');
+  const canReactivateInstructor = hasInstructorProfile && instructorOnboardingCompleted && !isInstructor;
   const isLoading =
     isInviting || isDeactivatingUser || isReactivatingUser || isDeactivatingInstructor || isReactivatingInstructor;
 
