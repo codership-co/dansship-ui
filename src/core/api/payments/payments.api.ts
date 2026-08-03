@@ -67,6 +67,7 @@ export class PaymentsAPI {
         bonus_classes_granted: data.bonus_classes_granted ?? null,
         bonus_expires_days: data.bonus_expires_days ?? null,
         bonus_benefit_name: data.bonus_benefit_name ?? null,
+        discount_benefit_code: data.discount_benefit_code ?? null,
       }),
     );
   }

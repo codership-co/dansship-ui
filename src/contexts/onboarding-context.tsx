@@ -13,7 +13,14 @@ import { useCallablePromise } from '../hooks/use-callable-promise';
 
 import { useAuth } from './auth-context';
 
-import { CompleteStepPayload, DansshipAPI, OnboardingStatus, ProfileDataKey, ProfileTrackKey } from '@core/api';
+import {
+  CompleteStepPayload,
+  DansshipAPI,
+  DansshipAPIError,
+  OnboardingStatus,
+  ProfileDataKey,
+  ProfileTrackKey,
+} from '@core/api';
 import { addSentryBreadcrumb, captureUnexpectedException } from '@core/sentry';
 
 const parseNextStep = (nextStep: string | null): OnboardingCurrentStep | null => {
@@ -46,7 +53,7 @@ interface OnboardingContextState {
   currentStep: OnboardingCurrentStep | null;
   isSubmittingStep: boolean;
   isLoading: boolean;
-  submitStep: ReturnType<typeof useCallablePromise<OnboardingStatus, [CompleteStepPayload]>>['call'];
+  submitStep: ReturnType<typeof useCallablePromise<OnboardingStatus | null, [CompleteStepPayload]>>['call'];
   setMemoryRouter: Dispatch<SetStateAction<MemoryRouterState>>;
   error: string | null;
 }
@@ -95,7 +102,7 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
   });
 
   const { call: submitStep, isLoading: completeOnboardingStepIsLoading } = useCallablePromise(
-    async (data: CompleteStepPayload) => {
+    async (data: CompleteStepPayload): Promise<OnboardingStatus | null> => {
       setError(null);
       addSentryBreadcrumb('onboarding.step', 'Submitting onboarding step', {
         track: data.track,
@@ -109,10 +116,15 @@ export const OnboardingProvider = ({ children }: OnboardingProviderProps) => {
         return response;
       } catch (submitError) {
         setError(t('auth:onboarding.submitFailed'));
-        captureUnexpectedException(submitError, {
-          tags: { flow: 'onboarding.submit', track: String(data.track), step: String(data.stepKey) },
-        });
-        throw new Error('ONBOARDING_STEP_SUBMIT_FAILED');
+
+        // API client already reports DansshipAPIError to Sentry; avoid double-capture + unhandled rejection.
+        if (!(submitError instanceof DansshipAPIError)) {
+          captureUnexpectedException(submitError, {
+            tags: { flow: 'onboarding.submit', track: String(data.track), step: String(data.stepKey) },
+          });
+        }
+
+        return null;
       }
     },
   );

@@ -72,6 +72,8 @@
     "startsIn": "Empieza {{relative}}",
     "emptyTitle": "No tienes clases asignadas esta semana",
     "emptyDescription": "Cuando te asignen clases, aparecerán aquí para que puedas ver el horario y tomar asistencia.",
+    "noProfileTitle": "No hay perfil de instructor",
+    "noProfileDescription": "Esta vista es para instructores con perfil activo. Si eres administrador, usa el panel de horarios.",
     "jumpedWeekBanner": "No tienes clases esta semana — mostrando la semana del {{week}}.",
     "dismissBanner": "Cerrar",
     "nextAvailable": "Próximo disponible"

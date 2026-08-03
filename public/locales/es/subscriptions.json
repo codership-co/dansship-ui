@@ -42,6 +42,8 @@
   "subtotal": "Subtotal",
   "iva": "IVA",
   "ivaIncluded": "* IVA incluido",
+  "discount": "Descuento",
+  "discountFirstPlan": "Descuento primer plan",
   "discountCode": "Descuento por código",
   "bonusClassesCheckoutNote": "Incluye +{{count}} clases bonus que vencen en {{days}} días (independiente del plan).",
   "bonusClassesRemaining": "Clases bonus",

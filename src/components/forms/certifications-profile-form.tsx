@@ -25,7 +25,7 @@ export const createCertificationsProfileSchema = (t: TFunction) =>
           .string()
           .min(1, { message: t('auth:onboarding.validationRequired') })
           .max(255),
-        file_key: z.string().optional(),
+        file_key: z.string().min(1, { message: t('auth:onboarding.certificationFileRequired') }),
         issue_date: z.date().optional().nullable(),
       }),
     ),
@@ -58,7 +58,13 @@ export function CertificationsProfileForm({
   );
   const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
 
-  const { control, handleSubmit, setValue, getValues } = useForm<CertificationsProfileFormValues>({
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useForm<CertificationsProfileFormValues>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     resolver: zodResolver(schema),
@@ -76,7 +82,7 @@ export function CertificationsProfileForm({
     }));
 
     if (!file) {
-      setValue(`documents.${index}.file_key`, undefined);
+      setValue(`documents.${index}.file_key`, '', { shouldValidate: true });
 
       return;
     }
@@ -85,14 +91,14 @@ export function CertificationsProfileForm({
 
     try {
       const fileKey = await uploadCertificationFile(file);
-      setValue(`documents.${index}.file_key`, fileKey);
+      setValue(`documents.${index}.file_key`, fileKey, { shouldValidate: true });
     } catch {
       toast.error(t('auth:onboarding.certificationUploadFailed'));
       setFilePreviews(prev => ({
         ...prev,
         [index]: { file: null, previewUrl: null },
       }));
-      setValue(`documents.${index}.file_key`, undefined);
+      setValue(`documents.${index}.file_key`, '', { shouldValidate: true });
     } finally {
       setUploadingIndex(null);
     }
@@ -103,7 +109,7 @@ export function CertificationsProfileForm({
       values.documents.map(document => ({
         title: document.title,
         issuer: document.issuer,
-        file_key: document.file_key || undefined,
+        file_key: document.file_key,
         issue_date: document.issue_date ? document.issue_date.toISOString().slice(0, 10) : null,
       })),
     );
@@ -113,7 +119,7 @@ export function CertificationsProfileForm({
     append({
       title: '',
       issuer: '',
-      file_key: undefined,
+      file_key: '',
       issue_date: undefined,
     });
   };
@@ -195,6 +201,10 @@ export function CertificationsProfileForm({
 
             {getValues(`documents.${index}.file_key`) ? (
               <p className='text-xs text-active-600'>{t('auth:onboarding.certificationUploaded')}</p>
+            ) : null}
+
+            {errors.documents?.[index]?.file_key?.message ? (
+              <p className='text-xs text-alert-600'>{errors.documents[index].file_key.message}</p>
             ) : null}
           </section>
         ))}
