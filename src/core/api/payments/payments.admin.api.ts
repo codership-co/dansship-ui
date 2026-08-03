@@ -7,6 +7,7 @@ import { DansshipAPIError, PaymentProofContentType } from '@core/api';
 import type {
   AdminPaymentListResponse,
   AdminPaymentReviewPayload,
+  BoldFallbackSyncResponse,
   ConfirmPaymentProofPayload,
   GetAdminPaymentsParams,
   PaymentIntent,
@@ -92,5 +93,12 @@ export class PaymentsAdminAPI {
       },
       normalizeIntent,
     );
+  }
+
+  async syncBoldPayment(id: string) {
+    return this.httpClient.callNoError<BoldFallbackSyncResponse>({
+      path: `/admin/payments/${id}/bold/sync`,
+      method: 'POST',
+    });
   }
 }

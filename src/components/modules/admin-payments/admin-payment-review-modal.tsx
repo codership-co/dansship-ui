@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Button, Textarea } from '@components/ui';
-import { PaymentIntent, PaymentIntentDetail, AdminPaymentReviewPayload, DansshipAPI } from '@core/api';
+import { PaymentIntent, PaymentIntentDetail, AdminPaymentReviewPayload, DansshipAPI, PaymentStatus } from '@core/api';
 import { formatPrice, paymentPurchaseLabel, purchaseTypeLabel, purchaseTypeLabelKey } from '@helpers';
 
 interface AdminPaymentReviewModalProps {
@@ -13,7 +14,10 @@ interface AdminPaymentReviewModalProps {
   onOpenChange: (open: boolean) => void;
   onReview: (id: string, payload: AdminPaymentReviewPayload) => Promise<void>;
   isReviewing: boolean;
+  onSynced?: () => void;
 }
+
+const PENDING_STATUSES = new Set([PaymentStatus.PENDING, PaymentStatus.PENDING_MANUAL_REVIEW]);
 
 export function AdminPaymentReviewModal({
   open,
@@ -21,12 +25,14 @@ export function AdminPaymentReviewModal({
   onOpenChange,
   onReview,
   isReviewing,
+  onSynced,
 }: AdminPaymentReviewModalProps) {
   const { t } = useTranslation();
   const [notes, setNotes] = useState('');
   const [detail, setDetail] = useState<PaymentIntentDetail | null>(null);
   const [proofViewUrl, setProofViewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSyncingBold, setIsSyncingBold] = useState(false);
   const [isRejectConfirmOpen, setIsRejectConfirmOpen] = useState(false);
 
   useEffect(() => {
@@ -35,6 +41,7 @@ export function AdminPaymentReviewModal({
       setProofViewUrl(null);
       setNotes('');
       setIsLoading(false);
+      setIsSyncingBold(false);
 
       return;
     }
@@ -86,6 +93,8 @@ export function AdminPaymentReviewModal({
     return null;
   }
 
+  const canSyncBold = current.gateway_provider === 'bold' && PENDING_STATUSES.has(current.status as PaymentStatus);
+
   const handleApprove = async () => {
     await onReview(current.id, {
       action: 'approve',
@@ -103,8 +112,38 @@ export function AdminPaymentReviewModal({
     onOpenChange(false);
   };
 
+  const handleSyncBold = async () => {
+    setIsSyncingBold(true);
+
+    try {
+      const { ok, data } = await DansshipAPI.paymentsAdmin.syncBoldPayment(current.id);
+
+      if (!ok || !data) {
+        toast.error(t('payments:admin.syncBoldFailedDesc'));
+
+        return;
+      }
+
+      setDetail(prev => ({ ...(prev ?? current), ...data.intent }) as PaymentIntentDetail);
+
+      if (data.outcome === 'finalized_approved' || data.outcome === 'finalized_rejected') {
+        toast.success(t('payments:admin.syncBoldSuccess'));
+        onSynced?.();
+      } else {
+        toast.message(t('payments:admin.syncBoldNoChange'), {
+          description: data.message,
+        });
+      }
+    } catch {
+      toast.error(t('payments:admin.syncBoldFailedDesc'));
+    } finally {
+      setIsSyncingBold(false);
+    }
+  };
+
   const purchaseLabel = paymentPurchaseLabel(current);
   const userEmail = current.user?.human_identifier ?? current.user?.name ?? t('common:noData');
+  const busy = isReviewing || isSyncingBold;
 
   return (
     <>
@@ -167,14 +206,19 @@ export function AdminPaymentReviewModal({
                 />
               </div>
 
-              <div className='flex justify-end gap-2 pt-2'>
-                <Button variant='outline' onClick={() => onOpenChange(false)} disabled={isReviewing}>
+              <div className='flex flex-wrap justify-end gap-2 pt-2'>
+                <Button variant='outline' onClick={() => onOpenChange(false)} disabled={busy}>
                   {t('common:cancel')}
                 </Button>
-                <Button variant='destructive' onClick={() => setIsRejectConfirmOpen(true)} disabled={isReviewing}>
+                {canSyncBold && (
+                  <Button variant='outline' onClick={() => void handleSyncBold()} disabled={busy}>
+                    {isSyncingBold ? t('common:saving') : t('payments:admin.syncBold')}
+                  </Button>
+                )}
+                <Button variant='destructive' onClick={() => setIsRejectConfirmOpen(true)} disabled={busy}>
                   {t('payments:admin.reject')}
                 </Button>
-                <Button onClick={() => void handleApprove()} disabled={isReviewing}>
+                <Button onClick={() => void handleApprove()} disabled={busy}>
                   {isReviewing ? t('common:saving') : t('payments:admin.approve')}
                 </Button>
               </div>
