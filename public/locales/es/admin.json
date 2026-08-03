@@ -38,6 +38,7 @@
       "documentNumber": "Número de documento",
       "actionsMenu": "Acciones del usuario",
       "convertToInstructor": "Convertir en Instructor",
+      "resendInstructorInvite": "Reenviar invitación de instructor",
       "deactivateUser": "Desactivar acceso de usuario",
       "deactivateUserConfirmTitle": "¿Desactivar acceso de este usuario?",
       "deactivateUserConfirmDescription": "El usuario {{email}} no podrá iniciar sesión en la plataforma. Su perfil de instructor y el progreso de onboarding se conservarán.",

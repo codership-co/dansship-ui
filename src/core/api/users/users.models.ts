@@ -25,6 +25,7 @@ export interface AdminUserInstructorProfile {
   bio: string | null;
   photo_url: string | null;
   contact_info: string | null;
+  business_status: string | null;
   created_at: string;
   updated_at: string;
   completion_percent?: number;
@@ -53,5 +54,6 @@ export interface AdminUserDetailsResponse {
   roles: Array<string>;
   permissions: Array<string>;
   has_instructor_profile: boolean;
+  instructor_onboarding_completed?: boolean;
   instructor_profile: AdminUserInstructorProfile | null;
 }
