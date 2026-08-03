@@ -129,7 +129,7 @@ export function CertificationsProfileForm({
   };
 
   return (
-    <div className='space-y-6' data-component='OnboardingCertificationsProfileForm'>
+    <div className='space-y-6' data-component='OnboardingCertificationsProfileForm' data-sentry-mask>
       <form className='grid gap-8' onSubmit={handleSubmit(handleFormSubmit)}>
         <div className='flex items-center justify-between gap-2'>
           <label className='font-medium text-left'>{t('auth:onboarding.certifications')}</label>

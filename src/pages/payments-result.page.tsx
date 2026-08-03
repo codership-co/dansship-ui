@@ -102,7 +102,7 @@ function PaymentsResultPage() {
     intent.status !== PaymentStatus.REJECTED;
 
   return (
-    <section className='grid gap-20'>
+    <section className='grid gap-20' data-sentry-mask>
       {intent && (
         <Section contentClassName='grid gap-20' navbarPadding>
           <section className='rounded-2xl shadow-2xl'>

@@ -165,7 +165,7 @@ export function CheckoutPaymentProofForm({
   };
 
   return (
-    <div className='grid grid-rows-[1fr_auto] h-full'>
+    <div className='grid grid-rows-[1fr_auto] h-full' data-sentry-mask>
       <section className='grid gap-8 content-start'>
         <section className={cn('grid gap-8', isCardMethod && 'lg:grid-cols-2')}>
           <div className='rounded-md border border-secondary bg-secondary-400/40 py-2 px-4'>
@@ -189,7 +189,10 @@ export function CheckoutPaymentProofForm({
         {requiresProof ? <TransferPaymentInstructions /> : null}
 
         {requiresProof ? (
-          <div className='grid lg:grid-cols-2 gap-8 rounded-md border border-dashed border-gray-300 p-3'>
+          <div
+            className='grid lg:grid-cols-2 gap-8 rounded-md border border-dashed border-gray-300 p-3'
+            data-sentry-block
+          >
             <section>
               <p className='text-sm font-medium text-gray-900'>{t('payments:proofUploadInCheckoutTitle')}</p>
               <p className='text-xs text-gray-600'>{t('payments:proofUploadInCheckoutDesc')}</p>

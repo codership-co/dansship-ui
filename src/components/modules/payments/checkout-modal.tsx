@@ -79,7 +79,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
   );
 
   return (
-    <section className='bg-transparent shadow-none border-0 p-0 max-w-none w-auto h-auto m-auto'>
+    <section className='bg-transparent shadow-none border-0 p-0 max-w-none w-auto h-auto m-auto' data-sentry-mask>
       <FormStepperLayout
         className={cn(
           'm-auto overflow-auto rounded-none sm:rounded-xl',

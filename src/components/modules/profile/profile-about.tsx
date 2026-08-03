@@ -19,7 +19,7 @@ export function ProfileAbout() {
     : null;
 
   return (
-    <Container>
+    <Container data-sentry-mask>
       <SectionHeading title={t('profile:profile')} subtitle={t('profile:accountScope')} />
 
       <section className='grid gap-8'>

@@ -53,7 +53,7 @@ export function HealthProfileForm({ isLoading, error, onContinue, onSkip, defaul
   });
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-6' data-sentry-mask>
       <form className='space-y-6' onSubmit={handleSubmit(onContinue)}>
         <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-end'>
           <TextField
