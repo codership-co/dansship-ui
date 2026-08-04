@@ -200,24 +200,24 @@ export const CheckoutReviewPlanFormInput = ({
 
       <section className='grid gap-2'>
         <div>
-          <div className='mb-2 flex items-center justify-between'>
-            <span className='text-gray-500'>{t('subscriptions:subtotal')}</span>
-            <span>{formatPrice(paymentData.baseAmount, plan.currency)}</span>
+          <div className='mb-2 flex items-center justify-between gap-2'>
+            <span className='min-w-0 break-words text-gray-500'>{t('subscriptions:subtotal')}</span>
+            <span className='shrink-0'>{formatPrice(paymentData.baseAmount, plan.currency)}</span>
           </div>
-          <div className='mb-2 flex items-center justify-between'>
-            <span className='text-gray-500'>{t('subscriptions:iva')}</span>
-            <span>{formatPrice(paymentData.taxAmount, plan.currency)}</span>
+          <div className='mb-2 flex items-center justify-between gap-2'>
+            <span className='min-w-0 break-words text-gray-500'>{t('subscriptions:iva')}</span>
+            <span className='shrink-0'>{formatPrice(paymentData.taxAmount, plan.currency)}</span>
           </div>
           {paymentData.applied && (
-            <div className='mb-2 flex items-center justify-between'>
-              <span className='text-gray-500'>
+            <div className='mb-2 flex items-center justify-between gap-2'>
+              <span className='min-w-0 break-words text-gray-500'>
                 {paymentData.discountBenefitCode === 'FIRST_PLAN_PCT_10'
                   ? t('subscriptions:discountFirstPlan')
                   : paymentData.discountCode
                     ? t('subscriptions:discountCode')
                     : t('subscriptions:discount')}
               </span>
-              <span>{isLoading ? <Spinner /> : paymentData.discountContext}</span>
+              <span className='shrink-0'>{isLoading ? <Spinner /> : paymentData.discountContext}</span>
             </div>
           )}
 
@@ -230,13 +230,13 @@ export const CheckoutReviewPlanFormInput = ({
             </div>
           )}
 
-          <div className='mt-4 flex items-center justify-between border-t pt-4 text-lg font-bold'>
-            <span>{t('subscriptions:totalDue')}</span>
-            <span>{formatPrice(paymentData.finalPrice, plan.currency)}</span>
+          <div className='mt-4 flex items-center justify-between gap-2 border-t pt-4 text-lg font-bold'>
+            <span className='min-w-0 break-words'>{t('subscriptions:totalDue')}</span>
+            <span className='shrink-0'>{formatPrice(paymentData.finalPrice, plan.currency)}</span>
           </div>
         </div>
 
-        <section className='justify-self-end text-label w-90'>
+        <section className='w-full max-w-90 justify-self-end text-label'>
           <Checkbox
             label={
               <Trans
@@ -258,7 +258,7 @@ export const CheckoutReviewPlanFormInput = ({
           />
         </section>
 
-        <div className='flex justify-end gap-2 pt-4'>
+        <div className='flex flex-wrap justify-end gap-2 pt-4'>
           <Button type='button' className='flex items-center' variant='outlined' color='primary' onClick={onCancel}>
             <LuX />
             {t('common:cancel')}

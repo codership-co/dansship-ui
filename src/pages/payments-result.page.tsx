@@ -106,7 +106,7 @@ function PaymentsResultPage() {
       {intent && (
         <Section contentClassName='grid gap-20' navbarPadding>
           <section className='rounded-2xl shadow-2xl'>
-            <section className='bg-white p-8 rounded-2xl grid md:grid-cols-[1fr_1fr] gap-8 overflow-hidden'>
+            <section className='grid gap-8 overflow-hidden rounded-2xl bg-white p-4 sm:p-8 md:grid-cols-[1fr_1fr]'>
               <section className='relative min-h-70 bg-accent px-8 py-16 rounded-lg shadow-lg'>
                 <img
                   src='/assets/images/bailarina.png'
@@ -114,7 +114,7 @@ function PaymentsResultPage() {
                   className='absolute w-40 xs:w-50 sm:w-60 md:w-60/100 bottom-1/2 right-1/2 translate-1/2'
                 />
               </section>
-              <section className='grid content-center gap-4 py-14 relative bg-white'>
+              <section className='grid content-center gap-4 py-14 relative bg-white min-w-0'>
                 <h4 className='m-0 text-center'>{intent.purchase_reference?.human_identifier}</h4>
                 {intent.payment_method_type === PaymentMethod.CARD &&
                   ['pending', 'pending_manual_review'].includes(intent.status) && (
@@ -134,7 +134,7 @@ function PaymentsResultPage() {
                     },
                     {
                       label: t('payments:referenceId'),
-                      value: <span className='font-code'>{intent.reference_id}</span>,
+                      value: <span className='font-code break-all'>{intent.reference_id}</span>,
                     },
                     {
                       label: t('payments:methodLabel'),
@@ -167,22 +167,25 @@ function PaymentsResultPage() {
                     >
                       {label && (
                         <>
-                          <small className='m-0'>{label}</small>
+                          <small className='m-0 min-w-0'>{label}</small>
                           <span className='border-b border-dashed border-gray-300' />
-                          <small className='m-0'>{value}</small>
+                          <small className='m-0 min-w-0 max-w-[55%] text-right break-all'>{value}</small>
                         </>
                       )}
                     </section>
                   ))}
                 </section>
 
-                <section className='bg-gray-200/60 rounded-2xl flex overflow-hidden'>
-                  <small className='m-0 block bg-gray-200 px-4 py-2'>{t('payments:intentId')}</small>
-                  <small className='m-0 block font-code px-4 py-2'>{intent.id}</small>
+                <section className='flex min-w-0 overflow-hidden rounded-2xl bg-gray-200/60'>
+                  <small className='m-0 block shrink-0 bg-gray-200 px-4 py-2'>{t('payments:intentId')}</small>
+                  <small className='m-0 block min-w-0 flex-1 truncate font-code px-4 py-2'>{intent.id}</small>
                 </section>
 
                 <section
-                  className={cn('flex gap-4 items-center mt-4', canUploadProof ? 'justify-end' : 'justify-center')}
+                  className={cn(
+                    'mt-4 flex flex-wrap items-center gap-4',
+                    canUploadProof ? 'justify-end' : 'justify-center',
+                  )}
                 >
                   {canUploadProof && (
                     <Button
@@ -220,9 +223,9 @@ function PaymentsResultPage() {
             <section className='bg-white rounded-2xl grid md:grid-cols-[3fr_2fr] overflow-hidden'>
               <section className='grid px-8 py-40 place-content-center gap-4 justify-items-center text-center'>
                 <p className='whitespace-pre-line m-0'>{t('payments:intentDetailsNotFound')}</p>
-                <section className='bg-gray-200/60 rounded-2xl flex overflow-hidden'>
-                  <small className='m-0 block bg-gray-200 px-4 py-2'>{t('payments:intentId')}</small>
-                  <small className='m-0 block font-code px-4 py-2'>{intentId}</small>
+                <section className='flex min-w-0 overflow-hidden rounded-2xl bg-gray-200/60'>
+                  <small className='m-0 block shrink-0 bg-gray-200 px-4 py-2'>{t('payments:intentId')}</small>
+                  <small className='m-0 block min-w-0 flex-1 truncate font-code px-4 py-2'>{intentId}</small>
                 </section>
                 <Button
                   color='primary'

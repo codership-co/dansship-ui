@@ -25,13 +25,13 @@ export function TransferPaymentInstructions() {
             className='size-32 object-contain'
           />
           </article> */}
-        <article className='col-span-2 grid justify-items-center gap-2 rounded-lg border border-white/60 bg-white/70 p-4 text-center'>
+        <article className='grid min-w-0 max-w-full justify-items-center gap-2 rounded-lg border border-white/60 bg-white/70 p-4 text-center'>
           {/* <p className='m-0 font-semibold text-primary'>{t('payments:instructions.transfer.brebQrTitle')}</p> */}
 
           <img
             src={BREB_QR_PLACEHOLDER}
             alt={t('payments:instructions.transfer.brebQrTitle')}
-            className='size-120 object-contain'
+            className='aspect-square h-auto w-full max-w-60 object-contain sm:max-w-80 md:max-w-120'
           />
 
           <p className='m-0 mt-4 font-semibold text-primary'>

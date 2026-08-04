@@ -41,11 +41,11 @@ export const FormStepperLayout = <T extends React.Key>({
     <section className='shadow-2xl rounded-xl md:rounded-2xl' data-component='FormStepperLayout'>
       <section
         className={cn(
-          'grid grid-rows-[auto_1fr] md:grid-rows-none md:grid-cols-[auto_1fr] bg-white rounded-xl md:rounded-2xl',
+          'grid min-w-0 grid-rows-[auto_1fr] md:grid-rows-none md:grid-cols-[auto_1fr] bg-white rounded-xl md:rounded-2xl',
           className,
         )}
       >
-        <section className='px-8 py-6 md:py-16 md:pl-8 md:pr-12 bg-gradient-onboarding grid grid-flow-col md:grid-flow-row gap-6 md:gap-8 justify-start content-start select-none'>
+        <section className='grid min-w-0 grid-flow-col content-start justify-start gap-6 bg-gradient-onboarding px-6 py-6 select-none sm:px-8 md:grid-flow-row md:gap-8 md:py-16 md:pl-8 md:pr-12'>
           {steps.map(({ title, step, Icon }, index) => {
             const isNavigable = Boolean(onStepSelect && canNavigateToStep?.(step) && index !== stepIndex);
 
@@ -104,7 +104,7 @@ export const FormStepperLayout = <T extends React.Key>({
             );
           })}
         </section>
-        <section className='px-8 py-6 md:py-16 md:pr-8 md:pl-12 h-full grid grid-rows-[auto_1fr] overflow-y-auto'>
+        <section className='grid h-full min-w-0 grid-rows-[auto_1fr] overflow-x-clip overflow-y-auto px-6 py-6 sm:px-8 md:py-16 md:pr-8 md:pl-12'>
           <section className='mb-10'>
             <div className='flex items-start gap-2'>
               <div>
