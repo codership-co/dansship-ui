@@ -1,5 +1,15 @@
 export interface UsersSearchParams {
-  email?: string;
+  search?: string;
+  is_instructor?: boolean;
+  limit?: number;
+  offset?: number;
+}
+
+export interface UserListPage {
+  items: Array<UserResponse>;
+  total: number;
+  limit: number;
+  offset: number;
 }
 
 export interface UserDeactivateResponse {
@@ -14,10 +24,11 @@ export interface UserResponse {
   id: string;
   full_name: string;
   onboarding_completed?: boolean;
+  has_instructor_profile?: boolean;
   email: string;
-  created_at: string;
-  roles: Array<string>;
-  permissions: Array<string>;
+  created_at?: string;
+  roles?: Array<string>;
+  permissions?: Array<string>;
 }
 
 export interface AdminUserInstructorProfile {

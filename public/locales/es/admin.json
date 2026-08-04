@@ -12,12 +12,17 @@
   "users": {
     "title": "Gestión de Usuarios",
     "subtitle": "Consulta usuarios y abre el detalle de uno para revisar su información.",
-    "searchLabel": "Buscar por correo",
-    "searchPlaceholder": "Buscar por correo (mín. 3 caracteres)",
+    "searchLabel": "Buscar usuario",
+    "searchPlaceholder": "Correo, teléfono o nombre (mín. 3 caracteres)",
+    "instructorFilter": "Solo instructores",
     "loading": "Cargando usuarios...",
     "empty": "No hay usuarios para mostrar.",
-    "noUsersFound": "No se encontraron usuarios con ese correo.",
+    "noUsersFound": "No se encontraron usuarios con esa búsqueda.",
     "total": "{{count}} usuario(s) encontrado(s)",
+    "pagination": {
+      "prev": "Anterior",
+      "next": "Siguiente"
+    },
     "columns": {
       "fullName": "Nombre completo",
       "profileCompleted": "Perfil completado",
@@ -36,6 +41,32 @@
       "birthDate": "Fecha de nacimiento",
       "phoneNumber": "Número de teléfono",
       "documentNumber": "Número de documento",
+      "tabs": {
+        "profile": "Perfil",
+        "subscriptions": "Suscripciones",
+        "payments": "Pagos",
+        "bookings": "Reservas",
+        "benefits": "Beneficios",
+        "instructorClasses": "Clases del instructor"
+      },
+      "columns": {
+        "plan": "Plan",
+        "remaining": "Clases restantes",
+        "expires": "Vence",
+        "class": "Clase",
+        "startTime": "Inicio",
+        "room": "Sala",
+        "benefit": "Beneficio",
+        "grantedAt": "Otorgado"
+      },
+      "emptySubscriptions": "Este usuario no tiene suscripciones.",
+      "emptyBookings": "Este usuario no tiene reservas.",
+      "emptyBenefits": "Este usuario no tiene beneficios aplicados.",
+      "assignedClasses": "Clases asignadas (próximas)",
+      "taughtClasses": "Clases dictadas (pasadas)",
+      "emptyAssignedClasses": "No hay clases asignadas próximas.",
+      "emptyTaughtClasses": "No hay clases dictadas registradas.",
+      "viewRoster": "Ver lista",
       "actionsMenu": "Acciones del usuario",
       "convertToInstructor": "Convertir en Instructor",
       "resendInstructorInvite": "Reenviar invitación de instructor",
@@ -58,6 +89,17 @@
       "reactivateInstructorSuccess": "El rol de instructor fue reactivado.",
       "reactivateInstructorFailed": "No se pudo reactivar el rol de instructor."
     }
+  },
+  "roster": {
+    "title": "Lista de clase",
+    "loading": "Cargando lista...",
+    "notFound": "No se pudo cargar la lista de esta clase.",
+    "enrolled": "Inscritos ({{count}})",
+    "waitlist": "Lista de espera ({{count}})",
+    "studentName": "Estudiante",
+    "joinedAt": "Ingreso",
+    "noStudents": "No hay estudiantes inscritos.",
+    "noWaitlist": "No hay estudiantes en lista de espera."
   },
   "reports": {
     "title": "Reportes y Configuración de la Plataforma",

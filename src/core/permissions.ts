@@ -72,8 +72,12 @@ export enum PERMISSION {
   STUDIO_RENTAL_READ = 'read:studio_rental',
 
   // SUBSCRIPTION
+  SUBSCRIPTION_MANAGE = 'manage:subscription',
   SUBSCRIPTION_PURCHASE = 'purchase:subscription',
   SUBSCRIPTION_READ = 'read:subscription',
+
+  // BENEFIT
+  BENEFIT_READ = 'read:benefit',
 }
 
 export const InstructorPermissions = {
@@ -104,6 +108,8 @@ export const AdminPermissions = {
   ],
   bookings: [PERMISSION.BOOKING_MANAGE],
   payments: [PERMISSION.PAYMENT_MANAGE],
+  subscriptions: [PERMISSION.SUBSCRIPTION_MANAGE],
+  benefits: [PERMISSION.BENEFIT_READ],
   merch: [PERMISSION.PRODUCT_MANAGE],
   merchPos: [PERMISSION.ORDER_CREATE],
   figures: [PERMISSION.FIGURE_MANAGE],

@@ -9,6 +9,7 @@ import type {
   GetAgendaEventsPayload,
   GetWaitlistDefaultResponse,
   GetWeeksPayload,
+  InstructorClassesResponse,
   ScheduledClass,
   ScheduleWeek,
   UpdateClassPayload,
@@ -17,6 +18,13 @@ import type {
 
 export class SchedulesAdminAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
+
+  async getInstructorClasses(userId: string) {
+    return this.httpClient.callNoError<InstructorClassesResponse>({
+      path: `/admin/schedules/instructors/${userId}/classes`,
+      method: 'GET',
+    });
+  }
 
   async getWeeks(payload: GetWeeksPayload = {}) {
     return this.httpClient.callNoError<Array<ScheduleWeek>>({

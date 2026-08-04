@@ -35,8 +35,10 @@ function AdminBookingsPage() {
   const [reason, setReason] = useState('');
   const userDropdownRef = useRef<HTMLDivElement>(null);
 
-  const { response: users, isLoading: isLoadingUsers } = usePromise(() =>
-    DansshipAPI.bookingsAdmin.searchUsers(emailQuery),
+  const { response: users, isLoading: isLoadingUsers } = usePromise(
+    () => DansshipAPI.bookingsAdmin.searchUsers(emailQuery),
+    emailQuery.length >= 3,
+    [emailQuery],
   );
 
   const {
