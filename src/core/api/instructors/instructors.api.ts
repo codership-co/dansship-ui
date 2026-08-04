@@ -6,9 +6,14 @@ import {
   type AvailabilityApiItem,
   type InstructorAvailability,
   type ClassRosterResponse,
+  type CreateInstructorCertificationPayload,
   type CreateInstructorProfilePayload,
   DAY_TO_INDEX,
   INDEX_TO_DAY,
+  type InstructorCertification,
+  type InstructorCertificationContentType,
+  type InstructorCertificationPresignedUpload,
+  type InstructorCertificationUploadRequest,
   type InstructorProfile,
   type InstructorUserSearchResult,
   type ManualAddStudentPayload,
@@ -130,6 +135,53 @@ export class InstructorsAPI {
       params: {
         ...(fromWeek ? { from: fromWeek } : {}),
       },
+    });
+  }
+
+  private async getCertificationUploadUrl(payload: InstructorCertificationUploadRequest) {
+    return this.httpClient.callNoError<InstructorCertificationPresignedUpload, InstructorCertificationUploadRequest>({
+      path: '/instructors/certifications/upload-url',
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async uploadCertificationDocument(file: File) {
+    const { data } = await this.getCertificationUploadUrl({
+      content_type: file.type as InstructorCertificationContentType,
+    });
+
+    if (!data?.upload_url || !data.file_key) {
+      throw new Error('Failed to get instructor certification upload url');
+    }
+
+    const uploadResponse = await fetch(data.upload_url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': file.type,
+      },
+      body: file,
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('Failed to upload instructor certification document');
+    }
+
+    return data.file_key;
+  }
+
+  async listCertifications() {
+    return this.httpClient.callNoError<Array<InstructorCertification>>({
+      path: '/instructors/certifications',
+      method: 'GET',
+    });
+  }
+
+  async createCertification(payload: CreateInstructorCertificationPayload) {
+    return this.httpClient.callNoError<InstructorCertification, CreateInstructorCertificationPayload>({
+      path: '/instructors/certifications',
+      method: 'POST',
+      data: payload,
     });
   }
 }

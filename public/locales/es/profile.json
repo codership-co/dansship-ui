@@ -27,6 +27,8 @@
     "specializations": "Especializaciones",
     "locations": "Lugares de Enseñanza"
   },
+  "certificationsSaveSuccess": "Certificaciones guardadas correctamente",
+  "certificationsSaveFailed": "No se pudieron guardar las certificaciones",
   "achievements": {
     "title": "Logros",
     "types": {

@@ -1,6 +1,7 @@
 import { Tabs } from 'polpo/components';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 import {
   BasicProfileForm,
@@ -9,16 +10,20 @@ import {
   OperationalProfileForm,
   PreferencesProfileForm,
 } from '@components/forms';
+import { SpinnerLoader } from '@components/loaders';
 import { useAuth } from '@contexts';
 import {
   BasicProfilePayload,
   CertificationsProfilePayload,
+  DansshipAPI,
   HealthProfilePayload,
+  InstructorCertificationPayload,
   OperationalProfilePayload,
   PreferencesProfilePayload,
   ProfileDataKey,
   User,
 } from '@core/api';
+import { useCallablePromise, usePromise } from '@hooks';
 
 export interface ProfileEditData {
   [ProfileDataKey.PROFILE]: BasicProfilePayload;
@@ -77,6 +82,57 @@ export function ProfileEdit({ onChange, isLoading, error, showInstructor }: Prof
   const { t } = useTranslation();
   const { user } = useAuth();
   const defaultData = useMemo<ProfileEditData>(() => getDefaultProfileDataFromUser(user!), [user]);
+  const {
+    response: certificationsResponse,
+    isLoading: isLoadingCertifications,
+    reFetch: refetchCertifications,
+  } = usePromise(() => DansshipAPI.instructors.listCertifications(), showInstructor);
+
+  const { call: saveCertifications, isLoading: isSavingCertifications } = useCallablePromise(
+    async (documents: Array<InstructorCertificationPayload & { certificationId?: string }>) => {
+      try {
+        const newDocuments = documents.filter(document => !document.certificationId && document.file_key);
+
+        for (const document of newDocuments) {
+          const { ok, error: createError } = await DansshipAPI.instructors.createCertification({
+            title: document.title,
+            issuer: document.issuer,
+            file_key: document.file_key!,
+            issue_date: document.issue_date ?? null,
+          });
+
+          if (!ok) {
+            throw createError ?? new Error('Failed to create certification');
+          }
+        }
+
+        await refetchCertifications();
+        onChange(ProfileDataKey.CERTIFICATIONS, {
+          documents: documents.map(({ title, issuer, file_key, issue_date }) => ({
+            title,
+            issuer,
+            file_key,
+            issue_date,
+          })),
+        });
+        toast.success(t('profile:certificationsSaveSuccess'));
+      } catch {
+        toast.error(t('profile:certificationsSaveFailed'));
+      }
+    },
+  );
+
+  const existingCertificationDocuments = useMemo(
+    () =>
+      (certificationsResponse?.data ?? []).map(certification => ({
+        certificationId: certification.id,
+        title: certification.title,
+        issuer: certification.issuer,
+        file_key: certification.file_key,
+        issue_date: certification.issue_date,
+      })),
+    [certificationsResponse?.data],
+  );
 
   return (
     <section className='grid md:grid-cols-[auto_1fr] gap-8 md:items-start'>
@@ -162,11 +218,22 @@ export function ProfileEdit({ onChange, isLoading, error, showInstructor }: Prof
                 <h3 className='text-primary'>{t('auth:onboarding.instructorSteps.second.title')}</h3>
                 <p>{t('auth:onboarding.instructorSteps.second.subtitle')}</p>
 
-                <CertificationsProfileForm
-                  isLoading={isLoading}
-                  error={error}
-                  onComplete={data => onChange(ProfileDataKey.CERTIFICATIONS, data)}
-                />
+                {isLoadingCertifications ? (
+                  <div className='flex justify-center p-12'>
+                    <SpinnerLoader />
+                  </div>
+                ) : (
+                  <CertificationsProfileForm
+                    isLoading={isLoading || isSavingCertifications}
+                    error={error || null}
+                    defaultDocuments={existingCertificationDocuments}
+                    uploadDocument={file => DansshipAPI.instructors.uploadCertificationDocument(file)}
+                    submitLabel={t('common:save')}
+                    onComplete={documents => {
+                      void saveCertifications(documents);
+                    }}
+                  />
+                )}
               </section>
             </Tabs.TabPanel>
           )}

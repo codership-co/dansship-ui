@@ -117,3 +117,39 @@ export interface AcceptInstructorInviteResponse {
   email: string;
   message?: string;
 }
+
+export type InstructorCertificationContentType = 'application/pdf' | 'image/jpeg' | 'image/png' | 'image/webp';
+
+export const InstructorCertificationContentTypes: Array<InstructorCertificationContentType> = [
+  'application/pdf',
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+];
+
+export interface InstructorCertificationUploadRequest {
+  content_type: InstructorCertificationContentType;
+}
+
+export interface InstructorCertificationPresignedUpload {
+  upload_url: string;
+  file_key: string;
+}
+
+export interface InstructorCertification {
+  id: string;
+  instructor_profile_id: string;
+  title: string;
+  issuer: string;
+  file_key: string;
+  issue_date?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CreateInstructorCertificationPayload {
+  title: string;
+  issuer: string;
+  file_key: string;
+  issue_date?: string | null;
+}

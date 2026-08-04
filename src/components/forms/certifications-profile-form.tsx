@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TFunction } from 'i18next';
 import { Button } from 'polpo/components';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { LuChevronLeft, LuPlus, LuTrash2 } from 'react-icons/lu';
@@ -10,13 +10,15 @@ import { z } from 'zod';
 
 import { DateField, TextField } from '@components/form-fields';
 import { OptionalFileUpload } from '@components/forms/optional-file-upload';
-import { DansshipAPI, InstructorCertificationPayload, PaymentProofContentType } from '@core/api';
+import { DansshipAPI, InstructorCertificationContentTypes, InstructorCertificationPayload } from '@core/api';
 import { useCallablePromise } from '@hooks';
 
 export const createCertificationsProfileSchema = (t: TFunction) =>
   z.object({
     documents: z.array(
       z.object({
+        // Avoid `id` — useFieldArray overwrites fields named `id`.
+        certificationId: z.string().optional(),
         title: z
           .string()
           .min(1, { message: t('auth:onboarding.validationRequired') })
@@ -33,12 +35,24 @@ export const createCertificationsProfileSchema = (t: TFunction) =>
 
 export type CertificationsProfileFormValues = z.infer<ReturnType<typeof createCertificationsProfileSchema>>;
 
-interface OnboardingCertificationsProfileFormProps {
+export type CertificationDocumentDefault = {
+  certificationId?: string;
+  title: string;
+  issuer: string;
+  file_key: string;
+  issue_date?: string | null;
+};
+
+interface CertificationsProfileFormProps {
   isLoading: boolean;
   error: string | null;
-  onComplete: (documents: Array<InstructorCertificationPayload>) => void;
+  onComplete: (documents: Array<InstructorCertificationPayload & { certificationId?: string }>) => void;
   onSkip?: () => void;
   onBack?: () => void;
+  /** Defaults to onboarding upload; profile self-service should pass instructors.uploadCertificationDocument. */
+  uploadDocument?: (file: File) => Promise<string>;
+  defaultDocuments?: Array<CertificationDocumentDefault>;
+  submitLabel?: string;
 }
 
 export function CertificationsProfileForm({
@@ -47,11 +61,14 @@ export function CertificationsProfileForm({
   onComplete,
   onSkip,
   onBack,
-}: OnboardingCertificationsProfileFormProps) {
+  uploadDocument = file => DansshipAPI.onboarding.uploadDocument(file),
+  defaultDocuments = [],
+  submitLabel,
+}: CertificationsProfileFormProps) {
   const { t } = useTranslation();
   const schema = createCertificationsProfileSchema(t);
   const { call: uploadCertificationFile, isLoading: isUploading } = useCallablePromise((file: File) =>
-    DansshipAPI.onboarding.uploadDocument(file),
+    uploadDocument(file),
   );
   const [filePreviews, setFilePreviews] = useState<Record<number, { file: File | null; previewUrl: string | null }>>(
     {},
@@ -63,15 +80,34 @@ export function CertificationsProfileForm({
     handleSubmit,
     setValue,
     getValues,
+    reset,
     formState: { errors },
   } = useForm<CertificationsProfileFormValues>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     resolver: zodResolver(schema),
     defaultValues: {
-      documents: [],
+      documents: defaultDocuments.map(document => ({
+        certificationId: document.certificationId,
+        title: document.title,
+        issuer: document.issuer,
+        file_key: document.file_key,
+        issue_date: document.issue_date ? new Date(document.issue_date) : null,
+      })),
     },
   });
+
+  useEffect(() => {
+    reset({
+      documents: defaultDocuments.map(document => ({
+        certificationId: document.certificationId,
+        title: document.title,
+        issuer: document.issuer,
+        file_key: document.file_key,
+        issue_date: document.issue_date ? new Date(document.issue_date) : null,
+      })),
+    });
+  }, [defaultDocuments, reset]);
 
   const { fields, append, remove } = useFieldArray({ control, name: 'documents' });
 
@@ -107,6 +143,7 @@ export function CertificationsProfileForm({
   const handleFormSubmit = (values: CertificationsProfileFormValues) => {
     onComplete(
       values.documents.map(document => ({
+        certificationId: document.certificationId,
         title: document.title,
         issuer: document.issuer,
         file_key: document.file_key,
@@ -117,6 +154,7 @@ export function CertificationsProfileForm({
 
   const handleAddDocument = () => {
     append({
+      certificationId: undefined,
       title: '',
       issuer: '',
       file_key: '',
@@ -156,58 +194,72 @@ export function CertificationsProfileForm({
           <p className='text-sm text-gray-600'>{t('auth:onboarding.certificationsEmpty')}</p>
         ) : null}
 
-        {fields.map((field, index) => (
-          <section key={field.id} className='space-y-4 rounded-xl border border-gray-200 p-4'>
-            <div className='flex justify-end'>
-              <Button type='button' color='tertiary' variant='text' onClick={() => handleRemoveDocument(index)}>
-                <LuTrash2 />
-                {t('common:fileUpload.remove')}
-              </Button>
-            </div>
+        {fields.map((field, index) => {
+          const isExisting = Boolean(getValues(`documents.${index}.certificationId`));
 
-            <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-start'>
-              <TextField
+          return (
+            <section key={field.id} className='space-y-4 rounded-xl border border-gray-200 p-4'>
+              <div className='flex justify-end'>
+                <Button
+                  type='button'
+                  color='tertiary'
+                  variant='text'
+                  disabled={isExisting}
+                  onClick={() => handleRemoveDocument(index)}
+                >
+                  <LuTrash2 />
+                  {t('common:fileUpload.remove')}
+                </Button>
+              </div>
+
+              <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-start'>
+                <TextField
+                  control={control}
+                  name={`documents.${index}.title`}
+                  label={t('auth:onboarding.fields.certificationTitle.label')}
+                  placeholder={t('auth:onboarding.fields.certificationTitle.placeholder')}
+                  disabled={isExisting}
+                />
+                <TextField
+                  control={control}
+                  name={`documents.${index}.issuer`}
+                  label={t('auth:onboarding.fields.certificationIssuer.label')}
+                  placeholder={t('auth:onboarding.fields.certificationIssuer.placeholder')}
+                  disabled={isExisting}
+                />
+              </div>
+
+              <DateField
                 control={control}
-                name={`documents.${index}.title`}
-                label={t('auth:onboarding.fields.certificationTitle.label')}
-                placeholder={t('auth:onboarding.fields.certificationTitle.placeholder')}
+                name={`documents.${index}.issue_date`}
+                label={t('auth:onboarding.fields.certificationIssueDate.label')}
+                placeholder={t('auth:onboarding.fields.certificationIssueDate.placeholder')}
+                disabled={isExisting}
               />
-              <TextField
-                control={control}
-                name={`documents.${index}.issuer`}
-                label={t('auth:onboarding.fields.certificationIssuer.label')}
-                placeholder={t('auth:onboarding.fields.certificationIssuer.placeholder')}
+
+              <OptionalFileUpload
+                value={filePreviews[index]?.file ?? null}
+                previewUrl={filePreviews[index]?.previewUrl ?? null}
+                acceptedTypes={[...InstructorCertificationContentTypes]}
+                isUploading={uploadingIndex === index || (isUploading && uploadingIndex === index)}
+                helperText={t('auth:onboarding.fields.certificationFile.helper')}
+                label={t('auth:onboarding.fields.certificationFile.label')}
+                onChange={(file, previewUrl) => {
+                  void handleFileChange(index, file, previewUrl);
+                }}
+                disabled={isExisting}
               />
-            </div>
 
-            <DateField
-              control={control}
-              name={`documents.${index}.issue_date`}
-              label={t('auth:onboarding.fields.certificationIssueDate.label')}
-              placeholder={t('auth:onboarding.fields.certificationIssueDate.placeholder')}
-            />
+              {getValues(`documents.${index}.file_key`) ? (
+                <p className='text-xs text-active-600'>{t('auth:onboarding.certificationUploaded')}</p>
+              ) : null}
 
-            <OptionalFileUpload
-              value={filePreviews[index]?.file ?? null}
-              previewUrl={filePreviews[index]?.previewUrl ?? null}
-              acceptedTypes={Object.values(PaymentProofContentType)}
-              isUploading={uploadingIndex === index || (isUploading && uploadingIndex === index)}
-              helperText={t('auth:onboarding.fields.certificationFile.helper')}
-              label={t('auth:onboarding.fields.certificationFile.label')}
-              onChange={(file, previewUrl) => {
-                void handleFileChange(index, file, previewUrl);
-              }}
-            />
-
-            {getValues(`documents.${index}.file_key`) ? (
-              <p className='text-xs text-active-600'>{t('auth:onboarding.certificationUploaded')}</p>
-            ) : null}
-
-            {errors.documents?.[index]?.file_key?.message ? (
-              <p className='text-xs text-alert-600'>{errors.documents[index].file_key.message}</p>
-            ) : null}
-          </section>
-        ))}
+              {errors.documents?.[index]?.file_key?.message ? (
+                <p className='text-xs text-alert-600'>{errors.documents[index].file_key.message}</p>
+              ) : null}
+            </section>
+          );
+        })}
 
         {error ? <p className='text-sm text-alert-600'>{error}</p> : null}
 
@@ -227,7 +279,7 @@ export function CertificationsProfileForm({
               </Button>
             )}
             <Button type='submit' fullWidth isLoading={isLoading || uploadingIndex !== null} color='primary'>
-              {t('auth:onboarding.complete')}
+              {submitLabel ?? t('auth:onboarding.complete')}
             </Button>
           </section>
           {onSkip && (
