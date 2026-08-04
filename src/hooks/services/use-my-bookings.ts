@@ -40,6 +40,8 @@ export const useMyBookings = () => {
               toast.error(t('bookings:timeOverlapDesc'));
             } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_GROUP_NOT_COVERED) {
               toast.error(t('bookings:classGroupNotCoveredDesc'));
+            } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_STARTED) {
+              toast.error(t('bookings:subscriptionNotStartedDesc'));
             } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_ELIGIBLE) {
               toast.error(t('bookings:subscriptionNotEligibleDesc'));
             } else {
@@ -104,6 +106,8 @@ export const useMyBookings = () => {
               toast.error(t('bookings:timeOverlapDesc'));
             } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_GROUP_NOT_COVERED) {
               toast.error(t('bookings:classGroupNotCoveredDesc'));
+            } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_STARTED) {
+              toast.error(t('bookings:subscriptionNotStartedDesc'));
             } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_ELIGIBLE) {
               toast.error(t('bookings:subscriptionNotEligibleDesc'));
             } else {
