@@ -11,7 +11,7 @@ import { ProfilePicture } from '@components/ui';
 import { useAuth } from '@contexts';
 import { DansshipAPI, ActiveSubscription, PublishedClass } from '@core/api';
 import { DEFAULT_ROOM_IMAGE, PageURLS } from '@core/constants';
-import { formatTimeDifference, getClassBookingEligibility } from '@helpers';
+import { formatTimeDifference, getClassBookingEligibility, isPastBookingDeadline } from '@helpers';
 import { useDateLocale, usePromise, useMyBookings } from '@hooks';
 
 type BookingConfirmAction = 'cancel' | 'leaveWaitlist';
@@ -53,7 +53,7 @@ export function BookingModal({
 
   if (!selectedClass) return null;
 
-  const isPast = new Date(selectedClass.end_time) < new Date();
+  const isPast = isPastBookingDeadline(selectedClass.start_time);
   const isFull = selectedClass.enrolled_count >= selectedClass.capacity;
 
   // Here we check if the user is already booked via the injected `user_booking_status` field.
@@ -264,7 +264,7 @@ export function BookingModal({
             <section className='flex flex-col gap-2'>
               {isPast ? (
                 <label className='bg-gray-50 p-3 rounded text-gray-700 border border-gray-200 text-center'>
-                  {t('bookings:classEnded')}
+                  {t('bookings:bookingWindowClosed')}
                 </label>
               ) : isBooked ? (
                 selectedClass.user_booking_is_cancellable === false ? (

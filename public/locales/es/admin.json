@@ -133,6 +133,7 @@
     "subscriptionNotStarted": "El plan del usuario aún no inicia para la fecha de esta clase.",
     "subscriptionNotEligible": "El usuario no tiene una suscripción activa con clases disponibles.",
     "timeOverlap": "El usuario ya tiene otra clase reservada en ese horario.",
+    "lateJoinClosed": "El plazo para reservar esta clase ya cerró.",
     "classFull": "Esta clase está llena.",
     "validationUser": "Selecciona un usuario.",
     "validationClass": "Selecciona una clase.",
