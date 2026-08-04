@@ -509,7 +509,9 @@ export function SecurityGuard(
       }
 
       return <Component />;
-    }, [isAuthenticated, location, requireOnboarding, validFeatureFlags, validPermissions]);
+      // Depend on pathname only so ?tab= / search updates do not remount page trees.
+      // eslint-disable-next-line react-hooks/exhaustive-deps -- location used for Navigate state; pathname drives remounts
+    }, [isAuthenticated, location.pathname, requireOnboarding, validFeatureFlags, validPermissions]);
   }
 
   return Guard as React.ComponentType;

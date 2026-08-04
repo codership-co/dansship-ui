@@ -2,6 +2,7 @@ export * from './admin.page';
 export * from './merch.page';
 export * from './user-list.page';
 export * from './user-details.page';
+export * from './class-roster.page';
 export * from './agenda.page';
 export * from './figures.page';
 export * from './reports.page';

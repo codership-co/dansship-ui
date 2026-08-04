@@ -38,7 +38,13 @@ const STATUS_OPTIONS: Array<{ value: 'all' | PaymentStatus; labelKey: string }> 
   { value: PaymentStatus.EXPIRED, labelKey: 'payments:status.expired' },
 ];
 
-export function AdminPaymentList() {
+export function AdminPaymentList({
+  userId,
+  readOnly = false,
+}: {
+  userId?: string;
+  readOnly?: boolean;
+} = {}) {
   const { t } = useTranslation();
   const locale = useDateLocale();
   const [statusFilter, setStatusFilter] = useState<'all' | PaymentStatus>('all');
@@ -47,8 +53,9 @@ export function AdminPaymentList() {
   const filters = useMemo(
     () => ({
       status: statusFilter === 'all' ? undefined : statusFilter,
+      user_id: userId,
     }),
-    [statusFilter],
+    [statusFilter, userId],
   );
 
   const {
@@ -165,14 +172,16 @@ export function AdminPaymentList() {
                         <TableCell>{format(new Date(intent.created_at), 'MMM d, yyyy', { locale })}</TableCell>
 
                         <TableCell className='text-right'>
-                          <Button
-                            size='sm'
-                            variant='outline'
-                            disabled={intent.status !== 'pending_manual_review'}
-                            onClick={() => setSelectedIntent(intent)}
-                          >
-                            {t('payments:admin.review')}
-                          </Button>
+                          {!readOnly ? (
+                            <Button
+                              size='sm'
+                              variant='outline'
+                              disabled={intent.status !== 'pending_manual_review'}
+                              onClick={() => setSelectedIntent(intent)}
+                            >
+                              {t('payments:admin.review')}
+                            </Button>
+                          ) : null}
                         </TableCell>
                       </TableRow>
                     );
@@ -184,20 +193,22 @@ export function AdminPaymentList() {
         </CardContent>
       </Card>
 
-      <AdminPaymentReviewModal
-        open={Boolean(selectedIntent)}
-        intent={selectedIntent}
-        onOpenChange={open => {
-          if (!open) {
-            setSelectedIntent(null);
-          }
-        }}
-        onReview={reviewPayment}
-        isReviewing={isReviewing}
-        onSynced={() => {
-          void reFetch();
-        }}
-      />
+      {!readOnly ? (
+        <AdminPaymentReviewModal
+          open={Boolean(selectedIntent)}
+          intent={selectedIntent}
+          onOpenChange={open => {
+            if (!open) {
+              setSelectedIntent(null);
+            }
+          }}
+          onReview={reviewPayment}
+          isReviewing={isReviewing}
+          onSynced={() => {
+            void reFetch();
+          }}
+        />
+      ) : null}
     </>
   );
 }

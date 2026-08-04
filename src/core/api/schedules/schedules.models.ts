@@ -17,6 +17,11 @@ export interface ScheduledClass {
   instructor?: { id: string; user_id: string; email: string; full_name: string; photo_url?: string | null } | null;
 }
 
+export interface InstructorClassesResponse {
+  assigned: Array<ScheduledClass>;
+  taught: Array<ScheduledClass>;
+}
+
 export interface ScheduleWeek {
   id: string;
   week_start_date: string;

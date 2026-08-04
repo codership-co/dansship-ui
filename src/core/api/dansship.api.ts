@@ -1,6 +1,7 @@
 import { HttpClient } from 'polpo-http-client';
 
 import { AuthAPI } from './auth/auth.api';
+import { BenefitsAdminAPI } from './benefits/benefits.admin.api';
 import { BillingAdminAPI } from './billing/billing.admin.api';
 import { BookingsAdminAPI } from './bookings/bookings.admin.api';
 import { BookingsAPI } from './bookings/bookings.api';
@@ -20,6 +21,7 @@ import { SchedulesAdminAPI } from './schedules/schedules.admin.api';
 import { SchedulesAPI } from './schedules/schedules.api';
 import { StudioRentalAdminAPI } from './studio-rental/studio-rental.admin.api';
 import { StudioRentalAPI } from './studio-rental/studio-rental.api';
+import { SubscriptionsAdminAPI } from './subscriptions/subscriptions.admin.api';
 import { SubscriptionsAPI } from './subscriptions/subscriptions.api';
 import { UsersAdminAPI } from './users/users.admin.api';
 
@@ -43,6 +45,7 @@ export class DansshipAPI {
   });
 
   static auth = new AuthAPI(this.httpClient);
+  static benefitsAdmin = new BenefitsAdminAPI(this.httpClient);
   static billingAdmin = new BillingAdminAPI(this.httpClient);
   static bookings = new BookingsAPI(this.httpClient);
   static bookingsAdmin = new BookingsAdminAPI(this.httpClient);
@@ -62,6 +65,7 @@ export class DansshipAPI {
   static studioRental = new StudioRentalAPI(this.httpClient);
   static studioRentalAdmin = new StudioRentalAdminAPI(this.httpClient);
   static subscriptions = new SubscriptionsAPI(this.httpClient);
+  static subscriptionsAdmin = new SubscriptionsAdminAPI(this.httpClient);
   static usersAdmin = new UsersAdminAPI(this.httpClient);
 
   static {

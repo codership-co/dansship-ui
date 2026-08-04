@@ -108,6 +108,7 @@ export const PageURLS = {
     agenda: '/admin/agenda',
     users: '/admin/users',
     userDetails: (userId: string | number) => `/admin/users/${userId}`,
+    classRoster: (classId: string | number) => `/admin/classes/${classId}/roster`,
     agendaConflicts: '/admin/agenda/conflicts',
     inventory: '/admin/inventory',
     scheduleBuilder: '/admin/schedule-builder',

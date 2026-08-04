@@ -5,8 +5,8 @@ import { DansshipAPIError } from '@core/api';
 import type {
   AdminUserDetailsResponse,
   UserDeactivateResponse,
+  UserListPage,
   UserReactivateResponse,
-  UserResponse,
   UsersSearchParams,
 } from './users.models';
 
@@ -14,7 +14,7 @@ export class UsersAdminAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
   async search(payload?: UsersSearchParams) {
-    return this.httpClient.callNoError<Array<UserResponse>>({
+    return this.httpClient.callNoError<UserListPage>({
       path: '/admin/users',
       method: 'GET',
       params: payload,

@@ -102,6 +102,7 @@ export interface PaymentIntent {
 export interface GetAdminPaymentsParams {
   status?: PaymentStatus;
   purchase_type?: PurchaseType;
+  user_id?: string;
 }
 
 export interface PaymentIntentDetail extends PaymentIntent {
