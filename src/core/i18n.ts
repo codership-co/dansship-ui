@@ -14,6 +14,12 @@ i18n
     debug: false,
     load: 'languageOnly',
     supportedLngs: languageCodes,
+    nonExplicitSupportedLngs: true,
+    // Unsupported browser languages (e.g. fr) fall back to Spanish.
+    detection: {
+      order: ['localStorage', 'navigator'],
+      caches: ['localStorage'],
+    },
     ns: [
       'admin',
       'auth',

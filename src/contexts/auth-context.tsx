@@ -24,7 +24,12 @@ import {
 import { AUTH_SESSION_KEY, PageURLS } from '@core/constants';
 import { type PERMISSION } from '@core/permissions';
 import { addSentryBreadcrumb, clearSentryUser, setSentryUser } from '@core/sentry';
-import { getPendingPlanCheckoutIntent, isValidReturnPath, resolvePostLoginPath } from '@helpers';
+import {
+  getPendingPlanCheckoutIntent,
+  isValidReturnPath,
+  resolveBrowserPreferredLanguage,
+  resolvePostLoginPath,
+} from '@helpers';
 import { useEventListener } from '@hooks';
 import { Error404Page, UnauthorizedPage, UnavailablePage } from '@pages';
 
@@ -189,10 +194,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }
 
   async function signUp(payload: RegisterPayload) {
-    const lang = payload.preferred_language || navigator.language.split('-')[0];
+    const preferred_language = resolveBrowserPreferredLanguage(payload.preferred_language);
 
     try {
-      await DansshipAPI.auth.register({ ...payload, preferred_language: lang });
+      await DansshipAPI.auth.register({ ...payload, preferred_language });
       clearSessionArtifacts();
       setUser(null);
       navigate(PageURLS.auth.verifyEmail, {
