@@ -30,7 +30,7 @@ export function PlanCard({ plan, onSelectPlan, isFeatured, hoverable, className,
         className={cn(
           'relative flex h-auto flex-col',
           isFeatured
-            ? 'bg-gradient-plan-recommended text-primary-foreground shadow-[0_2rem_2rem_-1rem_var(--color-primary)] transition-all w-[calc(100%+48px)] -left-6 lg:left-0 lg:w-auto md:-translate-y-8 duration-300 lg:h-full border-0'
+            ? 'bg-gradient-plan-recommended text-primary-foreground shadow-[0_2rem_2rem_-1rem_var(--color-primary)] transition-all w-full lg:w-[calc(100%+48px)] lg:-left-6 md:-translate-y-8 duration-300 lg:h-full border-0'
             : 'bg-transparent text-secondary-900 border-0 shadow-none transition-all',
           isFeatured &&
             hoverable &&

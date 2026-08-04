@@ -46,52 +46,54 @@ export function UserPaymentHistory({
     <section className='grid gap-4'>
       <h4>{title || t('payments:myPayments')}</h4>
 
-      <SmartTable
-        rowId='id'
-        columns={[
-          {
-            header: t('payments:createdAt'),
-            render: row => (
-              <Tooltip content={formatDateTime(row.created_at, i18n.language)}>
-                <small>{formatDate(row.created_at, i18n.language)}</small>
-              </Tooltip>
-            ),
-            sortBy: 'created_at',
-          },
-          {
-            header: t('payments:name'),
-            render: row => <label>{paymentPurchaseLabel(row)}</label>,
-          },
-          {
-            header: t('payments:methodLabel'),
-            render: row => <label>{t(`payments:method.${row.payment_method_type}`)}</label>,
-            sortBy: 'payment_method_type',
-          },
-          {
-            header: t('payments:ammount'),
-            render: row => <label>{formatPrice(row.amount, row.currency)}</label>,
-            sortBy: 'amount',
-          },
-          {
-            header: t('payments:intentStatus'),
-            render: row => <PaymentStatusBadge status={row.status} />,
-            sortBy: 'status',
-          },
-          {
-            header: '',
-            render: row => (
-              <Link to={`${PageURLS.paymentsResult}?intentId=${row.id}`}>
-                <Button color='primary' size='small' variant='flat' className='whitespace-nowrap'>
-                  {t('payments:moreDetails')}
-                </Button>
-              </Link>
-            ),
-          },
-        ]}
-        data={visibleIntents}
-        className='rounded-3xl'
-        tableClassName='bg-white/50'
-      />
+      <div className='w-full min-w-0 overflow-x-auto'>
+        <SmartTable
+          rowId='id'
+          columns={[
+            {
+              header: t('payments:createdAt'),
+              render: row => (
+                <Tooltip content={formatDateTime(row.created_at, i18n.language)}>
+                  <small>{formatDate(row.created_at, i18n.language)}</small>
+                </Tooltip>
+              ),
+              sortBy: 'created_at',
+            },
+            {
+              header: t('payments:name'),
+              render: row => <label>{paymentPurchaseLabel(row)}</label>,
+            },
+            {
+              header: t('payments:methodLabel'),
+              render: row => <label>{t(`payments:method.${row.payment_method_type}`)}</label>,
+              sortBy: 'payment_method_type',
+            },
+            {
+              header: t('payments:ammount'),
+              render: row => <label>{formatPrice(row.amount, row.currency)}</label>,
+              sortBy: 'amount',
+            },
+            {
+              header: t('payments:intentStatus'),
+              render: row => <PaymentStatusBadge status={row.status} />,
+              sortBy: 'status',
+            },
+            {
+              header: '',
+              render: row => (
+                <Link to={`${PageURLS.paymentsResult}?intentId=${row.id}`}>
+                  <Button color='primary' size='small' variant='flat' className='whitespace-nowrap'>
+                    {t('payments:moreDetails')}
+                  </Button>
+                </Link>
+              ),
+            },
+          ]}
+          data={visibleIntents}
+          className='rounded-3xl'
+          tableClassName='bg-white/50'
+        />
+      </div>
     </section>
   );
 }

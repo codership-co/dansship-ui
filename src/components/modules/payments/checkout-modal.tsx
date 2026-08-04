@@ -41,7 +41,7 @@ export function CheckoutModal({ onClose, plan, isOpen }: CheckoutModalProps) {
       icon={LuCreditCard}
       isOpen={isOpen}
       onClose={onClose}
-      className='p-0 rounded-none sm:rounded-xl'
+      className='w-dvw max-w-[100dvw] overflow-x-clip p-0 rounded-none sm:w-[96dvw] sm:max-w-[96dvw] sm:rounded-xl xl:max-w-7xl'
     >
       <ModalContent onClose={onClose} plan={plan} />
     </ActionModal>
@@ -79,14 +79,16 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
   );
 
   return (
-    <section className='bg-transparent shadow-none border-0 p-0 max-w-none w-auto h-auto m-auto' data-sentry-mask>
+    <section
+      className='m-auto h-auto max-w-[100dvw] w-dvw overflow-x-clip border-0 bg-transparent p-0 shadow-none sm:w-[96dvw] sm:max-w-[96dvw] xl:max-w-7xl'
+      data-sentry-mask
+    >
       <FormStepperLayout
         className={cn(
-          'm-auto overflow-auto rounded-none sm:rounded-xl',
-          'w-dvw max-w-dvw overflow-y-auto',
+          'm-auto min-w-0 overflow-x-clip overflow-y-auto rounded-none sm:rounded-xl',
+          'w-full max-w-full',
           'h-dvh md:h-[80dvh]',
           'max-h-dvh sm:max-h-[96dvh]',
-          'max-w-dvw sm:max-w-[96dvw] xl:max-w-7xl',
         )}
         steps={[
           {
@@ -115,7 +117,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
               <section className='grid grid-rows-[1fr_auto] h-full'>
                 <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
 
-                <div className='flex justify-end gap-2 pt-4'>
+                <div className='flex flex-wrap justify-end gap-2 pt-4'>
                   <Button
                     type='button'
                     color='primary'

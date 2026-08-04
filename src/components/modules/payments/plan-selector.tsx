@@ -70,7 +70,7 @@ export function PlanSelector({ plans }: PlanSelectorProps) {
   }
 
   return (
-    <div className='bg-white rounded-2xl mt-16 mx-6 lg:mx-0 lg:px-8 shadow'>
+    <div className='mt-16 mx-6 overflow-x-clip rounded-2xl bg-white shadow lg:mx-0 lg:px-8'>
       <div className='grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3'>
         {plans.map(plan => (
           <PlanCard
