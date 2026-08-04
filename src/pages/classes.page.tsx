@@ -8,7 +8,7 @@ import { Container, Section, SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { BookingCalendar, WeekSelector } from '@components/modules';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
-import { DansshipAPI, type PublishedClass } from '@core/api';
+import { DansshipAPI, type ActiveSubscription, type PublishedClass } from '@core/api';
 import { getMonday } from '@helpers';
 import { useDateLocale, usePromise } from '@hooks';
 
@@ -30,7 +30,7 @@ function ClassesPage() {
 
       return {
         upcoming: upcoming ?? null,
-        canBookClasses: false,
+        subscriptions: [] as Array<ActiveSubscription>,
         isTrialEligible: false,
         myBookings: [],
       };
@@ -42,14 +42,11 @@ function ClassesPage() {
       DansshipAPI.schedules.getUpcomingWeek(currentWeek),
     ]);
 
-    const totalRemainingClasses = mySubscriptions?.summary?.total_remaining_classes ?? 0;
-    const totalBonusClasses = mySubscriptions?.summary?.total_bonus_classes ?? 0;
     const isTrialEligible = mySubscriptions?.summary?.trial_eligible ?? false;
-    const hasCredits = totalRemainingClasses + totalBonusClasses > 0;
 
     return {
       upcoming: upcoming ?? null,
-      canBookClasses: hasCredits || isTrialEligible,
+      subscriptions: mySubscriptions?.subscriptions ?? [],
       isTrialEligible,
       myBookings: myBookings ?? [],
     };
@@ -149,7 +146,7 @@ function ClassesPage() {
               week={week}
               initialClasses={initialClasses}
               myBookings={response.myBookings}
-              canBookClasses={response.canBookClasses}
+              subscriptions={response.subscriptions}
               isTrialEligible={response.isTrialEligible}
               onBookingChange={() => void reFetch()}
             />

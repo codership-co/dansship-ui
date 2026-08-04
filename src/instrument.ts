@@ -2,8 +2,14 @@ import { init, browserTracingIntegration, replayIntegration } from '@sentry/reac
 
 const dsn = import.meta.env.VITE_SENTRY_DSN?.trim();
 
-/** Instagram / Facebook in-app browser bridge noise — not Dansship app failures. */
-const IGNORE_ERRORS = [/webkit\.messageHandlers/i, /Java object is gone/i, /Error invoking postMessage/i];
+/** Third-party browser / crawler noise — not Dansship app failures. */
+const IGNORE_ERRORS = [
+  /webkit\.messageHandlers/i,
+  /Java object is gone/i,
+  /Error invoking postMessage/i,
+  // CefSharp bots (often Outlook Safe Links) reject with this non-Error string.
+  /Object Not Found Matching Id:\d+/i,
+];
 
 if (import.meta.env.PROD && dsn) {
   const apiUrl = import.meta.env.VITE_DANSSHIP_API_URL;

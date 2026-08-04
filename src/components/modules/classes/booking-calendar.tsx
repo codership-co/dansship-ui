@@ -8,14 +8,14 @@ import { BookingModal } from './booking-modal';
 import { Container, SectionEmpty } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { BookingClassCard, BookingDaySelector } from '@components/modules';
-import { DansshipAPI, MyBooking, PublishedClass } from '@core/api';
+import { DansshipAPI, ActiveSubscription, MyBooking, PublishedClass } from '@core/api';
 import { BookingDay, getColombiaWeekRangeUtc, getMonday, hasOverlap, sortClassesByDay } from '@helpers';
 import { useCallablePromise, useDateLocale } from '@hooks';
 
 interface BookingCalendarProps {
   week: string;
-  canBookClasses: boolean;
   isTrialEligible?: boolean;
+  subscriptions?: Array<ActiveSubscription>;
   myBookings: Array<MyBooking>;
   /** When provided, hydrate from these classes and skip the range fetch for this week. */
   initialClasses?: Array<PublishedClass> | null;
@@ -24,8 +24,8 @@ interface BookingCalendarProps {
 
 export function BookingCalendar({
   week,
-  canBookClasses,
   isTrialEligible = false,
+  subscriptions = [],
   myBookings,
   initialClasses = null,
   onBookingChange,
@@ -175,7 +175,7 @@ export function BookingCalendar({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         selectedClass={selectedClass}
-        canBookClasses={canBookClasses}
+        subscriptions={subscriptions}
         isTrialEligible={isTrialEligible}
         onBookingChange={handleBookingChange}
       />

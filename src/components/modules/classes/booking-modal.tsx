@@ -9,9 +9,9 @@ import { Container } from '@components/containers';
 import { ConfirmDialog } from '@components/modals';
 import { ProfilePicture } from '@components/ui';
 import { useAuth } from '@contexts';
-import { DansshipAPI, PublishedClass } from '@core/api';
+import { DansshipAPI, ActiveSubscription, PublishedClass } from '@core/api';
 import { DEFAULT_ROOM_IMAGE, PageURLS } from '@core/constants';
-import { formatTimeDifference } from '@helpers';
+import { formatTimeDifference, getClassBookingEligibility } from '@helpers';
 import { useDateLocale, usePromise, useMyBookings } from '@hooks';
 
 type BookingConfirmAction = 'cancel' | 'leaveWaitlist';
@@ -20,7 +20,7 @@ interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
   selectedClass: PublishedClass | null;
-  canBookClasses: boolean;
+  subscriptions?: Array<ActiveSubscription>;
   isTrialEligible?: boolean;
   onBookingChange?: () => void | Promise<void>;
 }
@@ -29,7 +29,7 @@ export function BookingModal({
   isOpen,
   onClose,
   selectedClass,
-  canBookClasses,
+  subscriptions = [],
   isTrialEligible = false,
   onBookingChange,
 }: BookingModalProps) {
@@ -130,8 +130,12 @@ export function BookingModal({
     navigate(PageURLS.profile.user(selectedClass.instructor.id));
   };
 
-  const showSubscriptionWarning = !canBookClasses && !isBooked && !isWaitlisted && !isPast && !hasTimeOverlap;
-  const showTrialNote = Boolean(isTrialEligible && canBookClasses && !isBooked && !isWaitlisted && !isPast);
+  const eligibility = getClassBookingEligibility(subscriptions, selectedClass.start_time, isTrialEligible);
+  const showSubscriptionWarning =
+    eligibility.status === 'no_subscription' && !isBooked && !isWaitlisted && !isPast && !hasTimeOverlap;
+  const showNotStartedWarning =
+    eligibility.status === 'not_started' && !isBooked && !isWaitlisted && !isPast && !hasTimeOverlap;
+  const showTrialNote = Boolean(eligibility.status === 'trial' && !isBooked && !isWaitlisted && !isPast);
 
   return (
     <>
@@ -237,6 +241,14 @@ export function BookingModal({
               </label>
             )}
 
+            {showNotStartedWarning && eligibility.status === 'not_started' && (
+              <label className='bg-alert-50 p-3 rounded text-alert-800 border border-alert-200'>
+                {t('bookings:subscriptionNotStartedWarning', {
+                  date: format(parseISO(eligibility.startDate), 'd MMM yyyy', { locale }),
+                })}
+              </label>
+            )}
+
             {showTrialNote && (
               <label className='bg-primary/5 p-3 rounded text-primary border border-primary/20'>
                 {t('bookings:trialClassNote')}
@@ -273,11 +285,11 @@ export function BookingModal({
                 >
                   {isCancelingWaitlist ? t('bookings:leaving') : t('bookings:leaveWaitlist')}
                 </Button>
-              ) : !canBookClasses ? (
+              ) : eligibility.status === 'no_subscription' ? (
                 <Button color='primary' onClick={handleBuyPlan}>
                   {t('bookings:buyPlan')}
                 </Button>
-              ) : isFull ? (
+              ) : eligibility.status === 'not_started' ? null : isFull ? (
                 <Button color='primary' onClick={handleWaitlistJoin} isLoading={isLoading}>
                   {isJoiningWaitlist ? t('bookings:joining') : t('bookings:joinWaitlist')}
                 </Button>
