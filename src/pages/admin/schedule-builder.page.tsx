@@ -218,11 +218,13 @@ function AdminScheduleBuilderPage() {
       const endIso = new Date(`${data.date}T${data.end_time}:00`).toISOString();
 
       if (editingClass && isPublished) {
-        // Published schedule: use restricted published-edit endpoint
-        const resolvedInstructorId = resolveInstructorId(data.instructor_id);
+        /*
+         * Published schedule: use restricted published-edit endpoint
+         * Always send instructor_id so TBA (null) can unassign an existing instructor
+         */
         const publishedPayload = {
           room_id: data.room_id,
-          ...(resolvedInstructorId ? { instructor_id: resolvedInstructorId } : {}),
+          instructor_id: resolveInstructorId(data.instructor_id),
           capacity: data.capacity || undefined,
         };
         await editPublishedClass(selectedWeekId, editingClass.id, publishedPayload);
