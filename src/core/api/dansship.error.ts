@@ -41,6 +41,7 @@ export enum DANSSHIP_ERROR_CODE {
   // Onboarding & Onboarding Flows
   ONBOARDING_REQUIRED = 'ONBOARDING_REQUIRED', // AUTHORIZATION_ERROR = User has not completed required onboarding steps |
   ONBOARDING_STEP_INVALID = 'ONBOARDING_STEP_INVALID', // VALIDATION_ERROR = Onboarding step payload is invalid |
+  ONBOARDING_UPLOAD_PURPOSE_NOT_ALLOWED = 'ONBOARDING_UPLOAD_PURPOSE_NOT_ALLOWED', // VALIDATION_ERROR = Upload purpose not allowed for this user |
 
   // Schedules & Agenda
   SCHEDULE_RESOURCE_NOT_FOUND = 'SCHEDULE_RESOURCE_NOT_FOUND', // RESOURCE_NOT_FOUND = Schedule week or scheduled class not found |
