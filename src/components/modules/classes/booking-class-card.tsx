@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { ProfilePicture } from '@components/ui';
 import { PublishedClass } from '@core/api';
 import { DEFAULT_ROOM_IMAGE } from '@core/constants';
-import { formatTimeDifference } from '@helpers';
+import { formatTimeDifference, isPastBookingDeadline } from '@helpers';
 
 interface BookingClassCardProps {
   bookingClass: PublishedClass;
@@ -17,7 +17,7 @@ interface BookingClassCardProps {
 export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingClassCardProps) {
   const { t } = useTranslation();
   const isFull = bookingClass.enrolled_count >= bookingClass.capacity;
-  const isPast = new Date(bookingClass.end_time) < new Date();
+  const isPast = isPastBookingDeadline(bookingClass.start_time);
   const isUnavailable = isPast || isFull;
   const isBooked = bookingClass.user_booking_status === 'active';
   const isWaitlisted = bookingClass.user_booking_status === 'waitlisted';
@@ -103,7 +103,7 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
         tabIndex={-1}
       >
         {isPast
-          ? t('bookings:classEnded')
+          ? t('bookings:bookingWindowClosed')
           : isFull
             ? t('bookings:joinWaitlist')
             : isWaitlisted

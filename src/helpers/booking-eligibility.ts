@@ -1,5 +1,8 @@
 import type { ActiveSubscription } from '@core/api';
 
+/** Minutes after class start during which walk-in booking is still allowed (mirrors API BOOKING_LATE_JOIN_MINUTES). */
+export const LATE_JOIN_MINUTES = 15;
+
 export type ClassBookingEligibility =
   | { status: 'ok' }
   | { status: 'trial' }
@@ -22,6 +25,16 @@ function hasCreditsForClass(subscription: ActiveSubscription, classStart: Date):
   }
 
   return new Date(subscription.bonus_expires_at) >= classStart;
+}
+
+/**
+ * True when the late-join booking window has closed (start + LATE_JOIN_MINUTES).
+ */
+export function isPastBookingDeadline(classStart: Date | string, now: Date = new Date()): boolean {
+  const start = typeof classStart === 'string' ? new Date(classStart) : classStart;
+  const deadline = new Date(start.getTime() + LATE_JOIN_MINUTES * 60_000);
+
+  return deadline.getTime() <= now.getTime();
 }
 
 /**

@@ -20,7 +20,7 @@ import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { type AdminBookClassPayload, DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions } from '@core/permissions';
-import { getMonday, getNextMonday, getPrevMonday } from '@helpers';
+import { getMonday, getNextMonday, getPrevMonday, isPastBookingDeadline } from '@helpers';
 import { useCallablePromise, usePromise } from '@hooks';
 
 function AdminBookingsPage() {
@@ -72,6 +72,8 @@ function AdminBookingsPage() {
           toast.error(t('admin:bookings.subscriptionNotEligible'));
         } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP) {
           toast.error(t('admin:bookings.timeOverlap'));
+        } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_LATE_JOIN_CLOSED) {
+          toast.error(t('admin:bookings.lateJoinClosed'));
         } else if (
           error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_FULL ||
           error_code === DANSSHIP_ERROR_CODE.CLASS_FULL
@@ -109,10 +111,21 @@ function AdminBookingsPage() {
     return () => document.removeEventListener('mousedown', handleOutsideClick);
   }, []);
 
-  const selectedClass = useMemo(
-    () => classes?.data?.find(scheduledClass => scheduledClass.id === selectedClassId),
-    [classes, selectedClassId],
+  const bookableClasses = useMemo(
+    () => (classes?.ok ? classes.data.filter(scheduledClass => !isPastBookingDeadline(scheduledClass.start_time)) : []),
+    [classes],
   );
+
+  const selectedClass = useMemo(
+    () => bookableClasses.find(scheduledClass => scheduledClass.id === selectedClassId),
+    [bookableClasses, selectedClassId],
+  );
+
+  useEffect(() => {
+    if (selectedClassId && !selectedClass) {
+      setSelectedClassId('');
+    }
+  }, [selectedClass, selectedClassId]);
 
   const handleSubmit = async (event: SubmitEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -247,18 +260,18 @@ function AdminBookingsPage() {
               <Select
                 value={selectedClassId}
                 onValueChange={setSelectedClassId}
-                disabled={isLoadingClasses || !classes?.ok || classes.data.length === 0}
+                disabled={isLoadingClasses || !classes?.ok || bookableClasses.length === 0}
               >
                 <SelectTrigger>
                   <SelectValue placeholder={t('admin:bookings.classSelectPlaceholder')} />
                 </SelectTrigger>
                 <SelectContent>
-                  {!classes?.ok || classes.data.length === 0 ? (
+                  {!classes?.ok || bookableClasses.length === 0 ? (
                     <SelectItem value='__no_classes__' disabled>
                       {t('admin:bookings.noClasses')}
                     </SelectItem>
                   ) : (
-                    classes.data.map(scheduledClass => {
+                    bookableClasses.map(scheduledClass => {
                       const name = scheduledClass.class_definition?.name ?? t('bookings:classDefault');
                       const start = format(new Date(scheduledClass.start_time), 'EEE HH:mm');
                       const end = format(new Date(scheduledClass.end_time), 'HH:mm');
