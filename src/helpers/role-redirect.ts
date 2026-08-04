@@ -60,9 +60,13 @@ export function hasUpcomingActiveBookings(bookings: Array<MyBooking>, now = new 
 
 /**
  * Resolves the post-login destination for the user's primary role.
+ * Admins → reports; instructors → Mi Horario (`/instructor`).
  * Students with upcoming active/waitlisted bookings go to bookings; otherwise classes.
  * Skips bookings lookup when onboarding is incomplete (API returns ONBOARDING_REQUIRED).
  * Soft-fails to classes if the bookings request errors.
+ *
+ * Login prefers this path for admin/instructor (ignores marketing return paths).
+ * Students still restore a valid `from` return path when present.
  */
 export async function resolvePostLoginPath(
   user: Pick<User, 'roles' | 'requiresOnboarding' | 'onboardingCompleted'>,

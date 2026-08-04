@@ -6,28 +6,18 @@ import { MdMenu } from 'react-icons/md';
 import { NavLink, NavLinkProps, useLocation } from 'react-router';
 
 import { MobileMenu } from './mobile-menu';
+import { getPrimaryNavItems, type NavItem } from './nav-items';
 
 import { Section } from '@components/containers';
 import { LanguageSelector } from '@components/navigation/language-selector';
 import { Isotype } from '@components/svg';
 import { ProfilePicture } from '@components/ui';
-import { FEATURE_FLAG, useAuth, useEnabledFeatureFlag, useFeatureFlags, usePermissions } from '@contexts';
+import { useAuth, useEnabledFeatureFlag, useFeatureFlags, usePermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { AdminPermissions, InstructorPermissions, PERMISSION } from '@core/permissions';
 import { usePromise } from '@hooks';
 
-import type { IconType } from 'react-icons';
-
-export interface NavItem {
-  to: string;
-  label: string;
-  andPermissions?: Array<PERMISSION>;
-  orPermissions?: Array<PERMISSION>;
-  featureFlags?: Array<FEATURE_FLAG>;
-  requireAuthentication?: boolean;
-  icon?: IconType;
-}
+export type { NavItem } from './nav-items';
 
 export const Navbar = () => {
   const { t } = useTranslation();
@@ -45,39 +35,7 @@ export const Navbar = () => {
   const { areAuthPagesEnabled, isMyAccountBookingsPageEnabled, isMyAccountSubscriptionPageEnabled } = useFeatureFlags();
 
   const hasActivePlan = (response?.data?.summary?.active_count ?? 0) > 0;
-
-  const navLinks: Array<NavItem> = [
-    {
-      to: PageURLS.instructor.root,
-      label: t('nav:mySchedule'),
-      requireAuthentication: true,
-      orPermissions: [...InstructorPermissions.dashboard, PERMISSION.SCHEDULE_MANAGE],
-      featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isProfilePageEnabled],
-    },
-    { to: PageURLS.classes, label: t('nav:menuScheduleClass'), featureFlags: [FEATURE_FLAG.isClassesPageEnabled] },
-    {
-      to: PageURLS.plans,
-      label: t('nav:navPlans'),
-      featureFlags: [FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
-    },
-    { to: PageURLS.figures, label: t('nav:menuFigures'), featureFlags: [FEATURE_FLAG.isFiguresPageEnabled] },
-    {
-      to: PageURLS.admin.root,
-      label: t('nav:admin'),
-      orPermissions: [
-        ...AdminPermissions.scheduleBuilder,
-        ...AdminPermissions.inventory,
-        ...AdminPermissions.bookings,
-        ...AdminPermissions.payments,
-        ...AdminPermissions.merch,
-        ...AdminPermissions.merchPos,
-        ...AdminPermissions.figures,
-        ...AdminPermissions.reports,
-        ...AdminPermissions.studioRental,
-      ],
-      featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
-    },
-  ];
+  const navLinks = getPrimaryNavItems(t, { isAuthenticated, includeAdmin: true });
 
   return (
     <Section
@@ -210,7 +168,7 @@ export const MenuItem = ({
       end
       onClick={onNavigate}
     >
-      {Icon ? <Icon className='h-4 w-4' /> : null}
+      {variant === 'aside' && Icon ? <Icon className='h-4 w-4' /> : null}
       {label}
     </NavLink>
   );

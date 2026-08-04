@@ -6,7 +6,7 @@ import { GiAvoidance } from 'react-icons/gi';
 import { GrSchedules } from 'react-icons/gr';
 import { HiOutlineDocument } from 'react-icons/hi';
 import { HiMiniShoppingCart } from 'react-icons/hi2';
-import { LuBellElectric, LuBookHeart, LuBookImage, LuCalendarHeart, LuFootprints, LuUser, LuX } from 'react-icons/lu';
+import { LuX } from 'react-icons/lu';
 import { MdOutlineInventory, MdOutlinePayments } from 'react-icons/md';
 import { RiAdminFill } from 'react-icons/ri';
 import { SiReasonstudios } from 'react-icons/si';
@@ -14,13 +14,14 @@ import { TbManualGearbox } from 'react-icons/tb';
 import { TfiAgenda } from 'react-icons/tfi';
 import { useLocation, useNavigate } from 'react-router';
 
-import { MenuItem, NavItem } from './navbar';
+import { getAdminNavItem, getMobileProfileNavItem, getPrimaryNavItems, type NavItem } from './nav-items';
+import { MenuItem } from './navbar';
 
 import { LanguageSelector } from '@components/navigation/language-selector';
 import { Isotype, Logotype } from '@components/svg';
 import { FEATURE_FLAG, useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
-import { AdminPermissions, InstructorPermissions, PERMISSION } from '@core/permissions';
+import { AdminPermissions } from '@core/permissions';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -33,82 +34,13 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const location = useLocation();
   const { logout, user, isAuthenticated } = useAuth();
 
-  const authenticatedPrimaryMenuItems: Array<NavItem> = [
-    {
-      to: PageURLS.profile.root,
-      label: t('nav:profile'),
-      requireAuthentication: true,
-      featureFlags: [FEATURE_FLAG.isProfilePageEnabled],
-      icon: LuUser,
-    },
-    {
-      to: PageURLS.instructor.root,
-      label: t('nav:mySchedule'),
-      requireAuthentication: true,
-      orPermissions: [...InstructorPermissions.dashboard, PERMISSION.SCHEDULE_MANAGE],
-      featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isProfilePageEnabled],
-      icon: GrSchedules,
-    },
-    {
-      to: PageURLS.classes,
-      label: t('nav:menuScheduleClass'),
-      featureFlags: [FEATURE_FLAG.isClassesPageEnabled],
-      icon: LuFootprints,
-    },
-    {
-      to: PageURLS.plans,
-      label: t('nav:navPlans'),
-      featureFlags: [FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
-      icon: LuBellElectric,
-    },
-    {
-      to: PageURLS.profile.bookings,
-      label: t('nav:menuBookings'),
-      requireAuthentication: true,
-      featureFlags: [FEATURE_FLAG.isMyAccountBookingsPageEnabled],
-      icon: LuCalendarHeart,
-    },
-    {
-      to: PageURLS.figures,
-      label: t('nav:menuFigures'),
-      featureFlags: [FEATURE_FLAG.isFiguresPageEnabled],
-      icon: LuBookImage,
-    },
-    {
-      to: PageURLS.figureSaved,
-      label: t('nav:menuProgress'),
-      requireAuthentication: true,
-      featureFlags: [FEATURE_FLAG.isFigureSavedPageEnabled],
-      icon: LuBookHeart,
-    },
-    {
-      to: PageURLS.admin.users,
-      label: t('nav:adminMenu.users'),
-      orPermissions: AdminPermissions.users,
-      featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
-      icon: RiAdminFill,
-    },
+  const primaryMenuItems: Array<NavItem> = [
+    ...(isAuthenticated ? [getMobileProfileNavItem(t)] : []),
+    ...getPrimaryNavItems(t, { isAuthenticated, includeAdmin: false }),
   ];
 
   const adminMenuItems: Array<NavItem> = [
-    {
-      to: '/admin',
-      label: t('nav:admin'),
-      orPermissions: [
-        ...AdminPermissions.scheduleBuilder,
-        ...AdminPermissions.inventory,
-        ...AdminPermissions.bookings,
-        ...AdminPermissions.payments,
-        ...AdminPermissions.merch,
-        ...AdminPermissions.merchPos,
-        ...AdminPermissions.figures,
-        ...AdminPermissions.reports,
-        ...AdminPermissions.users,
-        ...AdminPermissions.studioRental,
-      ],
-      icon: RiAdminFill,
-      featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
-    },
+    getAdminNavItem(t),
     {
       to: PageURLS.admin.agenda,
       label: t('nav:adminMenu.agenda'),
@@ -211,7 +143,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       <div className='flex-1 flex flex-col overflow-auto'>
         <nav className='p-4 pt-8 grid gap-4 overflow-y-auto'>
           <section className='grid gap-2'>
-            {authenticatedPrimaryMenuItems.map((item, i) => (
+            {primaryMenuItems.map((item, i) => (
               <MenuItem
                 key={item.to}
                 {...item}
@@ -230,7 +162,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                   'font-bold uppercase text-primary mb-4 grid grid-cols-[1fr_auto_1fr] items-center gap-4',
                   'animate-in fade-in slide-in-from-left duration-300 fill-mode-both',
                 )}
-                style={{ animationDelay: `${50 * (2 + authenticatedPrimaryMenuItems.length)}ms` }}
+                style={{ animationDelay: `${50 * (2 + primaryMenuItems.length)}ms` }}
               >
                 <Line color='var(--color-primary-200)' />
                 {t('nav:admin')}
@@ -244,7 +176,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     variant='aside'
                     onNavigate={onClose}
                     className='animate-in fade-in slide-in-from-left duration-300 fill-mode-both'
-                    style={{ animationDelay: `${50 * (i + 3 + authenticatedPrimaryMenuItems.length)}ms` }}
+                    style={{ animationDelay: `${50 * (i + 3 + primaryMenuItems.length)}ms` }}
                   />
                 ))}
               </section>

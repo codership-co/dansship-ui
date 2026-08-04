@@ -154,7 +154,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       localStorage.setItem(AUTH_SESSION_KEY, '1');
       toast.success(t('auth:loginSuccess'));
 
-      const redirectPath = isValidReturnPath(fromPath) ? fromPath : await resolvePostLoginPath(data);
+      const roleHome = await resolvePostLoginPath(data);
+      const roles = (data.roles ?? []).map(role => role.toLowerCase());
+      const prefersRoleHome = roles.includes('admin') || roles.includes('instructor');
+      const redirectPath = !prefersRoleHome && isValidReturnPath(fromPath) ? fromPath : roleHome;
 
       setPendingPostLoginPath(redirectPath);
       setUser(data);
