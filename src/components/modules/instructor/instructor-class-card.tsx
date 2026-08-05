@@ -16,6 +16,7 @@ interface InstructorClassCardProps {
 
 export function InstructorClassCard({ scheduledClass, highlighted = false, onClick }: InstructorClassCardProps) {
   const { t } = useTranslation();
+  const isCancelled = Boolean(scheduledClass.is_cancelled);
   const isFull = scheduledClass.enrolled_count >= scheduledClass.capacity;
 
   return (
@@ -34,6 +35,7 @@ export function InstructorClassCard({ scheduledClass, highlighted = false, onCli
         'hover:scale-102 hover:shadow-[0_40px_30px_-30px_#00000055]',
         'group relative grid content-end',
         highlighted && 'ring-2 ring-primary/40',
+        isCancelled && 'grayscale opacity-60',
       )}
     >
       <section
@@ -46,10 +48,14 @@ export function InstructorClassCard({ scheduledClass, highlighted = false, onCli
       <p
         className={cn(
           'absolute block font-bold top-0 right-0 m-4 py-1 px-4 bg-accent-200 text-primary rounded-2xl',
-          isFull && 'bg-gray-100 text-gray-400',
+          (isFull || isCancelled) && 'bg-gray-100 text-gray-400',
         )}
       >
-        {isFull ? t('bookings:spotsFull') : `${scheduledClass.enrolled_count} / ${scheduledClass.capacity}`}
+        {isCancelled
+          ? t('instructor:home.classCancelledBadge')
+          : isFull
+            ? t('bookings:spotsFull')
+            : `${scheduledClass.enrolled_count} / ${scheduledClass.capacity}`}
       </p>
 
       <section className='bg-white/50 backdrop-blur-md py-4 px-8 grid gap-4 rounded-xl'>

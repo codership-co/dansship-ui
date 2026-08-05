@@ -8,6 +8,7 @@ import { usePromise } from '../use-promise';
 import {
   AddClassPayload,
   DansshipAPI,
+  type CancelPublishedClassPayload,
   type EditPublishedClassPayload,
   type UpdateClassPayload,
   type UpdateWaitlistConfigPayload,
@@ -59,7 +60,8 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
       DansshipAPI.schedulesAdmin.editPublishedClass(targetWeekId, classId, payload),
   );
   const { call: cancelPublishedClassPromise, isLoading: isCanceling } = useCallablePromise(
-    (targetWeekId: string, classId: string) => DansshipAPI.schedulesAdmin.cancelPublishedClass(targetWeekId, classId),
+    (targetWeekId: string, classId: string, payload: CancelPublishedClassPayload) =>
+      DansshipAPI.schedulesAdmin.cancelPublishedClass(targetWeekId, classId, payload),
   );
   const { call: updateWaitlistConfigPromise, isLoading: isUpdatingWaitlist } = useCallablePromise(
     (classId: string, payload: UpdateWaitlistConfigPayload) =>
@@ -150,8 +152,8 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
     [t, editPublishedClassPromise, refreshScheduleData],
   );
   const cancelPublishedClass = useCallback(
-    async (targetWeekId: string, classId: string) => {
-      const { ok, data } = await cancelPublishedClassPromise(targetWeekId, classId);
+    async (targetWeekId: string, classId: string, payload: CancelPublishedClassPayload = {}) => {
+      const { ok, data } = await cancelPublishedClassPromise(targetWeekId, classId, payload);
 
       if (ok) {
         toast.success(t('schedules:classCancelled'));

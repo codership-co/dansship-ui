@@ -71,3 +71,25 @@ export interface InstructorPerformanceRow {
 export interface InstructorPerformanceReport {
   items: Array<InstructorPerformanceRow>;
 }
+
+export interface ClassCancellationItem {
+  scheduled_class_id: string;
+  class_name: string;
+  instructor_id: string | null;
+  room: string;
+  start_time: string;
+  cancelled_at: string;
+  cancelled_by_user_id: string | null;
+  cancellation_note: string | null;
+}
+
+export interface ClassCancellationTrendPoint {
+  week: string;
+  cancellation_count: number;
+}
+
+export interface ClassCancellationReport {
+  total_cancellations: number;
+  items: Array<ClassCancellationItem>;
+  trend: Array<ClassCancellationTrendPoint>;
+}

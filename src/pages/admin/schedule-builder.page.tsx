@@ -7,10 +7,10 @@ import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
 import { ClassSlotModal, ScheduleGrid } from '@components/modules';
 import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
-import { FEATURE_FLAG, SecurityGuard } from '@contexts';
+import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
 import { AgendaEvent, DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError, ScheduledClass } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { AdminPermissions } from '@core/permissions';
+import { AdminPermissions, PERMISSION } from '@core/permissions';
 import { useClasses, usePromise, useRooms, useSchedules } from '@hooks';
 
 interface ClassSlotFormData {
@@ -64,6 +64,7 @@ function toUtcWeekRange(weekStartDate: string) {
 
 function AdminScheduleBuilderPage() {
   const { t } = useTranslation();
+  const canCancelPublishedClass = useOrPermissions([PERMISSION.SCHEDULED_CLASS_CANCEL]);
   const [currentDate, setCurrentDate] = useState<Date>(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPublishConfirmOpen, setIsPublishConfirmOpen] = useState(false);
@@ -270,11 +271,13 @@ function AdminScheduleBuilderPage() {
     }
   };
 
-  const handleDeleteClass = async () => {
+  const handleDeleteClass = async (options?: { cancellationNote?: string | null }) => {
     if (!editingClass) return;
 
     if (isPublished) {
-      await cancelPublishedClass(selectedWeekId, editingClass.id);
+      await cancelPublishedClass(selectedWeekId, editingClass.id, {
+        cancellation_note: options?.cancellationNote ?? null,
+      });
     } else {
       await removeClass(selectedWeekId, editingClass.id);
     }
@@ -466,6 +469,7 @@ function AdminScheduleBuilderPage() {
         isDeleting={isRemovingClass || isCancellingPublishedClass}
         submitError={submitError}
         isPublishedEdit={isPublished && editingClass !== null}
+        canCancelPublishedClass={canCancelPublishedClass}
       />
 
       <ConfirmDialog

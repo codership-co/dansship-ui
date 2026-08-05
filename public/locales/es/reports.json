@@ -48,5 +48,16 @@
     "netRevenue": "Ingreso Neto",
     "noPermissionTitle": "Acceso financiero restringido",
     "noPermissionDescription": "No tienes permisos para ver información financiera sensible."
+  },
+  "classCancellations": {
+    "title": "Cancelaciones de Clases (Academia)",
+    "total": "Total canceladas: {{count}}",
+    "class": "Clase",
+    "schedule": "Horario",
+    "room": "Sala",
+    "cancelledAt": "Cancelada el",
+    "note": "Nota",
+    "noNote": "Sin nota",
+    "empty": "No hay cancelaciones en este período."
   }
 }

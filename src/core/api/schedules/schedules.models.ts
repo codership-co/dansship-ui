@@ -11,6 +11,10 @@ export interface ScheduledClass {
   capacity: number;
   enrolled_count: number;
   waitlist_max_size?: number | null;
+  is_cancelled?: boolean;
+  cancellation_note?: string | null;
+  cancelled_at?: string | null;
+  cancelled_by_user_id?: string | null;
 
   class_definition?: { id: string; name: string; duration_minutes: number; level?: string | null };
   room?: { id: string; name: string; image_url?: string | null };
@@ -79,6 +83,10 @@ export interface EditPublishedClassPayload {
   room_id?: string;
   instructor_id?: string | null;
   capacity?: number;
+}
+
+export interface CancelPublishedClassPayload {
+  cancellation_note?: string | null;
 }
 
 export interface UpcomingWeekResponse<TClass = ScheduledClass> {

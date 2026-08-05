@@ -54,6 +54,7 @@ export function BookingModal({
   if (!selectedClass) return null;
 
   const isPast = isPastBookingDeadline(selectedClass.start_time);
+  const isCancelled = Boolean(selectedClass.is_cancelled);
   const isFull = selectedClass.enrolled_count >= selectedClass.capacity;
 
   // Here we check if the user is already booked via the injected `user_booking_status` field.
@@ -132,10 +133,17 @@ export function BookingModal({
 
   const eligibility = getClassBookingEligibility(subscriptions, selectedClass.start_time, isTrialEligible);
   const showSubscriptionWarning =
-    eligibility.status === 'no_subscription' && !isBooked && !isWaitlisted && !isPast && !hasTimeOverlap;
+    eligibility.status === 'no_subscription' &&
+    !isBooked &&
+    !isWaitlisted &&
+    !isPast &&
+    !isCancelled &&
+    !hasTimeOverlap;
   const showNotStartedWarning =
-    eligibility.status === 'not_started' && !isBooked && !isWaitlisted && !isPast && !hasTimeOverlap;
-  const showTrialNote = Boolean(eligibility.status === 'trial' && !isBooked && !isWaitlisted && !isPast);
+    eligibility.status === 'not_started' && !isBooked && !isWaitlisted && !isPast && !isCancelled && !hasTimeOverlap;
+  const showTrialNote = Boolean(
+    eligibility.status === 'trial' && !isBooked && !isWaitlisted && !isPast && !isCancelled,
+  );
 
   return (
     <>
@@ -262,7 +270,11 @@ export function BookingModal({
             )}
 
             <section className='flex flex-col gap-2'>
-              {isPast ? (
+              {isCancelled ? (
+                <label className='bg-gray-50 p-3 rounded text-gray-700 border border-gray-200 text-center'>
+                  {t('bookings:classCancelledMessage')}
+                </label>
+              ) : isPast ? (
                 <label className='bg-gray-50 p-3 rounded text-gray-700 border border-gray-200 text-center'>
                   {t('bookings:bookingWindowClosed')}
                 </label>

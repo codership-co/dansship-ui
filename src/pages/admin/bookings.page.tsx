@@ -112,7 +112,12 @@ function AdminBookingsPage() {
   }, []);
 
   const bookableClasses = useMemo(
-    () => (classes?.ok ? classes.data.filter(scheduledClass => !isPastBookingDeadline(scheduledClass.start_time)) : []),
+    () =>
+      classes?.ok
+        ? classes.data.filter(
+            scheduledClass => !scheduledClass.is_cancelled && !isPastBookingDeadline(scheduledClass.start_time),
+          )
+        : [],
     [classes],
   );
 

@@ -65,6 +65,7 @@ export enum PERMISSION {
 
   // SCHEDULE
   SCHEDULE_MANAGE = 'manage:schedule',
+  SCHEDULED_CLASS_CANCEL = 'cancel:scheduled_class',
 
   // STUDIO RENTAL
   STUDIO_RENTAL_CREATE = 'create:studio_rental',

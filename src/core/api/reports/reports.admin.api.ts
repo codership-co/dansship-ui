@@ -4,6 +4,7 @@ import { DansshipAPIError } from '@core/api';
 
 import type {
   AttendanceReport,
+  ClassCancellationReport,
   ClassOccupancyReport,
   InstructorPerformanceReport,
   RevenueIndicatorsReport,
@@ -48,6 +49,17 @@ export class ReportsAdminAPI {
   async getRevenueReport(startDate?: string, endDate?: string) {
     return this.httpClient.callNoError<RevenueIndicatorsReport>({
       path: '/admin/reports/revenue-indicators',
+      method: 'GET',
+      params: {
+        from_date: startDate,
+        to_date: endDate,
+      },
+    });
+  }
+
+  async getClassCancellationsReport(startDate?: string, endDate?: string) {
+    return this.httpClient.callNoError<ClassCancellationReport>({
+      path: '/admin/reports/class-cancellations',
       method: 'GET',
       params: {
         from_date: startDate,
