@@ -9,7 +9,14 @@ import { Container, SectionEmpty } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { BookingClassCard, BookingDaySelector } from '@components/modules';
 import { DansshipAPI, ActiveSubscription, MyBooking, PublishedClass } from '@core/api';
-import { BookingDay, getColombiaWeekRangeUtc, getMonday, hasOverlap, sortClassesByDay } from '@helpers';
+import {
+  BookingDay,
+  getColombiaWeekRangeUtc,
+  getMonday,
+  hasOverlap,
+  resolveActiveBookingDay,
+  sortClassesByDay,
+} from '@helpers';
 import { useCallablePromise, useDateLocale } from '@hooks';
 
 interface BookingCalendarProps {
@@ -54,11 +61,7 @@ export function BookingCalendar({
 
       setClasses(nextClasses);
       setClassesByDay(nextClassesByDay);
-      setActiveDay(previousDay => {
-        const sameDay = nextClassesByDay.find(day => day.day === previousDay?.day);
-
-        return sameDay ?? nextClassesByDay.find(day => day.classes.length);
-      });
+      setActiveDay(previousDay => resolveActiveBookingDay(nextClassesByDay, previousDay));
     },
     [call],
   );
@@ -69,11 +72,7 @@ export function BookingCalendar({
 
       setClasses(initialClasses);
       setClassesByDay(nextClassesByDay);
-      setActiveDay(previousDay => {
-        const sameDay = nextClassesByDay.find(day => day.day === previousDay?.day);
-
-        return sameDay ?? nextClassesByDay.find(day => day.classes.length);
-      });
+      setActiveDay(previousDay => resolveActiveBookingDay(nextClassesByDay, previousDay));
 
       return;
     }
