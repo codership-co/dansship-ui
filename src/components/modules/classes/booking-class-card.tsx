@@ -16,12 +16,13 @@ interface BookingClassCardProps {
 
 export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingClassCardProps) {
   const { t } = useTranslation();
+  const isCancelled = Boolean(bookingClass.is_cancelled);
   const isFull = bookingClass.enrolled_count >= bookingClass.capacity;
   const isPast = isPastBookingDeadline(bookingClass.start_time);
-  const isUnavailable = isPast || isFull;
+  const isUnavailable = isPast || isFull || isCancelled;
   const isBooked = bookingClass.user_booking_status === 'active';
   const isWaitlisted = bookingClass.user_booking_status === 'waitlisted';
-  const isBookButtonDisabled = isPast || isBooked || isWaitlisted || hasOverlap(bookingClass) || isFull;
+  const isBookButtonDisabled = isPast || isCancelled || isBooked || isWaitlisted || hasOverlap(bookingClass) || isFull;
 
   return (
     <section
@@ -55,7 +56,11 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
           isUnavailable && 'bg-gray-100 text-gray-400',
         )}
       >
-        {isFull ? `${t('bookings:spotsFull')}` : `${bookingClass.enrolled_count} / ${bookingClass.capacity}`}
+        {isCancelled
+          ? t('bookings:classCancelledBadge')
+          : isFull
+            ? `${t('bookings:spotsFull')}`
+            : `${bookingClass.enrolled_count} / ${bookingClass.capacity}`}
       </p>
 
       <section className='bg-white/50 backdrop-blur-md py-4 px-8 grid gap-4 rounded-xl'>
@@ -104,13 +109,15 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
       >
         {isPast
           ? t('bookings:bookingWindowClosed')
-          : isFull
-            ? t('bookings:joinWaitlist')
-            : isWaitlisted
-              ? t('bookings:status.waitlisted')
-              : isBooked
-                ? `${t('bookings:booked')} ✓`
-                : t('bookings:bookClass')}
+          : isCancelled
+            ? t('bookings:classCancelledMessage')
+            : isFull
+              ? t('bookings:joinWaitlist')
+              : isWaitlisted
+                ? t('bookings:status.waitlisted')
+                : isBooked
+                  ? `${t('bookings:booked')} ✓`
+                  : t('bookings:bookClass')}
       </Button>
     </section>
   );

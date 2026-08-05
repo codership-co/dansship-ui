@@ -76,6 +76,7 @@
     "noProfileDescription": "Esta vista es para instructores con perfil activo. Si eres administrador, usa el panel de horarios.",
     "jumpedWeekBanner": "No tienes clases esta semana — mostrando la semana del {{week}}.",
     "dismissBanner": "Cerrar",
-    "nextAvailable": "Próximo disponible"
+    "nextAvailable": "Próximo disponible",
+    "classCancelledBadge": "Cancelada"
   }
 }

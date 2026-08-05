@@ -76,7 +76,7 @@ interface ClassSlotModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: ClassSlotFormValues) => Promise<void> | void;
-  onDelete?: () => Promise<void> | void;
+  onDelete?: (options?: { cancellationNote?: string | null }) => Promise<void> | void;
   initialData?: ScheduledClass | null;
   // Options
   rooms: Array<Room>;
@@ -90,6 +90,7 @@ interface ClassSlotModalProps {
   submitError?: string | null;
   /** When true, the modal restricts edits to room, instructor, and capacity only */
   isPublishedEdit?: boolean;
+  canCancelPublishedClass?: boolean;
 }
 
 export function ClassSlotModal({
@@ -108,10 +109,12 @@ export function ClassSlotModal({
   isDeleting,
   submitError,
   isPublishedEdit = false,
+  canCancelPublishedClass = false,
 }: ClassSlotModalProps) {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
+  const [cancellationNote, setCancellationNote] = useState('');
   const { t } = useTranslation();
-
+  const isCancelled = Boolean(initialData?.is_cancelled);
   const {
     register,
     handleSubmit,
@@ -258,16 +261,19 @@ export function ClassSlotModal({
   useEffect(() => {
     if (!isOpen) {
       setIsDeleteConfirmOpen(false);
+      setCancellationNote('');
     }
   }, [isOpen]);
 
   const isBusy = Boolean(isLoading || isDeleting);
+  const isReadOnlyCancelled = isPublishedEdit && isCancelled;
 
   const handleDelete = async () => {
     if (!onDelete) return;
 
-    await onDelete();
+    await onDelete(isPublishedEdit ? { cancellationNote: cancellationNote.trim() || null } : undefined);
     setIsDeleteConfirmOpen(false);
+    setCancellationNote('');
   };
 
   return (
@@ -286,6 +292,15 @@ export function ClassSlotModal({
         {isPublishedEdit && (
           <div className='shrink-0 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800'>
             {t('schedules:publishedEditInfo')}
+          </div>
+        )}
+
+        {isReadOnlyCancelled && (
+          <div className='shrink-0 rounded-md border border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-700'>
+            <p className='m-0 font-medium'>{t('schedules:classCancelledBadge')}</p>
+            {initialData?.cancellation_note ? (
+              <p className='m-0 mt-1 text-gray-600'>{initialData.cancellation_note}</p>
+            ) : null}
           </div>
         )}
 
@@ -513,7 +528,7 @@ export function ClassSlotModal({
           </div>
 
           <div className='flex shrink-0 items-center justify-between border-t pt-4 mt-4'>
-            {initialData ? (
+            {initialData && !isReadOnlyCancelled && (!isPublishedEdit || canCancelPublishedClass) ? (
               <Button
                 type='button'
                 variant='destructive'
@@ -530,28 +545,65 @@ export function ClassSlotModal({
               <Button type='button' variant='outline' onClick={onClose} disabled={isBusy}>
                 {t('common:cancel')}
               </Button>
-              <Button type='submit' disabled={isBusy}>
-                {isLoading ? t('common:saving') : t('schedules:saveClass')}
-              </Button>
+              {!isReadOnlyCancelled && (
+                <Button type='submit' disabled={isBusy}>
+                  {isLoading ? t('common:saving') : t('schedules:saveClass')}
+                </Button>
+              )}
             </div>
           </div>
         </form>
 
-        <ConfirmDialog
-          open={isDeleteConfirmOpen}
-          onOpenChange={setIsDeleteConfirmOpen}
-          onConfirm={() => {
-            void handleDelete();
-          }}
-          title={isPublishedEdit ? t('schedules:cancelClassTitle') : t('schedules:deleteClassTitle')}
-          description={isPublishedEdit ? t('schedules:cancelClassConfirm') : t('schedules:deleteClassConfirm')}
-          confirmLabel={
-            isDeleting ? t('common:deleting') : isPublishedEdit ? t('schedules:cancelClassBtn') : t('common:delete')
-          }
-          cancelLabel={t('common:keep')}
-          confirmVariant='destructive'
-          isLoading={isDeleting}
-        />
+        {isPublishedEdit ? (
+          <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
+            <DialogContent className='sm:max-w-md'>
+              <DialogHeader>
+                <DialogTitle>{t('schedules:cancelClassTitle')}</DialogTitle>
+              </DialogHeader>
+              <p className='text-sm text-muted-foreground'>{t('schedules:cancelClassConfirm')}</p>
+              <div className='space-y-2'>
+                <Label htmlFor='cancellation_note'>{t('schedules:cancellationNoteLabel')}</Label>
+                <textarea
+                  id='cancellation_note'
+                  className='flex min-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
+                  placeholder={t('schedules:cancellationNotePlaceholder')}
+                  value={cancellationNote}
+                  onChange={event => setCancellationNote(event.target.value)}
+                  maxLength={2000}
+                  disabled={isDeleting}
+                />
+                <p className='text-xs text-gray-500'>{t('schedules:cancellationNoteHelp')}</p>
+              </div>
+              <div className='flex justify-end gap-2 pt-2'>
+                <Button
+                  type='button'
+                  variant='outline'
+                  onClick={() => setIsDeleteConfirmOpen(false)}
+                  disabled={isDeleting}
+                >
+                  {t('common:keep')}
+                </Button>
+                <Button type='button' variant='destructive' onClick={() => void handleDelete()} disabled={isDeleting}>
+                  {isDeleting ? t('common:deleting') : t('schedules:cancelClassBtn')}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        ) : (
+          <ConfirmDialog
+            open={isDeleteConfirmOpen}
+            onOpenChange={setIsDeleteConfirmOpen}
+            onConfirm={() => {
+              void handleDelete();
+            }}
+            title={t('schedules:deleteClassTitle')}
+            description={t('schedules:deleteClassConfirm')}
+            confirmLabel={isDeleting ? t('common:deleting') : t('common:delete')}
+            cancelLabel={t('common:keep')}
+            confirmVariant='destructive'
+            isLoading={isDeleting}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );

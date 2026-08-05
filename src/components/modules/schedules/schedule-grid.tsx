@@ -289,6 +289,11 @@ export function ScheduleGrid({
                 }
 
                 const isClassPast = scheduleStatus === 'published' && classStart <= new Date();
+                const isClassCancelled =
+                  eventType === 'studio_class'
+                    ? Boolean((cls as AgendaEvent).metadata?.is_cancelled === 'true')
+                    : Boolean((cls as ScheduledClass).is_cancelled);
+                const isMuted = isClassPast || isClassCancelled;
                 const isHighlighted = Boolean(highlightedClassId && id === highlightedClassId);
 
                 let bgClass =
@@ -309,10 +314,10 @@ export function ScheduleGrid({
                 return (
                   <div
                     key={id}
-                    onClick={() => !isClassPast && onClassClick?.(cls)}
+                    onClick={() => (isClassCancelled || !isClassPast) && onClassClick?.(cls)}
                     className={`group absolute rounded shadow-sm p-1 z-20 flex flex-col ${
-                      isClassPast
-                        ? 'bg-gray-100 border border-gray-300 cursor-default opacity-60'
+                      isMuted
+                        ? `bg-gray-100 border border-gray-300 opacity-60 ${isClassCancelled ? 'cursor-pointer' : 'cursor-default'}`
                         : `border cursor-pointer transition-colors ${bgClass}`
                     }`}
                     style={{
@@ -323,7 +328,7 @@ export function ScheduleGrid({
                     }}
                     title={classInstructor ? `${className} with ${classInstructor}` : className}
                   >
-                    {onAddAtTime && !isClassPast && (
+                    {onAddAtTime && !isMuted && (
                       <button
                         type='button'
                         className='absolute right-1 top-1 z-30 h-5 w-5 rounded bg-primary text-primary-foreground text-xs font-bold hover:bg-primary/90'
@@ -338,6 +343,11 @@ export function ScheduleGrid({
                     )}
                     <div className='overflow-hidden flex flex-col'>
                       <span className='text-xs font-semibold truncate leading-tight'>{className}</span>
+                      {isClassCancelled && (
+                        <span className='text-[10px] font-semibold uppercase text-gray-500 truncate leading-tight'>
+                          {t('schedules:classCancelledBadge')}
+                        </span>
+                      )}
                       {!isVeryShort && (
                         <span className='text-[10px] opacity-80 truncate leading-tight'>
                           {format(classStart, 'HH:mm')} - {format(classEnd, 'HH:mm')}

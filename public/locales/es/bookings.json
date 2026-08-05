@@ -30,6 +30,8 @@
   "instructorTBA": "Instructor por confirmar",
   "roomTBA": "Sala por confirmar",
   "spotsFull": "Lleno",
+  "classCancelledBadge": "Cancelada",
+  "classCancelledMessage": "Esta clase fue cancelada.",
   "startTime": "Inicio",
   "endTime": "Fin",
   "duration": "Duración",

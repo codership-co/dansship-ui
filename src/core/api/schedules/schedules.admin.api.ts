@@ -5,6 +5,7 @@ import { DansshipAPIError } from '@core/api';
 import type {
   AddClassPayload,
   AgendaEvent,
+  CancelPublishedClassPayload,
   EditPublishedClassPayload,
   GetAgendaEventsPayload,
   GetWaitlistDefaultResponse,
@@ -109,10 +110,11 @@ export class SchedulesAdminAPI {
     });
   }
 
-  async cancelPublishedClass(weekId: string, classId: string) {
-    return this.httpClient.callNoError({
+  async cancelPublishedClass(weekId: string, classId: string, payload: CancelPublishedClassPayload = {}) {
+    return this.httpClient.callNoError<ScheduledClass, CancelPublishedClassPayload>({
       path: `/admin/schedules/weeks/${weekId}/classes/${classId}/published-cancel`,
-      method: 'DELETE',
+      method: 'POST',
+      data: payload,
     });
   }
 }

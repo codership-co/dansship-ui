@@ -1,6 +1,11 @@
 import { useTranslation } from 'react-i18next';
 
-import { InstructorPerformanceTable, NotificationSettings, OperationalDashboard } from '@components/modules';
+import {
+  ClassCancellationsTable,
+  InstructorPerformanceTable,
+  NotificationSettings,
+  OperationalDashboard,
+} from '@components/modules';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { PageURLS } from '@core/constants';
@@ -22,6 +27,7 @@ function AdminReportsPage() {
           <TabsTrigger value='instructor-performance'>
             {t('admin:reports.tabs.instructorPerformance', 'Instructor Performance')}
           </TabsTrigger>
+          <TabsTrigger value='class-cancellations'>{t('admin:reports.tabs.classCancellations')}</TabsTrigger>
           <TabsTrigger value='notifications'>{t('admin:reports.tabs.notifications')}</TabsTrigger>
         </TabsList>
 
@@ -31,6 +37,10 @@ function AdminReportsPage() {
 
         <TabsContent value='instructor-performance' className='outline-none'>
           <InstructorPerformanceTable />
+        </TabsContent>
+
+        <TabsContent value='class-cancellations' className='outline-none'>
+          <ClassCancellationsTable />
         </TabsContent>
 
         <TabsContent value='notifications' className='outline-none'>

@@ -106,6 +106,8 @@
     "subtitle": "Consulta KPIs operativos y configura el comportamiento de la plataforma.",
     "tabs": {
       "dashboard": "Panel Operativo",
+      "instructorPerformance": "Desempeño de Instructores",
+      "classCancellations": "Cancelaciones de Clases",
       "notifications": "Configuración de Notificaciones"
     }
   },

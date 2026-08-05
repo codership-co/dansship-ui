@@ -24,7 +24,7 @@ function findNextAssignedClass(classes: Array<ScheduledClass>, now = new Date())
   const nowMs = now.getTime();
 
   const upcoming = classes
-    .filter(cls => new Date(cls.end_time).getTime() > nowMs)
+    .filter(cls => !cls.is_cancelled && new Date(cls.end_time).getTime() > nowMs)
     .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime());
 
   return upcoming[0] ?? null;
