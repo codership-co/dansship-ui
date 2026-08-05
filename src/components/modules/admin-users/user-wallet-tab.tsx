@@ -1,20 +1,50 @@
 import { format, parseISO } from 'date-fns';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
-import { Button, Input, Label, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
-import { DansshipAPI, type CreateWalletEntryPayload, type WalletEntryType } from '@core/api';
-import { formatPrice } from '@helpers';
+import {
+  Button,
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@components/ui';
+import { DansshipAPI, PaymentStatus, type CreateWalletEntryPayload, type WalletEntryType } from '@core/api';
+import { formatPrice, paymentPurchaseLabel } from '@helpers';
 import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
+
+const NONE_PAYMENT_VALUE = '__none__';
+const RECENT_PAYMENTS_LIMIT = 10;
 
 export function UserWalletTab({ userId }: { userId: string }) {
   const { t } = useTranslation();
   const locale = useDateLocale();
   const { response, isLoading, reFetch } = usePromise(() => DansshipAPI.walletsAdmin.getUserWallet(userId), !!userId);
+  const { response: paymentsResponse, isLoading: isLoadingPayments } = usePromise(
+    () =>
+      DansshipAPI.paymentsAdmin.getAdminPayments({
+        user_id: userId,
+        status: PaymentStatus.APPROVED,
+      }),
+    !!userId,
+  );
   const wallet = response?.data;
+  const recentPayments = useMemo(
+    () => (paymentsResponse?.data?.items ?? []).slice(0, RECENT_PAYMENTS_LIMIT),
+    [paymentsResponse?.data?.items],
+  );
   const { call: createEntry, isLoading: isSubmitting } = useCallablePromise((payload: CreateWalletEntryPayload) =>
     DansshipAPI.walletsAdmin.createEntry(userId, payload),
   );
@@ -22,7 +52,7 @@ export function UserWalletTab({ userId }: { userId: string }) {
   const [entryType, setEntryType] = useState<WalletEntryType>('credit');
   const [amount, setAmount] = useState('');
   const [note, setNote] = useState('');
-  const [paymentIntentId, setPaymentIntentId] = useState('');
+  const [paymentIntentId, setPaymentIntentId] = useState(NONE_PAYMENT_VALUE);
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const parsedAmount = Number(amount);
@@ -35,7 +65,7 @@ export function UserWalletTab({ userId }: { userId: string }) {
       entry_type: entryType,
       amount: parsedAmount,
       note: note.trim(),
-      ...(paymentIntentId.trim() ? { payment_intent_id: paymentIntentId.trim() } : {}),
+      ...(paymentIntentId !== NONE_PAYMENT_VALUE ? { payment_intent_id: paymentIntentId } : {}),
     };
 
     const { ok } = await createEntry(payload);
@@ -49,7 +79,7 @@ export function UserWalletTab({ userId }: { userId: string }) {
     toast.success(t('admin:users.details.wallet.entrySuccess'));
     setAmount('');
     setNote('');
-    setPaymentIntentId('');
+    setPaymentIntentId(NONE_PAYMENT_VALUE);
     setConfirmOpen(false);
     void reFetch();
   };
@@ -119,13 +149,27 @@ export function UserWalletTab({ userId }: { userId: string }) {
         </div>
 
         <div className='grid gap-1.5'>
-          <Label htmlFor='wallet-payment-intent'>{t('admin:users.details.wallet.paymentIntentOptional')}</Label>
-          <Input
-            id='wallet-payment-intent'
-            value={paymentIntentId}
-            onChange={event => setPaymentIntentId(event.target.value)}
-            placeholder={t('admin:users.details.wallet.paymentIntentPlaceholder')}
-          />
+          <Label>{t('admin:users.details.wallet.paymentIntentOptional')}</Label>
+          <Select value={paymentIntentId} onValueChange={setPaymentIntentId} disabled={isLoadingPayments}>
+            <SelectTrigger className='w-full'>
+              <SelectValue
+                placeholder={
+                  isLoadingPayments
+                    ? t('admin:users.details.wallet.paymentsLoading')
+                    : t('admin:users.details.wallet.paymentIntentPlaceholder')
+                }
+              />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={NONE_PAYMENT_VALUE}>{t('admin:users.details.wallet.paymentIntentNone')}</SelectItem>
+              {recentPayments.map(intent => (
+                <SelectItem key={intent.id} value={intent.id}>
+                  {`${format(parseISO(intent.created_at), 'MMM d, yyyy', { locale })} · ${formatPrice(intent.amount, intent.currency)} · ${paymentPurchaseLabel(intent)}`}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <p className='text-xs text-muted-foreground'>{t('admin:users.details.wallet.paymentIntentHint')}</p>
         </div>
 
         <div className='flex justify-end'>
