@@ -47,6 +47,7 @@ import {
   SecureProfilePage,
   SecureSubscriptionPage,
   SecureBookingsPage,
+  SecureWalletPage,
   SecureLegalPage,
 } from '@pages';
 
@@ -106,6 +107,7 @@ const routes: Array<RouteObject> = [
               { index: true, Component: SecureProfilePage },
               { path: 'subscription', Component: SecureSubscriptionPage },
               { path: 'bookings', Component: SecureBookingsPage },
+              { path: 'wallet', Component: SecureWalletPage },
             ],
           },
 

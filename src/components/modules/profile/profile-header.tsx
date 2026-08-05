@@ -3,7 +3,7 @@ import { cn } from 'polpo/helpers';
 import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaFileUpload, FaSave } from 'react-icons/fa';
-import { LuCalendar, LuCreditCard, LuPencil } from 'react-icons/lu';
+import { LuCalendar, LuCreditCard, LuPencil, LuWallet } from 'react-icons/lu';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
 
@@ -155,6 +155,13 @@ export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
               <Button variant='solid' color='primary' size='small' fullWidth>
                 <LuCalendar className='h-4 w-4' />
                 {t('profile:bookings')}
+              </Button>
+            </Link>
+
+            <Link to={PageURLS.profile.wallet}>
+              <Button variant='solid' color='primary' size='small' fullWidth>
+                <LuWallet className='h-4 w-4' />
+                {t('profile:wallet.nav')}
               </Button>
             </Link>
           </section>

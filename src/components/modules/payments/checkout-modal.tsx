@@ -66,48 +66,52 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
   const [paymentData, setPaymentData] = useState<PaymentData>({
     ...DefaultPaymentData,
     finalPrice: plan.price,
+    amountToCharge: plan.price,
   });
+
+  const isWalletCovered = paymentData.amountToCharge === 0 && paymentData.walletAmountApplied > 0;
 
   const handleSubmit = useCallback(
     async (data: CheckoutFormValues, nextPaymentData: PaymentData) => {
       setCheckoutData(data);
       setPaymentData(nextPaymentData);
+      const fullyCovered = nextPaymentData.amountToCharge === 0 && nextPaymentData.walletAmountApplied > 0;
+
+      if (fullyCovered) {
+        setPaymentMethod(PaymentMethod.WALLET);
+        addSentryBreadcrumb('checkout.step', 'Moved to wallet confirm step', { plan_id: plan.id });
+        setStep(CheckoutStep.CONFIRM);
+
+        return;
+      }
+
       addSentryBreadcrumb('checkout.step', 'Moved to payment method step', { plan_id: plan.id });
       setStep(CheckoutStep.METHOD);
     },
     [plan.id],
   );
 
-  return (
-    <section
-      className='m-auto h-auto max-w-[100dvw] w-dvw overflow-x-clip border-0 bg-transparent p-0 shadow-none sm:w-[96dvw] sm:max-w-[96dvw] xl:max-w-7xl'
-      data-sentry-mask
-    >
-      <FormStepperLayout
-        className={cn(
-          'm-auto min-w-0 overflow-x-clip overflow-y-auto rounded-none sm:rounded-xl',
-          'w-full max-w-full',
-          'h-dvh md:h-[80dvh]',
-          'max-h-dvh sm:max-h-[96dvh]',
-        )}
-        steps={[
-          {
-            title: t('payments:checkoutTitle'),
-            subtitle: '',
-            step: CheckoutStep.REVIEW,
-            Icon: LuList,
-            form: (
-              <section className='grid h-full grid-rows-[auto_1fr] items-start gap-8'>
-                <PlanCard plan={plan} className='border-none' asIndividual />
-                <CheckoutReviewPlanFormInput
-                  plan={plan}
-                  onCancel={onClose}
-                  onSubmit={handleSubmit}
-                  defaultFormValues={checkoutData}
-                />
-              </section>
-            ),
-          },
+  const steps = [
+    {
+      title: t('payments:checkoutTitle'),
+      subtitle: '',
+      step: CheckoutStep.REVIEW,
+      Icon: LuList,
+      form: (
+        <section className='grid h-full grid-rows-[auto_1fr] items-start gap-8'>
+          <PlanCard plan={plan} className='border-none' asIndividual />
+          <CheckoutReviewPlanFormInput
+            plan={plan}
+            onCancel={onClose}
+            onSubmit={handleSubmit}
+            defaultFormValues={checkoutData}
+          />
+        </section>
+      ),
+    },
+    ...(isWalletCovered
+      ? []
+      : [
           {
             title: t('payments:selectMethod'),
             subtitle: '',
@@ -149,26 +153,43 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
               </section>
             ),
           },
-          {
-            title: t('payments:confirmationTitle'),
-            subtitle: '',
-            step: CheckoutStep.CONFIRM,
-            Icon: LuReceipt,
-            form: (
-              <CheckoutPaymentProofForm
-                plan={plan}
-                checkoutData={checkoutData}
-                paymentMethod={paymentMethod ?? PaymentMethod.CARD}
-                finalPrice={paymentData.finalPrice}
-                onClose={onClose}
-                onBack={() => setStep(CheckoutStep.METHOD)}
-                onSubmit={(intentId: string) => {
-                  navigate(`${PageURLS.paymentsResult}?intentId=${intentId}`);
-                }}
-              />
-            ),
-          },
-        ]}
+        ]),
+    {
+      title: t('payments:confirmationTitle'),
+      subtitle: '',
+      step: CheckoutStep.CONFIRM,
+      Icon: LuReceipt,
+      form: (
+        <CheckoutPaymentProofForm
+          plan={plan}
+          checkoutData={checkoutData}
+          paymentMethod={paymentMethod ?? (isWalletCovered ? PaymentMethod.WALLET : PaymentMethod.CARD)}
+          finalPrice={paymentData.finalPrice}
+          amountToCharge={paymentData.amountToCharge}
+          walletAmountApplied={paymentData.walletAmountApplied}
+          onClose={onClose}
+          onBack={() => setStep(isWalletCovered ? CheckoutStep.REVIEW : CheckoutStep.METHOD)}
+          onSubmit={(intentId: string) => {
+            navigate(`${PageURLS.paymentsResult}?intentId=${intentId}`);
+          }}
+        />
+      ),
+    },
+  ];
+
+  return (
+    <section
+      className='m-auto h-auto max-w-[100dvw] w-dvw overflow-x-clip border-0 bg-transparent p-0 shadow-none sm:w-[96dvw] sm:max-w-[96dvw] xl:max-w-7xl'
+      data-sentry-mask
+    >
+      <FormStepperLayout
+        className={cn(
+          'm-auto min-w-0 overflow-x-clip overflow-y-auto rounded-none sm:rounded-xl',
+          'w-full max-w-full',
+          'h-dvh md:h-[80dvh]',
+          'max-h-dvh sm:max-h-[96dvh]',
+        )}
+        steps={steps}
         currentStep={step}
       />
     </section>

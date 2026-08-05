@@ -24,6 +24,7 @@ import { StudioRentalAPI } from './studio-rental/studio-rental.api';
 import { SubscriptionsAdminAPI } from './subscriptions/subscriptions.admin.api';
 import { SubscriptionsAPI } from './subscriptions/subscriptions.api';
 import { UsersAdminAPI } from './users/users.admin.api';
+import { WalletsAdminAPI, WalletsAPI } from './wallets/wallets.api';
 
 import { AUTH_SESSION_KEY } from '@core/constants';
 
@@ -67,6 +68,8 @@ export class DansshipAPI {
   static subscriptions = new SubscriptionsAPI(this.httpClient);
   static subscriptionsAdmin = new SubscriptionsAdminAPI(this.httpClient);
   static usersAdmin = new UsersAdminAPI(this.httpClient);
+  static wallets = new WalletsAPI(this.httpClient);
+  static walletsAdmin = new WalletsAdminAPI(this.httpClient);
 
   static {
     this.httpClient.setOnErrorInterceptor(async (request, response) => {
