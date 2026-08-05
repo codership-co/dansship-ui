@@ -5,7 +5,7 @@ import { LuCircleCheck, LuSearch, LuCircleX } from 'react-icons/lu';
 
 import { SpinnerLoader } from '@components/loaders';
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Input } from '@components/ui';
-import { DansshipAPI, InstructorUserSearchResult } from '@core/api';
+import { DansshipAPI, InstructorUserSearchResult, RosterStudent } from '@core/api';
 import { captureUnexpectedException } from '@core/sentry';
 import { useDateLocale, usePromise, useInstructorRoster } from '@hooks';
 
@@ -13,6 +13,53 @@ interface ClassRosterProps {
   classId: string;
   className: string;
   startTime: string;
+}
+
+function studentDisplayName(student: RosterStudent) {
+  return student.user_name || student.user_email || student.user_id;
+}
+
+interface AttendanceActionsProps {
+  student: RosterStudent;
+  isPastStartTime: boolean;
+  isMarking: boolean;
+  onAttendance: (bookingId: string, status: 'attended' | 'no_show') => void;
+  stacked?: boolean;
+}
+
+function AttendanceActions({
+  student,
+  isPastStartTime,
+  isMarking,
+  onAttendance,
+  stacked = false,
+}: AttendanceActionsProps) {
+  const { t } = useTranslation();
+
+  return (
+    <div className={stacked ? 'grid grid-cols-2 gap-2 w-full' : 'inline-flex gap-2 justify-end'}>
+      <Button
+        variant={student.status === 'attended' ? 'default' : 'outline'}
+        size='sm'
+        onClick={() => onAttendance(student.id, 'attended')}
+        disabled={!isPastStartTime || isMarking}
+        className={`${stacked ? 'w-full' : ''} ${student.status === 'attended' ? 'bg-active-600 hover:bg-active-700' : ''}`}
+        title={!isPastStartTime ? t('instructor:roster.cannotMarkBeforeStart') : ''}
+      >
+        <LuCircleCheck className='h-4 w-4 mr-1' /> {t('instructor:roster.attended')}
+      </Button>
+      <Button
+        variant={student.status === 'no_show' ? 'destructive' : 'outline'}
+        size='sm'
+        onClick={() => onAttendance(student.id, 'no_show')}
+        disabled={!isPastStartTime || isMarking}
+        className={stacked ? 'w-full' : ''}
+        title={!isPastStartTime ? t('instructor:roster.cannotMarkBeforeStart') : ''}
+      >
+        <LuCircleX className='h-4 w-4 mr-1' /> {t('instructor:roster.noShow')}
+      </Button>
+    </div>
+  );
 }
 
 export function ClassRoster({ classId, className, startTime }: ClassRosterProps) {
@@ -106,6 +153,28 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
   const enrolled = roster?.data?.enrolled?.filter(s => s.status !== 'waitlisted' && s.status !== 'cancelled') ?? [];
   const waitlisted = roster?.data?.waitlisted?.filter(s => s.status === 'waitlisted') ?? [];
 
+  const searchDropdown =
+    isDropdownOpen && trimmedSearch.length > 2 ? (
+      <div className='absolute left-0 right-0 lg:right-auto top-11 z-20 w-full lg:w-80 max-h-60 overflow-auto rounded-md border border-gray-200 bg-white shadow-lg'>
+        {!isSearchingUsers && (!searchedUsers?.ok || searchedUsers?.data?.length === 0) ? (
+          <div className='px-4 py-3 text-sm text-gray-500'>{t('common:noUsersFound')}</div>
+        ) : (
+          <ul className='py-1'>
+            {searchedUsers?.data?.map(user => (
+              <li
+                key={user.id}
+                onClick={() => handleSelectUser(user)}
+                className='cursor-pointer border-b px-4 py-2 text-sm hover:bg-purple-50 last:border-0'
+              >
+                <div className='font-medium'>{user.email}</div>
+                <div className='text-xs text-gray-400'>ID: {user.id}</div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    ) : null;
+
   return (
     <div className='space-y-8'>
       <div>
@@ -114,19 +183,19 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
       </div>
 
       <div className='space-y-4'>
-        <div className='flex justify-between items-end'>
-          <h3 className='text-lg font-semibold text-gray-800'>
+        <div className='flex flex-col gap-4 lg:flex-row lg:justify-between lg:items-end'>
+          <h3 className='text-lg font-semibold text-gray-800 m-0'>
             {t('instructor:roster.enrolledStudents', { count: enrolled.length })}
           </h3>
 
-          <div className='relative flex space-x-2' ref={dropdownRef}>
-            <div className='relative'>
+          <div className='relative flex flex-col gap-2 sm:flex-row sm:items-center w-full lg:w-auto' ref={dropdownRef}>
+            <div className='relative w-full lg:w-80'>
               <Input
                 placeholder={t('instructor:roster.searchPlaceholder')}
                 value={searchInput}
                 onChange={e => handleSearchInputChange(e.target.value)}
                 onFocus={() => setIsDropdownOpen(true)}
-                className='w-80'
+                className='w-full'
               />
               {isSearchingUsers ? (
                 <div className='absolute right-3 top-2.5'>
@@ -135,89 +204,68 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
               ) : (
                 <LuSearch className='absolute right-3 top-2.5 h-4 w-4 text-gray-400' />
               )}
+              {searchDropdown}
             </div>
-            <Button onClick={handleManualAdd} disabled={isAdding || !selectedUser}>
+            <Button
+              onClick={handleManualAdd}
+              disabled={isAdding || !selectedUser}
+              className='w-full sm:w-auto shrink-0'
+            >
               {isAdding ? t('instructor:roster.adding') : t('instructor:roster.manualAdd')}
             </Button>
-
-            {isDropdownOpen && trimmedSearch.length > 2 && (
-              <div className='absolute left-0 top-11 z-20 w-80 max-h-60 overflow-auto rounded-md border border-gray-200 bg-white shadow-lg'>
-                {!isSearchingUsers && (!searchedUsers?.ok || searchedUsers?.data?.length === 0) ? (
-                  <div className='px-4 py-3 text-sm text-gray-500'>{t('common:noUsersFound')}</div>
-                ) : (
-                  <ul className='py-1'>
-                    {searchedUsers?.data?.map(user => (
-                      <li
-                        key={user.id}
-                        onClick={() => handleSelectUser(user)}
-                        className='cursor-pointer border-b px-4 py-2 text-sm hover:bg-purple-50 last:border-0'
-                      >
-                        <div className='font-medium'>{user.email}</div>
-                        <div className='text-xs text-gray-400'>ID: {user.id}</div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
           </div>
         </div>
 
-        <div className='border rounded-md bg-white'>
+        <div className='lg:hidden space-y-3'>
+          {enrolled.length === 0 ? (
+            <p className='text-center py-6 text-gray-500 text-sm'>{t('instructor:roster.noStudents')}</p>
+          ) : (
+            enrolled.map(student => (
+              <article key={student.id} className='rounded-xl border border-gray-200 bg-white p-4 grid gap-3'>
+                <div className='grid gap-1 min-w-0'>
+                  <p className='m-0 font-semibold text-gray-900 truncate'>{studentDisplayName(student)}</p>
+                  <p className='m-0 text-sm text-gray-500 truncate'>{student.user_email || '-'}</p>
+                </div>
+                <AttendanceActions
+                  student={student}
+                  isPastStartTime={isPastStartTime}
+                  isMarking={isMarking}
+                  onAttendance={handleAttendance}
+                  stacked
+                />
+              </article>
+            ))
+          )}
+        </div>
+
+        <div className='hidden lg:block border rounded-md bg-white'>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>{t('instructor:roster.studentName')}</TableHead>
                 <TableHead>{t('common:email')}</TableHead>
-                <TableHead>{t('common:status')}</TableHead>
                 <TableHead className='text-right'>{t('instructor:roster.attendance')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {enrolled.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className='text-center py-6 text-gray-500'>
+                  <TableCell colSpan={3} className='text-center py-6 text-gray-500'>
                     {t('instructor:roster.noStudents')}
                   </TableCell>
                 </TableRow>
               ) : (
                 enrolled.map(student => (
                   <TableRow key={student.id}>
-                    <TableCell className='font-medium'>
-                      {student.user_name || student.user_email || student.user_id}
-                    </TableCell>
+                    <TableCell className='font-medium'>{studentDisplayName(student)}</TableCell>
                     <TableCell>{student.user_email || '-'}</TableCell>
-                    <TableCell>
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-bold uppercase
-                        ${student.status === 'active' ? 'bg-blue-100 text-info-800' : ''}
-                        ${student.status === 'attended' ? 'bg-active-100 text-active-800' : ''}
-                        ${student.status === 'no_show' ? 'bg-red-100 text-alert-800' : ''}
-                      `}
-                      >
-                        {student.status.replace('_', ' ')}
-                      </span>
-                    </TableCell>
-                    <TableCell className='text-right space-x-2'>
-                      <Button
-                        variant={student.status === 'attended' ? 'default' : 'outline'}
-                        size='sm'
-                        onClick={() => handleAttendance(student.id, 'attended')}
-                        disabled={!isPastStartTime || isMarking}
-                        className={student.status === 'attended' ? 'bg-active-600 hover:bg-active-700' : ''}
-                        title={!isPastStartTime ? t('instructor:roster.cannotMarkBeforeStart') : ''}
-                      >
-                        <LuCircleCheck className='h-4 w-4 mr-1' /> {t('instructor:roster.attended')}
-                      </Button>
-                      <Button
-                        variant={student.status === 'no_show' ? 'destructive' : 'outline'}
-                        size='sm'
-                        onClick={() => handleAttendance(student.id, 'no_show')}
-                        disabled={!isPastStartTime || isMarking}
-                        title={!isPastStartTime ? t('instructor:roster.cannotMarkBeforeStart') : ''}
-                      >
-                        <LuCircleX className='h-4 w-4 mr-1' /> {t('instructor:roster.noShow')}
-                      </Button>
+                    <TableCell className='text-right'>
+                      <AttendanceActions
+                        student={student}
+                        isPastStartTime={isPastStartTime}
+                        isMarking={isMarking}
+                        onAttendance={handleAttendance}
+                      />
                     </TableCell>
                   </TableRow>
                 ))
@@ -233,27 +281,28 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
             {t('instructor:roster.waitlist', { count: waitlisted.length })}
           </h3>
 
-          <div className='border rounded-md bg-white'>
+          <div className='lg:hidden space-y-3'>
+            {waitlisted.map(student => (
+              <article key={student.id} className='rounded-xl border border-gray-200 bg-white p-4 grid gap-1'>
+                <p className='m-0 font-semibold text-gray-900 truncate'>{studentDisplayName(student)}</p>
+                <p className='m-0 text-sm text-gray-500 truncate'>{student.user_email || '-'}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className='hidden lg:block border rounded-md bg-white'>
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('instructor:roster.studentName')}</TableHead>
-                  <TableHead>{t('instructor:roster.joinedAt')}</TableHead>
-                  <TableHead>{t('common:status')}</TableHead>
+                  <TableHead>{t('common:email')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {waitlisted.map(student => (
                   <TableRow key={student.id}>
-                    <TableCell className='font-medium'>
-                      {student.user_name || student.user_email || student.user_id}
-                    </TableCell>
-                    <TableCell>{format(new Date(student.created_at), 'MMM d, h:mm a', { locale })}</TableCell>
-                    <TableCell>
-                      <span className='px-2 py-1 rounded-full text-xs font-bold uppercase bg-yellow-100 text-yellow-800'>
-                        {t('instructor:roster.waitlisted')}
-                      </span>
-                    </TableCell>
+                    <TableCell className='font-medium'>{studentDisplayName(student)}</TableCell>
+                    <TableCell>{student.user_email || '-'}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

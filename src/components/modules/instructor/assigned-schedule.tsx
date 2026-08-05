@@ -1,20 +1,23 @@
 import { format, parseISO } from 'date-fns';
 import { Button } from 'polpo/components';
+import { toCapitalize } from 'polpo/helpers';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuCalendar, LuClipboardList, LuClock, LuX } from 'react-icons/lu';
 
-import { ScheduleGrid, WeekSelector } from '../schedules';
+import { WeekSelector } from '../schedules';
 
 import { ClassRoster } from './class-roster';
+import { InstructorClassCard } from './instructor-class-card';
 
 import { Container } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
+import { BookingDaySelector } from '@components/modules/classes/booking-day-selector';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@components/ui';
 import { useAuth } from '@contexts';
 import { DansshipAPI, DansshipAPIError, DANSSHIP_ERROR_CODE, ScheduledClass } from '@core/api';
 import { captureUnexpectedException } from '@core/sentry';
-import { getMonday, getRelativeTime } from '@helpers';
+import { BookingDay, getMonday, getRelativeTime, sortClassesByDay } from '@helpers';
 import { useDateLocale, usePromise } from '@hooks';
 
 function findNextAssignedClass(classes: Array<ScheduledClass>, now = new Date()): ScheduledClass | null {
@@ -61,6 +64,7 @@ export function AssignedSchedule() {
   const [nearestWeek, setNearestWeek] = useState<string | null>(null);
   const [showJumpedBanner, setShowJumpedBanner] = useState(false);
   const [weekReady, setWeekReady] = useState(!hasInstructorProfile);
+  const [activeDay, setActiveDay] = useState<BookingDay<ScheduledClass>>();
   const hasAppliedUpcoming = useRef(false);
 
   const { response: upcomingResponse, isLoading: isResolvingUpcoming } = usePromise(
@@ -128,6 +132,16 @@ export function AssignedSchedule() {
 
     return instructorSchedule?.data ?? [];
   }, [initialClasses, instructorSchedule?.data]);
+
+  const classesByDay = useMemo(() => sortClassesByDay(classes, week), [classes, week]);
+
+  useEffect(() => {
+    setActiveDay(previousDay => {
+      const sameDay = classesByDay.find(day => day.day === previousDay?.day);
+
+      return sameDay ?? classesByDay.find(day => day.classes.length);
+    });
+  }, [classesByDay]);
 
   const nextClass = useMemo(() => findNextAssignedClass(classes), [classes]);
   const nextClassStatus = useMemo(() => (nextClass ? getUpcomingStatusKey(nextClass) : null), [nextClass]);
@@ -288,16 +302,58 @@ export function AssignedSchedule() {
             </div>
           </Container>
         ) : (
-          <ScheduleGrid
-            weekDate={week}
-            classes={classes}
-            highlightedClassId={nextClass?.id}
-            onClassClick={cls => openRoster(cls as ScheduledClass)}
-          />
+          <section className='grid gap-8'>
+            <section className='grid grid-flow-col sm:gap-4 pb-4 xs:pb-8 overflow-x-auto'>
+              {classesByDay.map(bookingDay => (
+                <BookingDaySelector
+                  key={bookingDay.day}
+                  day={bookingDay.day}
+                  classes={bookingDay.classes}
+                  activeDay={activeDay?.day}
+                  setActiveDay={() => setActiveDay(bookingDay)}
+                />
+              ))}
+            </section>
+
+            {activeDay && (
+              <Container className='lg:hidden bg-white/40 py-4 grid grid-flow-col justify-between gap-8 items-center'>
+                <section className='grid'>
+                  <p className='m-0 font-bold'>{toCapitalize(format(parseISO(activeDay.day), 'EEEE', { locale }))}</p>
+                  <span className='m-0 text-label whitespace-nowrap'>
+                    {format(parseISO(activeDay.day), 'MMMM d', { locale })}
+                  </span>
+                </section>
+                <section className='grid content-center text-center'>
+                  <h3 className='m-0 leading-[1em]'>{activeDay.classes.length}</h3>
+                  <small className='m-0'>
+                    {t('bookings:classes', {
+                      count: activeDay.classes.length,
+                    })}
+                  </small>
+                </section>
+              </Container>
+            )}
+
+            <section className='grid gap-12 pb-8'>
+              {activeDay?.classes.map((scheduledClass, i) => (
+                <section
+                  key={scheduledClass.id}
+                  className='transition-all animate-in fade-in slide-in-from-left duration-300 fill-mode-backwards'
+                  style={{ animationDelay: `${100 * (i + 2)}ms` }}
+                >
+                  <InstructorClassCard
+                    scheduledClass={scheduledClass}
+                    highlighted={scheduledClass.id === nextClass?.id}
+                    onClick={() => openRoster(scheduledClass)}
+                  />
+                </section>
+              ))}
+            </section>
+          </section>
         )}
 
         <Dialog open={!!selectedClass} onOpenChange={() => setSelectedClass(null)}>
-          <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto'>
+          <DialogContent className='max-w-[calc(100%-1rem)] sm:max-w-4xl max-h-[92vh] overflow-y-auto p-4 sm:p-6'>
             <DialogTitle>
               {t('schedules:classRoster', {
                 name: selectedClass?.class_definition?.name || t('bookings:classDefault'),
