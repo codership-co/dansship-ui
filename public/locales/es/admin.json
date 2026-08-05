@@ -75,7 +75,7 @@
         "paymentIntentOptional": "Pago relacionado (opcional)",
         "paymentIntentPlaceholder": "Selecciona un pago reciente",
         "paymentIntentNone": "Sin pago relacionado",
-        "paymentIntentHint": "Se muestran los últimos 10 pagos de este usuario.",
+        "paymentIntentHint": "Se muestran los últimos 10 pagos aprobados de este usuario.",
         "paymentsLoading": "Cargando pagos...",
         "submit": "Registrar movimiento",
         "empty": "Este usuario no tiene movimientos en la billetera.",

@@ -21,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@components/ui';
-import { DansshipAPI, type CreateWalletEntryPayload, type WalletEntryType } from '@core/api';
+import { DansshipAPI, PaymentStatus, type CreateWalletEntryPayload, type WalletEntryType } from '@core/api';
 import { formatPrice, paymentPurchaseLabel } from '@helpers';
 import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
 
@@ -33,7 +33,11 @@ export function UserWalletTab({ userId }: { userId: string }) {
   const locale = useDateLocale();
   const { response, isLoading, reFetch } = usePromise(() => DansshipAPI.walletsAdmin.getUserWallet(userId), !!userId);
   const { response: paymentsResponse, isLoading: isLoadingPayments } = usePromise(
-    () => DansshipAPI.paymentsAdmin.getAdminPayments({ user_id: userId }),
+    () =>
+      DansshipAPI.paymentsAdmin.getAdminPayments({
+        user_id: userId,
+        status: PaymentStatus.APPROVED,
+      }),
     !!userId,
   );
   const wallet = response?.data;
@@ -160,7 +164,7 @@ export function UserWalletTab({ userId }: { userId: string }) {
               <SelectItem value={NONE_PAYMENT_VALUE}>{t('admin:users.details.wallet.paymentIntentNone')}</SelectItem>
               {recentPayments.map(intent => (
                 <SelectItem key={intent.id} value={intent.id}>
-                  {`${format(parseISO(intent.created_at), 'MMM d, yyyy', { locale })} · ${formatPrice(intent.amount, intent.currency)} · ${paymentPurchaseLabel(intent)} · ${t(`payments:status.${intent.status}`)}`}
+                  {`${format(parseISO(intent.created_at), 'MMM d, yyyy', { locale })} · ${formatPrice(intent.amount, intent.currency)} · ${paymentPurchaseLabel(intent)}`}
                 </SelectItem>
               ))}
             </SelectContent>
