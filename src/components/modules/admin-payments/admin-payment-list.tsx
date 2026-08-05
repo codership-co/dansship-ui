@@ -173,13 +173,10 @@ export function AdminPaymentList({
 
                         <TableCell className='text-right'>
                           {!readOnly ? (
-                            <Button
-                              size='sm'
-                              variant='outline'
-                              disabled={intent.status !== 'pending_manual_review'}
-                              onClick={() => setSelectedIntent(intent)}
-                            >
-                              {t('payments:admin.review')}
+                            <Button size='sm' variant='outline' onClick={() => setSelectedIntent(intent)}>
+                              {intent.status === PaymentStatus.PENDING_MANUAL_REVIEW
+                                ? t('payments:admin.review')
+                                : t('payments:admin.view')}
                             </Button>
                           ) : null}
                         </TableCell>

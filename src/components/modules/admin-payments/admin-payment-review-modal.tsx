@@ -1,12 +1,15 @@
+import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
+import { PaymentStatusBadge } from '@components/modules';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Button, Textarea } from '@components/ui';
 import { PaymentIntent, PaymentIntentDetail, AdminPaymentReviewPayload, DansshipAPI, PaymentStatus } from '@core/api';
 import { formatPrice, paymentPurchaseLabel, purchaseTypeLabel, purchaseTypeLabelKey } from '@helpers';
+import { useDateLocale } from '@hooks';
 
 interface AdminPaymentReviewModalProps {
   open: boolean;
@@ -28,6 +31,7 @@ export function AdminPaymentReviewModal({
   onSynced,
 }: AdminPaymentReviewModalProps) {
   const { t } = useTranslation();
+  const locale = useDateLocale();
   const [notes, setNotes] = useState('');
   const [detail, setDetail] = useState<PaymentIntentDetail | null>(null);
   const [proofViewUrl, setProofViewUrl] = useState<string | null>(null);
@@ -93,7 +97,10 @@ export function AdminPaymentReviewModal({
     return null;
   }
 
-  const canSyncBold = current.gateway_provider === 'bold' && PENDING_STATUSES.has(current.status as PaymentStatus);
+  const canReview = current.status === PaymentStatus.PENDING_MANUAL_REVIEW;
+  const canSyncBold =
+    canReview && current.gateway_provider === 'bold' && PENDING_STATUSES.has(current.status as PaymentStatus);
+  const reviewerLabel = current.reviewer?.human_identifier ?? current.reviewer?.name ?? t('common:noData');
 
   const handleApprove = async () => {
     await onReview(current.id, {
@@ -150,7 +157,7 @@ export function AdminPaymentReviewModal({
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className='max-w-lg'>
           <DialogHeader>
-            <DialogTitle>{t('payments:admin.reviewTitle')}</DialogTitle>
+            <DialogTitle>{canReview ? t('payments:admin.reviewTitle') : t('payments:admin.viewTitle')}</DialogTitle>
           </DialogHeader>
 
           {isLoading ? (
@@ -180,6 +187,21 @@ export function AdminPaymentReviewModal({
                 <p>
                   <span className='font-medium'>{t('payments:userLabel')}:</span> {userEmail}
                 </p>
+                <p className='flex items-center gap-2'>
+                  <span className='font-medium'>{t('common:status')}:</span>{' '}
+                  <PaymentStatusBadge status={current.status} />
+                </p>
+                {!canReview && current.reviewed_at ? (
+                  <>
+                    <p>
+                      <span className='font-medium'>{t('payments:admin.reviewedAt')}:</span>{' '}
+                      {format(new Date(current.reviewed_at), 'MMM d, yyyy HH:mm', { locale })}
+                    </p>
+                    <p>
+                      <span className='font-medium'>{t('payments:admin.reviewedBy')}:</span> {reviewerLabel}
+                    </p>
+                  </>
+                ) : null}
               </div>
 
               <div className='space-y-2'>
@@ -193,34 +215,49 @@ export function AdminPaymentReviewModal({
                 )}
               </div>
 
-              <div className='space-y-2'>
-                <label className='text-sm font-medium text-gray-900' htmlFor='admin_notes'>
-                  {t('payments:admin.notesLabel')}
-                </label>
-                <Textarea
-                  id='admin_notes'
-                  rows={3}
-                  value={notes}
-                  onChange={event => setNotes(event.target.value)}
-                  placeholder={t('payments:admin.notesPlaceholder')}
-                />
-              </div>
+              {canReview ? (
+                <div className='space-y-2'>
+                  <label className='text-sm font-medium text-gray-900' htmlFor='admin_notes'>
+                    {t('payments:admin.notesLabel')}
+                  </label>
+                  <Textarea
+                    id='admin_notes'
+                    rows={3}
+                    value={notes}
+                    onChange={event => setNotes(event.target.value)}
+                    placeholder={t('payments:admin.notesPlaceholder')}
+                  />
+                </div>
+              ) : current.admin_notes ? (
+                <div className='space-y-2'>
+                  <p className='text-sm font-medium text-gray-900'>{t('payments:admin.notesLabel')}</p>
+                  <p className='rounded-md border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700 whitespace-pre-wrap'>
+                    {current.admin_notes}
+                  </p>
+                </div>
+              ) : null}
 
               <div className='flex flex-wrap justify-end gap-2 pt-2'>
-                <Button variant='outline' onClick={() => onOpenChange(false)} disabled={busy}>
-                  {t('common:cancel')}
-                </Button>
-                {canSyncBold && (
-                  <Button variant='outline' onClick={() => void handleSyncBold()} disabled={busy}>
-                    {isSyncingBold ? t('common:saving') : t('payments:admin.syncBold')}
-                  </Button>
+                {canReview ? (
+                  <>
+                    <Button variant='outline' onClick={() => onOpenChange(false)} disabled={busy}>
+                      {t('common:cancel')}
+                    </Button>
+                    {canSyncBold ? (
+                      <Button variant='outline' onClick={() => void handleSyncBold()} disabled={busy}>
+                        {isSyncingBold ? t('common:saving') : t('payments:admin.syncBold')}
+                      </Button>
+                    ) : null}
+                    <Button variant='destructive' onClick={() => setIsRejectConfirmOpen(true)} disabled={busy}>
+                      {t('payments:admin.reject')}
+                    </Button>
+                    <Button onClick={() => void handleApprove()} disabled={busy}>
+                      {isReviewing ? t('common:saving') : t('payments:admin.approve')}
+                    </Button>
+                  </>
+                ) : (
+                  <Button onClick={() => onOpenChange(false)}>{t('common:close')}</Button>
                 )}
-                <Button variant='destructive' onClick={() => setIsRejectConfirmOpen(true)} disabled={busy}>
-                  {t('payments:admin.reject')}
-                </Button>
-                <Button onClick={() => void handleApprove()} disabled={busy}>
-                  {isReviewing ? t('common:saving') : t('payments:admin.approve')}
-                </Button>
               </div>
             </div>
           )}
