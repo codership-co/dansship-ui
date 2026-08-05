@@ -47,6 +47,7 @@
         "payments": "Pagos",
         "bookings": "Reservas",
         "benefits": "Beneficios",
+        "wallet": "Billetera",
         "instructorClasses": "Clases del instructor"
       },
       "columns": {
@@ -62,6 +63,37 @@
       "emptySubscriptions": "Este usuario no tiene suscripciones.",
       "emptyBookings": "Este usuario no tiene reservas.",
       "emptyBenefits": "Este usuario no tiene beneficios aplicados.",
+      "wallet": {
+        "balanceLabel": "Saldo disponible",
+        "addEntryTitle": "Agregar movimiento",
+        "entryType": "Tipo",
+        "credit": "Crédito",
+        "debit": "Débito",
+        "amount": "Monto",
+        "note": "Nota (obligatoria)",
+        "notePlaceholder": "Motivo del movimiento",
+        "paymentIntentOptional": "ID de pago (opcional)",
+        "paymentIntentPlaceholder": "UUID del payment intent relacionado",
+        "submit": "Registrar movimiento",
+        "empty": "Este usuario no tiene movimientos en la billetera.",
+        "entrySuccess": "Movimiento de billetera registrado.",
+        "entryFailed": "No se pudo registrar el movimiento de billetera.",
+        "confirmTitle": "¿Confirmar movimiento de billetera?",
+        "confirmDescription": "Se registrará un {{type}} por {{amount}}. Esta acción afecta dinero real del estudiante.",
+        "columns": {
+          "date": "Fecha",
+          "type": "Tipo",
+          "amount": "Monto",
+          "note": "Nota",
+          "source": "Origen",
+          "runningBalance": "Saldo"
+        },
+        "sources": {
+          "manual": "Manual",
+          "checkout_apply": "Compra de plan",
+          "checkout_reversal": "Reverso de compra"
+        }
+      },
       "assignedClasses": "Clases asignadas (próximas)",
       "taughtClasses": "Clases dictadas (pasadas)",
       "emptyAssignedClasses": "No hay clases asignadas próximas.",

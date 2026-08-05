@@ -11,6 +11,7 @@ import {
   UserDetailsHeader,
   UserInstructorClassesTab,
   UserSubscriptionsTab,
+  UserWalletTab,
 } from '@components/modules';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
@@ -24,6 +25,7 @@ const SUBSCRIPTIONS_TAB = 'subscriptions';
 const PAYMENTS_TAB = 'payments';
 const BOOKINGS_TAB = 'bookings';
 const BENEFITS_TAB = 'benefits';
+const WALLET_TAB = 'wallet';
 const INSTRUCTOR_CLASSES_TAB = 'instructor-classes';
 
 function UserDetailsPage() {
@@ -38,6 +40,7 @@ function UserDetailsPage() {
   const canManagePayments = useOrPermissions(AdminPermissions.payments);
   const canManageBookings = useOrPermissions(AdminPermissions.bookings);
   const canReadBenefits = useOrPermissions(AdminPermissions.benefits);
+  const canManageWallet = useOrPermissions(AdminPermissions.wallet);
   const canManageSchedule = useOrPermissions(AdminPermissions.scheduleBuilder);
   const showInstructorClasses = Boolean(user?.has_instructor_profile) && canManageSchedule;
 
@@ -48,6 +51,7 @@ function UserDetailsPage() {
     ...(canManagePayments ? [PAYMENTS_TAB] : []),
     ...(canManageBookings ? [BOOKINGS_TAB] : []),
     ...(canReadBenefits ? [BENEFITS_TAB] : []),
+    ...(canManageWallet ? [WALLET_TAB] : []),
     ...(showInstructorClasses ? [INSTRUCTOR_CLASSES_TAB] : []),
   ];
   const activeTab = availableTabs.includes(requestedTab) ? requestedTab : PROFILE_TAB;
@@ -99,6 +103,9 @@ function UserDetailsPage() {
               {canReadBenefits ? (
                 <TabsTrigger value={BENEFITS_TAB}>{t('admin:users.details.tabs.benefits')}</TabsTrigger>
               ) : null}
+              {canManageWallet ? (
+                <TabsTrigger value={WALLET_TAB}>{t('admin:users.details.tabs.wallet')}</TabsTrigger>
+              ) : null}
               {showInstructorClasses ? (
                 <TabsTrigger value={INSTRUCTOR_CLASSES_TAB}>
                   {t('admin:users.details.tabs.instructorClasses')}
@@ -131,6 +138,12 @@ function UserDetailsPage() {
             {canReadBenefits ? (
               <TabsContent value={BENEFITS_TAB}>
                 {activeTab === BENEFITS_TAB && userId ? <UserBenefitsTab userId={userId} /> : null}
+              </TabsContent>
+            ) : null}
+
+            {canManageWallet ? (
+              <TabsContent value={WALLET_TAB}>
+                {activeTab === WALLET_TAB && userId ? <UserWalletTab userId={userId} /> : null}
               </TabsContent>
             ) : null}
 

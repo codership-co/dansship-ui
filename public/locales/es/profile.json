@@ -4,6 +4,25 @@
   "subscription": "Mis Suscripciones",
   "subscriptions": "Mis Suscripciones",
   "bookings": "Mis reservas",
+  "wallet": {
+    "nav": "Mi billetera",
+    "title": "Mi billetera",
+    "subtitle": "Consulta tu saldo disponible y el historial de movimientos.",
+    "loading": "Cargando billetera...",
+    "loadFailed": "No se pudo cargar la billetera.",
+    "balanceLabel": "Saldo disponible",
+    "balanceHint": "Este saldo se aplica automáticamente en la compra de planes.",
+    "empty": "Aún no tienes movimientos en tu billetera.",
+    "credit": "Crédito",
+    "debit": "Débito",
+    "columns": {
+      "date": "Fecha",
+      "type": "Tipo",
+      "amount": "Monto",
+      "note": "Nota",
+      "runningBalance": "Saldo"
+    }
+  },
   "stats": {
     "savedFigures": "Figuras Guardadas",
     "completed": "Completadas",

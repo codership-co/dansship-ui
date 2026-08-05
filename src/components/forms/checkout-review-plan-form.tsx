@@ -48,6 +48,8 @@ export interface PaymentData {
   bonusClassesGranted: number | null;
   bonusExpiresDays: number | null;
   bonusBenefitName: string | null;
+  walletAmountApplied: number;
+  amountToCharge: number;
 }
 
 export const DefaultPaymentData: PaymentData = {
@@ -66,6 +68,8 @@ export const DefaultPaymentData: PaymentData = {
   bonusClassesGranted: null,
   bonusExpiresDays: null,
   bonusBenefitName: null,
+  walletAmountApplied: 0,
+  amountToCharge: 0,
 };
 
 interface CheckoutReviewPlanFormInputProps {
@@ -86,6 +90,7 @@ export const CheckoutReviewPlanFormInput = ({
   const [paymentData, setPaymentData] = useState<PaymentData>({
     ...DefaultPaymentData,
     finalPrice: plan.price,
+    amountToCharge: plan.price,
   });
   const { call: previewPayment, isLoading } = useCallablePromise((payload: PaymentPreviewRequest) =>
     DansshipAPI.payments.previewPayment(payload),
@@ -130,6 +135,8 @@ export const CheckoutReviewPlanFormInput = ({
         bonus_expires_days,
         bonus_benefit_name,
         discount_benefit_code,
+        wallet_amount_applied,
+        amount_to_charge,
       } = data;
 
       const isPercentage = discount_type === 'percentage_discount' || discount_type === 'percentage';
@@ -155,6 +162,8 @@ export const CheckoutReviewPlanFormInput = ({
         bonusClassesGranted: bonus_classes_granted,
         bonusExpiresDays: bonus_expires_days,
         bonusBenefitName: bonus_benefit_name,
+        walletAmountApplied: wallet_amount_applied,
+        amountToCharge: amount_to_charge,
       });
     });
   }, [discountCode, plan.currency, plan.id, previewPayment]);
@@ -234,6 +243,21 @@ export const CheckoutReviewPlanFormInput = ({
             <span className='min-w-0 break-words'>{t('subscriptions:totalDue')}</span>
             <span className='shrink-0'>{formatPrice(paymentData.finalPrice, plan.currency)}</span>
           </div>
+
+          {paymentData.walletAmountApplied > 0 && (
+            <>
+              <div className='mt-2 flex items-center justify-between gap-2 text-sm'>
+                <span className='min-w-0 break-words text-primary'>{t('subscriptions:walletApplied')}</span>
+                <span className='shrink-0 text-primary'>
+                  -{formatPrice(paymentData.walletAmountApplied, plan.currency)}
+                </span>
+              </div>
+              <div className='flex items-center justify-between gap-2 text-base font-semibold'>
+                <span className='min-w-0 break-words'>{t('subscriptions:amountToCharge')}</span>
+                <span className='shrink-0'>{formatPrice(paymentData.amountToCharge, plan.currency)}</span>
+              </div>
+            </>
+          )}
         </div>
 
         <section className='w-full max-w-90 justify-self-end text-label'>

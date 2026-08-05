@@ -1,6 +1,7 @@
 export enum PaymentMethod {
   TRANSFER = 'transfer',
   CARD = 'card',
+  WALLET = 'wallet',
 }
 
 export enum PaymentStatus {
@@ -77,6 +78,7 @@ export interface PaymentIntent {
   id: string;
   user_id: string;
   amount: number;
+  wallet_amount_applied?: number;
   currency: string;
   purchase_type: PurchaseType;
   reference_id: string;
@@ -145,6 +147,8 @@ export interface PaymentPreviewResponse {
   bonus_expires_days?: number | null;
   bonus_benefit_name?: string | null;
   discount_benefit_code?: string | null;
+  wallet_amount_applied?: string;
+  amount_to_charge?: string;
 }
 
 export interface PaymentPreviewMappedResponse {
@@ -163,4 +167,6 @@ export interface PaymentPreviewMappedResponse {
   bonus_expires_days: number | null;
   bonus_benefit_name: string | null;
   discount_benefit_code: string | null;
+  wallet_amount_applied: number;
+  amount_to_charge: number;
 }

@@ -16,6 +16,7 @@ export function normalizeIntent(intent: PaymentIntent): PaymentIntent {
   return {
     ...intent,
     amount: toNumber(intent.amount),
+    wallet_amount_applied: toNumber(intent.wallet_amount_applied),
   };
 }
 

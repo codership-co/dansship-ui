@@ -25,6 +25,8 @@ interface CheckoutPaymentProofFormProps {
   plan: PublicPlan;
   paymentMethod: PaymentMethod;
   finalPrice: number;
+  amountToCharge: number;
+  walletAmountApplied: number;
   onClose: () => void;
   onBack: () => void;
   checkoutData: CheckoutFormValues;
@@ -35,6 +37,8 @@ export function CheckoutPaymentProofForm({
   plan,
   paymentMethod,
   finalPrice,
+  amountToCharge,
+  walletAmountApplied,
   onClose,
   onBack,
   checkoutData,
@@ -50,8 +54,9 @@ export function CheckoutPaymentProofForm({
   const { call: uploadProof, isLoading: isUploadingProof } = useCallablePromise((id: string, file: File) =>
     DansshipAPI.payments.uploadProof(id, file),
   );
-  const isCardMethod = paymentMethod === PaymentMethod.CARD;
-  const requiresProof = paymentMethod === PaymentMethod.TRANSFER;
+  const isWalletMethod = paymentMethod === PaymentMethod.WALLET || amountToCharge === 0;
+  const isCardMethod = paymentMethod === PaymentMethod.CARD && !isWalletMethod;
+  const requiresProof = paymentMethod === PaymentMethod.TRANSFER && !isWalletMethod;
   const isBusy = isCreating || isCreatingBoldCheckout || isUploadingProof;
   const [selectedProofFile, setSelectedProofFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -67,7 +72,7 @@ export function CheckoutPaymentProofForm({
 
     const payload: CreatePaymentIntentPayload = {
       plan_id: plan.id,
-      payment_method_type: paymentMethod,
+      payment_method_type: isWalletMethod ? PaymentMethod.WALLET : paymentMethod,
       discount_code: discount_code.trim() ? discount_code.trim() : undefined,
       start_date: start_date.toISOString(),
     };
@@ -116,7 +121,7 @@ export function CheckoutPaymentProofForm({
     } = await withSentrySpan(
       'checkout.createIntent',
       'ui.action',
-      { plan_id: plan.id, payment_method: paymentMethod },
+      { plan_id: plan.id, payment_method: payload.payment_method_type },
       () => createIntent(payload),
     );
 
@@ -173,10 +178,26 @@ export function CheckoutPaymentProofForm({
             <label className='block'>
               {t('payments:total')}: {formatPrice(finalPrice, plan.currency)}
             </label>
+            {walletAmountApplied > 0 ? (
+              <>
+                <label className='block text-primary'>
+                  {t('subscriptions:walletApplied')}: -{formatPrice(walletAmountApplied, plan.currency)}
+                </label>
+                <label className='block font-semibold'>
+                  {t('subscriptions:amountToCharge')}: {formatPrice(amountToCharge, plan.currency)}
+                </label>
+              </>
+            ) : null}
             <label className='block'>
               {t('payments:startDate')}: {format(checkoutData.start_date, 'yyyy-MM-dd')}
             </label>
           </div>
+
+          {isWalletMethod ? (
+            <div className='rounded-md border border-primary/20 bg-primary/5 p-3 text-sm text-gray-700'>
+              <p className='font-semibold text-primary'>{t('subscriptions:walletFullyCoveredNote')}</p>
+            </div>
+          ) : null}
 
           {isCardMethod ? (
             <div className='rounded-md border border-primary/20 bg-primary/5 p-3 text-sm text-gray-700'>
@@ -244,7 +265,11 @@ export function CheckoutPaymentProofForm({
           onClick={() => onConfirm()}
           className='flex items-center'
         >
-          {isBusy ? t('subscriptions:processing') : t('payments:confirmPurchase')}
+          {isBusy
+            ? t('subscriptions:processing')
+            : isWalletMethod
+              ? t('subscriptions:confirmWalletPurchase')
+              : t('payments:confirmPurchase')}
           <MdOutlinePayments />
         </Button>
       </div>

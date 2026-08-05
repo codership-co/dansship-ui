@@ -18,3 +18,5 @@ export * from './schedules/schedules.helpers';
 export * from './studio-rental/studio-rental.models';
 export * from './subscriptions/subscriptions.models';
 export * from './users/users.models';
+export * from './wallets/wallets.models';
+export * from './wallets/wallets.api';

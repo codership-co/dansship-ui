@@ -41,6 +41,9 @@ export enum PERMISSION {
   // PAYMENT
   PAYMENT_MANAGE = 'manage:payment',
 
+  // WALLET
+  WALLET_MANAGE = 'manage:wallet',
+
   // PLAN
   PLAN_MANAGE = 'manage:plan',
 
@@ -109,6 +112,7 @@ export const AdminPermissions = {
   ],
   bookings: [PERMISSION.BOOKING_MANAGE],
   payments: [PERMISSION.PAYMENT_MANAGE],
+  wallet: [PERMISSION.WALLET_MANAGE],
   subscriptions: [PERMISSION.SUBSCRIPTION_MANAGE],
   benefits: [PERMISSION.BENEFIT_READ],
   merch: [PERMISSION.PRODUCT_MANAGE],
