@@ -7,6 +7,28 @@ export interface BookingDay<T extends ScheduledClass = ScheduledClass> {
   classes: Array<T>;
 }
 
+export const resolveActiveBookingDay = <T extends ScheduledClass>(
+  days: Array<BookingDay<T>>,
+  previousDay?: BookingDay<T>,
+): BookingDay<T> | undefined => {
+  if (previousDay) {
+    const sameDay = days.find(day => day.day === previousDay.day);
+
+    if (sameDay) {
+      return sameDay;
+    }
+  }
+
+  const todayKey = toColombiaDateKey(new Date());
+  const today = days.find(day => day.day === todayKey);
+
+  if (today) {
+    return today;
+  }
+
+  return days.find(day => day.classes.length);
+};
+
 export const sortClassesByDay = <T extends ScheduledClass>(
   classes: Array<T>,
   weekMonday: string,
