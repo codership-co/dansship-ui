@@ -2,12 +2,11 @@ import { format, parseISO } from 'date-fns';
 import { cn, toCapitalize } from 'polpo/helpers';
 import { useTranslation } from 'react-i18next';
 
-import { PublishedClass } from '@core/api';
 import { useDateLocale } from '@hooks';
 
 interface BookingDaySelectorProps {
   day: string;
-  classes: Array<PublishedClass>;
+  classes: Array<unknown>;
   activeDay: string | undefined;
   setActiveDay: () => void;
 }

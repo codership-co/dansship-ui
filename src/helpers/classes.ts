@@ -1,16 +1,19 @@
 import { addDaysToFormat, toColombiaDateKey } from './date';
 
-import { MyBooking, PublishedClass } from '@core/api';
+import { MyBooking, PublishedClass, ScheduledClass } from '@core/api';
 
-export interface BookingDay {
+export interface BookingDay<T extends ScheduledClass = ScheduledClass> {
   day: string;
-  classes: Array<PublishedClass>;
+  classes: Array<T>;
 }
 
-export const sortClassesByDay = (classes: Array<PublishedClass>, weekMonday: string) => {
+export const sortClassesByDay = <T extends ScheduledClass>(
+  classes: Array<T>,
+  weekMonday: string,
+): Array<BookingDay<T>> => {
   const rangeDays = Object.fromEntries(
-    Array.from({ length: 7 }, (_, offset) => [addDaysToFormat(weekMonday, offset), [] as Array<PublishedClass>]),
-  ) as Record<string, Array<PublishedClass>>;
+    Array.from({ length: 7 }, (_, offset) => [addDaysToFormat(weekMonday, offset), [] as Array<T>]),
+  ) as Record<string, Array<T>>;
 
   for (const scheduledClass of classes) {
     const dayKey = toColombiaDateKey(scheduledClass.start_time);
@@ -20,7 +23,7 @@ export const sortClassesByDay = (classes: Array<PublishedClass>, weekMonday: str
     }
   }
 
-  return Object.entries(rangeDays).map<BookingDay>(([day, dayClasses]) => ({
+  return Object.entries(rangeDays).map(([day, dayClasses]) => ({
     day,
     classes: dayClasses.sort(
       (first, second) => new Date(first.start_time).getTime() - new Date(second.start_time).getTime(),
