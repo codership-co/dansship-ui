@@ -1,13 +1,15 @@
 import { format } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
 import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
 import { PaymentStatusBadge } from '@components/modules';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, Button, Textarea } from '@components/ui';
+import { Badge, Dialog, DialogContent, DialogHeader, DialogTitle, Button, Textarea } from '@components/ui';
 import { PaymentIntent, PaymentIntentDetail, AdminPaymentReviewPayload, DansshipAPI, PaymentStatus } from '@core/api';
+import { PageURLS } from '@core/constants';
 import { formatPrice, paymentPurchaseLabel, purchaseTypeLabel, purchaseTypeLabelKey } from '@helpers';
 import { useDateLocale } from '@hooks';
 
@@ -170,12 +172,23 @@ export function AdminPaymentReviewModal({
                 <p>
                   <span className='font-medium'>{t('payments:planLabel')}:</span> {purchaseLabel}
                 </p>
-                <p>
+                <p className='flex flex-wrap items-center gap-2'>
                   <span className='font-medium'>{t('common:type')}:</span>{' '}
                   {t(purchaseTypeLabelKey(current.purchase_type), {
                     defaultValue: purchaseTypeLabel(current.purchase_type),
                   })}
+                  {current.is_gift ? (
+                    <Badge variant='outlineTertiary' size='small'>
+                      {t('payments:admin.giftBadge')}
+                    </Badge>
+                  ) : null}
                 </p>
+                {current.is_gift && current.gift_recipient_email ? (
+                  <p>
+                    <span className='font-medium'>{t('payments:admin.giftRecipient')}:</span>{' '}
+                    {current.gift_recipient_email}
+                  </p>
+                ) : null}
                 <p>
                   <span className='font-medium'>{t('payments:total')}:</span>{' '}
                   {formatPrice(current.amount, current.currency)}
@@ -185,7 +198,14 @@ export function AdminPaymentReviewModal({
                   {t(`payments.method.${current.payment_method_type}`)}
                 </p>
                 <p>
-                  <span className='font-medium'>{t('payments:userLabel')}:</span> {userEmail}
+                  <span className='font-medium'>{t('payments:userLabel')}:</span>{' '}
+                  <Link
+                    to={PageURLS.admin.userDetails(current.user_id)}
+                    viewTransition
+                    className='text-primary underline'
+                  >
+                    {userEmail}
+                  </Link>
                 </p>
                 <p className='flex items-center gap-2'>
                   <span className='font-medium'>{t('common:status')}:</span>{' '}

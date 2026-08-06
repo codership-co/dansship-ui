@@ -1,6 +1,7 @@
 import { format } from 'date-fns';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
 import { toast } from 'sonner';
 
 import { AdminPaymentReviewModal } from './admin-payment-review-modal';
@@ -8,6 +9,7 @@ import { AdminPaymentReviewModal } from './admin-payment-review-modal';
 import { SpinnerLoader } from '@components/loaders';
 import { PaymentStatusBadge } from '@components/modules';
 import {
+  Badge,
   Card,
   Select,
   SelectContent,
@@ -26,6 +28,7 @@ import {
   CardTitle,
 } from '@components/ui';
 import { type AdminPaymentReviewPayload, DansshipAPI, PaymentIntent, PaymentStatus } from '@core/api';
+import { PageURLS } from '@core/constants';
 import { formatPrice, paymentPurchaseLabel, purchaseTypeLabel, purchaseTypeLabelKey } from '@helpers';
 import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
 
@@ -151,14 +154,31 @@ export function AdminPaymentList({
 
                     return (
                       <TableRow key={intent.id}>
-                        <TableCell>{userEmail}</TableCell>
+                        <TableCell>
+                          <Link
+                            to={PageURLS.admin.userDetails(intent.user_id)}
+                            viewTransition
+                            className='text-primary underline'
+                          >
+                            {userEmail}
+                          </Link>
+                        </TableCell>
 
                         <TableCell>{purchaseLabel}</TableCell>
 
                         <TableCell>
-                          {t(purchaseTypeLabelKey(intent.purchase_type), {
-                            defaultValue: purchaseTypeLabel(intent.purchase_type),
-                          })}
+                          <div className='flex flex-wrap items-center gap-2'>
+                            <span>
+                              {t(purchaseTypeLabelKey(intent.purchase_type), {
+                                defaultValue: purchaseTypeLabel(intent.purchase_type),
+                              })}
+                            </span>
+                            {intent.is_gift ? (
+                              <Badge variant='outlineTertiary' size='small'>
+                                {t('payments:admin.giftBadge')}
+                              </Badge>
+                            ) : null}
+                          </div>
                         </TableCell>
 
                         <TableCell>{formatPrice(intent.amount, intent.currency)}</TableCell>

@@ -157,6 +157,8 @@
     "syncBoldNoChange": "Bold no reportó un estado terminal",
     "syncBoldFailed": "No se pudo consultar Bold",
     "syncBoldFailedDesc": "Intenta de nuevo en unos momentos.",
+    "giftBadge": "Regalo",
+    "giftRecipient": "Destinatario",
     "filter": {
       "all": "Todos los estados",
       "status": "Filtrar por estado"
