@@ -95,6 +95,8 @@ export interface PaymentIntent {
   proof_url: string | null;
   subscription_id: string | null;
   metadata: Record<string, unknown> | null;
+  is_gift?: boolean;
+  gift_recipient_email?: string | null;
   admin_notes: string | null;
   reviewed_by: string | null;
   reviewed_at: string | null;
