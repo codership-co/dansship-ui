@@ -1,6 +1,7 @@
 export { cn } from 'polpo/helpers';
 export * from './booking-eligibility';
 export * from './checkout-intent';
+export * from './gift-claim-intent';
 export * from './classes';
 export * from './date';
 export * from './merch';

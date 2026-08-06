@@ -36,6 +36,7 @@ import {
   SecureLoginPage,
   SecureOnboardingPage,
   SecurePaymentsResultPage,
+  SecureGiftClaimPage,
   SecureResetPasswordPage,
   SecureSignupPage,
   SecureStudioRentalBrowsePage,
@@ -48,6 +49,7 @@ import {
   SecureSubscriptionPage,
   SecureBookingsPage,
   SecureWalletPage,
+  SecureGiftsPage,
   SecureLegalPage,
 } from '@pages';
 
@@ -108,6 +110,7 @@ const routes: Array<RouteObject> = [
               { path: 'subscription', Component: SecureSubscriptionPage },
               { path: 'bookings', Component: SecureBookingsPage },
               { path: 'wallet', Component: SecureWalletPage },
+              { path: 'gifts', Component: SecureGiftsPage },
             ],
           },
 
@@ -120,6 +123,8 @@ const routes: Array<RouteObject> = [
           },
 
           { path: 'payments/result', Component: SecurePaymentsResultPage, loader: PaymentsResultsLoader },
+
+          { path: 'gifts/claim', Component: SecureGiftClaimPage },
 
           {
             path: 'studio-rental',

@@ -100,6 +100,7 @@ export const PageURLS = {
     subscription: '/profile/subscription',
     bookings: '/profile/bookings',
     wallet: '/profile/wallet',
+    gifts: '/profile/gifts',
   },
   instructor: {
     root: '/instructor',
@@ -129,6 +130,9 @@ export const PageURLS = {
   figureCompleted: '/figure/completed',
   figureSaved: '/figure/saved',
   paymentsResult: '/payments/result',
+  gifts: {
+    claim: '/gifts/claim',
+  },
   studioRentalBrowse: '/studio-rental/browse',
   studioRentalRequests: '/studio-rental/requests',
 } as const;

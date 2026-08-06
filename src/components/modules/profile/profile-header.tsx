@@ -3,7 +3,7 @@ import { cn } from 'polpo/helpers';
 import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaFileUpload, FaSave } from 'react-icons/fa';
-import { LuCalendar, LuCreditCard, LuPencil, LuWallet } from 'react-icons/lu';
+import { LuCalendar, LuCreditCard, LuGift, LuPencil, LuWallet } from 'react-icons/lu';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
 
@@ -162,6 +162,13 @@ export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
               <Button variant='solid' color='primary' size='small' fullWidth>
                 <LuWallet className='h-4 w-4' />
                 {t('profile:wallet.nav')}
+              </Button>
+            </Link>
+
+            <Link to={PageURLS.profile.gifts}>
+              <Button variant='solid' color='primary' size='small' fullWidth>
+                <LuGift className='h-4 w-4' />
+                {t('profile:gifts.nav')}
               </Button>
             </Link>
           </section>

@@ -35,6 +35,7 @@ i18n
       'errors',
       'figure',
       'figureTypes',
+      'gifts',
       'home',
       'instructor',
       'inventory',

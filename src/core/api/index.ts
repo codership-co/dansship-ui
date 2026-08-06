@@ -5,6 +5,7 @@ export * from './benefits/benefits.models';
 export * from './billing/billing.models';
 export * from './bookings/bookings.models';
 export * from './figures/figures.models';
+export * from './gifts/gifts.models';
 export * from './instructors/instructors.models';
 export * from './inventory/inventory.models';
 export * from './merch/merch.models';

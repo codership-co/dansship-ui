@@ -9,28 +9,65 @@ import { Trans, useTranslation } from 'react-i18next';
 import { LuArrowRight, LuX } from 'react-icons/lu';
 import { z } from 'zod';
 
-import { DateField, TextField } from '@components/form-fields';
+import { DateField, EmailField, TextField } from '@components/form-fields';
 import { Spinner } from '@components/loaders';
-import { DansshipAPI, PaymentPreviewRequest, PublicPlan } from '@core/api';
+import { DansshipAPI, DansshipAPIError, PaymentPreviewRequest, PublicPlan } from '@core/api';
 import { captureUnexpectedException, withSentrySpan } from '@core/sentry';
 import { formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
 
-const createCheckoutSchema = (t: TFunction) =>
-  z.object({
-    start_date: z.date().refine(
-      date => {
+const createCheckoutReviewSchema = (t: TFunction) =>
+  z
+    .object({
+      start_date: z.date().optional(),
+      discount_code: z.string(),
+      is_gift: z.boolean(),
+      gift_recipient_name: z.string(),
+      gift_recipient_email: z.string(),
+      gift_message: z.string(),
+      gift_is_anonymous: z.boolean(),
+      gift_sender_display_name: z.string(),
+    })
+    .superRefine((data, ctx) => {
+      if (data.is_gift) {
+        if (!data.gift_recipient_email.trim()) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: t('validation:required'),
+            path: ['gift_recipient_email'],
+          });
+        } else if (!z.string().email().safeParse(data.gift_recipient_email.trim()).success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: t('validation:email'),
+            path: ['gift_recipient_email'],
+          });
+        }
+
+        return;
+      }
+
+      if (!data.start_date) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: t('validation:required'),
+          path: ['start_date'],
+        });
+      } else {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        return date >= today;
-      },
-      { message: t('subscriptions:dateInPast') },
-    ),
-    discount_code: z.string(),
-  });
+        if (data.start_date < today) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: t('subscriptions:dateInPast'),
+            path: ['start_date'],
+          });
+        }
+      }
+    });
 
-export type CheckoutFormValues = z.infer<ReturnType<typeof createCheckoutSchema>>;
+export type CheckoutFormValues = z.infer<ReturnType<typeof createCheckoutReviewSchema>>;
 
 export interface PaymentData {
   discountCode: string;
@@ -72,6 +109,17 @@ export const DefaultPaymentData: PaymentData = {
   amountToCharge: 0,
 };
 
+export const defaultCheckoutFormValues: CheckoutFormValues = {
+  start_date: new Date(),
+  discount_code: '',
+  is_gift: false,
+  gift_recipient_name: '',
+  gift_recipient_email: '',
+  gift_message: '',
+  gift_is_anonymous: false,
+  gift_sender_display_name: '',
+};
+
 interface CheckoutReviewPlanFormInputProps {
   plan: PublicPlan;
   onCancel: () => void;
@@ -87,6 +135,7 @@ export const CheckoutReviewPlanFormInput = ({
 }: CheckoutReviewPlanFormInputProps) => {
   const { t } = useTranslation();
   const [termsAndConditions, setTermsAndConditions] = useState(false);
+  const [giftEligibilityError, setGiftEligibilityError] = useState<string | null>(null);
   const [paymentData, setPaymentData] = useState<PaymentData>({
     ...DefaultPaymentData,
     finalPrice: plan.price,
@@ -96,29 +145,70 @@ export const CheckoutReviewPlanFormInput = ({
     DansshipAPI.payments.previewPayment(payload),
   );
 
-  const { handleSubmit, watch, control } = useForm<CheckoutFormValues>({
+  const { handleSubmit, watch, control, setValue } = useForm<CheckoutFormValues>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    resolver: zodResolver(createCheckoutSchema(t)),
+    resolver: zodResolver(createCheckoutReviewSchema(t)),
     defaultValues: defaultFormValues,
   });
 
   const discountCode = useDebounce(watch('discount_code'), 800);
+  const isGift = watch('is_gift');
+  const giftRecipientEmail = useDebounce(watch('gift_recipient_email'), 800);
+
+  const handleGiftToggle = useCallback(() => {
+    const nextIsGift = !isGift;
+    setValue('is_gift', nextIsGift);
+    setGiftEligibilityError(null);
+
+    if (nextIsGift) {
+      setValue('start_date', undefined);
+
+      return;
+    }
+
+    setValue('start_date', new Date());
+    setValue('gift_recipient_name', '');
+    setValue('gift_recipient_email', '');
+    setValue('gift_message', '');
+    setValue('gift_is_anonymous', false);
+    setValue('gift_sender_display_name', '');
+  }, [isGift, setValue]);
 
   const getPaymentPreview = useCallback(async () => {
     void withSentrySpan('checkout.preview', 'ui.action', { plan_id: plan.id }, async () => {
-      const { data, ok, error } = await previewPayment({
+      const previewPayload: PaymentPreviewRequest = {
         plan_id: plan.id,
         discount_code: discountCode ? discountCode.toUpperCase() : undefined,
-      });
+      };
+      const trimmedGiftEmail = giftRecipientEmail.trim();
+
+      if (isGift && trimmedGiftEmail) {
+        previewPayload.is_gift = true;
+        previewPayload.gift_recipient_email = trimmedGiftEmail;
+      }
+
+      const { data, ok, error } = await previewPayment(previewPayload);
 
       if (!ok) {
+        if (isGift && trimmedGiftEmail) {
+          const message =
+            error instanceof DansshipAPIError
+              ? error.body.message || t('gifts:giftEligibilityFailed')
+              : t('gifts:giftEligibilityFailed');
+          setGiftEligibilityError(message);
+        } else {
+          setGiftEligibilityError(null);
+        }
+
         captureUnexpectedException(error ?? new Error('Payment preview failed'), {
           tags: { flow: 'checkout.preview', plan_id: plan.id },
         });
 
         return;
       }
+
+      setGiftEligibilityError(null);
 
       const {
         base_amount,
@@ -166,7 +256,7 @@ export const CheckoutReviewPlanFormInput = ({
         amountToCharge: amount_to_charge,
       });
     });
-  }, [discountCode, plan.currency, plan.id, previewPayment]);
+  }, [discountCode, giftRecipientEmail, isGift, plan.currency, plan.id, previewPayment, t]);
 
   useEffect(() => {
     void getPaymentPreview();
@@ -174,7 +264,22 @@ export const CheckoutReviewPlanFormInput = ({
 
   const handleInternalSubmit = useCallback(
     async (formData: CheckoutFormValues) => {
-      await onSubmit(formData, paymentData);
+      const nextData: CheckoutFormValues = formData.is_gift
+        ? {
+            ...formData,
+            start_date: undefined,
+            gift_recipient_email: formData.gift_recipient_email.trim(),
+          }
+        : {
+            ...formData,
+            gift_recipient_name: '',
+            gift_recipient_email: '',
+            gift_message: '',
+            gift_is_anonymous: false,
+            gift_sender_display_name: '',
+          };
+
+      await onSubmit(nextData, paymentData);
     },
     [paymentData, onSubmit],
   );
@@ -182,13 +287,27 @@ export const CheckoutReviewPlanFormInput = ({
   return (
     <form onSubmit={handleSubmit(handleInternalSubmit)} className='grid grid-rows-[1fr_auto] h-full'>
       <div className='grid gap-8 content-start'>
-        <DateField
-          control={control}
-          name='start_date'
-          min={new Date()}
-          max={addMonths(new Date(), 1)}
-          label={t('subscriptions:startDate')}
-        />
+        <div className='grid gap-2'>
+          <Checkbox label={t('gifts:purchaseAsGift')} name='is_gift' value={isGift} setValue={handleGiftToggle} />
+        </div>
+
+        {isGift ? (
+          <EmailField
+            control={control}
+            name='gift_recipient_email'
+            label={t('gifts:recipientEmail')}
+            placeholder={t('common:placeholder.email')}
+            errorMessage={giftEligibilityError ?? undefined}
+          />
+        ) : (
+          <DateField
+            control={control}
+            name='start_date'
+            min={new Date()}
+            max={addMonths(new Date(), 1)}
+            label={t('subscriptions:startDate')}
+          />
+        )}
 
         <TextField
           inputClassName='uppercase'
@@ -290,7 +409,9 @@ export const CheckoutReviewPlanFormInput = ({
 
           <Button
             isLoading={isLoading}
-            disabled={(Boolean(discountCode) && !paymentData.isValid) || !termsAndConditions}
+            disabled={
+              (Boolean(discountCode) && !paymentData.isValid) || !termsAndConditions || Boolean(giftEligibilityError)
+            }
             color='primary'
             className='flex items-center'
           >

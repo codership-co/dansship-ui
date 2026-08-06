@@ -68,14 +68,33 @@ export function CheckoutPaymentProofForm({
       return;
     }
 
-    const { start_date, discount_code } = checkoutData;
+    const {
+      start_date,
+      discount_code,
+      is_gift,
+      gift_recipient_name,
+      gift_recipient_email,
+      gift_message,
+      gift_is_anonymous,
+      gift_sender_display_name,
+    } = checkoutData;
 
     const payload: CreatePaymentIntentPayload = {
       plan_id: plan.id,
       payment_method_type: isWalletMethod ? PaymentMethod.WALLET : paymentMethod,
       discount_code: discount_code.trim() ? discount_code.trim() : undefined,
-      start_date: start_date.toISOString(),
     };
+
+    if (is_gift) {
+      payload.is_gift = true;
+      payload.gift_recipient_name = gift_recipient_name.trim();
+      payload.gift_recipient_email = gift_recipient_email.trim();
+      payload.gift_message = gift_message.trim() ? gift_message.trim() : undefined;
+      payload.gift_is_anonymous = gift_is_anonymous;
+      payload.gift_sender_display_name = gift_is_anonymous ? undefined : gift_sender_display_name.trim() || undefined;
+    } else if (start_date) {
+      payload.start_date = start_date.toISOString();
+    }
 
     if (isCardMethod) {
       const { data, ok, error } = await withSentrySpan(
@@ -188,9 +207,31 @@ export function CheckoutPaymentProofForm({
                 </label>
               </>
             ) : null}
-            <label className='block'>
-              {t('payments:startDate')}: {format(checkoutData.start_date, 'yyyy-MM-dd')}
-            </label>
+            {checkoutData.is_gift ? (
+              <div className='mt-2 grid gap-1 text-sm text-gray-700'>
+                <label className='block font-medium text-gray-900'>{t('gifts:checkoutGiftSummaryTitle')}</label>
+                <label className='block'>
+                  {t('gifts:recipientLabel')}: {checkoutData.gift_recipient_name} ({checkoutData.gift_recipient_email})
+                </label>
+                {checkoutData.gift_is_anonymous ? (
+                  <label className='block'>{t('gifts:anonymousSender')}</label>
+                ) : checkoutData.gift_sender_display_name ? (
+                  <label className='block'>
+                    {t('gifts:fromSender', { name: checkoutData.gift_sender_display_name })}
+                  </label>
+                ) : null}
+                {checkoutData.gift_message ? (
+                  <label className='block'>
+                    {t('gifts:messageLabel')}: {checkoutData.gift_message}
+                  </label>
+                ) : null}
+                <label className='block text-gray-600'>{t('gifts:startDateGiftNote')}</label>
+              </div>
+            ) : checkoutData.start_date ? (
+              <label className='block'>
+                {t('payments:startDate')}: {format(checkoutData.start_date, 'yyyy-MM-dd')}
+              </label>
+            ) : null}
           </div>
 
           {isWalletMethod ? (
