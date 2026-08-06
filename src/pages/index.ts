@@ -15,3 +15,4 @@ export * from './studio-rental-browse.page';
 export * from './studio-rental-requests.page';
 export * from './profile';
 export * from './payments-result.page';
+export * from './gifts-claim.page';

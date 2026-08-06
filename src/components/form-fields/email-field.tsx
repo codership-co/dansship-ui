@@ -13,6 +13,7 @@ interface EmailFieldProps<T extends FieldValues = Record<string, unknown>> {
   placeholder?: string;
   disabled?: boolean;
   isLoading?: boolean;
+  errorMessage?: string;
   icon?: React.ReactNode;
 }
 
@@ -24,6 +25,7 @@ export function EmailField<T extends FieldValues = Record<string, unknown>>({
   placeholder,
   disabled,
   isLoading = false,
+  errorMessage,
   icon = <LuMail className='h-5 w-5 text-gray-400' />,
 }: EmailFieldProps<T>) {
   return (
@@ -37,6 +39,7 @@ export function EmailField<T extends FieldValues = Record<string, unknown>>({
       placeholder={placeholder}
       icon={isLoading ? <Spinner size='sm' /> : icon}
       disabled={disabled}
+      errorMessage={errorMessage}
     />
   );
 }

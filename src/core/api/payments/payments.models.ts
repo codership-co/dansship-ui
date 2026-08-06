@@ -27,6 +27,12 @@ export interface CreatePaymentIntentPayload {
   payment_method_type: PaymentMethod;
   discount_code?: string;
   start_date?: string;
+  is_gift?: boolean;
+  gift_recipient_name?: string;
+  gift_recipient_email?: string;
+  gift_message?: string;
+  gift_is_anonymous?: boolean;
+  gift_sender_display_name?: string;
 }
 
 export interface BoldCheckoutConfig {
@@ -129,6 +135,8 @@ export interface AdminPaymentListResponse {
 export interface PaymentPreviewRequest {
   plan_id: string;
   discount_code?: string;
+  is_gift?: boolean;
+  gift_recipient_email?: string;
 }
 
 export interface PaymentPreviewResponse {

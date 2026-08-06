@@ -23,6 +23,17 @@
       "runningBalance": "Saldo"
     }
   },
+  "gifts": {
+    "nav": "Regalos",
+    "title": "Mis regalos",
+    "subtitle": "Consulta los regalos que enviaste y los que recibiste.",
+    "loading": "Cargando regalos...",
+    "loadFailed": "No se pudieron cargar los regalos.",
+    "received": "Recibidos",
+    "sent": "Enviados",
+    "emptyReceived": "Aún no has recibido regalos.",
+    "emptySent": "Aún no has enviado regalos."
+  },
   "stats": {
     "savedFigures": "Figuras Guardadas",
     "completed": "Completadas",

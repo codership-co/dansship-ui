@@ -8,6 +8,7 @@ import { BookingsAPI } from './bookings/bookings.api';
 import { DansshipAPIError, getResponseError, logger } from './dansship.error';
 import { FiguresAdminAPI } from './figures/figures.admin.api';
 import { FiguresAPI } from './figures/figures.api';
+import { GiftsAPI } from './gifts/gifts.api';
 import { InstructorsAdminAPI } from './instructors/instructors.admin.api';
 import { InstructorsAPI } from './instructors/instructors.api';
 import { InventoryAdminApi } from './inventory/inventory.admin.api';
@@ -52,6 +53,7 @@ export class DansshipAPI {
   static bookingsAdmin = new BookingsAdminAPI(this.httpClient);
   static figures = new FiguresAPI(this.httpClient);
   static figuresAdmin = new FiguresAdminAPI(this.httpClient);
+  static gifts = new GiftsAPI(this.httpClient);
   static instructors = new InstructorsAPI(this.httpClient);
   static instructorsAdmin = new InstructorsAdminAPI(this.httpClient);
   static inventoryAdmin = new InventoryAdminApi(this.httpClient);

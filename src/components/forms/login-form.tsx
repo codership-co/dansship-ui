@@ -90,7 +90,12 @@ export function LoginForm() {
       {!defaultEmail ? (
         <div className='text-center text-sm'>
           <span className='text-gray-600'>{t('auth:login.noAccount')}</span>{' '}
-          <Link to={PageURLS.auth.signup} viewTransition className='font-medium text-primary hover:text-primary/90'>
+          <Link
+            to={PageURLS.auth.signup}
+            state={location.state}
+            viewTransition
+            className='font-medium text-primary hover:text-primary/90'
+          >
             {t('auth:login.signUp')}
           </Link>
         </div>

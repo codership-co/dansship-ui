@@ -25,6 +25,7 @@ import { AUTH_SESSION_KEY, PageURLS } from '@core/constants';
 import { type PERMISSION } from '@core/permissions';
 import { addSentryBreadcrumb, clearSentryUser, setSentryUser } from '@core/sentry';
 import {
+  consumePendingGiftClaimToken,
   getPendingPlanCheckoutIntent,
   isValidReturnPath,
   resolveBrowserPreferredLanguage,
@@ -162,7 +163,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const roleHome = await resolvePostLoginPath(data);
       const roles = (data.roles ?? []).map(role => role.toLowerCase());
       const prefersRoleHome = roles.includes('admin') || roles.includes('instructor');
-      const redirectPath = !prefersRoleHome && isValidReturnPath(fromPath) ? fromPath : roleHome;
+      let redirectPath = roleHome;
+
+      if (!prefersRoleHome) {
+        if (isValidReturnPath(fromPath)) {
+          redirectPath = fromPath;
+        } else {
+          const giftToken = consumePendingGiftClaimToken();
+
+          if (giftToken) {
+            redirectPath = `${PageURLS.gifts.claim}?token=${encodeURIComponent(giftToken)}`;
+          }
+        }
+      }
 
       setPendingPostLoginPath(redirectPath);
       setUser(data);
@@ -204,6 +217,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         state: {
           email: payload.email,
           shouldStartCountDownImmediately: true,
+          from: (location.state as { from?: Location } | null)?.from,
         },
       });
 

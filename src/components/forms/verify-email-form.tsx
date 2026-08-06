@@ -4,7 +4,7 @@ import { Button } from 'polpo/components';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { LuArrowLeft, LuArrowRight } from 'react-icons/lu';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { z } from 'zod';
 
 import { EmailField } from '@components/form-fields';
@@ -46,6 +46,8 @@ export const VerifyEmailForm = ({
   email,
 }: VerifyEmailFormProps) => {
   const { t } = useTranslation();
+  const location = useLocation();
+  const returnFrom = (location.state as { from?: Location } | null)?.from;
   const { control, handleSubmit } = useForm<VerifyEmailFormData>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
@@ -93,7 +95,7 @@ export const VerifyEmailForm = ({
           </>
         )}
 
-        <Link to={PageURLS.auth.login} viewTransition>
+        <Link to={PageURLS.auth.login} state={returnFrom ? { from: returnFrom } : undefined} viewTransition>
           {status === VerificationStatus.VERIFIED ? (
             <Button fullWidth color='primary' type='button'>
               <LuArrowRight className='w-4 h-4' />

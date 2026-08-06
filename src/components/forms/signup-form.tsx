@@ -3,7 +3,7 @@ import { Button, Checkbox } from 'polpo/components';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { z } from 'zod';
 
 import { EmailField, PasswordFieldset } from '@components/form-fields';
@@ -33,6 +33,7 @@ export type SignUpFormData = z.infer<ReturnType<typeof createSignUpSchema>>;
 export function SignUpForm() {
   const { t } = useTranslation();
   const { signUp } = useAuth();
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [termsAndConditions, setTermsAndConditions] = useState(false);
 
@@ -106,7 +107,12 @@ export function SignUpForm() {
 
       <div className='text-center text-sm'>
         <span className='text-gray-600'>{t('auth:signup.hasAccount')}</span>{' '}
-        <Link to={PageURLS.auth.login} viewTransition className='font-medium text-primary hover:text-primary/90'>
+        <Link
+          to={PageURLS.auth.login}
+          state={location.state}
+          viewTransition
+          className='font-medium text-primary hover:text-primary/90'
+        >
           {t('auth:signup.signIn')}
         </Link>
       </div>
