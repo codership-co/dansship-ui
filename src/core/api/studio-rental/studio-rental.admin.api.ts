@@ -6,13 +6,18 @@ import type {
   AdminCancelInternalReservedUsePayload,
   AdminListInternalReservedUsesParams,
   AdminListRequestsPayload,
+  AdminListSeriesPayload,
   AdminRejectPayload,
-  AvailabilityRule,
-  AvailabilityRulePayload,
+  CreateRoomResourcePayload,
   InternalReservedUseCreatePayload,
-  ListRulesParams,
+  ListAvailabilityBlocksParams,
   RentalRequest,
-  UpdateRulePayload,
+  RentalSeries,
+  RoomAvailabilityBlock,
+  RoomAvailabilityBlockCreatePayload,
+  RoomAvailabilityBlockUpdatePayload,
+  RoomResourceOption,
+  UpdateRoomResourcePayload,
 } from './studio-rental.models';
 
 export class StudioRentalAdminAPI {
@@ -21,6 +26,14 @@ export class StudioRentalAdminAPI {
   async adminListRequests(payload?: AdminListRequestsPayload) {
     return this.httpClient.callNoError<Array<RentalRequest>>({
       path: '/admin/studio-rentals/requests',
+      method: 'GET',
+      params: payload,
+    });
+  }
+
+  async adminListSeries(payload?: AdminListSeriesPayload) {
+    return this.httpClient.callNoError<Array<RentalSeries>>({
+      path: '/admin/studio-rentals/series',
       method: 'GET',
       params: payload,
     });
@@ -36,6 +49,21 @@ export class StudioRentalAdminAPI {
   async adminRejectRequest(id: string, payload: AdminRejectPayload) {
     return this.httpClient.callNoError<RentalRequest, AdminRejectPayload>({
       path: `/admin/studio-rentals/requests/${id}/reject`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async adminApproveSeries(id: string) {
+    return this.httpClient.callNoError<RentalSeries>({
+      path: `/admin/studio-rentals/series/${id}/approve`,
+      method: 'POST',
+    });
+  }
+
+  async adminRejectSeries(id: string, payload: AdminRejectPayload) {
+    return this.httpClient.callNoError<RentalSeries, AdminRejectPayload>({
+      path: `/admin/studio-rentals/series/${id}/reject`,
       method: 'POST',
       data: payload,
     });
@@ -65,33 +93,56 @@ export class StudioRentalAdminAPI {
     });
   }
 
-  async listRules(payload: ListRulesParams) {
-    return this.httpClient.callNoError<Array<AvailabilityRule>>({
-      path: '/admin/studio-rentals/rules',
+  async listAvailabilityBlocks(payload: ListAvailabilityBlocksParams) {
+    return this.httpClient.callNoError<Array<RoomAvailabilityBlock>>({
+      path: '/admin/studio-rentals/availability-blocks',
       method: 'GET',
       params: payload,
     });
   }
 
-  async createRule(payload: AvailabilityRulePayload) {
-    return this.httpClient.callNoError<AvailabilityRule, AvailabilityRulePayload>({
-      path: '/admin/studio-rentals/rules',
+  async createAvailabilityBlock(payload: RoomAvailabilityBlockCreatePayload) {
+    return this.httpClient.callNoError<RoomAvailabilityBlock, RoomAvailabilityBlockCreatePayload>({
+      path: '/admin/studio-rentals/availability-blocks',
       method: 'POST',
       data: payload,
     });
   }
 
-  async updateRule(id: string, payload: UpdateRulePayload) {
-    return this.httpClient.callNoError<AvailabilityRule, UpdateRulePayload>({
-      path: `/admin/studio-rentals/rules/${id}`,
+  async updateAvailabilityBlock(id: string, payload: RoomAvailabilityBlockUpdatePayload) {
+    return this.httpClient.callNoError<RoomAvailabilityBlock, RoomAvailabilityBlockUpdatePayload>({
+      path: `/admin/studio-rentals/availability-blocks/${id}`,
       method: 'PUT',
       data: payload,
     });
   }
 
-  async deleteRule(id: string) {
+  async deleteAvailabilityBlock(id: string) {
     return this.httpClient.callNoError({
-      path: `/admin/studio-rentals/rules/${id}`,
+      path: `/admin/studio-rentals/availability-blocks/${id}`,
+      method: 'DELETE',
+    });
+  }
+
+  async createRoomResource(roomId: string, payload: CreateRoomResourcePayload) {
+    return this.httpClient.callNoError<RoomResourceOption, CreateRoomResourcePayload>({
+      path: `/admin/studio-rentals/rooms/${roomId}/resources`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async updateRoomResource(id: string, payload: UpdateRoomResourcePayload) {
+    return this.httpClient.callNoError<RoomResourceOption, UpdateRoomResourcePayload>({
+      path: `/admin/studio-rentals/resources/${id}`,
+      method: 'PUT',
+      data: payload,
+    });
+  }
+
+  async deleteRoomResource(id: string) {
+    return this.httpClient.callNoError({
+      path: `/admin/studio-rentals/resources/${id}`,
       method: 'DELETE',
     });
   }

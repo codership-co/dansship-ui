@@ -15,8 +15,8 @@ export const useInstructorRoster = () => {
   );
 
   const markAttendance = useCallback(
-    async (bookingId: string, payload: MarkAttendancePayload) => {
-      await withSentrySpan(
+    async (bookingId: string, payload: MarkAttendancePayload): Promise<boolean> => {
+      return withSentrySpan(
         'instructor.mark_attendance',
         'ui.action',
         { booking_id: bookingId, attendance_status: payload.status },
@@ -25,16 +25,20 @@ export const useInstructorRoster = () => {
 
           if (ok) {
             toast.success(t('instructor:roster.attendanceUpdated'));
-          } else {
-            toast.error(t('instructor:roster.updateAttendanceFailed'));
-            captureUnexpectedException(error ?? new Error('Mark attendance failed'), {
-              tags: {
-                flow: 'instructor.mark_attendance',
-                booking_id: bookingId,
-                attendance_status: payload.status,
-              },
-            });
+
+            return true;
           }
+
+          toast.error(t('instructor:roster.updateAttendanceFailed'));
+          captureUnexpectedException(error ?? new Error('Mark attendance failed'), {
+            tags: {
+              flow: 'instructor.mark_attendance',
+              booking_id: bookingId,
+              attendance_status: payload.status,
+            },
+          });
+
+          return false;
         },
       );
     },

@@ -1,5 +1,5 @@
 import { format, parseISO, addDays, isBefore, startOfDay } from 'date-fns';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useDateLocale } from '@hooks';
@@ -7,6 +7,14 @@ import { useDateLocale } from '@hooks';
 import type { ScheduledClass, AgendaEvent, ScheduleStatus } from '@core/api';
 
 export type GridEvent = ScheduledClass | AgendaEvent;
+
+export type HourRangeSelection = {
+  date: string;
+  /** Inclusive start hour (0–23). */
+  startHour: number;
+  /** Exclusive end hour (0–23), e.g. 9→11 means 09:00–11:00. */
+  endHour: number;
+};
 
 interface ScheduleGridProps {
   // The Monday string 'YYYY-MM-DD'
@@ -22,11 +30,17 @@ interface ScheduleGridProps {
   scheduleStatus?: ScheduleStatus;
   /** Emphasizes a specific scheduled class in the grid (e.g. next upcoming). */
   highlightedClassId?: string | null;
+  /** Google Calendar-style drag to select consecutive free hours. */
+  enableRangeSelect?: boolean;
+  rangeSelection?: HourRangeSelection | null;
+  onRangeSelect?: (selection: HourRangeSelection) => void;
 }
 
 // 6 AM to 9 PM
 const HOURS = Array.from({ length: 16 }, (_, i) => i + 6);
 const HOUR_HEIGHT_PX = 64;
+const GRID_START_HOUR = 6;
+const GRID_END_HOUR = 22;
 
 interface ClassLayout {
   top: number;
@@ -148,6 +162,62 @@ function buildDayLayout(dayClasses: Array<GridEvent>): Array<ClassWithLayout> {
   return result;
 }
 
+function hourOverlapsOccupied(dateString: string, hour: number, events: Array<GridEvent>): boolean {
+  const slotStart = hour;
+  const slotEnd = hour + 1;
+
+  return events.some(event => {
+    const start = new Date(getStartTime(event));
+    const end = new Date(getEndTime(event));
+
+    if (format(start, 'yyyy-MM-dd') !== dateString) {
+      return false;
+    }
+
+    const eventStartHour = start.getHours() + start.getMinutes() / 60;
+    const eventEndHour = end.getHours() + end.getMinutes() / 60 + (end.getSeconds() > 0 ? 1 / 3600 : 0);
+
+    return eventStartHour < slotEnd && eventEndHour > slotStart;
+  });
+}
+
+function clampRangeToFreeHours(
+  dateString: string,
+  anchorHour: number,
+  targetHour: number,
+  events: Array<GridEvent>,
+): HourRangeSelection | null {
+  const low = Math.min(anchorHour, targetHour);
+  const high = Math.max(anchorHour, targetHour);
+
+  if (hourOverlapsOccupied(dateString, anchorHour, events)) {
+    return null;
+  }
+
+  let start = anchorHour;
+  let endExclusive = anchorHour + 1;
+
+  if (targetHour >= anchorHour) {
+    for (let hour = anchorHour + 1; hour <= high; hour += 1) {
+      if (hour >= GRID_END_HOUR || hourOverlapsOccupied(dateString, hour, events)) {
+        break;
+      }
+
+      endExclusive = hour + 1;
+    }
+  } else {
+    for (let hour = anchorHour - 1; hour >= low; hour -= 1) {
+      if (hour < GRID_START_HOUR || hourOverlapsOccupied(dateString, hour, events)) {
+        break;
+      }
+
+      start = hour;
+    }
+  }
+
+  return { date: dateString, startHour: start, endHour: endExclusive };
+}
+
 export function ScheduleGrid({
   weekDate,
   classes = [],
@@ -158,10 +228,16 @@ export function ScheduleGrid({
   dayColumnMinWidth = 150,
   scheduleStatus,
   highlightedClassId,
+  enableRangeSelect = false,
+  rangeSelection = null,
+  onRangeSelect,
 }: ScheduleGridProps) {
   const { t } = useTranslation();
   const locale = useDateLocale();
-  // Generate the 7 days of the week starting from weekDate
+  const dragAnchorRef = useRef<{ date: string; hour: number } | null>(null);
+  const draftSelectionRef = useRef<HourRangeSelection | null>(null);
+  const [draftSelection, setDraftSelection] = useState<HourRangeSelection | null>(null);
+
   const days = useMemo(() => {
     const start = parseISO(weekDate);
 
@@ -180,14 +256,37 @@ export function ScheduleGrid({
   }, [weekDate, locale]);
 
   const allEvents = useMemo(() => {
-    return [...classes, ...events];
-  }, [classes, events]);
+    return events.length > 0 ? events : classes;
+  }, [events, classes]);
 
-  // Group classes by date string and pre-compute overlap layout
+  useEffect(() => {
+    draftSelectionRef.current = draftSelection;
+  }, [draftSelection]);
+
+  useEffect(() => {
+    if (!enableRangeSelect) {
+      return;
+    }
+
+    const handlePointerUp = () => {
+      const draft = draftSelectionRef.current;
+      dragAnchorRef.current = null;
+
+      if (draft && onRangeSelect) {
+        onRangeSelect(draft);
+      }
+
+      setDraftSelection(null);
+    };
+
+    window.addEventListener('pointerup', handlePointerUp);
+
+    return () => window.removeEventListener('pointerup', handlePointerUp);
+  }, [enableRangeSelect, onRangeSelect]);
+
   const classesByDate = useMemo(() => {
     const dict: Record<string, Array<GridEvent>> = {};
     allEvents.forEach(c => {
-      // Localize the start_time ISO string
       const localDate = new Date(c.start_time);
       const dateStr = format(localDate, 'yyyy-MM-dd');
 
@@ -204,17 +303,49 @@ export function ScheduleGrid({
     return layoutDict;
   }, [allEvents]);
 
+  const activeSelection = draftSelection ?? rangeSelection;
+
+  const beginRangeSelect = (dateString: string, hour: number) => {
+    if (!enableRangeSelect) {
+      return;
+    }
+
+    const next = clampRangeToFreeHours(dateString, hour, hour, allEvents);
+
+    if (!next) {
+      return;
+    }
+
+    dragAnchorRef.current = { date: dateString, hour };
+    setDraftSelection(next);
+  };
+
+  const extendRangeSelect = (dateString: string, hour: number) => {
+    if (!enableRangeSelect || !dragAnchorRef.current) {
+      return;
+    }
+
+    if (dragAnchorRef.current.date !== dateString) {
+      return;
+    }
+
+    const next = clampRangeToFreeHours(dateString, dragAnchorRef.current.hour, hour, allEvents);
+
+    if (next) {
+      setDraftSelection(next);
+    }
+  };
+
   return (
     <div className='flex bg-white rounded-xl shadow-xl border border-gray-200 overflow-auto'>
-      {/* Time column */}
       <div className='w-16 shrink-0 border-r border-gray-200 bg-gray-50'>
-        <div className='h-14 border-b border-gray-200'></div> {/* Header spacer */}
+        <div className='h-14 border-b border-gray-200'></div>
         <div className='relative' style={{ height: `${HOURS.length * HOUR_HEIGHT_PX}px` }}>
           {HOURS.map(hour => (
             <div
               key={hour}
-              className='absolute w-full text-right pr-2 text-xs text-gray-500 transform -translate-y-1/2'
-              style={{ top: `${(hour - 6) * HOUR_HEIGHT_PX + 10}px` }}
+              className='absolute w-full text-right pr-2 text-xs text-gray-500 -translate-y-1/2'
+              style={{ top: `${(hour - GRID_START_HOUR) * HOUR_HEIGHT_PX}px` }}
             >
               {hour}:00
             </div>
@@ -222,7 +353,6 @@ export function ScheduleGrid({
         </div>
       </div>
 
-      {/* Days grid */}
       <div className='flex-1 flex overflow-x-auto'>
         {days.map((day, i) => (
           <div
@@ -230,7 +360,6 @@ export function ScheduleGrid({
             className={`flex-1 ${i < 6 ? 'border-r border-gray-200' : ''}`}
             style={{ minWidth: `${dayColumnMinWidth}px` }}
           >
-            {/* Day Header */}
             <div
               className={`h-14 border-b border-gray-200 flex flex-col items-center justify-center sticky top-0 z-10 ${
                 day.isPast ? 'bg-gray-100' : 'bg-gray-50'
@@ -242,21 +371,56 @@ export function ScheduleGrid({
               <span className={`text-xs ${day.isPast ? 'text-gray-400' : 'text-gray-500'}`}>{day.shortDate}</span>
             </div>
 
-            {/* Day Body */}
-            <div className='relative w-full' style={{ height: `${HOURS.length * HOUR_HEIGHT_PX}px` }}>
-              {/* Grid lines & clickable slots */}
-              {HOURS.map((hour, idx) => (
-                <div
-                  key={hour}
-                  className={`absolute w-full h-16 border-gray-100 ${idx < HOURS.length - 1 ? 'border-b' : ''} ${
-                    day.isPast ? 'bg-gray-50 cursor-default' : 'cursor-pointer hover:bg-accent transition-colors'
-                  }`}
-                  style={{ top: `${idx * HOUR_HEIGHT_PX}px` }}
-                  onClick={() => !day.isPast && onSlotClick?.(day.dateString, hour)}
-                ></div>
-              ))}
+            <div className='relative w-full select-none' style={{ height: `${HOURS.length * HOUR_HEIGHT_PX}px` }}>
+              {HOURS.map((hour, idx) => {
+                const occupied = hourOverlapsOccupied(day.dateString, hour, allEvents);
 
-              {/* Render Classes */}
+                return (
+                  <div
+                    key={hour}
+                    className={`absolute w-full h-16 border-gray-100 ${idx < HOURS.length - 1 ? 'border-b' : ''} ${
+                      day.isPast
+                        ? 'bg-gray-50 cursor-default'
+                        : occupied
+                          ? 'cursor-not-allowed'
+                          : 'cursor-pointer hover:bg-accent/40 transition-colors'
+                    }`}
+                    style={{ top: `${idx * HOUR_HEIGHT_PX}px` }}
+                    onPointerDown={event => {
+                      if (day.isPast || occupied) {
+                        return;
+                      }
+
+                      if (enableRangeSelect) {
+                        event.preventDefault();
+                        beginRangeSelect(day.dateString, hour);
+
+                        return;
+                      }
+
+                      onSlotClick?.(day.dateString, hour);
+                    }}
+                    onPointerEnter={() => {
+                      if (day.isPast || occupied) {
+                        return;
+                      }
+
+                      extendRangeSelect(day.dateString, hour);
+                    }}
+                  ></div>
+                );
+              })}
+
+              {activeSelection && activeSelection.date === day.dateString ? (
+                <div
+                  className='pointer-events-none absolute inset-x-1 z-15 rounded border border-emerald-400 bg-emerald-200/50'
+                  style={{
+                    top: `${(activeSelection.startHour - GRID_START_HOUR) * HOUR_HEIGHT_PX}px`,
+                    height: `${Math.max(activeSelection.endHour - activeSelection.startHour, 1) * HOUR_HEIGHT_PX}px`,
+                  }}
+                />
+              ) : null}
+
               {(classesByDate[day.dateString] || []).map(({ cls, layout }) => {
                 const columnWidthPercent = 100 / layout.columnsCount;
                 const leftPercent = columnWidthPercent * layout.column;
@@ -274,14 +438,12 @@ export function ScheduleGrid({
                 let id = '';
 
                 if ('event_type' in cls) {
-                  // It's an AgendaEvent
                   eventType = cls.event_type;
                   className = cls.metadata['title'] || cls.event_type.replace(/_/g, ' ');
-                  classInstructor = cls.metadata['user'] || '';
+                  classInstructor = cls.metadata['teacher'] || '';
                   classRoom = cls.room_id || t('schedules:roomNotAvailable');
                   id = `${cls.source_id}-${cls.start_time}`;
                 } else {
-                  // It's a ScheduledClass
                   className = cls.class_definition?.name || t('schedules:unnamedClass');
                   classInstructor = cls.instructor?.email || t('schedules:instructorTBA');
                   classRoom = cls.room?.name || t('schedules:roomNotAvailable');
@@ -295,6 +457,7 @@ export function ScheduleGrid({
                     : Boolean((cls as ScheduledClass).is_cancelled);
                 const isMuted = isClassPast || isClassCancelled;
                 const isHighlighted = Boolean(highlightedClassId && id === highlightedClassId);
+                const occupancyKind = 'event_type' in cls ? cls.metadata?.kind : undefined;
 
                 let bgClass =
                   'bg-secondary/40 border-secondary hover:bg-secondary/60 hover:border-primary/40 text-primary';
@@ -302,13 +465,16 @@ export function ScheduleGrid({
                 if (isHighlighted) {
                   bgClass =
                     'bg-primary/15 border-primary ring-2 ring-primary/40 hover:bg-primary/25 hover:border-primary text-primary';
+                } else if (occupancyKind === 'free') {
+                  bgClass =
+                    'bg-emerald-100 border-emerald-300 hover:bg-emerald-200 hover:border-emerald-400 text-emerald-950';
+                } else if (occupancyKind === 'occupied' || eventType === 'blocked_space') {
+                  bgClass = 'bg-red-100 border-red-300 hover:bg-red-200 hover:border-red-400 text-red-900';
                 } else if (eventType === 'space_rental_external') {
                   bgClass = 'bg-blue-100 border-blue-300 hover:bg-blue-200 hover:border-blue-400 text-blue-900';
                 } else if (eventType === 'internal_reserved_use') {
                   bgClass =
                     'bg-purple-100 border-purple-300 hover:bg-purple-200 hover:border-purple-400 text-purple-900';
-                } else if (eventType === 'blocked_space') {
-                  bgClass = 'bg-red-100 border-red-300 hover:bg-red-200 hover:border-red-400 text-red-900';
                 }
 
                 return (
