@@ -36,6 +36,7 @@
     "merchPos": "Punto de Venta",
     "reportsConfig": "Reportes y Configuración",
     "users": "Usuarios",
-    "studioRental": "Renta de Estudio"
+    "studioRental": "Renta de Estudio",
+    "doorCode": "Código de Puerta"
   }
 }

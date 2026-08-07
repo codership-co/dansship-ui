@@ -4,6 +4,8 @@ export * from './auth/auth.models';
 export * from './benefits/benefits.models';
 export * from './billing/billing.models';
 export * from './bookings/bookings.models';
+export * from './door-code/door-code.models';
+export * from './door-code/door-code.admin.api';
 export * from './figures/figures.models';
 export * from './gifts/gifts.models';
 export * from './instructors/instructors.models';
