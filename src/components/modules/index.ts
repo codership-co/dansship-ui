@@ -6,6 +6,7 @@ export * from './admin-payments';
 export * from './admin-reports';
 export * from './auth';
 export * from './admin-studio-rentals';
+export * from './admin-door-code';
 export * from './instructor';
 export * from './classes';
 export * from './profile';

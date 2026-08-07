@@ -6,6 +6,7 @@ import { BillingAdminAPI } from './billing/billing.admin.api';
 import { BookingsAdminAPI } from './bookings/bookings.admin.api';
 import { BookingsAPI } from './bookings/bookings.api';
 import { DansshipAPIError, getResponseError, logger } from './dansship.error';
+import { DoorCodeAdminAPI } from './door-code/door-code.admin.api';
 import { FiguresAdminAPI } from './figures/figures.admin.api';
 import { FiguresAPI } from './figures/figures.api';
 import { GiftsAPI } from './gifts/gifts.api';
@@ -72,6 +73,7 @@ export class DansshipAPI {
   static usersAdmin = new UsersAdminAPI(this.httpClient);
   static wallets = new WalletsAPI(this.httpClient);
   static walletsAdmin = new WalletsAdminAPI(this.httpClient);
+  static doorCodeAdmin = new DoorCodeAdminAPI(this.httpClient);
 
   static {
     this.httpClient.setOnErrorInterceptor(async (request, response) => {

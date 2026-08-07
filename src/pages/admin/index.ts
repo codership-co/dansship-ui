@@ -13,3 +13,4 @@ export * from './merch-pos.page';
 export * from './studio-rental.page';
 export * from './agenda-conflicts.page';
 export * from './schedule-builder.page';
+export * from './door-code.page';

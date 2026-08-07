@@ -6,7 +6,7 @@ import { GiAvoidance } from 'react-icons/gi';
 import { GrSchedules } from 'react-icons/gr';
 import { HiOutlineDocument } from 'react-icons/hi';
 import { HiMiniShoppingCart } from 'react-icons/hi2';
-import { LuX } from 'react-icons/lu';
+import { LuKeyRound, LuX } from 'react-icons/lu';
 import { MdOutlineInventory, MdOutlinePayments } from 'react-icons/md';
 import { RiAdminFill } from 'react-icons/ri';
 import { SiReasonstudios } from 'react-icons/si';
@@ -68,6 +68,13 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       orPermissions: AdminPermissions.studioRental,
       featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
       icon: SiReasonstudios,
+    },
+    {
+      to: PageURLS.admin.doorCode,
+      label: t('nav:adminMenu.doorCode'),
+      orPermissions: AdminPermissions.doorCode,
+      featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
+      icon: LuKeyRound,
     },
     {
       to: PageURLS.admin.reports,

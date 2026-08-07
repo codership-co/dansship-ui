@@ -175,5 +175,22 @@
     "validationUser": "Selecciona un usuario.",
     "validationClass": "Selecciona una clase.",
     "selectedClassSummary": "Clase seleccionada: {{className}} ({{enrolled}}/{{capacity}} reservados)"
+  },
+  "doorCode": {
+    "title": "Código de la Puerta",
+    "subtitle": "Administra el código del candado inteligente y notifica a quienes tienen reservas próximas.",
+    "loading": "Cargando código actual...",
+    "currentLabel": "Código actual",
+    "noCurrent": "Aún no hay un código configurado.",
+    "lastChanged": "Último cambio: {{date}}",
+    "rotateTitle": "Actualizar código",
+    "rotateHint": "Al guardar, se enviará un correo a todas las personas con una reserva física confirmada y próxima.",
+    "codeLabel": "Nuevo código",
+    "codePlaceholder": "Ej. 2468",
+    "submit": "Actualizar código",
+    "confirmTitle": "¿Confirmar cambio de código?",
+    "confirmDescription": "Se establecerá el código {{code}} y se notificará a todas las personas con reservas próximas. Esta acción afecta el acceso físico a la academia.",
+    "rotateSuccess": "Código actualizado. Se notificó a {{count}} persona(s).",
+    "rotateFailed": "No se pudo actualizar el código de la puerta."
   }
 }
