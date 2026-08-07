@@ -15,6 +15,8 @@ export interface Room {
   image_key?: string | null;
   image_url?: string | null;
   is_active: boolean;
+  hourly_rental_price?: string;
+  tax_type_id?: string;
   created_at: string;
   updated_at?: string;
 }
@@ -22,7 +24,10 @@ export interface Room {
 export type CreateRoomPayload = Omit<
   Room,
   'id' | 'is_active' | 'created_at' | 'updated_at' | 'image_key' | 'image_url'
->;
+> & {
+  hourly_rental_price?: string | null;
+  tax_type_id?: string | null;
+};
 export type UpdateRoomPayload = Partial<CreateRoomPayload>;
 
 export interface RoomImageUploadRequest {

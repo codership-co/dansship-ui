@@ -135,10 +135,16 @@ export interface AdminPaymentListResponse {
 }
 
 export interface PaymentPreviewRequest {
-  plan_id: string;
+  purchase_type?: PurchaseType;
+  plan_id?: string;
   discount_code?: string;
   is_gift?: boolean;
   gift_recipient_email?: string;
+  room_id?: string;
+  resource_id?: string | null;
+  start_time?: string;
+  end_time?: string;
+  duration_hours?: number | string;
 }
 
 export interface PaymentPreviewResponse {

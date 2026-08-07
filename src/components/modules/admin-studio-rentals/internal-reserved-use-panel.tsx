@@ -93,7 +93,6 @@ export function InternalReservedUsePanel() {
           room_id: roomId,
           start_time: new Date(startAt).toISOString(),
           end_time: new Date(endAt).toISOString(),
-          resource_type: 'room',
         },
       ],
     });

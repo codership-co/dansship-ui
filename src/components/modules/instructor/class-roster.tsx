@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuCircleCheck, LuSearch, LuCircleX } from 'react-icons/lu';
 
-import { SpinnerLoader } from '@components/loaders';
+import { SpinnerLoader, Spinner } from '@components/loaders';
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Input } from '@components/ui';
 import { DansshipAPI, InstructorUserSearchResult, RosterStudent } from '@core/api';
 import { captureUnexpectedException } from '@core/sentry';
@@ -22,7 +22,8 @@ function studentDisplayName(student: RosterStudent) {
 interface AttendanceActionsProps {
   student: RosterStudent;
   isPastStartTime: boolean;
-  isMarking: boolean;
+  isUpdating: boolean;
+  isDisabled: boolean;
   onAttendance: (bookingId: string, status: 'attended' | 'no_show') => void;
   stacked?: boolean;
 }
@@ -30,19 +31,20 @@ interface AttendanceActionsProps {
 function AttendanceActions({
   student,
   isPastStartTime,
-  isMarking,
+  isUpdating,
+  isDisabled,
   onAttendance,
   stacked = false,
 }: AttendanceActionsProps) {
   const { t } = useTranslation();
 
   return (
-    <div className={stacked ? 'grid grid-cols-2 gap-2 w-full' : 'inline-flex gap-2 justify-end'}>
+    <div className={`relative ${stacked ? 'grid grid-cols-2 gap-2 w-full' : 'inline-flex gap-2 justify-end'}`}>
       <Button
         variant={student.status === 'attended' ? 'default' : 'outline'}
         size='sm'
         onClick={() => onAttendance(student.id, 'attended')}
-        disabled={!isPastStartTime || isMarking}
+        disabled={!isPastStartTime || isDisabled}
         className={`${stacked ? 'w-full' : ''} ${student.status === 'attended' ? 'bg-active-600 hover:bg-active-700' : ''}`}
         title={!isPastStartTime ? t('instructor:roster.cannotMarkBeforeStart') : ''}
       >
@@ -52,12 +54,17 @@ function AttendanceActions({
         variant={student.status === 'no_show' ? 'destructive' : 'outline'}
         size='sm'
         onClick={() => onAttendance(student.id, 'no_show')}
-        disabled={!isPastStartTime || isMarking}
+        disabled={!isPastStartTime || isDisabled}
         className={stacked ? 'w-full' : ''}
         title={!isPastStartTime ? t('instructor:roster.cannotMarkBeforeStart') : ''}
       >
         <LuCircleX className='h-4 w-4 mr-1' /> {t('instructor:roster.noShow')}
       </Button>
+      {isUpdating ? (
+        <div className='absolute inset-0 flex items-center justify-center rounded-md bg-white/70'>
+          <Spinner size='sm' />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -65,14 +72,19 @@ function AttendanceActions({
 export function ClassRoster({ classId, className, startTime }: ClassRosterProps) {
   const { t } = useTranslation();
   const locale = useDateLocale();
-  const { markAttendance, manualAddStudent, isAdding, isMarking } = useInstructorRoster();
+  const { markAttendance, manualAddStudent, isAdding } = useInstructorRoster();
   const [searchInput, setSearchInput] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedUser, setSelectedUser] = useState<InstructorUserSearchResult | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [updatingBookingId, setUpdatingBookingId] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { response: roster, isLoading } = usePromise(() => DansshipAPI.instructors.getClassRoster(classId));
+  const {
+    response: roster,
+    isLoading,
+    reFetch: reFetchRoster,
+  } = usePromise(() => DansshipAPI.instructors.getClassRoster(classId));
 
   useEffect(() => {
     if (!roster || roster.ok) {
@@ -112,7 +124,17 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
   }, []);
 
   const handleAttendance = async (bookingId: string, status: 'attended' | 'no_show') => {
-    await markAttendance(bookingId, { status });
+    setUpdatingBookingId(bookingId);
+
+    try {
+      const updated = await markAttendance(bookingId, { status });
+
+      if (updated) {
+        await reFetchRoster();
+      }
+    } finally {
+      setUpdatingBookingId(null);
+    }
   };
 
   const handleManualAdd = async () => {
@@ -141,8 +163,9 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
   };
 
   const isPastStartTime = new Date(startTime) < new Date();
+  const isAttendanceBusy = updatingBookingId !== null;
 
-  if (isLoading) {
+  if (isLoading && !roster) {
     return (
       <div className='py-8 flex justify-center'>
         <SpinnerLoader />
@@ -229,7 +252,8 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
                 <AttendanceActions
                   student={student}
                   isPastStartTime={isPastStartTime}
-                  isMarking={isMarking}
+                  isUpdating={updatingBookingId === student.id}
+                  isDisabled={isAttendanceBusy}
                   onAttendance={handleAttendance}
                   stacked
                 />
@@ -263,7 +287,8 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
                       <AttendanceActions
                         student={student}
                         isPastStartTime={isPastStartTime}
-                        isMarking={isMarking}
+                        isUpdating={updatingBookingId === student.id}
+                        isDisabled={isAttendanceBusy}
                         onAttendance={handleAttendance}
                       />
                     </TableCell>
