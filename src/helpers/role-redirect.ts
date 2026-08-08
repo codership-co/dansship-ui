@@ -50,7 +50,7 @@ export function hasUpcomingActiveBookings(bookings: Array<MyBooking>, now = new 
   const nowMs = now.getTime();
 
   return bookings.some(booking => {
-    if (booking.status !== 'active' && booking.status !== 'waitlisted') {
+    if (booking.status !== 'active') {
       return false;
     }
 
@@ -61,7 +61,7 @@ export function hasUpcomingActiveBookings(bookings: Array<MyBooking>, now = new 
 /**
  * Resolves the post-login destination for the user's primary role.
  * Admins → reports; instructors → Mi Horario (`/instructor`).
- * Students with upcoming active/waitlisted bookings go to bookings; otherwise classes.
+ * Students with upcoming active bookings go to bookings; otherwise classes.
  * Skips bookings lookup when onboarding is incomplete (API returns ONBOARDING_REQUIRED).
  * Soft-fails to classes if the bookings request errors.
  *

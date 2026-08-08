@@ -22,7 +22,6 @@
   "selectInstructor": "Selecciona un instructor",
   "dateRequired": "La fecha es obligatoria",
   "timeFormatRequired": "Se requiere el formato HH:MM",
-  "waitlistMinSize": "El tamaño máximo de la lista de espera debe ser al menos 1",
   "endTimeAfterStart": "La hora de fin debe ser después de la hora de inicio",
   "mustBeMonday": "La fecha seleccionada debe ser un lunes",
   "actionRequired": "La acción es obligatoria",

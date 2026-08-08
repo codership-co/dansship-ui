@@ -14,7 +14,7 @@ import { DEFAULT_ROOM_IMAGE, PageURLS } from '@core/constants';
 import { formatTimeDifference, getClassBookingEligibility, isPastBookingDeadline } from '@helpers';
 import { useDateLocale, usePromise, useMyBookings } from '@hooks';
 
-type BookingConfirmAction = 'cancel' | 'leaveWaitlist';
+type BookingConfirmAction = 'cancel';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -37,16 +37,7 @@ export function BookingModal({
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
   const locale = useDateLocale();
-  const {
-    bookClass,
-    cancelClass,
-    joinWaitlist,
-    cancelWaitlist,
-    isBookingClass,
-    isCancelingClass,
-    isJoiningWaitlist,
-    isCancelingWaitlist,
-  } = useMyBookings();
+  const { bookClass, cancelClass, isBookingClass, isCancelingClass } = useMyBookings();
   const [confirmAction, setConfirmAction] = useState<BookingConfirmAction | null>(null);
   const { response: myBookingsResponse } = usePromise(() => DansshipAPI.bookings.getMyBookings(), isAuthenticated);
   const myBookings = myBookingsResponse?.data ?? [];
@@ -60,9 +51,8 @@ export function BookingModal({
   // Here we check if the user is already booked via the injected `user_booking_status` field.
   const userStatus = selectedClass.user_booking_status;
   const isBooked = userStatus === 'active';
-  const isWaitlisted = userStatus === 'waitlisted';
 
-  const isLoading = isBookingClass || isCancelingClass || isJoiningWaitlist || isCancelingWaitlist;
+  const isLoading = isBookingClass || isCancelingClass;
 
   const hasTimeOverlap = myBookings.some(booking => {
     if (!booking.scheduled_class || booking.scheduled_class.id === selectedClass.id) return false;
@@ -98,27 +88,6 @@ export function BookingModal({
     }
   };
 
-  const handleWaitlistJoin = async () => {
-    const ok = await joinWaitlist({ scheduled_class_id: selectedClass.id });
-
-    if (ok) {
-      await onBookingChange?.();
-      onClose();
-    }
-  };
-
-  const handleConfirmWaitlistCancel = async () => {
-    if (!selectedClass.user_booking_id) return;
-
-    const ok = await cancelWaitlist(selectedClass.user_booking_id);
-
-    if (ok) {
-      setConfirmAction(null);
-      await onBookingChange?.();
-      onClose();
-    }
-  };
-
   const handleBuyPlan = () => {
     onClose();
     navigate(PageURLS.profile.subscription);
@@ -133,17 +102,10 @@ export function BookingModal({
 
   const eligibility = getClassBookingEligibility(subscriptions, selectedClass.start_time, isTrialEligible);
   const showSubscriptionWarning =
-    eligibility.status === 'no_subscription' &&
-    !isBooked &&
-    !isWaitlisted &&
-    !isPast &&
-    !isCancelled &&
-    !hasTimeOverlap;
+    eligibility.status === 'no_subscription' && !isBooked && !isPast && !isCancelled && !hasTimeOverlap;
   const showNotStartedWarning =
-    eligibility.status === 'not_started' && !isBooked && !isWaitlisted && !isPast && !isCancelled && !hasTimeOverlap;
-  const showTrialNote = Boolean(
-    eligibility.status === 'trial' && !isBooked && !isWaitlisted && !isPast && !isCancelled,
-  );
+    eligibility.status === 'not_started' && !isBooked && !isPast && !isCancelled && !hasTimeOverlap;
+  const showTrialNote = Boolean(eligibility.status === 'trial' && !isBooked && !isPast && !isCancelled);
 
   return (
     <>
@@ -263,7 +225,7 @@ export function BookingModal({
               </label>
             )}
 
-            {hasTimeOverlap && !isBooked && !isWaitlisted && (
+            {hasTimeOverlap && !isBooked && (
               <label className='bg-warning-50 p-3 rounded text-warning-800 border border-warning-200'>
                 {t('bookings:timeOverlapWarning')}
               </label>
@@ -288,23 +250,14 @@ export function BookingModal({
                     {isCancelingClass ? t('bookings:cancelling') : t('bookings:cancelBooking')}
                   </Button>
                 )
-              ) : isWaitlisted ? (
-                <Button
-                  color='primary'
-                  variant='outlined'
-                  onClick={() => setConfirmAction('leaveWaitlist')}
-                  isLoading={isLoading}
-                >
-                  {isCancelingWaitlist ? t('bookings:leaving') : t('bookings:leaveWaitlist')}
-                </Button>
               ) : eligibility.status === 'no_subscription' ? (
                 <Button color='primary' onClick={handleBuyPlan}>
                   {t('bookings:buyPlan')}
                 </Button>
               ) : eligibility.status === 'not_started' ? null : isFull ? (
-                <Button color='primary' onClick={handleWaitlistJoin} isLoading={isLoading}>
-                  {isJoiningWaitlist ? t('bookings:joining') : t('bookings:joinWaitlist')}
-                </Button>
+                <label className='bg-gray-50 p-3 rounded text-gray-700 border border-gray-200 text-center'>
+                  {t('bookings:spotsFull')}
+                </label>
               ) : (
                 <Button color='primary' onClick={handleBook} isLoading={isLoading}>
                   {isBookingClass ? t('bookings:booking') : t('bookings:bookClass')}
@@ -330,23 +283,11 @@ export function BookingModal({
         onConfirm={() => {
           if (confirmAction === 'cancel') {
             void handleConfirmCancel();
-          } else if (confirmAction === 'leaveWaitlist') {
-            void handleConfirmWaitlistCancel();
           }
         }}
-        title={confirmAction === 'leaveWaitlist' ? t('bookings:leaveWaitlistTitle') : t('bookings:cancelBookingTitle')}
-        description={
-          confirmAction === 'leaveWaitlist' ? t('bookings:leaveWaitlistConfirm') : t('bookings:cancelBookingConfirm')
-        }
-        confirmLabel={
-          isLoading
-            ? confirmAction === 'leaveWaitlist'
-              ? t('bookings:leaving')
-              : t('bookings:cancelling')
-            : confirmAction === 'leaveWaitlist'
-              ? t('bookings:leaveWaitlist')
-              : t('bookings:cancelBooking')
-        }
+        title={t('bookings:cancelBookingTitle')}
+        description={t('bookings:cancelBookingConfirm')}
+        confirmLabel={isLoading ? t('bookings:cancelling') : t('bookings:cancelBooking')}
         cancelLabel={t('common:keep')}
         confirmVariant='destructive'
         isLoading={isLoading}

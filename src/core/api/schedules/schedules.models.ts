@@ -10,7 +10,6 @@ export interface ScheduledClass {
   end_time: string;
   capacity: number;
   enrolled_count: number;
-  waitlist_max_size?: number | null;
   is_cancelled?: boolean;
   cancellation_note?: string | null;
   cancelled_at?: string | null;
@@ -65,19 +64,9 @@ export interface AddClassPayload {
   start_time: string;
   end_time: string;
   capacity?: number;
-  waitlist_max_size?: number | null;
 }
 
 export interface UpdateClassPayload extends Partial<AddClassPayload> {}
-
-export interface UpdateWaitlistConfigPayload {
-  waitlistMaxSize: number | null;
-}
-
-export interface GetWaitlistDefaultResponse {
-  waitlist_default_max_size: number | null;
-  source: string;
-}
 
 export interface EditPublishedClassPayload {
   room_id?: string;

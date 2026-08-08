@@ -13,8 +13,6 @@ const statusLabel = (status: BookingStatus, t: (key: string) => string) => {
   switch (status) {
     case 'active':
       return t('bookings:status.active');
-    case 'waitlisted':
-      return t('bookings:status.waitlisted');
     case 'attended':
       return t('bookings:status.attended');
     case 'no_show':
@@ -26,8 +24,6 @@ const statusLabel = (status: BookingStatus, t: (key: string) => string) => {
 
 const statusVariant = (status: BookingStatus): 'default' | 'secondary' | 'destructive' | 'outline' => {
   if (status === 'active') return 'default';
-
-  if (status === 'waitlisted') return 'secondary';
 
   if (status === 'no_show') return 'destructive';
 
@@ -48,7 +44,7 @@ const canCancel = (booking: MyBooking) => {
   const isFuture = startsAt > Date.now();
   const planAllowsCancel = booking.is_cancellable !== false;
 
-  return isFuture && planAllowsCancel && (booking.status === 'active' || booking.status === 'waitlisted');
+  return isFuture && planAllowsCancel && booking.status === 'active';
 };
 
 function BookingsPage() {
@@ -58,7 +54,7 @@ function BookingsPage() {
     isLoading: isLoadingMyBookings,
     error: myBookingsError,
   } = usePromise(() => DansshipAPI.bookings.getMyBookings());
-  const { cancelClass, cancelWaitlist, isCancelingClass, isCancelingWaitlist } = useMyBookings();
+  const { cancelClass, isCancelingClass } = useMyBookings();
   const [bookingToCancel, setBookingToCancel] = useState<MyBooking | null>(null);
 
   const sortedBookings = useMemo(
@@ -69,16 +65,10 @@ function BookingsPage() {
     [myBookingsResponse?.data],
   );
 
-  const isSubmitting = isCancelingClass || isCancelingWaitlist;
-  const isWaitlistCancellation = bookingToCancel?.status === 'waitlisted';
-
   const handleConfirmCancel = async () => {
     if (!bookingToCancel) return;
 
-    const ok =
-      bookingToCancel.status === 'waitlisted'
-        ? await cancelWaitlist(bookingToCancel.id)
-        : await cancelClass(bookingToCancel.id);
+    const ok = await cancelClass(bookingToCancel.id);
 
     if (ok) {
       setBookingToCancel(null);
@@ -128,10 +118,10 @@ function BookingsPage() {
                     <Button
                       variant='outline'
                       size='sm'
-                      disabled={isSubmitting}
+                      disabled={isCancelingClass}
                       onClick={() => setBookingToCancel(booking)}
                     >
-                      {booking.status === 'waitlisted' ? t('bookings:leaveWaitlist') : t('bookings:cancelBooking')}
+                      {t('bookings:cancelBooking')}
                     </Button>
                   </div>
                 )}
@@ -149,20 +139,12 @@ function BookingsPage() {
           }
         }}
         onConfirm={handleConfirmCancel}
-        title={isWaitlistCancellation ? t('bookings:leaveWaitlistTitle') : t('bookings:cancelBookingTitle')}
-        description={isWaitlistCancellation ? t('bookings:leaveWaitlistConfirm') : t('bookings:cancelBookingConfirm')}
-        confirmLabel={
-          isSubmitting
-            ? isWaitlistCancellation
-              ? t('bookings:leaving')
-              : t('bookings:cancelling')
-            : isWaitlistCancellation
-              ? t('bookings:leaveWaitlist')
-              : t('bookings:cancelBooking')
-        }
+        title={t('bookings:cancelBookingTitle')}
+        description={t('bookings:cancelBookingConfirm')}
+        confirmLabel={isCancelingClass ? t('bookings:cancelling') : t('bookings:cancelBooking')}
         cancelLabel={t('common:keep')}
         confirmVariant='destructive'
-        isLoading={isSubmitting}
+        isLoading={isCancelingClass}
       />
     </div>
   );

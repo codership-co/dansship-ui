@@ -36,21 +36,6 @@ export class BookingsAPI {
     });
   }
 
-  async joinWaitlist(payload: BookClassPayload) {
-    return this.httpClient.callNoError<Booking, BookClassPayload>({
-      path: '/bookings/waitlist',
-      method: 'POST',
-      data: payload,
-    });
-  }
-
-  async cancelWaitlist(id: string) {
-    return this.httpClient.callNoError({
-      path: `/bookings/waitlist/${id}`,
-      method: 'DELETE',
-    });
-  }
-
   async markAttendance(bookingId: string, payload: MarkAttendancePayload) {
     return this.httpClient.callNoError({
       path: `/bookings/${bookingId}/attendance`,

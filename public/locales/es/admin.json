@@ -130,11 +130,8 @@
     "loading": "Cargando lista...",
     "notFound": "No se pudo cargar la lista de esta clase.",
     "enrolled": "Inscritos ({{count}})",
-    "waitlist": "Lista de espera ({{count}})",
     "studentName": "Estudiante",
-    "joinedAt": "Ingreso",
-    "noStudents": "No hay estudiantes inscritos.",
-    "noWaitlist": "No hay estudiantes en lista de espera."
+    "noStudents": "No hay estudiantes inscritos."
   },
   "reports": {
     "title": "Reportes y Configuración de la Plataforma",

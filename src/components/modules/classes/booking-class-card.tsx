@@ -21,8 +21,7 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
   const isPast = isPastBookingDeadline(bookingClass.start_time);
   const isUnavailable = isPast || isFull || isCancelled;
   const isBooked = bookingClass.user_booking_status === 'active';
-  const isWaitlisted = bookingClass.user_booking_status === 'waitlisted';
-  const isBookButtonDisabled = isPast || isCancelled || isBooked || isWaitlisted || hasOverlap(bookingClass) || isFull;
+  const isBookButtonDisabled = isPast || isCancelled || isBooked || hasOverlap(bookingClass) || isFull;
 
   return (
     <section
@@ -94,7 +93,7 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
             </p>
           </section>
         </section>
-        {hasOverlap(bookingClass) && !isBooked && !isWaitlisted && (
+        {hasOverlap(bookingClass) && !isBooked && (
           <p className='text-warning-600'>⚠ {t('bookings:timeOverlapWarning')}</p>
         )}
       </section>
@@ -112,12 +111,10 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
           : isCancelled
             ? t('bookings:classCancelledMessage')
             : isFull
-              ? t('bookings:joinWaitlist')
-              : isWaitlisted
-                ? t('bookings:status.waitlisted')
-                : isBooked
-                  ? `${t('bookings:booked')} ✓`
-                  : t('bookings:bookClass')}
+              ? t('bookings:spotsFull')
+              : isBooked
+                ? `${t('bookings:booked')} ✓`
+                : t('bookings:bookClass')}
       </Button>
     </section>
   );
