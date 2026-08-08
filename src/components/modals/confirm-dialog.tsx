@@ -35,7 +35,14 @@ export function ConfirmDialog({
   elevated = false,
 }: ConfirmDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={nextOpen => {
+        if (isLoading && !nextOpen) return;
+
+        onOpenChange(nextOpen);
+      }}
+    >
       <DialogContent
         className={elevated ? 'z-[1002] sm:max-w-106.25' : 'sm:max-w-106.25'}
         overlayClassName={elevated ? 'z-[1001]' : undefined}
