@@ -40,7 +40,7 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
     reFetch: reFetchWeekDetails,
   } = usePromise(() => DansshipAPI.schedulesAdmin.getWeekDetail(weekId), weekId !== '', [weekId]);
 
-  const { call: publishWeekPromise } = useCallablePromise((targetWeekId: string) =>
+  const { call: publishWeekPromise, isLoading: isPublishing } = useCallablePromise((targetWeekId: string) =>
     DansshipAPI.schedulesAdmin.publishWeek(targetWeekId),
   );
   const { call: addClassPromise, isLoading: isAdding } = useCallablePromise((payload: AddClassPayload) =>
@@ -173,6 +173,7 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
     removeClass,
     editPublishedClass,
     cancelPublishedClass,
+    isPublishing,
     isCreatingClass: isAdding,
     isUpdatingClass: isUpdating,
     isEditingPublishedClass: isEditing,

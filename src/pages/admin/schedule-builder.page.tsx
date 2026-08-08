@@ -88,6 +88,7 @@ function AdminScheduleBuilderPage() {
     editPublishedClass,
     cancelPublishedClass,
     removeClass,
+    isPublishing,
     isCreatingClass,
     isUpdatingClass,
     isEditingPublishedClass,
@@ -357,7 +358,11 @@ function AdminScheduleBuilderPage() {
                 </Button>
               </div>
 
-              {weekObj?.status === 'draft' && <Button onClick={handlePublish}>{t('schedules:publishSchedule')}</Button>}
+              {weekObj?.status === 'draft' && (
+                <Button onClick={handlePublish} disabled={isPublishing}>
+                  {t('schedules:publishSchedule')}
+                </Button>
+              )}
             </div>
           </div>
 
@@ -459,6 +464,7 @@ function AdminScheduleBuilderPage() {
         title={t('schedules:publishTitle')}
         description={t('schedules:publishConfirm')}
         confirmLabel={t('schedules:publish')}
+        isLoading={isPublishing}
       />
     </div>
   );
