@@ -173,8 +173,7 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
     );
   }
 
-  const enrolled = roster?.data?.enrolled?.filter(s => s.status !== 'waitlisted' && s.status !== 'cancelled') ?? [];
-  const waitlisted = roster?.data?.waitlisted?.filter(s => s.status === 'waitlisted') ?? [];
+  const enrolled = roster?.data?.enrolled?.filter(s => s.status !== 'cancelled') ?? [];
 
   const searchDropdown =
     isDropdownOpen && trimmedSearch.length > 2 ? (
@@ -299,42 +298,6 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
           </Table>
         </div>
       </div>
-
-      {waitlisted.length > 0 && (
-        <div className='space-y-4 pt-6 border-t border-gray-200'>
-          <h3 className='text-lg font-semibold text-gray-800'>
-            {t('instructor:roster.waitlist', { count: waitlisted.length })}
-          </h3>
-
-          <div className='lg:hidden space-y-3'>
-            {waitlisted.map(student => (
-              <article key={student.id} className='rounded-xl border border-gray-200 bg-white p-4 grid gap-1'>
-                <p className='m-0 font-semibold text-gray-900 truncate'>{studentDisplayName(student)}</p>
-                <p className='m-0 text-sm text-gray-500 truncate'>{student.user_email || '-'}</p>
-              </article>
-            ))}
-          </div>
-
-          <div className='hidden lg:block border rounded-md bg-white'>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('instructor:roster.studentName')}</TableHead>
-                  <TableHead>{t('common:email')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {waitlisted.map(student => (
-                  <TableRow key={student.id}>
-                    <TableCell className='font-medium'>{studentDisplayName(student)}</TableCell>
-                    <TableCell>{student.user_email || '-'}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-      )}
 
       {!isPastStartTime && (
         <p className='text-sm text-gray-500 italic mt-4 text-center'>{t('instructor:roster.attendanceNote')}</p>

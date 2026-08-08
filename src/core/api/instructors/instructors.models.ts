@@ -68,14 +68,13 @@ export interface RosterStudent {
   user_id: string;
   user_name?: string;
   user_email?: string;
-  status: 'active' | 'attended' | 'no_show' | 'waitlisted' | 'cancelled';
+  status: 'active' | 'attended' | 'no_show' | 'cancelled';
   created_at: string;
 }
 
 export interface ClassRosterResponse {
   class_id: string;
   enrolled: Array<RosterStudent>;
-  waitlisted: Array<RosterStudent>;
 }
 
 export interface InstructorUserSearchResult {

@@ -21,7 +21,6 @@ interface ClassSlotFormData {
   start_time: string;
   end_time: string;
   capacity?: number;
-  waitlist_max_size?: number;
 }
 
 const UNASSIGNED_INSTRUCTOR = '__tba__';
@@ -83,19 +82,16 @@ function AdminScheduleBuilderPage() {
     activeWeekDetail,
     isLoadingWeeks,
     isLoadingWeekDetails,
-    waitlistDefaultConfig,
     publishWeek,
     addClass,
     updateClass,
     editPublishedClass,
     cancelPublishedClass,
-    updateWaitlistConfig,
     removeClass,
     isCreatingClass,
     isUpdatingClass,
     isEditingPublishedClass,
     isCancellingPublishedClass,
-    isUpdatingWaitlistConfig,
     isRemovingClass,
   } = useSchedules({ weekStartDate: selectedWeekDate });
   const weekObj = useMemo(() => weeks.find(w => w.week_start_date === selectedWeekDate), [weeks, selectedWeekDate]);
@@ -229,11 +225,6 @@ function AdminScheduleBuilderPage() {
           capacity: data.capacity || undefined,
         };
         await editPublishedClass(selectedWeekId, editingClass.id, publishedPayload);
-
-        // Update waitlist config through the separate endpoint
-        await updateWaitlistConfig(editingClass.id, {
-          waitlistMaxSize: typeof data.waitlist_max_size === 'number' ? data.waitlist_max_size : null,
-        });
       } else {
         // Draft schedule: full create/update
         const resolvedInstructorId = resolveInstructorId(data.instructor_id);
@@ -246,21 +237,11 @@ function AdminScheduleBuilderPage() {
           capacity: data.capacity || undefined,
         };
 
-        let affectedClassId = editingClass?.id;
-
         if (editingClass) {
-          const updatedClass = await updateClass(selectedWeekId, editingClass.id, payload);
-          affectedClassId = updatedClass?.id;
+          await updateClass(selectedWeekId, editingClass.id, payload);
         } else {
           // addClass works for both draft and published schedules
-          const createdClass = await addClass(payload);
-          affectedClassId = createdClass?.id;
-        }
-
-        if (affectedClassId) {
-          await updateWaitlistConfig(affectedClassId, {
-            waitlistMaxSize: typeof data.waitlist_max_size === 'number' ? data.waitlist_max_size : null,
-          });
+          await addClass(payload);
         }
       }
 
@@ -463,8 +444,7 @@ function AdminScheduleBuilderPage() {
         instructors={instructors?.data ?? []}
         defaultDate={defaultSlot?.date}
         defaultTime={defaultSlot?.time}
-        waitlistDefaultMaxSize={waitlistDefaultConfig?.waitlist_default_max_size}
-        isLoading={isCreatingClass || isUpdatingClass || isEditingPublishedClass || isUpdatingWaitlistConfig}
+        isLoading={isCreatingClass || isUpdatingClass || isEditingPublishedClass}
         onDelete={handleDeleteClass}
         isDeleting={isRemovingClass || isCancellingPublishedClass}
         submitError={submitError}

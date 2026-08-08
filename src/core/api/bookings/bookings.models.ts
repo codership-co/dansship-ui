@@ -1,6 +1,6 @@
 import type { ScheduledClass } from '../schedules/schedules.models';
 
-export type BookingStatus = 'active' | 'cancelled' | 'attended' | 'no_show' | 'waitlisted';
+export type BookingStatus = 'active' | 'cancelled' | 'attended' | 'no_show';
 
 export interface Booking {
   id: string;

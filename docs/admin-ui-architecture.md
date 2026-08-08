@@ -138,7 +138,7 @@ All under `/admin`, wrapped with `SecurityGuard` + admin feature flag + `AdminPe
 | --- | --- | --- | --- |
 | `/admin/agenda` | `agenda.page.tsx` | schedules | `GET /admin/agenda/events` |
 | `/admin/agenda/conflicts` | `agenda-conflicts.page.tsx` | schedules | same agenda events + client-side conflict helper |
-| `/admin/schedule-builder` | `schedule-builder.page.tsx` | schedules, rooms, class_catalog, instructors | `/admin/schedules/weeks`, publish/archive, classes CRUD, published-edit/cancel, waitlist-config, `/admin/settings/waitlist-default`, inventory/instructor lookups |
+| `/admin/schedule-builder` | `schedule-builder.page.tsx` | schedules, rooms, class_catalog, instructors | `/admin/schedules/weeks`, publish/archive, classes CRUD, published-edit/cancel, inventory/instructor lookups |
 
 ### Inventory (rooms, class catalog, plans)
 

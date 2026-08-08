@@ -11,7 +11,6 @@ import {
   type CancelPublishedClassPayload,
   type EditPublishedClassPayload,
   type UpdateClassPayload,
-  type UpdateWaitlistConfigPayload,
 } from '@core/api';
 
 interface UseSchedulesOptions {
@@ -40,7 +39,6 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
     isLoading: isLoadingWeekDetails,
     reFetch: reFetchWeekDetails,
   } = usePromise(() => DansshipAPI.schedulesAdmin.getWeekDetail(weekId), weekId !== '', [weekId]);
-  const { response: waitlistDefaults } = usePromise(() => DansshipAPI.schedulesAdmin.getWaitlistDefault());
 
   const { call: publishWeekPromise } = useCallablePromise((targetWeekId: string) =>
     DansshipAPI.schedulesAdmin.publishWeek(targetWeekId),
@@ -62,10 +60,6 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
   const { call: cancelPublishedClassPromise, isLoading: isCanceling } = useCallablePromise(
     (targetWeekId: string, classId: string, payload: CancelPublishedClassPayload) =>
       DansshipAPI.schedulesAdmin.cancelPublishedClass(targetWeekId, classId, payload),
-  );
-  const { call: updateWaitlistConfigPromise, isLoading: isUpdatingWaitlist } = useCallablePromise(
-    (classId: string, payload: UpdateWaitlistConfigPayload) =>
-      DansshipAPI.schedulesAdmin.updateWaitlistConfig(classId, payload),
   );
 
   const refreshScheduleData = useCallback(async () => {
@@ -166,21 +160,6 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
     },
     [t, cancelPublishedClassPromise, refreshScheduleData],
   );
-  const updateWaitlistConfig = useCallback(
-    async (classId: string, payload: UpdateWaitlistConfigPayload) => {
-      const { ok, data } = await updateWaitlistConfigPromise(classId, payload);
-
-      if (ok) {
-        toast.success(t('schedules:waitlistConfigUpdated'));
-        await refreshScheduleData();
-      } else {
-        toast.error(t('schedules:waitlistConfigFailed'));
-      }
-
-      return data;
-    },
-    [t, updateWaitlistConfigPromise, refreshScheduleData],
-  );
 
   return {
     weeks: weeks?.data ?? [],
@@ -188,19 +167,16 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
     isLoadingWeeks,
     activeWeekDetail: weekDetails?.data ?? null,
     isLoadingWeekDetails,
-    waitlistDefaultConfig: waitlistDefaults?.data ?? null,
     publishWeek,
     addClass,
     updateClass,
     removeClass,
     editPublishedClass,
     cancelPublishedClass,
-    updateWaitlistConfig,
     isCreatingClass: isAdding,
     isUpdatingClass: isUpdating,
     isEditingPublishedClass: isEditing,
     isCancellingPublishedClass: isCanceling,
-    isUpdatingWaitlistConfig: isUpdatingWaitlist,
     isRemovingClass: isRemoving,
     reFetchWeeks,
     reFetchWeekDetails,

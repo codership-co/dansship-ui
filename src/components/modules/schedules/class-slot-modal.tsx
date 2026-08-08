@@ -55,10 +55,6 @@ const classSlotSchema = z
       value => (value === '' || value === null || value === undefined ? undefined : Number(value)),
       z.number().int().min(1, 'Capacity must be at least 1').optional(),
     ),
-    waitlist_max_size: z.preprocess(
-      value => (value === '' || value === null ? undefined : Number(value)),
-      z.number().int().min(1, 'Waitlist max size must be at least 1').optional(),
-    ),
   })
   .refine(
     data => {
@@ -84,7 +80,6 @@ interface ClassSlotModalProps {
   instructors: Array<AdminInstructorListItem>;
   defaultDate?: string;
   defaultTime?: string;
-  waitlistDefaultMaxSize?: number | null;
   isLoading?: boolean;
   isDeleting?: boolean;
   submitError?: string | null;
@@ -103,7 +98,6 @@ export function ClassSlotModal({
   instructors,
   defaultDate,
   defaultTime,
-  waitlistDefaultMaxSize,
   isLoading,
   onDelete,
   isDeleting,
@@ -131,7 +125,6 @@ export function ClassSlotModal({
       date: defaultDate || '',
       start_time: defaultTime || '09:00',
       end_time: getOneHourAfter(defaultTime || '09:00'),
-      waitlist_max_size: undefined,
     },
   });
 
@@ -241,7 +234,6 @@ export function ClassSlotModal({
           start_time: format(localStartDate, 'HH:mm'),
           end_time: format(localEndDate, 'HH:mm'),
           capacity: initialData.capacity,
-          waitlist_max_size: initialData.waitlist_max_size ?? undefined,
         });
       } else {
         reset({
@@ -252,7 +244,6 @@ export function ClassSlotModal({
           start_time: defaultTime || '09:00',
           end_time: getOneHourAfter(defaultTime || '09:00'),
           capacity: undefined,
-          waitlist_max_size: undefined,
         });
       }
     }
@@ -501,23 +492,6 @@ export function ClassSlotModal({
                   : t('schedules:capacityDefaultHelpGeneric')}
               </p>
               <p className='text-xs text-gray-500'>{t('schedules:capacityEffectiveHelp')}</p>
-            </div>
-
-            <div className='space-y-2'>
-              <Label htmlFor='waitlist_max_size'>{t('schedules:waitlistMaxSize')}</Label>
-              <Input
-                id='waitlist_max_size'
-                type='number'
-                min={1}
-                placeholder={t('schedules:leaveBlankStudioDefault')}
-                {...register('waitlist_max_size')}
-              />
-              {errors.waitlist_max_size && <p className='text-sm text-alert-500'>{errors.waitlist_max_size.message}</p>}
-              <p className='text-xs text-gray-500'>
-                {typeof waitlistDefaultMaxSize === 'number'
-                  ? t('schedules:waitlistDefaultHelp', { size: waitlistDefaultMaxSize })
-                  : t('schedules:waitlistDefaultHelpNoLimit')}
-              </p>
             </div>
 
             {submitError && (

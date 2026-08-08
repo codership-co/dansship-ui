@@ -8,13 +8,11 @@ import type {
   CancelPublishedClassPayload,
   EditPublishedClassPayload,
   GetAgendaEventsPayload,
-  GetWaitlistDefaultResponse,
   GetWeeksPayload,
   InstructorClassesResponse,
   ScheduledClass,
   ScheduleWeek,
   UpdateClassPayload,
-  UpdateWaitlistConfigPayload,
 } from './schedules.models';
 
 export class SchedulesAdminAPI {
@@ -77,21 +75,6 @@ export class SchedulesAdminAPI {
       path: `/admin/schedules/weeks/${weekId}/classes/${classId}`,
       method: 'PUT',
       data: payload,
-    });
-  }
-
-  async updateWaitlistConfig(classId: string, payload: UpdateWaitlistConfigPayload) {
-    return this.httpClient.callNoError<ScheduledClass, UpdateWaitlistConfigPayload>({
-      path: `/admin/schedules/classes/${classId}/waitlist-config`,
-      method: 'PUT',
-      data: payload,
-    });
-  }
-
-  async getWaitlistDefault() {
-    return this.httpClient.callNoError<GetWaitlistDefaultResponse>({
-      path: '/admin/settings/waitlist-default',
-      method: 'GET',
     });
   }
 
