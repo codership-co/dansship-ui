@@ -1,5 +1,5 @@
 import { GrSchedules } from 'react-icons/gr';
-import { LuBellElectric, LuBookImage, LuCalendarHeart, LuFootprints, LuUser } from 'react-icons/lu';
+import { LuBellElectric, LuBookImage, LuCalendarHeart, LuDoorOpen, LuFootprints, LuUser } from 'react-icons/lu';
 import { RiAdminFill } from 'react-icons/ri';
 
 import { FEATURE_FLAG } from '@contexts';
@@ -51,7 +51,7 @@ export function getAdminNavItem(t: Translate): NavItem {
 /**
  * Shared primary nav for desktop + mobile.
  * Guest: Classes → Plans → Figures
- * Signed-in: Mi Horario (instructor) → Classes → Bookings → Plans→subscription
+ * Signed-in: Mi Horario (instructor) → Classes → Bookings → Studio rental → Plans→subscription
  * Figuras/Progreso omitted when authenticated (not prod-ready).
  */
 export function getPrimaryNavItems(
@@ -100,6 +100,13 @@ export function getPrimaryNavItems(
           requireAuthentication: true,
           featureFlags: [FEATURE_FLAG.isMyAccountBookingsPageEnabled],
           icon: LuCalendarHeart,
+        },
+        {
+          to: PageURLS.studioRentalBrowse,
+          label: t('nav:studioRental'),
+          requireAuthentication: true,
+          featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isStudioRentalBrowsePageEnabled],
+          icon: LuDoorOpen,
         },
         {
           to: PageURLS.profile.subscription,

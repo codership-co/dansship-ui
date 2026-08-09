@@ -3,13 +3,13 @@ import { cn } from 'polpo/helpers';
 import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaFileUpload, FaSave } from 'react-icons/fa';
-import { LuCalendar, LuCreditCard, LuGift, LuPencil, LuWallet } from 'react-icons/lu';
+import { LuCalendar, LuClipboardList, LuCreditCard, LuGift, LuPencil, LuWallet } from 'react-icons/lu';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
 
 import { Section } from '@components/containers';
 import { ProfilePicture } from '@components/ui';
-import { useAuth } from '@contexts';
+import { FEATURE_FLAG, useAuth, useEnabledFeatureFlag } from '@contexts';
 import { DansshipAPI, PaymentProofContentType, PaymentProofContentTypesList } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { usePromise } from '@hooks';
@@ -24,6 +24,10 @@ export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
   const { user, uploadProfilePhoto } = useAuth();
   const [imageURL, setImageURL] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
+  const isStudioRentalRequestsEnabled = useEnabledFeatureFlag([
+    FEATURE_FLAG.areUserPagesEnabled,
+    FEATURE_FLAG.isStudioRentalRequestsPageEnabled,
+  ]);
   const { response: savedFiguresResponse } = usePromise(() => DansshipAPI.figures.getSavedFigures());
   const { response: mySubscriptionsResponse } = usePromise(() => DansshipAPI.subscriptions.getMySubscriptions());
   const savedFigures = savedFiguresResponse?.data ?? [];
@@ -157,6 +161,15 @@ export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
                 {t('profile:bookings')}
               </Button>
             </Link>
+
+            {isStudioRentalRequestsEnabled ? (
+              <Link to={PageURLS.studioRentalRequests}>
+                <Button variant='solid' color='primary' size='small' fullWidth>
+                  <LuClipboardList className='h-4 w-4' />
+                  {t('profile:rentalRequests')}
+                </Button>
+              </Link>
+            ) : null}
 
             <Link to={PageURLS.profile.wallet}>
               <Button variant='solid' color='primary' size='small' fullWidth>
