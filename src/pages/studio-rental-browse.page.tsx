@@ -12,7 +12,9 @@ import {
   AgendaEvent,
   CreateRentalRequestPayload,
   CreateRentalSeriesPayload,
+  DANSSHIP_ERROR_CODE,
   DansshipAPI,
+  DansshipAPIError,
   DayOfWeek,
   GetCalendarParams,
   PaymentPreviewMappedResponse,
@@ -43,6 +45,37 @@ const SERIES_DAY_OPTIONS: Array<DayOfWeek> = [
 
 const WHOLE_ROOM = '__whole_room__';
 const BOGOTA_OFFSET = '-05:00';
+
+function resolveStudioRentalMutationError(error: unknown, t: (key: string) => string, fallbackKey: string): string {
+  const apiError =
+    error instanceof DansshipAPIError
+      ? error
+      : error && typeof error === 'object' && 'body' in error && (error as DansshipAPIError).body
+        ? (error as DansshipAPIError)
+        : null;
+
+  if (apiError?.body) {
+    const code = String(apiError.body.error_code ?? '');
+    const message = String(apiError.body.message ?? '');
+
+    if (
+      code === DANSSHIP_ERROR_CODE.STUDIO_RENTAL_LEAD_TIME_REQUIRED ||
+      message.toLowerCase().includes('at least 24 hours')
+    ) {
+      return t('studioRental:toast.leadTimeRequired');
+    }
+
+    if (code === DANSSHIP_ERROR_CODE.STUDIO_RENTAL_SLOT_CONFLICT || code === 'AGENDA_ROOM_OCCUPANCY_CONFLICT') {
+      return t('studioRental:toast.slotConflict');
+    }
+
+    if (message.toLowerCase().includes('has not been configured')) {
+      return t('studioRental:toast.priceNotConfigured');
+    }
+  }
+
+  return t(fallbackKey);
+}
 
 function formatDateInput(date: Date): string {
   return format(date, 'yyyy-MM-dd');
@@ -308,7 +341,7 @@ function StudioRentalBrowsePage() {
     });
 
     if (error) {
-      toast.error(t('studioRental:toast.requestFailed'));
+      toast.error(resolveStudioRentalMutationError(error, t, 'studioRental:toast.requestFailed'));
 
       return;
     }
@@ -340,7 +373,7 @@ function StudioRentalBrowsePage() {
     const { error } = await createSeries(payload);
 
     if (error) {
-      toast.error(t('studioRental:toast.seriesFailed'));
+      toast.error(resolveStudioRentalMutationError(error, t, 'studioRental:toast.seriesFailed'));
 
       return;
     }
