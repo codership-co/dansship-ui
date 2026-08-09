@@ -191,12 +191,15 @@
     "reservedUseCreateFailed": "No se pudo crear el uso reservado",
     "reservedUseCancelled": "Uso reservado cancelado",
     "reservedUseCancelFailed": "No se pudo cancelar el uso reservado",
-    "pricingMustBePositive": "El precio por hora debe ser mayor a 0"
+    "pricingMustBePositive": "El precio por hora debe ser mayor a 0",
+    "leadTimeRequired": "Las rentas externas deben solicitarse con al menos 24 horas de anticipación.",
+    "slotConflict": "El horario seleccionado ya no está disponible. Elige otra franja.",
+    "priceNotConfigured": "Esta opción aún no tiene precio configurado. Contacta al estudio."
   },
   "resourceTypes": {
-    "pole": "Barra",
+    "pole": "Pole",
     "lyra": "Lira",
     "aerial_fabric": "Tela aérea",
-    "pendular_pole": "Barra pendular"
+    "pendular_pole": "Pole pendular"
   }
 }
