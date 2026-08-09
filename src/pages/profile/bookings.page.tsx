@@ -59,8 +59,8 @@ function BookingsPage() {
 
   const sortedBookings = useMemo(
     () =>
-      (myBookingsResponse?.data ?? []).sort(
-        (a, b) => new Date(a.scheduled_class.start_time).getTime() - new Date(b.scheduled_class.start_time).getTime(),
+      [...(myBookingsResponse?.data ?? [])].sort(
+        (a, b) => new Date(b.scheduled_class.start_time).getTime() - new Date(a.scheduled_class.start_time).getTime(),
       ),
     [myBookingsResponse?.data],
   );
