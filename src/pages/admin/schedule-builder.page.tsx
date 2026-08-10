@@ -64,6 +64,8 @@ function toUtcWeekRange(weekStartDate: string) {
 function AdminScheduleBuilderPage() {
   const { t } = useTranslation();
   const canCancelPublishedClass = useOrPermissions([PERMISSION.SCHEDULED_CLASS_CANCEL]);
+  const canManageFullSchedule = useOrPermissions([PERMISSION.SCHEDULE_MANAGE]);
+  const canEditDraftSchedule = useOrPermissions([PERMISSION.SCHEDULE_DRAFT_CREATE, PERMISSION.SCHEDULE_MANAGE]);
   const [currentDate, setCurrentDate] = useState<Date>(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPublishConfirmOpen, setIsPublishConfirmOpen] = useState(false);
@@ -105,6 +107,7 @@ function AdminScheduleBuilderPage() {
   // Calculate the current active week
   const isPublished = weekObj?.status === 'published';
   const isArchived = weekObj?.status === 'archived';
+  const canMutateCurrentWeek = isPublished ? canManageFullSchedule : canEditDraftSchedule;
   const agendaRoomId = agendaRoomFilter === 'all' ? undefined : agendaRoomFilter;
 
   const {
@@ -161,7 +164,7 @@ function AdminScheduleBuilderPage() {
 
   // Handlers
   const handleSlotClick = (date: string, hour: number) => {
-    if (isArchived) return;
+    if (isArchived || !canMutateCurrentWeek) return;
 
     if (isSlotInPast(date, hour)) return;
 
@@ -172,7 +175,7 @@ function AdminScheduleBuilderPage() {
   };
 
   const handleAddAtSameTime = (date: string, time: string) => {
-    if (isArchived) return;
+    if (isArchived || !canMutateCurrentWeek) return;
 
     const [h] = time.split(':').map(Number);
 
@@ -188,6 +191,10 @@ function AdminScheduleBuilderPage() {
     if (isArchived) return;
 
     if (isClassInPast(cls)) return;
+
+    if (isPublished && !(canManageFullSchedule || canCancelPublishedClass)) return;
+
+    if (!isPublished && !canEditDraftSchedule) return;
 
     setEditingClass(cls);
     setSubmitError(null);
@@ -358,7 +365,7 @@ function AdminScheduleBuilderPage() {
                 </Button>
               </div>
 
-              {weekObj?.status === 'draft' && (
+              {weekObj?.status === 'draft' && canManageFullSchedule && (
                 <Button onClick={handlePublish} disabled={isPublishing}>
                   {t('schedules:publishSchedule')}
                 </Button>
@@ -371,7 +378,7 @@ function AdminScheduleBuilderPage() {
             classes={activeWeekDetail?.classes || []}
             onSlotClick={handleSlotClick}
             onClassClick={selectedClass => handleClassClick(selectedClass as ScheduledClass)}
-            onAddAtTime={!isArchived ? handleAddAtSameTime : undefined}
+            onAddAtTime={!isArchived && canMutateCurrentWeek ? handleAddAtSameTime : undefined}
             dayColumnMinWidth={dayColumnMinWidth}
             scheduleStatus={weekObj?.status}
           />
@@ -455,6 +462,7 @@ function AdminScheduleBuilderPage() {
         submitError={submitError}
         isPublishedEdit={isPublished && editingClass !== null}
         canCancelPublishedClass={canCancelPublishedClass}
+        canSave={!isPublished || canManageFullSchedule}
       />
 
       <ConfirmDialog

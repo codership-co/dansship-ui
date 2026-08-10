@@ -86,6 +86,8 @@ interface ClassSlotModalProps {
   /** When true, the modal restricts edits to room, instructor, and capacity only */
   isPublishedEdit?: boolean;
   canCancelPublishedClass?: boolean;
+  /** When false, hide the save action (e.g. cancel-only viewers of published classes) */
+  canSave?: boolean;
 }
 
 export function ClassSlotModal({
@@ -104,6 +106,7 @@ export function ClassSlotModal({
   submitError,
   isPublishedEdit = false,
   canCancelPublishedClass = false,
+  canSave = true,
 }: ClassSlotModalProps) {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
   const [cancellationNote, setCancellationNote] = useState('');
@@ -519,7 +522,7 @@ export function ClassSlotModal({
               <Button type='button' variant='outline' onClick={onClose} disabled={isBusy}>
                 {t('common:cancel')}
               </Button>
-              {!isReadOnlyCancelled && (
+              {!isReadOnlyCancelled && canSave && (
                 <Button type='submit' disabled={isBusy}>
                   {isLoading ? t('common:saving') : t('schedules:saveClass')}
                 </Button>

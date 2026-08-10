@@ -16,7 +16,7 @@ export const HomeAdminDashboard = () => {
   const { isAuthenticated } = useAuth();
 
   const canAccessAnyAdminArea = useOrPermissions([
-    ...AdminPermissions.scheduleBuilder,
+    ...AdminPermissions.scheduleManage,
     ...AdminPermissions.inventory,
     ...AdminPermissions.bookings,
     ...AdminPermissions.payments,
@@ -26,7 +26,7 @@ export const HomeAdminDashboard = () => {
     ...AdminPermissions.reports,
     ...AdminPermissions.studioRental,
   ]);
-  const canReadAgenda = useOrPermissions(AdminPermissions.scheduleBuilder);
+  const canReadAgenda = useOrPermissions(AdminPermissions.scheduleManage);
   const canManageStudioRental = useOrPermissions(AdminPermissions.studioRental);
 
   const adminWindow = useMemo(() => {

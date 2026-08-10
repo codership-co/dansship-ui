@@ -122,7 +122,20 @@
       "deactivateInstructorSuccess": "El rol de instructor fue desactivado.",
       "deactivateInstructorFailed": "No se pudo desactivar el rol de instructor.",
       "reactivateInstructorSuccess": "El rol de instructor fue reactivado.",
-      "reactivateInstructorFailed": "No se pudo reactivar el rol de instructor."
+      "reactivateInstructorFailed": "No se pudo reactivar el rol de instructor.",
+      "roles": {
+        "title": "Roles del usuario",
+        "subtitle": "Asigna o revoca roles RBAC (por ejemplo area_leader) sin cambiar el flujo de instructor.",
+        "assignLabel": "Asignar rol",
+        "assignPlaceholder": "Selecciona un rol",
+        "assign": "Asignar",
+        "revoke": "Quitar",
+        "assignSuccess": "Rol asignado correctamente.",
+        "assignFailed": "No se pudo asignar el rol.",
+        "revokeSuccess": "Se quitó el rol {{role}}.",
+        "revokeFailed": "No se pudo quitar el rol.",
+        "loadFailed": "No se pudieron cargar los roles."
+      }
     }
   },
   "roster": {

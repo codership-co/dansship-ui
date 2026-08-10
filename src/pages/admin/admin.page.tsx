@@ -39,7 +39,7 @@ function AdminPage() {
     };
   }, []);
 
-  const canReadAgenda = useOrPermissions(AdminPermissions.scheduleBuilder);
+  const canReadAgenda = useOrPermissions(AdminPermissions.scheduleManage);
   const canManageStudioRental = useOrPermissions(AdminPermissions.studioRental);
   const canReadReports = useOrPermissions(AdminPermissions.reports);
 
@@ -306,7 +306,7 @@ export const SecureAdminPage = SecurityGuard(AdminPage, {
     ...AdminPermissions.merchPos,
     ...AdminPermissions.payments,
     ...AdminPermissions.reports,
-    ...AdminPermissions.scheduleBuilder,
+    ...AdminPermissions.scheduleManage,
     ...AdminPermissions.studioRental,
   ],
   requiresAuth: true,

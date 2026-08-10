@@ -31,7 +31,7 @@ export function getAdminNavItem(t: Translate): NavItem {
     to: PageURLS.admin.root,
     label: t('nav:admin'),
     orPermissions: [
-      ...AdminPermissions.scheduleBuilder,
+      ...AdminPermissions.scheduleManage,
       ...AdminPermissions.inventory,
       ...AdminPermissions.bookings,
       ...AdminPermissions.payments,
@@ -45,6 +45,16 @@ export function getAdminNavItem(t: Translate): NavItem {
     ],
     featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
     icon: RiAdminFill,
+  };
+}
+
+export function getScheduleBuilderNavItem(t: Translate): NavItem {
+  return {
+    to: PageURLS.admin.scheduleBuilder,
+    label: t('nav:adminMenu.scheduleBuilder'),
+    orPermissions: AdminPermissions.scheduleBuilder,
+    featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
+    icon: GrSchedules,
   };
 }
 

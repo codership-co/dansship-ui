@@ -10,6 +10,7 @@ import {
   UserDetailsActions,
   UserDetailsHeader,
   UserInstructorClassesTab,
+  UserRolesManager,
   UserSubscriptionsTab,
   UserWalletTab,
 } from '@components/modules';
@@ -17,7 +18,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { AdminPermissions } from '@core/permissions';
+import { AdminPermissions, PERMISSION } from '@core/permissions';
 import { usePromise } from '@hooks';
 
 const PROFILE_TAB = 'profile';
@@ -41,7 +42,7 @@ function UserDetailsPage() {
   const canManageBookings = useOrPermissions(AdminPermissions.bookings);
   const canReadBenefits = useOrPermissions(AdminPermissions.benefits);
   const canManageWallet = useOrPermissions(AdminPermissions.wallet);
-  const canManageSchedule = useOrPermissions(AdminPermissions.scheduleBuilder);
+  const canManageSchedule = useOrPermissions([PERMISSION.SCHEDULE_MANAGE]);
   const showInstructorClasses = Boolean(user?.has_instructor_profile) && canManageSchedule;
 
   const requestedTab = searchParams.get('tab') ?? PROFILE_TAB;
@@ -114,7 +115,12 @@ function UserDetailsPage() {
             </TabsList>
 
             <TabsContent value={PROFILE_TAB}>
-              {activeTab === PROFILE_TAB ? <UserDetails user={user} isLoading={isLoading} hasError={hasError} /> : null}
+              {activeTab === PROFILE_TAB ? (
+                <div className='grid gap-6'>
+                  <UserDetails user={user} isLoading={isLoading} hasError={hasError} />
+                  {userId ? <UserRolesManager userId={userId} onChanged={() => void reFetch()} /> : null}
+                </div>
+              ) : null}
             </TabsContent>
 
             {canManageSubscriptions ? (

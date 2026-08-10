@@ -3,7 +3,6 @@ import { cn } from 'polpo/helpers';
 import { useTranslation } from 'react-i18next';
 import { FaCartArrowDown, FaSignOutAlt } from 'react-icons/fa';
 import { GiAvoidance } from 'react-icons/gi';
-import { GrSchedules } from 'react-icons/gr';
 import { HiOutlineDocument } from 'react-icons/hi';
 import { HiMiniShoppingCart } from 'react-icons/hi2';
 import { LuKeyRound, LuX } from 'react-icons/lu';
@@ -14,12 +13,18 @@ import { TbManualGearbox } from 'react-icons/tb';
 import { TfiAgenda } from 'react-icons/tfi';
 import { useLocation, useNavigate } from 'react-router';
 
-import { getAdminNavItem, getMobileProfileNavItem, getPrimaryNavItems, type NavItem } from './nav-items';
+import {
+  getAdminNavItem,
+  getMobileProfileNavItem,
+  getPrimaryNavItems,
+  getScheduleBuilderNavItem,
+  type NavItem,
+} from './nav-items';
 import { MenuItem } from './navbar';
 
 import { LanguageSelector } from '@components/navigation/language-selector';
 import { Isotype, Logotype } from '@components/svg';
-import { FEATURE_FLAG, useAuth } from '@contexts';
+import { FEATURE_FLAG, useAuth, useOrPermissions } from '@contexts';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions } from '@core/permissions';
 
@@ -32,7 +37,13 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const { logout, user, isAuthenticated } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
+  const adminNavItem = getAdminNavItem(t);
+  const scheduleBuilderNavItem = getScheduleBuilderNavItem(t);
+  const canAccessAdminMenu = useOrPermissions([
+    ...(adminNavItem.orPermissions ?? []),
+    ...(scheduleBuilderNavItem.orPermissions ?? []),
+  ]);
 
   const primaryMenuItems: Array<NavItem> = [
     ...(isAuthenticated ? [getMobileProfileNavItem(t)] : []),
@@ -40,11 +51,12 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   ];
 
   const adminMenuItems: Array<NavItem> = [
-    getAdminNavItem(t),
+    scheduleBuilderNavItem,
+    adminNavItem,
     {
       to: PageURLS.admin.agenda,
       label: t('nav:adminMenu.agenda'),
-      orPermissions: AdminPermissions.scheduleBuilder,
+      orPermissions: AdminPermissions.scheduleManage,
       featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
       icon: TfiAgenda,
     },
@@ -54,13 +66,6 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       orPermissions: AdminPermissions.users,
       featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
       icon: RiAdminFill,
-    },
-    {
-      to: PageURLS.admin.scheduleBuilder,
-      label: t('nav:adminMenu.scheduleBuilder'),
-      orPermissions: AdminPermissions.scheduleBuilder,
-      featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
-      icon: GrSchedules,
     },
     {
       to: PageURLS.admin.studioRental,
@@ -162,7 +167,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
             ))}
           </section>
 
-          {user?.isAdmin && (
+          {canAccessAdminMenu && (
             <section>
               <label
                 className={cn(

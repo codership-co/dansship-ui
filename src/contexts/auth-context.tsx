@@ -162,7 +162,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       const roleHome = await resolvePostLoginPath(data);
       const roles = (data.roles ?? []).map(role => role.toLowerCase());
-      const prefersRoleHome = roles.includes('admin') || roles.includes('instructor');
+      const prefersRoleHome = roles.includes('admin') || roles.includes('area_leader') || roles.includes('instructor');
       let redirectPath = roleHome;
 
       if (!prefersRoleHome) {

@@ -18,6 +18,7 @@ import { NotificationsAdminApi } from './notifications/notifications.admin.api';
 import { OnboardingAPI } from './onboarding/onboarding.api';
 import { PaymentsAdminAPI } from './payments/payments.admin.api';
 import { PaymentsAPI } from './payments/payments.api';
+import { RbacAdminAPI } from './rbac/rbac.admin.api';
 import { ReportsAdminAPI } from './reports/reports.admin.api';
 import { SchedulesAdminAPI } from './schedules/schedules.admin.api';
 import { SchedulesAPI } from './schedules/schedules.api';
@@ -71,6 +72,7 @@ export class DansshipAPI {
   static subscriptions = new SubscriptionsAPI(this.httpClient);
   static subscriptionsAdmin = new SubscriptionsAdminAPI(this.httpClient);
   static usersAdmin = new UsersAdminAPI(this.httpClient);
+  static rbacAdmin = new RbacAdminAPI(this.httpClient);
   static wallets = new WalletsAPI(this.httpClient);
   static walletsAdmin = new WalletsAdminAPI(this.httpClient);
   static doorCodeAdmin = new DoorCodeAdminAPI(this.httpClient);
