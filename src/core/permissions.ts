@@ -1,5 +1,6 @@
 export enum ROLE {
   ADMIN = 'admin',
+  AREA_LEADER = 'area_leader',
   INSTRUCTOR = 'instructor',
   USER = 'user',
   COACH = 'coach',
@@ -25,6 +26,7 @@ export enum PERMISSION {
 
   // CLASS CATALOG
   CLASS_CATALOG_MANAGE = 'manage:class_catalog',
+  CLASS_CATALOG_READ = 'read:class_catalog',
 
   // CLASS GROUP
   CLASS_GROUP_MANAGE = 'manage:class_group',
@@ -34,6 +36,9 @@ export enum PERMISSION {
 
   // FIGURE
   FIGURE_MANAGE = 'manage:figure',
+
+  // INSTRUCTOR
+  INSTRUCTOR_LIST = 'list:instructor',
 
   // ORDER
   ORDER_CREATE = 'create:order',
@@ -62,8 +67,12 @@ export enum PERMISSION {
   // FINANCIAL REPORT
   FINANCIAL_REPORT_READ = 'read:financial_report',
 
+  // ROLE
+  ROLE_MANAGE = 'manage:role',
+
   // ROOM
   ROOM_MANAGE = 'manage:room',
+  ROOM_READ = 'read:room',
 
   // ROSTER
   ROSTER_ADD = 'add:roster',
@@ -71,6 +80,7 @@ export enum PERMISSION {
 
   // SCHEDULE
   SCHEDULE_MANAGE = 'manage:schedule',
+  SCHEDULE_DRAFT_CREATE = 'create:schedule_draft',
   SCHEDULED_CLASS_CANCEL = 'cancel:scheduled_class',
 
   // STUDIO RENTAL
@@ -106,7 +116,9 @@ export const StudentPermissions = {
 
 export const AdminPermissions = {
   users: [PERMISSION.USER_MANAGE],
-  scheduleBuilder: [PERMISSION.SCHEDULE_MANAGE],
+  roles: [PERMISSION.ROLE_MANAGE],
+  scheduleBuilder: [PERMISSION.SCHEDULE_MANAGE, PERMISSION.SCHEDULE_DRAFT_CREATE],
+  scheduleManage: [PERMISSION.SCHEDULE_MANAGE],
   inventory: [
     PERMISSION.ROOM_MANAGE,
     PERMISSION.CLASS_CATALOG_MANAGE,

@@ -21,6 +21,8 @@ export const mapAuthUserToUser = (authUser: AuthUser): User => {
 
   if (roles.includes(ROLE.ADMIN)) {
     baseProfileRedirect = PageURLS.admin.reports;
+  } else if (roles.includes(ROLE.AREA_LEADER)) {
+    baseProfileRedirect = PageURLS.admin.scheduleBuilder;
   } else if (roles.includes(ROLE.INSTRUCTOR)) {
     baseProfileRedirect = PageURLS.instructor.root;
   }

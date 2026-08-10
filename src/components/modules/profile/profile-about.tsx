@@ -5,12 +5,27 @@ import { PiCaretLeft } from 'react-icons/pi';
 
 import { Container, SectionHeading } from '@components/containers';
 import { Badge } from '@components/ui';
-import { useAuth } from '@contexts';
+import { useAuth, useOrPermissions } from '@contexts';
+import { AdminPermissions } from '@core/permissions';
 import { formatDateTime } from '@helpers';
 
 export function ProfileAbout() {
   const { user } = useAuth();
   const { t, i18n } = useTranslation();
+  const canViewAdminPermissions = useOrPermissions([
+    ...AdminPermissions.scheduleBuilder,
+    ...AdminPermissions.inventory,
+    ...AdminPermissions.bookings,
+    ...AdminPermissions.payments,
+    ...AdminPermissions.merch,
+    ...AdminPermissions.merchPos,
+    ...AdminPermissions.figures,
+    ...AdminPermissions.reports,
+    ...AdminPermissions.users,
+    ...AdminPermissions.studioRental,
+    ...AdminPermissions.doorCode,
+    ...AdminPermissions.roles,
+  ]);
 
   if (!user) return null;
 
@@ -116,7 +131,7 @@ export function ProfileAbout() {
             </AccordionItem>
           )}
 
-          {user.isAdmin && (
+          {canViewAdminPermissions && (
             <AccordionItem
               className='rounded-2xl overflow-hidden'
               classNames={{

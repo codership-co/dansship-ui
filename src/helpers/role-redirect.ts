@@ -39,6 +39,10 @@ export function getRedirectPathByRole(roles?: Array<string>): string {
     return PageURLS.admin.reports;
   }
 
+  if (normalized.includes('area_leader')) {
+    return PageURLS.admin.scheduleBuilder;
+  }
+
   if (normalized.includes('instructor')) {
     return PageURLS.instructor.root;
   }
@@ -74,7 +78,7 @@ export async function resolvePostLoginPath(
   const roles = (user.roles ?? []).map(role => role.toLowerCase());
   const syncPath = getRedirectPathByRole(user.roles);
 
-  if (roles.includes('admin') || roles.includes('instructor')) {
+  if (roles.includes('admin') || roles.includes('area_leader') || roles.includes('instructor')) {
     return syncPath;
   }
 
