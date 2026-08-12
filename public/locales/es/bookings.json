@@ -66,6 +66,8 @@
   "cancellationFailedDesc": "No se pudo cancelar la reserva.",
   "calendarLoadError": "No se pudieron cargar las clases publicadas. Intenta de nuevo en un momento.",
   "timeOverlapWarning": "Ya tienes otra clase en este horario.",
+  "ownClassWarning": "No puedes reservar una clase que tú impartes.",
+  "ownClassBadge": "Tu clase",
   "jumpedWeekBanner": "No hay clases esta semana — mostrando la semana del {{week}}.",
   "dismissBanner": "Cerrar"
 }

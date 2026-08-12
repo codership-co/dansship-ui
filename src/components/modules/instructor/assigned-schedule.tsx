@@ -17,7 +17,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@componen
 import { useAuth } from '@contexts';
 import { DansshipAPI, DansshipAPIError, DANSSHIP_ERROR_CODE, ScheduledClass } from '@core/api';
 import { captureUnexpectedException } from '@core/sentry';
-import { BookingDay, getMonday, getRelativeTime, sortClassesByDay } from '@helpers';
+import { BookingDay, getMonday, getRelativeTime, resolveActiveBookingDay, sortClassesByDay } from '@helpers';
 import { useDateLocale, usePromise } from '@hooks';
 
 function findNextAssignedClass(classes: Array<ScheduledClass>, now = new Date()): ScheduledClass | null {
@@ -61,6 +61,7 @@ export function AssignedSchedule() {
   const [week, setWeek] = useState(currentWeek);
   const [selectedClass, setSelectedClass] = useState<ScheduledClass | null>(null);
   const [initialClasses, setInitialClasses] = useState<Array<ScheduledClass> | null>(null);
+  const [initialFocusDay, setInitialFocusDay] = useState<string | null>(null);
   const [nearestWeek, setNearestWeek] = useState<string | null>(null);
   const [showJumpedBanner, setShowJumpedBanner] = useState(false);
   const [weekReady, setWeekReady] = useState(!hasInstructorProfile);
@@ -75,6 +76,7 @@ export function AssignedSchedule() {
   useEffect(() => {
     if (!hasInstructorProfile) {
       setInitialClasses([]);
+      setInitialFocusDay(null);
       setWeekReady(true);
 
       return;
@@ -98,6 +100,7 @@ export function AssignedSchedule() {
       }
 
       setInitialClasses([]);
+      setInitialFocusDay(null);
       setWeekReady(true);
 
       return;
@@ -108,10 +111,12 @@ export function AssignedSchedule() {
     if (upcoming) {
       setWeek(upcoming.resolved_week_start);
       setInitialClasses(upcoming.classes);
+      setInitialFocusDay(upcoming.focus_day);
       setNearestWeek(upcoming.resolved_week_start);
       setShowJumpedBanner(upcoming.jumped);
     } else {
       setInitialClasses([]);
+      setInitialFocusDay(null);
     }
 
     setWeekReady(true);
@@ -136,12 +141,15 @@ export function AssignedSchedule() {
   const classesByDay = useMemo(() => sortClassesByDay(classes, week), [classes, week]);
 
   useEffect(() => {
-    setActiveDay(previousDay => {
-      const sameDay = classesByDay.find(day => day.day === previousDay?.day);
+    if (initialClasses !== null) {
+      // Upcoming hydrate owns day focus via backend focus_day; don't keep a prior tab.
+      setActiveDay(resolveActiveBookingDay(classesByDay, undefined, { focusDay: initialFocusDay }));
 
-      return sameDay ?? classesByDay.find(day => day.classes.length);
-    });
-  }, [classesByDay]);
+      return;
+    }
+
+    setActiveDay(previousDay => resolveActiveBookingDay(classesByDay, previousDay));
+  }, [classesByDay, initialClasses, initialFocusDay]);
 
   const nextClass = useMemo(() => findNextAssignedClass(classes), [classes]);
   const nextClassStatus = useMemo(() => (nextClass ? getUpcomingStatusKey(nextClass) : null), [nextClass]);
@@ -155,6 +163,7 @@ export function AssignedSchedule() {
     if (!hasInstructorProfile) return;
 
     setInitialClasses(null);
+    setInitialFocusDay(null);
     setWeek(nextWeek);
     setShowJumpedBanner(false);
   };
@@ -163,6 +172,7 @@ export function AssignedSchedule() {
     if (!hasInstructorProfile) return;
 
     setInitialClasses(null);
+    setInitialFocusDay(null);
     setWeek(currentWeek);
     setShowJumpedBanner(false);
   };
@@ -187,6 +197,7 @@ export function AssignedSchedule() {
 
     setWeek(data.resolved_week_start);
     setInitialClasses(data.classes);
+    setInitialFocusDay(data.focus_day);
     setNearestWeek(data.resolved_week_start);
     setShowJumpedBanner(data.jumped);
   };

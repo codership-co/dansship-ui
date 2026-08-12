@@ -83,4 +83,6 @@ export interface UpcomingWeekResponse<TClass = ScheduledClass> {
   resolved_week_start: string;
   jumped: boolean;
   classes: Array<TClass>;
+  /** Colombia calendar day (YYYY-MM-DD) of the next bookable class. */
+  focus_day: string | null;
 }
