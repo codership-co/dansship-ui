@@ -31,6 +31,45 @@ export interface UserResponse {
   permissions?: Array<string>;
 }
 
+export interface AdminUserHealthProfile {
+  emergency_contact_name: string | null;
+  emergency_contact_relative: string | null;
+  emergency_contact_phone_country_code: string | null;
+  emergency_contact_phone_number: string | null;
+  eps: string | null;
+  existing_medical_conditions: string | null;
+}
+
+export interface AdminUserPreferences {
+  heard_about_us: string | null;
+  goals: Array<string>;
+  disciplines: Array<string>;
+  current_level: string | null;
+  preferred_schedules: Array<string>;
+}
+
+export interface AdminInstructorAvailability {
+  day_of_week: 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+  start_time: string;
+  end_time: string;
+}
+
+export interface AdminInstructorDiscipline {
+  discipline_name: string;
+  years_experience: number;
+}
+
+export interface AdminInstructorCertification {
+  id: string;
+  instructor_profile_id: string;
+  title: string;
+  issuer: string;
+  file_key: string;
+  issue_date: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface AdminUserInstructorProfile {
   id: string;
   bio: string | null;
@@ -40,6 +79,10 @@ export interface AdminUserInstructorProfile {
   created_at: string;
   updated_at: string;
   completion_percent?: number;
+  instagram?: string | null;
+  availability?: Array<AdminInstructorAvailability>;
+  disciplines?: Array<AdminInstructorDiscipline>;
+  certifications?: Array<AdminInstructorCertification>;
 }
 
 export interface AdminUserDetailsResponse {
@@ -67,5 +110,7 @@ export interface AdminUserDetailsResponse {
   has_instructor_profile: boolean;
   instructor_onboarding_completed?: boolean;
   instructor_business_status?: string | null;
+  health_profile: AdminUserHealthProfile | null;
+  preferences: AdminUserPreferences | null;
   instructor_profile: AdminUserInstructorProfile | null;
 }
