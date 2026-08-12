@@ -37,6 +37,7 @@ export function UserSubscriptionsTab({ userId }: { userId: string }) {
             <TableHead>{t('admin:users.details.columns.plan')}</TableHead>
             <TableHead>{t('common:status')}</TableHead>
             <TableHead>{t('admin:users.details.columns.remaining')}</TableHead>
+            <TableHead>{t('admin:users.details.columns.starts')}</TableHead>
             <TableHead>{t('admin:users.details.columns.expires')}</TableHead>
           </TableRow>
         </TableHeader>
@@ -46,6 +47,9 @@ export function UserSubscriptionsTab({ userId }: { userId: string }) {
               <TableCell>{subscription.plan_name_snapshot}</TableCell>
               <TableCell>{subscription.status}</TableCell>
               <TableCell>{subscription.remaining_classes}</TableCell>
+              <TableCell>
+                {subscription.start_date ? format(parseISO(subscription.start_date), 'MMM d, yyyy', { locale }) : '-'}
+              </TableCell>
               <TableCell>
                 {subscription.expiration_date
                   ? format(parseISO(subscription.expiration_date), 'MMM d, yyyy', { locale })

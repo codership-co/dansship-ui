@@ -41,6 +41,55 @@
       "birthDate": "Fecha de nacimiento",
       "phoneNumber": "Número de teléfono",
       "documentNumber": "Número de documento",
+      "city": "Ciudad",
+      "address": "Dirección",
+      "preferredLanguage": "Idioma preferido",
+      "isActive": "Cuenta activa",
+      "isEmailVerified": "Correo verificado",
+      "onboardingCompleted": "Onboarding completado",
+      "pendingSteps": "Pasos pendientes",
+      "sections": {
+        "profile": "Perfil y cuenta",
+        "health": "Datos de salud",
+        "preferences": "Preferencias",
+        "instructorOnboarding": "Onboarding de instructor"
+      },
+      "health": {
+        "emergencyContactName": "Contacto de emergencia",
+        "emergencyContactRelative": "Parentesco",
+        "emergencyContactPhone": "Teléfono de emergencia",
+        "eps": "EPS",
+        "medicalConditions": "Condiciones médicas"
+      },
+      "preferences": {
+        "heardAboutUs": "Cómo nos conoció",
+        "goals": "Objetivos",
+        "disciplines": "Disciplinas",
+        "currentLevel": "Nivel actual",
+        "preferredSchedules": "Horarios preferidos"
+      },
+      "instructor": {
+        "onboardingCompleted": "Onboarding de instructor completado",
+        "businessStatus": "Estado del instructor",
+        "instagram": "Instagram",
+        "bio": "Biografía",
+        "availability": "Disponibilidad",
+        "disciplines": "Disciplinas e experiencia",
+        "certifications": "Certificaciones",
+        "emptyAvailability": "Sin disponibilidad registrada.",
+        "emptyDisciplines": "Sin disciplinas registradas.",
+        "emptyCertifications": "Sin certificaciones registradas.",
+        "columns": {
+          "day": "Día",
+          "start": "Inicio",
+          "end": "Fin",
+          "discipline": "Disciplina",
+          "years": "Años",
+          "title": "Título",
+          "issuer": "Emisor",
+          "issueDate": "Fecha de emisión"
+        }
+      },
       "tabs": {
         "profile": "Perfil",
         "subscriptions": "Suscripciones",
@@ -53,6 +102,7 @@
       "columns": {
         "plan": "Plan",
         "remaining": "Clases restantes",
+        "starts": "Inicio del plan",
         "expires": "Vence",
         "class": "Clase",
         "startTime": "Inicio",
