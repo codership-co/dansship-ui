@@ -26,6 +26,8 @@ interface BookingCalendarProps {
   myBookings: Array<MyBooking>;
   /** When provided, hydrate from these classes and skip the range fetch for this week. */
   initialClasses?: Array<PublishedClass> | null;
+  /** Backend focus day (YYYY-MM-DD) from upcoming-week; used for first-paint day selection. */
+  initialFocusDay?: string | null;
   onBookingChange?: () => void | Promise<void>;
 }
 
@@ -35,6 +37,7 @@ export function BookingCalendar({
   subscriptions = [],
   myBookings,
   initialClasses = null,
+  initialFocusDay = null,
   onBookingChange,
 }: BookingCalendarProps) {
   const { t } = useTranslation();
@@ -72,13 +75,14 @@ export function BookingCalendar({
 
       setClasses(initialClasses);
       setClassesByDay(nextClassesByDay);
-      setActiveDay(previousDay => resolveActiveBookingDay(nextClassesByDay, previousDay));
+      // Upcoming hydrate owns day focus via backend focus_day; don't keep a prior tab.
+      setActiveDay(resolveActiveBookingDay(nextClassesByDay, undefined, { focusDay: initialFocusDay }));
 
       return;
     }
 
     void refreshClasses(week);
-  }, [initialClasses, refreshClasses, week]);
+  }, [initialClasses, initialFocusDay, refreshClasses, week]);
 
   const handleBookingChange = useCallback(async () => {
     await refreshClasses(week);

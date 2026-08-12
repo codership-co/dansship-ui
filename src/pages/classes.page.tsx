@@ -20,6 +20,7 @@ function ClassesPage() {
   const [week, setWeek] = useState(() => currentWeek);
   const [nearestWeek, setNearestWeek] = useState<string | null>(null);
   const [initialClasses, setInitialClasses] = useState<Array<PublishedClass> | null>(null);
+  const [initialFocusDay, setInitialFocusDay] = useState<string | null>(null);
   const [showJumpedBanner, setShowJumpedBanner] = useState(false);
   const [weekReady, setWeekReady] = useState(false);
   const hasAppliedUpcoming = useRef(false);
@@ -64,9 +65,11 @@ function ClassesPage() {
       setWeek(upcoming.resolved_week_start);
       setNearestWeek(upcoming.resolved_week_start);
       setInitialClasses(upcoming.classes);
+      setInitialFocusDay(upcoming.focus_day);
       setShowJumpedBanner(upcoming.jumped);
     } else {
       setInitialClasses(null);
+      setInitialFocusDay(null);
     }
 
     setWeekReady(true);
@@ -74,6 +77,7 @@ function ClassesPage() {
 
   const handleSetWeek = (nextWeek: string) => {
     setInitialClasses(null);
+    setInitialFocusDay(null);
     setWeek(nextWeek);
 
     if (nextWeek !== nearestWeek) {
@@ -91,6 +95,7 @@ function ClassesPage() {
     setWeek(data.resolved_week_start);
     setNearestWeek(data.resolved_week_start);
     setInitialClasses(data.classes);
+    setInitialFocusDay(data.focus_day);
     setShowJumpedBanner(data.jumped);
   };
 
@@ -145,6 +150,7 @@ function ClassesPage() {
             <BookingCalendar
               week={week}
               initialClasses={initialClasses}
+              initialFocusDay={initialFocusDay}
               myBookings={response.myBookings}
               subscriptions={response.subscriptions}
               isTrialEligible={response.isTrialEligible}

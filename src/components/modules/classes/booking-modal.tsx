@@ -11,7 +11,12 @@ import { ProfilePicture } from '@components/ui';
 import { useAuth } from '@contexts';
 import { DansshipAPI, ActiveSubscription, PublishedClass } from '@core/api';
 import { DEFAULT_ROOM_IMAGE, PageURLS } from '@core/constants';
-import { formatTimeDifference, getClassBookingEligibility, isPastBookingDeadline } from '@helpers';
+import {
+  formatTimeDifference,
+  getClassBookingEligibility,
+  isOwnInstructedClass,
+  isPastBookingDeadline,
+} from '@helpers';
 import { useDateLocale, usePromise, useMyBookings } from '@hooks';
 
 type BookingConfirmAction = 'cancel';
@@ -35,7 +40,7 @@ export function BookingModal({
 }: BookingModalProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const locale = useDateLocale();
   const { bookClass, cancelClass, isBookingClass, isCancelingClass } = useMyBookings();
   const [confirmAction, setConfirmAction] = useState<BookingConfirmAction | null>(null);
@@ -47,6 +52,7 @@ export function BookingModal({
   const isPast = isPastBookingDeadline(selectedClass.start_time);
   const isCancelled = Boolean(selectedClass.is_cancelled);
   const isFull = selectedClass.enrolled_count >= selectedClass.capacity;
+  const isOwnClass = isOwnInstructedClass(selectedClass, user?.id);
 
   // Here we check if the user is already booked via the injected `user_booking_status` field.
   const userStatus = selectedClass.user_booking_status;
@@ -102,10 +108,10 @@ export function BookingModal({
 
   const eligibility = getClassBookingEligibility(subscriptions, selectedClass.start_time, isTrialEligible);
   const showSubscriptionWarning =
-    eligibility.status === 'no_subscription' && !isBooked && !isPast && !isCancelled && !hasTimeOverlap;
+    eligibility.status === 'no_subscription' && !isBooked && !isPast && !isCancelled && !hasTimeOverlap && !isOwnClass;
   const showNotStartedWarning =
-    eligibility.status === 'not_started' && !isBooked && !isPast && !isCancelled && !hasTimeOverlap;
-  const showTrialNote = Boolean(eligibility.status === 'trial' && !isBooked && !isPast && !isCancelled);
+    eligibility.status === 'not_started' && !isBooked && !isPast && !isCancelled && !hasTimeOverlap && !isOwnClass;
+  const showTrialNote = Boolean(eligibility.status === 'trial' && !isBooked && !isPast && !isCancelled && !isOwnClass);
 
   return (
     <>
@@ -225,9 +231,15 @@ export function BookingModal({
               </label>
             )}
 
-            {hasTimeOverlap && !isBooked && (
+            {hasTimeOverlap && !isBooked && !isOwnClass && (
               <label className='bg-warning-50 p-3 rounded text-warning-800 border border-warning-200'>
                 {t('bookings:timeOverlapWarning')}
+              </label>
+            )}
+
+            {isOwnClass && !isBooked && !isPast && !isCancelled && (
+              <label className='bg-warning-50 p-3 rounded text-warning-800 border border-warning-200'>
+                {t('bookings:ownClassWarning')}
               </label>
             )}
 
@@ -250,6 +262,10 @@ export function BookingModal({
                     {isCancelingClass ? t('bookings:cancelling') : t('bookings:cancelBooking')}
                   </Button>
                 )
+              ) : isOwnClass ? (
+                <label className='bg-gray-50 p-3 rounded text-gray-700 border border-gray-200 text-center'>
+                  {t('bookings:ownClassBadge')}
+                </label>
               ) : eligibility.status === 'no_subscription' ? (
                 <Button color='primary' onClick={handleBuyPlan}>
                   {t('bookings:buyPlan')}

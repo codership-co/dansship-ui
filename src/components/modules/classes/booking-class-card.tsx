@@ -4,9 +4,10 @@ import { cn } from 'polpo/helpers';
 import { useTranslation } from 'react-i18next';
 
 import { ProfilePicture } from '@components/ui';
+import { useAuth } from '@contexts';
 import { PublishedClass } from '@core/api';
 import { DEFAULT_ROOM_IMAGE } from '@core/constants';
-import { formatTimeDifference, isPastBookingDeadline } from '@helpers';
+import { formatTimeDifference, isOwnInstructedClass, isPastBookingDeadline } from '@helpers';
 
 interface BookingClassCardProps {
   bookingClass: PublishedClass;
@@ -16,12 +17,14 @@ interface BookingClassCardProps {
 
 export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingClassCardProps) {
   const { t } = useTranslation();
+  const { user } = useAuth();
   const isCancelled = Boolean(bookingClass.is_cancelled);
   const isFull = bookingClass.enrolled_count >= bookingClass.capacity;
   const isPast = isPastBookingDeadline(bookingClass.start_time);
+  const isOwnClass = isOwnInstructedClass(bookingClass, user?.id);
   const isUnavailable = isPast || isFull || isCancelled;
   const isBooked = bookingClass.user_booking_status === 'active';
-  const isBookButtonDisabled = isPast || isCancelled || isBooked || hasOverlap(bookingClass) || isFull;
+  const isBookButtonDisabled = isPast || isCancelled || isBooked || hasOverlap(bookingClass) || isFull || isOwnClass;
 
   return (
     <section
@@ -93,8 +96,11 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
             </p>
           </section>
         </section>
-        {hasOverlap(bookingClass) && !isBooked && (
+        {hasOverlap(bookingClass) && !isBooked && !isOwnClass && (
           <p className='text-warning-600'>⚠ {t('bookings:timeOverlapWarning')}</p>
+        )}
+        {isOwnClass && !isBooked && !isPast && !isCancelled && (
+          <p className='text-warning-600'>⚠ {t('bookings:ownClassWarning')}</p>
         )}
       </section>
 
@@ -114,7 +120,9 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
               ? t('bookings:spotsFull')
               : isBooked
                 ? `${t('bookings:booked')} ✓`
-                : t('bookings:bookClass')}
+                : isOwnClass
+                  ? t('bookings:ownClassBadge')
+                  : t('bookings:bookClass')}
       </Button>
     </section>
   );
