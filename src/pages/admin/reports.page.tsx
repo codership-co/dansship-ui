@@ -1,18 +1,43 @@
+import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
-  ClassCancellationsTable,
+  FinancialReports,
   InstructorPerformanceTable,
   NotificationSettings,
   OperationalDashboard,
+  StudentReports,
+  StudioRentalReports,
 } from '@components/modules';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
-import { FEATURE_FLAG, SecurityGuard } from '@contexts';
+import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
 import { PageURLS } from '@core/constants';
-import { AdminPermissions } from '@core/permissions';
+import { AdminPermissions, PERMISSION } from '@core/permissions';
 
 function AdminReportsPage() {
   const { t } = useTranslation();
+  const canOperations = useOrPermissions(AdminPermissions.reports);
+  const canFinance = useOrPermissions(AdminPermissions.financialReports);
+  const canStudents = useOrPermissions(AdminPermissions.studentReports);
+  const canInstructors = useOrPermissions(AdminPermissions.instructorReports);
+  const canRentals = useOrPermissions(AdminPermissions.studioRentalReports);
+  const canNotifications = useOrPermissions(AdminPermissions.notifications);
+
+  const tabs = useMemo(
+    () =>
+      [
+        canOperations ? { value: 'operations', label: t('admin:reports.tabs.operations') } : null,
+        canFinance ? { value: 'finance', label: t('admin:reports.tabs.finance') } : null,
+        canStudents ? { value: 'students', label: t('admin:reports.tabs.students') } : null,
+        canInstructors ? { value: 'instructors', label: t('admin:reports.tabs.instructors') } : null,
+        canRentals ? { value: 'rentals', label: t('admin:reports.tabs.rentals') } : null,
+        canNotifications ? { value: 'notifications', label: t('admin:reports.tabs.notifications') } : null,
+      ].filter((tab): tab is { value: string; label: string } => tab !== null),
+    [canFinance, canInstructors, canNotifications, canOperations, canRentals, canStudents, t],
+  );
+  const defaultTab = tabs[0]?.value ?? 'operations';
+  const [tab, setTab] = useState(defaultTab);
+  const activeTab = tabs.some(item => item.value === tab) ? tab : defaultTab;
 
   return (
     <div className='max-w-7xl mx-auto py-8 px-4 pt-20'>
@@ -21,31 +46,45 @@ function AdminReportsPage() {
         <p className='text-gray-500 mt-2'>{t('admin:reports.subtitle')}</p>
       </div>
 
-      <Tabs defaultValue='dashboard' className='w-full'>
+      <Tabs value={activeTab} onValueChange={setTab} className='w-full'>
         <TabsList className='mb-4 bg-white border border-gray-200 shadow-sm flex-wrap h-auto gap-1 p-1'>
-          <TabsTrigger value='dashboard'>{t('admin:reports.tabs.dashboard')}</TabsTrigger>
-          <TabsTrigger value='instructor-performance'>
-            {t('admin:reports.tabs.instructorPerformance', 'Instructor Performance')}
-          </TabsTrigger>
-          <TabsTrigger value='class-cancellations'>{t('admin:reports.tabs.classCancellations')}</TabsTrigger>
-          <TabsTrigger value='notifications'>{t('admin:reports.tabs.notifications')}</TabsTrigger>
+          {tabs.map(item => (
+            <TabsTrigger key={item.value} value={item.value}>
+              {item.label}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
-        <TabsContent value='dashboard' className='outline-none'>
-          <OperationalDashboard />
-        </TabsContent>
-
-        <TabsContent value='instructor-performance' className='outline-none'>
-          <InstructorPerformanceTable />
-        </TabsContent>
-
-        <TabsContent value='class-cancellations' className='outline-none'>
-          <ClassCancellationsTable />
-        </TabsContent>
-
-        <TabsContent value='notifications' className='outline-none'>
-          <NotificationSettings />
-        </TabsContent>
+        {canOperations && (
+          <TabsContent value='operations' className='outline-none'>
+            <OperationalDashboard />
+          </TabsContent>
+        )}
+        {canFinance && (
+          <TabsContent value='finance' className='outline-none'>
+            <FinancialReports />
+          </TabsContent>
+        )}
+        {canStudents && (
+          <TabsContent value='students' className='outline-none'>
+            <StudentReports />
+          </TabsContent>
+        )}
+        {canInstructors && (
+          <TabsContent value='instructors' className='outline-none'>
+            <InstructorPerformanceTable />
+          </TabsContent>
+        )}
+        {canRentals && (
+          <TabsContent value='rentals' className='outline-none'>
+            <StudioRentalReports />
+          </TabsContent>
+        )}
+        {canNotifications && (
+          <TabsContent value='notifications' className='outline-none'>
+            <NotificationSettings />
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
@@ -53,7 +92,14 @@ function AdminReportsPage() {
 
 export const SecureAdminReportsPage = SecurityGuard(AdminReportsPage, {
   featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
-  orPermissions: AdminPermissions.reports,
+  orPermissions: [
+    PERMISSION.REPORT_READ,
+    PERMISSION.FINANCIAL_REPORT_READ,
+    PERMISSION.STUDENT_REPORT_READ,
+    PERMISSION.INSTRUCTOR_REPORT_READ,
+    PERMISSION.STUDIO_RENTAL_REPORT_READ,
+    PERMISSION.NOTIFICATION_MANAGE,
+  ],
   requiresAuth: true,
   redirect: PageURLS.auth.login,
 });

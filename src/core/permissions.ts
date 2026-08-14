@@ -67,6 +67,15 @@ export enum PERMISSION {
   // FINANCIAL REPORT
   FINANCIAL_REPORT_READ = 'read:financial_report',
 
+  // STUDENT REPORT
+  STUDENT_REPORT_READ = 'read:student_report',
+
+  // INSTRUCTOR REPORT
+  INSTRUCTOR_REPORT_READ = 'read:instructor_report',
+
+  // STUDIO RENTAL REPORT
+  STUDIO_RENTAL_REPORT_READ = 'read:studio_rental_report',
+
   // ROLE
   ROLE_MANAGE = 'manage:role',
 
@@ -95,6 +104,9 @@ export enum PERMISSION {
 
   // BENEFIT
   BENEFIT_READ = 'read:benefit',
+
+  // NOTIFICATION
+  NOTIFICATION_MANAGE = 'manage:notification',
 }
 
 export const InstructorPermissions = {
@@ -135,5 +147,10 @@ export const AdminPermissions = {
   merchPos: [PERMISSION.ORDER_CREATE],
   figures: [PERMISSION.FIGURE_MANAGE],
   reports: [PERMISSION.REPORT_READ],
+  studentReports: [PERMISSION.STUDENT_REPORT_READ],
+  instructorReports: [PERMISSION.INSTRUCTOR_REPORT_READ],
+  studioRentalReports: [PERMISSION.STUDIO_RENTAL_REPORT_READ],
+  financialReports: [PERMISSION.FINANCIAL_REPORT_READ],
+  notifications: [PERMISSION.NOTIFICATION_MANAGE],
   studioRental: [PERMISSION.STUDIO_RENTAL_MANAGE],
 };

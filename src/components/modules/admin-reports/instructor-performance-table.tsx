@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SpinnerLoader } from '@components/loaders';
+import { InstructorCancellationsTable } from '@components/modules/admin-reports/instructor-cancellations-table';
 import {
   Table,
   TableBody,
@@ -49,8 +50,10 @@ export function InstructorPerformanceTable() {
   const isInvalidRange = dateRange.start > dateRange.end;
   const isUnchangedRange = dateRange.start === appliedDateRange.start && dateRange.end === appliedDateRange.end;
 
-  const { response: reportData, isLoading } = usePromise(() =>
-    DansshipAPI.reportsAdmin.getInstructorPerformanceReport(appliedDateRange.start, appliedDateRange.end),
+  const { response: reportData, isLoading } = usePromise(
+    () => DansshipAPI.reportsAdmin.getInstructorPerformanceReport(appliedDateRange.start, appliedDateRange.end),
+    true,
+    [appliedDateRange.start, appliedDateRange.end],
   );
   const instructors = reportData?.data?.items || [];
 
@@ -250,6 +253,8 @@ export function InstructorPerformanceTable() {
           </div>
         </CardContent>
       </Card>
+
+      <InstructorCancellationsTable startDate={appliedDateRange.start} endDate={appliedDateRange.end} />
     </div>
   );
 }

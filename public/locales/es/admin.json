@@ -200,8 +200,13 @@
     "title": "Reportes y Configuración de la Plataforma",
     "subtitle": "Consulta KPIs operativos y configura el comportamiento de la plataforma.",
     "tabs": {
-      "dashboard": "Panel Operativo",
-      "instructorPerformance": "Desempeño de Instructores",
+      "operations": "Operaciones",
+      "finance": "Finanzas",
+      "students": "Estudiantes",
+      "instructors": "Instructores",
+      "rentals": "Alquiler de estudio",
+      "dashboard": "Operaciones",
+      "instructorPerformance": "Instructores",
       "classCancellations": "Cancelaciones de Clases",
       "notifications": "Configuración de Notificaciones"
     }
