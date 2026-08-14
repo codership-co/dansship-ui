@@ -1,0 +1,22 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "composite": false,
+    "incremental": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "noEmit": false,
+    "outDir": "../types",
+    "tsBuildInfoFile": null
+  },
+  "include": [
+    "../src/components/ui/**/*",
+    "../src/components/form-fields/**/*",
+    "../src/components/layouts/**/*",
+    "../src/components/loaders/**/*",
+    "../src/components/modals/**/*",
+    "../src/components/navigation/**/*",
+    "../src/components/containers/**/*",
+    "../src/components/svg/**/*"
+  ]
+}

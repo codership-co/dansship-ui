@@ -1,0 +1,19 @@
+{
+  "projectId": "798dfd4a-e8cb-4077-8aaa-642c7f50194e",
+  "pkg": "dansship-ui",
+  "shape": "package",
+  "entry": "src/components/index.ts",
+  "srcDir": ".design-sync/.cache/scoped-src",
+  "tsconfig": "tsconfig.json",
+  "cssEntry": ".design-sync/.cache/compiled.css",
+  "extraFonts": ["public/assets/fonts/guntertest-regular.otf"],
+  "runtimeFontPrefixes": ["Montserrat", "Josefin"],
+  "readmeHeader": ".design-sync/conventions.md",
+  "componentSrcMap": {
+    "CheckboxField": ".design-sync/.cache/scoped-src/form-fields/checkbox.tsx",
+    "Checkbox": ".design-sync/.cache/scoped-src/ui/checkbox.tsx"
+  },
+  "libOverrides": {
+    "css.mjs": "rewriteBundleFontFaces false-positived every quoted, successfully-rewritten ./fonts/ url as unresolved and dropped the whole @font-face block — fixed the resolution check to track per-url state during the loop instead of re-testing the mutated string with a lookahead regex that could backtrack to zero-width"
+  }
+}

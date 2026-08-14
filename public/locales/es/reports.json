@@ -4,6 +4,20 @@
   "dateTo": "Fecha hasta",
   "applyDateRange": "Aplicar",
   "invalidDateRange": "La fecha inicial debe ser anterior o igual a la fecha final",
+  "preset": "Preset",
+  "selectPreset": "Seleccionar período",
+  "presets": {
+    "thisMonth": "Este mes",
+    "lastMonth": "Mes anterior",
+    "ytd": "Año en curso",
+    "custom": "Personalizado"
+  },
+  "filters": {
+    "all": "Todos",
+    "classType": "Tipo de clase",
+    "room": "Sala",
+    "instructor": "Instructor"
+  },
   "occupancyTitle": "Ocupación de Clases (Tasa de Llenado)",
   "occupancy": {
     "classHeader": "Clase",
@@ -39,7 +53,11 @@
     "noShow": "No Asistieron",
     "rate": "Tasa"
   },
-  "revenueTitle": "Ingresos por Suscripciones (Operativos)",
+  "underutilized": {
+    "title": "Horarios subutilizados (candidatos a alquiler)",
+    "empty": "No hay clases con llenado menor a 50% en horas rentables."
+  },
+  "revenueTitle": "Análisis de precios por plan",
   "revenue": {
     "plan": "Plan",
     "sold": "Vendidos",
@@ -48,6 +66,117 @@
     "netRevenue": "Ingreso Neto",
     "noPermissionTitle": "Acceso financiero restringido",
     "noPermissionDescription": "No tienes permisos para ver información financiera sensible."
+  },
+  "cash": {
+    "title": "Ingresos en efectivo",
+    "description": "Cobros aprobados. El efectivo es el cargo en pasarela; el reconocido suma la billetera aplicada.",
+    "intents": "Intents",
+    "cashCollected": "Efectivo cobrado",
+    "walletApplied": "Billetera aplicada",
+    "recognized": "Total reconocido",
+    "tax": "Impuesto",
+    "purchaseType": "Tipo de compra",
+    "trendTitle": "Tendencia semanal",
+    "purchaseTypes": {
+      "plan": "Plan",
+      "merch": "Merch",
+      "studioRental": "Alquiler de estudio"
+    }
+  },
+  "tax": {
+    "title": "Impuesto recaudado",
+    "total": "Total impuesto",
+    "type": "Tipo de impuesto",
+    "none": "Sin tipo"
+  },
+  "wallet": {
+    "title": "Pasivo de billetera",
+    "outstanding": "Saldo pendiente",
+    "users": "Usuarios con saldo",
+    "asOfToday": "Al día de hoy. Los filtros de fecha no aplican."
+  },
+  "gifts": {
+    "title": "Valor de regalos",
+    "status": "Estado",
+    "count": "Cantidad",
+    "value": "Valor",
+    "statuses": {
+      "pending_claim": "Pendiente de reclamo",
+      "claimed": "Reclamado",
+      "expired": "Vencido"
+    }
+  },
+  "benefits": {
+    "title": "Costo de beneficios",
+    "trials": "Clases de prueba otorgadas",
+    "bonusAllowances": "Bonos otorgados",
+    "bonusClasses": "Clases bono",
+    "monetaryCount": "Descuentos monetarios",
+    "monetaryTotal": "Descuento en lista"
+  },
+  "pricing": {
+    "title": "Análisis de precios por plan",
+    "description": "Precio de lista vs. descuento en suscripciones pagadas no-sistema. No es efectivo cobrado; usa Ingresos en efectivo para caja."
+  },
+  "students": {
+    "activeTitle": "Estudiantes únicos activos",
+    "uniqueStudents": "Estudiantes únicos",
+    "acquisitionTitle": "Adquisición",
+    "trialStudents": "Prueba",
+    "payingStudents": "De pago",
+    "renewalTitle": "Renovación y churn",
+    "renewals": "Renovaciones",
+    "churned": "Churn",
+    "conversionTitle": "Conversión de prueba (30 días)",
+    "converted": "Convertidos",
+    "conversionRate": "Tasa de conversión",
+    "usageTitle": "Uso de suscripciones",
+    "activeSubs": "Suscripciones activas",
+    "remaining": "Clases restantes",
+    "avgRemaining": "Promedio restantes",
+    "expirationRate": "Tasa de vencimiento",
+    "renewalRate": "Tasa de renovación"
+  },
+  "rentals": {
+    "revenueTitle": "Ingresos de alquiler",
+    "utilizationTitle": "Utilización de salas",
+    "availableHours": "Horas disponibles",
+    "bookedHours": "Horas reservadas",
+    "utilizationRate": "Utilización",
+    "funnelTitle": "Embudo de alquiler",
+    "requests": "Solicitudes sueltas",
+    "series": "Series",
+    "confirmationRate": "Tasa de confirmación",
+    "status": "Estado",
+    "mixTitle": "Mix suelto vs. serie",
+    "kind": "Tipo",
+    "listedPrice": "Precio listado",
+    "oneOff": "Suelto",
+    "statuses": {
+      "pending_approval": "Solicitado",
+      "pending_payment": "Pendiente de pago",
+      "confirmed": "Confirmado",
+      "cancelled": "Cancelado"
+    }
+  },
+  "instructorPerformanceTitle": "Desempeño de Instructores",
+  "instructorPerformance": {
+    "dateFilter": "Filtro de fechas"
+  },
+  "instructor": {
+    "name": "Instructor",
+    "classesTaught": "Clases dictadas",
+    "hoursTaught": "Horas dictadas",
+    "occupancyRate": "Ocupación",
+    "attendanceReliability": "Asistencia",
+    "cancellationRate": "Cancelación",
+    "studentRetention": "Retención"
+  },
+  "instructorCancellations": {
+    "title": "Cancelaciones de instructores",
+    "total": "Total cancelaciones: {{count}}",
+    "reason": "Motivo",
+    "instructor": "Instructor"
   },
   "classCancellations": {
     "title": "Cancelaciones de Clases (Academia)",
@@ -58,6 +187,8 @@
     "cancelledAt": "Cancelada el",
     "note": "Nota",
     "noNote": "Sin nota",
-    "empty": "No hay cancelaciones en este período."
+    "empty": "No hay cancelaciones en este período.",
+    "trendTitle": "Tendencia semanal",
+    "count": "Cantidad"
   }
 }
