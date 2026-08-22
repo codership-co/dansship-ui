@@ -56,6 +56,7 @@ export const mapAuthUserToUser = (authUser: AuthUser): User => {
     onboardingPendingSteps: authUser.onboarding_pending_steps || [],
     updatedAt: authUser.updated_at,
     hasInstructorProfile: authUser.has_instructor_profile,
+    cuentaDeCobroEnabled: authUser.cuenta_de_cobro_enabled,
     profileCompletionPercent: authUser.profile_completion_percent,
     instructorProfile: authUser.instructor_profile
       ? {

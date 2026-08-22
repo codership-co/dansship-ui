@@ -1,29 +1,131 @@
 import { format } from 'date-fns';
-import { useCallback, useMemo } from 'react';
+import { ActionModal } from 'polpo/components';
+import { KeyboardEvent, MouseEvent, ReactNode, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
+import { PaymentProofUpload } from '@components/modules/payments/payment-proof-upload';
+import { TransferPaymentInstructions } from '@components/modules/payments/transfer-payment-instructions';
 import { Button } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
-import { type CancelRequestPayload, DansshipAPI, RentalRequest, RentalRequestStatus, RentalSeries } from '@core/api';
+import {
+  type CancelRequestPayload,
+  DansshipAPI,
+  PaymentMethod,
+  type PaymentIntent,
+  PaymentStatus,
+  RentalRequest,
+  RentalRequestStatus,
+  RentalSeries,
+} from '@core/api';
 import { PageURLS } from '@core/constants';
+import { cn, formatPrice } from '@helpers';
 import { useCallablePromise, usePromise } from '@hooks';
 
-const statusKey: Record<RentalRequestStatus, string> = {
-  draft: 'studioRental:status.draft',
+const rentalStatusKey: Record<RentalRequestStatus, string> = {
   pending_payment: 'studioRental:status.pendingPayment',
-  pending_approval: 'studioRental:status.pendingApproval',
   confirmed: 'studioRental:status.confirmed',
   cancelled: 'studioRental:status.cancelled',
 };
 
-function canCancel(status: RentalRequestStatus): boolean {
-  return status !== 'cancelled' && status !== 'confirmed';
+interface PaymentSummary {
+  intentId: string | null;
+  status: PaymentStatus | null;
+  proofUrl: string | null;
+  method: PaymentMethod | null;
+}
+
+function resolvePayment(
+  entity: {
+    payment_intent_id?: string | null;
+    payment_status?: PaymentStatus | null;
+    payment_method_type?: PaymentMethod | null;
+    payment_proof_url?: string | null;
+  },
+  intentById: Record<string, PaymentIntent>,
+): PaymentSummary {
+  const intentId = entity.payment_intent_id ?? null;
+  const intent = intentId ? intentById[intentId] : undefined;
+
+  return {
+    intentId,
+    status: entity.payment_status ?? intent?.status ?? null,
+    proofUrl: entity.payment_proof_url ?? intent?.proof_url ?? null,
+    method: entity.payment_method_type ?? intent?.payment_method_type ?? null,
+  };
+}
+
+function RequestListCard({
+  title,
+  subtitle,
+  status,
+  clickable,
+  onOpen,
+  actions,
+}: {
+  title: string;
+  subtitle: string;
+  status: RentalRequestStatus;
+  clickable: boolean;
+  onOpen?: () => void;
+  actions?: ReactNode;
+}) {
+  const { t } = useTranslation();
+
+  const open = () => {
+    if (clickable) {
+      onOpen?.();
+    }
+  };
+
+  const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (!clickable) {
+      return;
+    }
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onOpen?.();
+    }
+  };
+
+  return (
+    <article
+      className={cn(
+        'rounded-xl bg-[hsl(var(--surface-container-highest))] px-4 py-3',
+        clickable && 'cursor-pointer transition-colors hover:bg-black/5',
+      )}
+      role={clickable ? 'link' : undefined}
+      tabIndex={clickable ? 0 : undefined}
+      onClick={open}
+      onKeyDown={onKeyDown}
+    >
+      <div className='flex items-center justify-between gap-3'>
+        <div className='min-w-0'>
+          <p className='truncate text-sm font-semibold'>{title}</p>
+          <p className='truncate text-sm text-muted-foreground'>{subtitle}</p>
+        </div>
+        <span className='shrink-0 rounded-full bg-background px-2 py-1 text-xs'>{t(rentalStatusKey[status])}</span>
+      </div>
+      {actions ? (
+        <div
+          className='mt-2 flex flex-wrap gap-2'
+          onClick={(event: MouseEvent<HTMLDivElement>) => event.stopPropagation()}
+          onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => event.stopPropagation()}
+        >
+          {actions}
+        </div>
+      ) : null}
+    </article>
+  );
 }
 
 function StudioRentalRequestsPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const [payingIntentId, setPayingIntentId] = useState<string | null>(null);
   const {
     response: requestsResponse,
     isLoading: isLoadingRequests,
@@ -35,6 +137,7 @@ function StudioRentalRequestsPage() {
     reFetch: refetchSeries,
   } = usePromise(() => DansshipAPI.studioRental.getMySeries());
   const { response: rooms } = usePromise(() => DansshipAPI.studioRental.getRooms());
+  const { response: intentsResponse, reFetch: refetchIntents } = usePromise(() => DansshipAPI.payments.getMyIntents());
 
   const { call: cancelRequest, isLoading: isLoadingCancelRequest } = useCallablePromise(
     (id: string, payload?: CancelRequestPayload) => DansshipAPI.studioRental.cancelRequest(id, payload),
@@ -52,6 +155,15 @@ function StudioRentalRequestsPage() {
     return dictionary;
   }, [rooms?.data]);
 
+  const intentById = useMemo(() => {
+    const dictionary: Record<string, PaymentIntent> = {};
+    (intentsResponse?.data ?? []).forEach(intent => {
+      dictionary[intent.id] = intent;
+    });
+
+    return dictionary;
+  }, [intentsResponse?.data]);
+
   const standaloneRequests = useMemo(
     () => (requestsResponse?.data ?? []) as Array<RentalRequest>,
     [requestsResponse?.data],
@@ -59,8 +171,8 @@ function StudioRentalRequestsPage() {
   const seriesList = useMemo(() => (seriesResponse?.data ?? []) as Array<RentalSeries>, [seriesResponse?.data]);
 
   const refresh = useCallback(async () => {
-    await Promise.all([refetchRequests(), refetchSeries()]);
-  }, [refetchRequests, refetchSeries]);
+    await Promise.all([refetchRequests(), refetchSeries(), refetchIntents()]);
+  }, [refetchIntents, refetchRequests, refetchSeries]);
 
   const handleCancelRequest = useCallback(
     async (id: string) => {
@@ -90,6 +202,39 @@ function StudioRentalRequestsPage() {
     [cancelSeries, refresh, t],
   );
 
+  const canPay = (rentalStatus: RentalRequestStatus, payment: PaymentSummary) => {
+    if (rentalStatus !== 'pending_payment' || !payment.intentId) {
+      return false;
+    }
+
+    if (
+      payment.status === PaymentStatus.REJECTED ||
+      payment.status === PaymentStatus.CANCELLED ||
+      payment.status === PaymentStatus.EXPIRED ||
+      payment.status === PaymentStatus.APPROVED
+    ) {
+      return false;
+    }
+
+    if (payment.method === PaymentMethod.CARD) {
+      return false;
+    }
+
+    return !payment.proofUrl;
+  };
+
+  const canCancel = (rentalStatus: RentalRequestStatus, payment: PaymentSummary) => {
+    if (rentalStatus !== 'pending_payment') {
+      return false;
+    }
+
+    return !payment.intentId || !payment.proofUrl;
+  };
+
+  const openDetail = (intentId: string) => {
+    navigate(`${PageURLS.studioRentalResult}?intentId=${intentId}`);
+  };
+
   const isLoading = isLoadingRequests || isLoadingSeries;
   const loadFailed = Boolean((requestsResponse && !requestsResponse.ok) || (seriesResponse && !seriesResponse.ok));
   const isEmpty = standaloneRequests.length === 0 && seriesList.length === 0;
@@ -98,109 +243,136 @@ function StudioRentalRequestsPage() {
   return (
     <div className='mx-auto max-w-6xl space-y-6 px-4 py-8 pt-20'>
       <div>
-        <h1 className='text-3xl font-bold text-gray-900'>{t('studioRental:myRequests.title')}</h1>
-        <p className='mt-2 text-gray-500'>{t('studioRental:myRequests.subtitle')}</p>
+        <h1 className='text-3xl font-bold text-primary'>{t('studioRental:myRequests.title')}</h1>
+        <p className='mt-2 text-muted-foreground'>{t('studioRental:myRequests.subtitle')}</p>
       </div>
 
-      <div className='space-y-4 rounded-lg border border-gray-100 bg-white p-4 shadow-sm'>
+      <div className='space-y-4 rounded-xl border bg-card p-4 shadow-sm'>
         {isLoading ? (
           <SpinnerLoader message={t('studioRental:myRequests.loading')} />
         ) : loadFailed ? (
-          <p className='text-sm text-alert-600'>{t('studioRental:myRequests.loadError')}</p>
+          <p className='text-sm text-alert'>{t('studioRental:myRequests.loadError')}</p>
         ) : isEmpty ? (
-          <p className='text-sm text-gray-500'>{t('studioRental:myRequests.empty')}</p>
+          <p className='text-sm text-muted-foreground'>{t('studioRental:myRequests.empty')}</p>
         ) : (
           <>
             {seriesList.length > 0 ? (
               <div className='space-y-3'>
-                <h2 className='text-sm font-semibold uppercase tracking-wide text-gray-500'>
+                <h2 className='text-sm font-semibold uppercase tracking-wide text-muted-foreground'>
                   {t('studioRental:myRequests.seriesSection')}
                 </h2>
-                {seriesList.map(series => (
-                  <div key={series.id} className='space-y-2 rounded-md border border-gray-200 p-4'>
-                    <div className='flex items-center justify-between gap-2'>
-                      <span className='text-sm font-semibold text-gray-900'>
-                        {t('studioRental:myRequests.seriesLabel', { id: series.id.slice(0, 8) })}
-                      </span>
-                      <span className='rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700'>
-                        {t(statusKey[series.status])}
-                      </span>
-                    </div>
-                    <p className='text-sm text-gray-600'>
-                      {t('studioRental:myRequests.room')}: {roomNameById[series.room_id] ?? series.room_id}
-                    </p>
-                    <p className='text-sm text-gray-600'>
-                      {t(`common:days.${series.day_of_week}`)} · {series.start_time.slice(0, 5)} –{' '}
-                      {series.end_time.slice(0, 5)}
-                    </p>
-                    <p className='text-sm text-gray-600'>
-                      {t('studioRental:myRequests.seriesRange')}: {series.series_start_date}
-                      {series.series_end_date
-                        ? ` → ${series.series_end_date}`
-                        : series.occurrence_count
-                          ? ` · ${t('studioRental:myRequests.occurrences', { count: series.occurrence_count })}`
-                          : ''}
-                    </p>
-                    <p className='text-sm text-gray-600'>
-                      {t('studioRental:myRequests.total')}: {series.total_price} {series.currency}
-                    </p>
-                    <p className='text-sm text-gray-600'>
-                      {t('studioRental:myRequests.memberRequests', { count: series.requests?.length ?? 0 })}
-                    </p>
-                    {canCancel(series.status) ? (
-                      <Button
-                        variant='outline'
-                        size='sm'
-                        disabled={isCanceling}
-                        onClick={() => void handleCancelSeries(series.id)}
-                      >
-                        {t('studioRental:myRequests.cancelSeries')}
-                      </Button>
-                    ) : null}
-                  </div>
-                ))}
+                {seriesList.map(series => {
+                  const payment = resolvePayment(series, intentById);
+                  const showPay = canPay(series.status, payment);
+                  const showCancel = canCancel(series.status, payment);
+
+                  return (
+                    <RequestListCard
+                      key={series.id}
+                      title={t('studioRental:myRequests.seriesLabel', { id: series.id.slice(0, 8) })}
+                      subtitle={`${roomNameById[series.room_id] ?? series.room_id} · ${t(`common:days.${series.day_of_week}`)} ${series.start_time.slice(0, 5)}–${series.end_time.slice(0, 5)} · ${formatPrice(Number(series.total_price), series.currency)}`}
+                      status={series.status}
+                      clickable={Boolean(payment.intentId)}
+                      onOpen={() => {
+                        if (payment.intentId) {
+                          openDetail(payment.intentId);
+                        }
+                      }}
+                      actions={
+                        showPay || showCancel ? (
+                          <>
+                            {showPay ? (
+                              <Button size='sm' onClick={() => setPayingIntentId(payment.intentId)}>
+                                {t('studioRental:myRequests.pay')}
+                              </Button>
+                            ) : null}
+                            {showCancel ? (
+                              <Button
+                                variant='outline'
+                                size='sm'
+                                disabled={isCanceling}
+                                onClick={() => void handleCancelSeries(series.id)}
+                              >
+                                {t('studioRental:myRequests.cancelSeries')}
+                              </Button>
+                            ) : null}
+                          </>
+                        ) : null
+                      }
+                    />
+                  );
+                })}
               </div>
             ) : null}
 
             {standaloneRequests.length > 0 ? (
               <div className='space-y-3'>
-                <h2 className='text-sm font-semibold uppercase tracking-wide text-gray-500'>
+                <h2 className='text-sm font-semibold uppercase tracking-wide text-muted-foreground'>
                   {t('studioRental:myRequests.oneOffSection')}
                 </h2>
-                {standaloneRequests.map(request => (
-                  <div key={request.id} className='space-y-2 rounded-md border border-gray-200 p-4'>
-                    <div className='flex items-center justify-between'>
-                      <span className='text-sm font-semibold text-gray-900'>#{request.id.slice(0, 8)}</span>
-                      <span className='rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700'>
-                        {t(statusKey[request.status])}
-                      </span>
-                    </div>
-                    <p className='text-sm text-gray-600'>
-                      {t('studioRental:myRequests.total')}: {request.total_price} {request.currency}
-                    </p>
-                    <p className='text-sm text-gray-600'>
-                      {t('studioRental:myRequests.createdAt')}: {format(new Date(request.created_at), 'PPpp')}
-                    </p>
-                    <p className='text-sm text-gray-600'>
-                      {t('studioRental:myRequests.slots', { count: request.slots.length })}
-                    </p>
-                    {canCancel(request.status) ? (
-                      <Button
-                        variant='outline'
-                        size='sm'
-                        disabled={isCanceling}
-                        onClick={() => void handleCancelRequest(request.id)}
-                      >
-                        {t('studioRental:myRequests.cancel')}
-                      </Button>
-                    ) : null}
-                  </div>
-                ))}
+                {standaloneRequests.map(request => {
+                  const payment = resolvePayment(request, intentById);
+                  const showPay = canPay(request.status, payment);
+                  const showCancel = canCancel(request.status, payment);
+
+                  return (
+                    <RequestListCard
+                      key={request.id}
+                      title={`#${request.id.slice(0, 8)}`}
+                      subtitle={`${formatPrice(Number(request.total_price ?? 0), request.currency)} · ${format(new Date(request.created_at), 'PP')}`}
+                      status={request.status}
+                      clickable={Boolean(payment.intentId)}
+                      onOpen={() => {
+                        if (payment.intentId) {
+                          openDetail(payment.intentId);
+                        }
+                      }}
+                      actions={
+                        showPay || showCancel ? (
+                          <>
+                            {showPay ? (
+                              <Button size='sm' onClick={() => setPayingIntentId(payment.intentId)}>
+                                {t('studioRental:myRequests.pay')}
+                              </Button>
+                            ) : null}
+                            {showCancel ? (
+                              <Button
+                                variant='outline'
+                                size='sm'
+                                disabled={isCanceling}
+                                onClick={() => void handleCancelRequest(request.id)}
+                              >
+                                {t('studioRental:myRequests.cancel')}
+                              </Button>
+                            ) : null}
+                          </>
+                        ) : null
+                      }
+                    />
+                  );
+                })}
               </div>
             ) : null}
           </>
         )}
       </div>
+
+      <ActionModal isOpen={Boolean(payingIntentId)} onClose={() => setPayingIntentId(null)} className='max-w-lg'>
+        {payingIntentId ? (
+          <div className='space-y-4 p-2'>
+            <TransferPaymentInstructions />
+            <PaymentProofUpload
+              intentId={payingIntentId}
+              currentProofUrl={intentById[payingIntentId]?.proof_url ?? null}
+              onUploaded={() => {
+                toast.success(t('studioRental:toast.proofUploaded'));
+                setPayingIntentId(null);
+                void refresh();
+              }}
+            />
+          </div>
+        ) : null}
+      </ActionModal>
     </div>
   );
 }

@@ -15,3 +15,4 @@ export * from './figures';
 export * from './home';
 export * from './onboarding';
 export * from './payments';
+export * from './studio-rental';

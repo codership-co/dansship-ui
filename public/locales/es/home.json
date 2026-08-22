@@ -111,6 +111,27 @@
       "viewAllPlans": "Ver todos los planes"
     }
   },
+  "admin": {
+    "kicker": "Operaciones",
+    "title": "Panel de administración",
+    "subtitle": "Revisa agenda, rentas y conflictos de ocupación.",
+    "error": "No se pudieron cargar los indicadores de administración.",
+    "retry": "Reintentar",
+    "empty": "No hay acciones pendientes.",
+    "metric": "Indicador",
+    "cards": {
+      "unifiedAgenda": "Agenda unificada",
+      "unifiedAgendaDescription": "Eventos y ocupación de la semana.",
+      "pendingPayments": "Pagos de renta pendientes",
+      "pendingPaymentsDescription": "Solicitudes de renta esperando comprobante o revisión.",
+      "internalReservedUse": "Uso reservado interno",
+      "internalReservedUseDescription": "Bloques internos en la agenda.",
+      "blockedSpaces": "Espacios bloqueados",
+      "blockedSpacesDescription": "Bloques de ocupación en la agenda.",
+      "occupancyConflicts": "Conflictos de ocupación",
+      "occupancyConflictsDescription": "Solapes detectados en la agenda."
+    }
+  },
   "sharedFooter": {
     "description": "Muévete con gracia en cada sesión. Descubre clases, sigue tu progreso y construye tu propio ritmo.",
     "explore": {

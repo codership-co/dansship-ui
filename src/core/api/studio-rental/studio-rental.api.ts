@@ -1,5 +1,7 @@
 import { HttpClient } from 'polpo-http-client';
 
+import { toNumber } from '../payments/payments.helpers';
+
 import { DansshipAPIError } from '@core/api';
 
 import type {
@@ -9,6 +11,7 @@ import type {
   CreateRentalSeriesPayload,
   GetAvailabilityParams,
   GetCalendarParams,
+  RentalPaymentResult,
   RentalRequest,
   RentalSeries,
   StudioRentalRoomOption,
@@ -83,6 +86,35 @@ export class StudioRentalAPI {
       path: `/studio-rentals/series/${id}`,
       method: 'GET',
     });
+  }
+
+  async getPaymentResult(intentId: string) {
+    return this.httpClient.callNoError<RentalPaymentResult>(
+      {
+        path: `/studio-rentals/payments/${intentId}`,
+        method: 'GET',
+      },
+      data => ({
+        ...data,
+        payment: {
+          ...data.payment,
+          amount: toNumber(data.payment.amount),
+          wallet_amount_applied: toNumber(data.payment.wallet_amount_applied),
+          tax_rate_percentage:
+            data.payment.tax_rate_percentage === null || data.payment.tax_rate_percentage === undefined
+              ? null
+              : toNumber(data.payment.tax_rate_percentage),
+          tax_amount:
+            data.payment.tax_amount === null || data.payment.tax_amount === undefined
+              ? null
+              : toNumber(data.payment.tax_amount),
+          base_amount:
+            data.payment.base_amount === null || data.payment.base_amount === undefined
+              ? null
+              : toNumber(data.payment.base_amount),
+        },
+      }),
+    );
   }
 
   async confirmRequest(id: string) {

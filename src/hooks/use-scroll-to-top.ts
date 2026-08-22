@@ -30,9 +30,17 @@ export function useScrollToTop() {
       return;
     }
 
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
+    const scrollToTop = () => {
+      window.scrollTo(0, 0);
+    };
+
+    /*
+     * Instant jump (smooth + view transitions often never reach top: 0).
+     * Re-run after paint so React transitions cannot restore the previous offset.
+     */
+    scrollToTop();
+    const frame = requestAnimationFrame(scrollToTop);
+
+    return () => cancelAnimationFrame(frame);
   }, [pathname, hash]);
 }

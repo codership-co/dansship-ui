@@ -1,53 +1,61 @@
+import { format, parseISO } from 'date-fns';
 import { Button } from 'polpo/components';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LoaderFunctionArgs, redirect, useLoaderData, useRevalidator } from 'react-router';
+import { LoaderFunctionArgs, useLoaderData, useNavigate, useRevalidator } from 'react-router';
 import { toast } from 'sonner';
 
 import { Section } from '@components/containers';
-import { PaymentStatusBadge, UserPaymentHistory } from '@components/modules';
+import { PaymentStatusBadge } from '@components/modules';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import {
   DansshipAPI,
-  PaymentIntentDetail,
   PaymentMethod,
   PaymentProofContentType,
   PaymentProofContentTypesList,
   PaymentStatus,
+  type RentalPaymentResult,
+  type RentalRequestStatus,
 } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { cn, formatDateTime, formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
 
-export interface PaymentsResultsLoaderData {
+const rentalStatusKey: Record<RentalRequestStatus, string> = {
+  pending_payment: 'studioRental:status.pendingPayment',
+  confirmed: 'studioRental:status.confirmed',
+  cancelled: 'studioRental:status.cancelled',
+};
+
+export interface StudioRentalResultLoaderData {
   intentId: string;
-  boldStatusParam: string;
-  intent: PaymentIntentDetail | null;
+  result: RentalPaymentResult | null;
 }
 
-export async function PaymentsResultsLoader({ url }: LoaderFunctionArgs): Promise<PaymentsResultsLoaderData> {
-  const intentIdParam = url.searchParams.get('intentId');
-  const boldIntentIdParam = url.searchParams.get('bold-order-id');
-  const boldStatusParam = url.searchParams.get('bold-tx-status') || '';
-  const intentId = intentIdParam || boldIntentIdParam || '';
+export async function StudioRentalResultLoader({ url }: LoaderFunctionArgs): Promise<StudioRentalResultLoaderData> {
+  const intentId = url.searchParams.get('intentId') || url.searchParams.get('bold-order-id') || '';
 
-  const { data } = await DansshipAPI.payments.getIntent(intentId);
-
-  if (data?.purchase_type === 'studio_rental' && intentId) {
-    throw redirect(`${PageURLS.studioRentalResult}?intentId=${intentId}`);
+  if (!intentId) {
+    return { intentId: '', result: null };
   }
+
+  const { data } = await DansshipAPI.studioRental.getPaymentResult(intentId);
 
   return {
     intentId,
-    boldStatusParam,
-    intent: data,
+    result: data ?? null,
   };
 }
 
-function PaymentsResultPage() {
+function formatTimeLabel(value: string) {
+  return value.slice(0, 5);
+}
+
+function StudioRentalResultPage() {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
   const revalidator = useRevalidator();
-  const { intent, intentId } = useLoaderData<PaymentsResultsLoaderData>();
+  const { intentId, result } = useLoaderData<StudioRentalResultLoaderData>();
   const { call: getProofViewUrlPromise, isLoading: isGettingProofViewUrl } = useCallablePromise((id: string) =>
     DansshipAPI.payments.getProofViewUrl(id),
   );
@@ -71,14 +79,15 @@ function PaymentsResultPage() {
       try {
         await uploadProofPromise(id, file);
         toast.success(t('payments:proofUploadSuccess'));
+        revalidator.revalidate();
       } catch {
         toast.error(t('payments:proofUploadFailedDesc'));
       }
     },
-    [uploadProofPromise, t],
+    [revalidator, t, uploadProofPromise],
   );
 
-  const handleUploadProof = (intentId: string) => {
+  const handleUploadProof = (paymentIntentId: string) => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = PaymentProofContentTypesList.join(',');
@@ -94,20 +103,61 @@ function PaymentsResultPage() {
         return;
       }
 
-      await uploadProof(intentId, file);
+      await uploadProof(paymentIntentId, file);
     };
 
     input.click();
   };
 
+  const payment = result?.payment;
   const canUploadProof =
-    intent?.payment_method_type === PaymentMethod.TRANSFER &&
-    intent.status !== PaymentStatus.APPROVED &&
-    intent.status !== PaymentStatus.REJECTED;
+    result?.rental_status === 'pending_payment' &&
+    payment?.payment_method_type === PaymentMethod.TRANSFER &&
+    (payment.status === PaymentStatus.PENDING || payment.status === PaymentStatus.PENDING_MANUAL_REVIEW);
+  const resourceLabel = result?.resource
+    ? (result.resource.label ??
+      t(`studioRental:resourceTypes.${result.resource.resource_type}`, { position: result.resource.position }))
+    : t('studioRental:browse.wholeRoom');
+
+  const amountRows = payment
+    ? [
+        {
+          label: t('payments:createdAt'),
+          value: formatDateTime(payment.created_at, i18n.language),
+        },
+        {
+          label: t('payments:methodLabel'),
+          value: t(`payments:method.${payment.payment_method_type}`),
+        },
+        {
+          label: t('studioRental:result.rentalStatus'),
+          value: result ? t(rentalStatusKey[result.rental_status]) : '',
+        },
+        { label: '', value: '' },
+        ...(payment.base_amount !== null && payment.base_amount !== undefined
+          ? [{ label: t('payments:subtotal'), value: formatPrice(payment.base_amount, payment.currency) }]
+          : []),
+        ...(payment.tax_amount !== null && payment.tax_amount !== undefined
+          ? [{ label: t('payments:iva'), value: formatPrice(payment.tax_amount, payment.currency) }]
+          : []),
+        ...(payment.wallet_amount_applied > 0
+          ? [
+              {
+                label: t('studioRental:result.walletApplied'),
+                value: formatPrice(payment.wallet_amount_applied, payment.currency),
+              },
+            ]
+          : []),
+        {
+          label: t('payments:ammount'),
+          value: formatPrice(payment.amount, payment.currency),
+        },
+      ]
+    : [];
 
   return (
     <section className='grid gap-20' data-sentry-mask>
-      {intent && (
+      {result && payment ? (
         <Section contentClassName='grid gap-20' navbarPadding>
           <section className='rounded-2xl shadow-2xl'>
             <section className='grid gap-8 overflow-hidden rounded-2xl bg-white p-4 sm:p-8 md:grid-cols-[1fr_1fr]'>
@@ -119,61 +169,54 @@ function PaymentsResultPage() {
                 />
               </section>
               <section className='grid content-center gap-4 py-14 relative bg-white min-w-0'>
-                <h4 className='m-0 text-center'>{intent.purchase_reference?.human_identifier}</h4>
-                {intent.payment_method_type === PaymentMethod.CARD &&
-                  ['pending', 'pending_manual_review'].includes(intent.status) && (
+                <h4 className='m-0 text-center'>{result.room.name}</h4>
+                <p className='m-0 text-center text-sm text-muted-foreground'>{resourceLabel}</p>
+                <p className='m-0 text-center text-sm'>
+                  {result.kind === 'series' ? t('studioRental:browse.series') : t('studioRental:browse.oneOff')}
+                </p>
+
+                {result.kind === 'one_off'
+                  ? result.slots.map(slot => (
+                      <p key={`${slot.start_time}-${slot.end_time}`} className='m-0 text-center text-sm'>
+                        {format(parseISO(slot.start_time), 'PP')} · {format(parseISO(slot.start_time), 'HH:mm')} –{' '}
+                        {format(parseISO(slot.end_time), 'HH:mm')}
+                      </p>
+                    ))
+                  : result.series && (
+                      <p className='m-0 text-center text-sm'>
+                        {t(`common:days.${result.series.day_of_week}`)} · {formatTimeLabel(result.series.start_time)} –{' '}
+                        {formatTimeLabel(result.series.end_time)}
+                        {result.series.occurrence_total
+                          ? ` · ${t('studioRental:result.occurrences', { count: result.series.occurrence_total })}`
+                          : ''}
+                      </p>
+                    )}
+
+                {payment.payment_method_type === PaymentMethod.CARD &&
+                  ['pending', 'pending_manual_review'].includes(payment.status) && (
                     <p className='m-0 text-center'>{t('payments:result.description')}</p>
                   )}
 
                 <section className='grid place-content-center gap-1 justify-items-center py-4'>
-                  <PaymentStatusBadge status={intent.status} />
+                  <PaymentStatusBadge status={payment.status} />
                   <small className='m-0'>{t('payments:currentIntentStatus')}</small>
                 </section>
 
-                <section className='border py-4 border-gray-200 rounded-2xl overflow-hidden'>
-                  {[
-                    {
-                      label: t('payments:createdAt'),
-                      value: formatDateTime(intent.created_at, i18n.language),
-                    },
-                    {
-                      label: t('payments:referenceId'),
-                      value: <span className='font-code break-all'>{intent.reference_id}</span>,
-                    },
-                    {
-                      label: t('payments:methodLabel'),
-                      value: t(`payments:method.${intent.payment_method_type}`),
-                    },
-                    {
-                      label: '',
-                      value: '',
-                    },
-                    {
-                      label: t('payments:subtotal'),
-                      value: formatPrice(intent.amount * 0.81, intent.currency),
-                    },
-                    {
-                      label: t('payments:iva'),
-                      value: formatPrice(intent.amount * 0.19, intent.currency),
-                    },
-                    {
-                      label: t('payments:ammount'),
-                      value: formatPrice(intent.amount, intent.currency),
-                    },
-                  ].map(({ label, value }) => (
+                <section className='border py-4 border-gray-200 rounded-2xl overflow-x-auto'>
+                  {amountRows.map(({ label, value }, index) => (
                     <section
-                      key={label}
+                      key={`${label}-${index}`}
                       className={cn(
-                        'grid grid-cols-[auto_1fr_auto] justify-between gap-2 items-center',
+                        'grid grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-x-3',
                         label && 'px-4 py-2 hover:bg-gray-100',
                         !label && 'border-b border-gray-200 my-4',
                       )}
                     >
                       {label && (
                         <>
-                          <small className='m-0 min-w-0'>{label}</small>
-                          <span className='border-b border-dashed border-gray-300' />
-                          <small className='m-0 min-w-0 max-w-[55%] text-right break-all'>{value}</small>
+                          <small className='m-0 whitespace-nowrap'>{label}</small>
+                          <span className='min-w-4 self-center border-b border-dashed border-gray-300' />
+                          <small className='m-0 text-right whitespace-nowrap'>{value}</small>
                         </>
                       )}
                     </section>
@@ -182,7 +225,7 @@ function PaymentsResultPage() {
 
                 <section className='flex min-w-0 overflow-hidden rounded-2xl bg-gray-200/60'>
                   <small className='m-0 block shrink-0 bg-gray-200 px-4 py-2'>{t('payments:intentId')}</small>
-                  <small className='m-0 block min-w-0 flex-1 truncate font-code px-4 py-2'>{intent.id}</small>
+                  <small className='m-0 block min-w-0 flex-1 truncate font-code px-4 py-2'>{payment.id}</small>
                 </section>
 
                 <section
@@ -197,36 +240,40 @@ function PaymentsResultPage() {
                       color='primary'
                       variant='outlined'
                       isLoading={isUploadingProof}
-                      onClick={() => void handleUploadProof(intent.id)}
+                      onClick={() => void handleUploadProof(payment.id)}
                     >
                       {t('payments:uploadProof')}
                     </Button>
                   )}
 
-                  {intent.proof_url && (
+                  {payment.proof_url && (
                     <Button
                       size='small'
                       color='primary'
                       variant='outlined'
                       isLoading={isGettingProofViewUrl}
-                      onClick={() => void getProofViewUrl(intent.id)}
+                      onClick={() => void getProofViewUrl(payment.id)}
                     >
                       {t('payments:viewProof')}
                     </Button>
                   )}
+
+                  <Button size='small' color='primary' onClick={() => navigate(PageURLS.studioRentalRequests)}>
+                    {t('studioRental:wizard.goToRequests')}
+                  </Button>
                 </section>
               </section>
             </section>
           </section>
         </Section>
-      )}
+      ) : null}
 
-      {!intent && intentId && (
+      {!result && intentId && (
         <Section contentClassName='grid gap-20' navbarPadding>
           <section className='rounded-2xl shadow-2xl'>
             <section className='bg-white rounded-2xl grid md:grid-cols-[3fr_2fr] overflow-hidden'>
               <section className='grid px-8 py-40 place-content-center gap-4 justify-items-center text-center'>
-                <p className='whitespace-pre-line m-0'>{t('payments:intentDetailsNotFound')}</p>
+                <p className='whitespace-pre-line m-0'>{t('studioRental:result.notFound')}</p>
                 <section className='flex min-w-0 overflow-hidden rounded-2xl bg-gray-200/60'>
                   <small className='m-0 block shrink-0 bg-gray-200 px-4 py-2'>{t('payments:intentId')}</small>
                   <small className='m-0 block min-w-0 flex-1 truncate font-code px-4 py-2'>{intentId}</small>
@@ -250,16 +297,12 @@ function PaymentsResultPage() {
           </section>
         </Section>
       )}
-
-      <Section contentClassName='grid gap-20'>
-        <UserPaymentHistory title={t('payments:result.historyTitle')} />
-      </Section>
     </section>
   );
 }
 
-export const SecurePaymentsResultPage = SecurityGuard(PaymentsResultPage, {
-  featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isPaymentsResultsPageEnabled],
+export const SecureStudioRentalResultPage = SecurityGuard(StudioRentalResultPage, {
+  featureFlags: [FEATURE_FLAG.areUserPagesEnabled, FEATURE_FLAG.isStudioRentalRequestsPageEnabled],
   requiresAuth: true,
   redirect: PageURLS.auth.login,
 });

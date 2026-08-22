@@ -100,6 +100,7 @@ export const PageURLS = {
     subscription: '/profile/subscription',
     bookings: '/profile/bookings',
     wallet: '/profile/wallet',
+    paymentDocuments: '/profile/payment-documents',
     gifts: '/profile/gifts',
   },
   instructor: {
@@ -136,4 +137,5 @@ export const PageURLS = {
   },
   studioRentalBrowse: '/studio-rental/browse',
   studioRentalRequests: '/studio-rental/requests',
+  studioRentalResult: '/studio-rental/result',
 } as const;

@@ -206,11 +206,9 @@ export interface StudioRentalUtilizationReport {
 }
 
 export interface StudioRentalFunnelCounts {
-  pending_approval: number;
   pending_payment: number;
   confirmed: number;
   cancelled: number;
-  draft: number;
 }
 
 export interface StudioRentalFunnelReport {

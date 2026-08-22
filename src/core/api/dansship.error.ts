@@ -78,13 +78,12 @@ export enum DANSSHIP_ERROR_CODE {
   // Studio Rentals
   STUDIO_RENTAL_REQUEST_NOT_FOUND = 'STUDIO_RENTAL_REQUEST_NOT_FOUND', // RESOURCE_NOT_FOUND = Studio rental request does not exist |
   STUDIO_RENTAL_INVALID_REQUEST = 'STUDIO_RENTAL_INVALID_REQUEST', // VALIDATION_ERROR = Studio rental request payload is invalid |
-  STUDIO_RENTAL_LEAD_TIME_REQUIRED = 'STUDIO_RENTAL_LEAD_TIME_REQUIRED', // VALIDATION_ERROR = External rentals require at least 24h lead time |
+  STUDIO_RENTAL_LEAD_TIME_REQUIRED = 'STUDIO_RENTAL_LEAD_TIME_REQUIRED', // VALIDATION_ERROR = Rentals require at least 24h lead time |
   STUDIO_RENTAL_INVALID_AVAILABILITY_RANGE = 'STUDIO_RENTAL_INVALID_AVAILABILITY_RANGE', // VALIDATION_ERROR = Invalid date/time range for availability check |
   STUDIO_RENTAL_SLOT_CONFLICT = 'STUDIO_RENTAL_SLOT_CONFLICT', // CONFLICT = Selected time slot conflicts with another rental or blocked time |
+  STUDIO_RENTAL_OUTSIDE_AVAILABILITY = 'STUDIO_RENTAL_OUTSIDE_AVAILABILITY', // CONFLICT = Selected time is outside configured rental availability windows |
   STUDIO_RENTAL_PAYMENT_CONFLICT = 'STUDIO_RENTAL_PAYMENT_CONFLICT', // CONFLICT = Payment issue prevents rental confirmation |
-  STUDIO_RENTAL_INVALID_STATE_TRANSITION = 'STUDIO_RENTAL_INVALID_STATE_TRANSITION', // CONFLICT = Rental state transition is invalid (e.g., cannot approve a cancelled rental) |
-  STUDIO_RENTAL_INVALID_RULE = 'STUDIO_RENTAL_INVALID_RULE', // VALIDATION_ERROR = Rental rule payload is invalid |
-  STUDIO_RENTAL_RULE_NOT_FOUND = 'STUDIO_RENTAL_RULE_NOT_FOUND', // RESOURCE_NOT_FOUND = Rental rule does not exist |
+  STUDIO_RENTAL_INVALID_STATE_TRANSITION = 'STUDIO_RENTAL_INVALID_STATE_TRANSITION', // CONFLICT = Rental state transition is invalid (e.g., cannot cancel after payment is submitted) |
   INTERNAL_RESERVED_USE_INVALID_REQUEST = 'INTERNAL_RESERVED_USE_INVALID_REQUEST', // VALIDATION_ERROR = Internal reserved-use booking request is invalid |
   INTERNAL_RESERVED_USE_NOT_FOUND = 'INTERNAL_RESERVED_USE_NOT_FOUND', // RESOURCE_NOT_FOUND = Internal reserved-use booking does not exist |
 

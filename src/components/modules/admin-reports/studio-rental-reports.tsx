@@ -182,11 +182,9 @@ function FunnelTable({
 }: {
   title: string;
   counts?: {
-    pending_approval: number;
     pending_payment: number;
     confirmed: number;
     cancelled: number;
-    draft: number;
   };
   rate?: number;
 }) {
@@ -206,10 +204,6 @@ function FunnelTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableRow>
-            <TableCell>{t('reports:rentals.statuses.pending_approval')}</TableCell>
-            <TableCell className='text-right'>{counts?.pending_approval ?? 0}</TableCell>
-          </TableRow>
           <TableRow>
             <TableCell>{t('reports:rentals.statuses.pending_payment')}</TableCell>
             <TableCell className='text-right'>{counts?.pending_payment ?? 0}</TableCell>

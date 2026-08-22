@@ -6,9 +6,9 @@ import { LuChevronLeft, LuChevronRight } from 'react-icons/lu';
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
 import { ClassSlotModal, ScheduleGrid } from '@components/modules';
-import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
+import { Button } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
-import { AgendaEvent, DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError, ScheduledClass } from '@core/api';
+import { DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError, ScheduledClass } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions, PERMISSION } from '@core/permissions';
 import { useClasses, usePromise, useRooms, useSchedules } from '@hooks';
@@ -31,22 +31,6 @@ function resolveInstructorId(instructorId: string): string | null {
   }
 
   return instructorId;
-}
-
-function formatAgendaTimeRange(event: AgendaEvent): string {
-  const startTime = new Date(event.start_time);
-  const endTime = new Date(event.end_time);
-  const dateLabel = startTime.toLocaleDateString();
-  const startLabel = startTime.toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-  const endLabel = endTime.toLocaleTimeString([], {
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-
-  return `${dateLabel} ${startLabel} - ${endLabel}`;
 }
 
 function toUtcWeekRange(weekStartDate: string) {
@@ -73,7 +57,6 @@ function AdminScheduleBuilderPage() {
   const [defaultSlot, setDefaultSlot] = useState<{ date: string; time: string } | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [dayColumnMinWidth, setDayColumnMinWidth] = useState<number>(150);
-  const [agendaRoomFilter, setAgendaRoomFilter] = useState<string>('all');
 
   const selectedWeekDate = format(currentDate, 'yyyy-MM-dd');
 
@@ -108,47 +91,16 @@ function AdminScheduleBuilderPage() {
   const isPublished = weekObj?.status === 'published';
   const isArchived = weekObj?.status === 'archived';
   const canMutateCurrentWeek = isPublished ? canManageFullSchedule : canEditDraftSchedule;
-  const agendaRoomId = agendaRoomFilter === 'all' ? undefined : agendaRoomFilter;
 
-  const {
-    response: agendaEvents,
-    isLoading: isLoadingAgendaEvents,
-    error: agendaEventsError,
-  } = usePromise(
+  const { response: agendaEvents } = usePromise(
     () =>
       DansshipAPI.schedulesAdmin.getAgendaEvents({
         start_at: toUtcWeekRange(selectedWeekDate).startAt,
         end_at: toUtcWeekRange(selectedWeekDate).endAt,
-        room_id: agendaRoomId,
       }),
     true,
-    [selectedWeekDate, agendaRoomId],
+    [selectedWeekDate],
   );
-
-  const roomNameById = useMemo(() => {
-    const dictionary: Record<string, string> = {};
-    rooms.forEach(room => {
-      dictionary[room.id] = room.name;
-    });
-
-    return dictionary;
-  }, [rooms]);
-
-  const getAgendaEventTypeLabel = (eventType: AgendaEvent['event_type']) => {
-    if (eventType === 'studio_class') {
-      return t('schedules:agenda.types.studioClass');
-    }
-
-    if (eventType === 'space_rental_external') {
-      return t('schedules:agenda.types.externalRental');
-    }
-
-    if (eventType === 'internal_reserved_use') {
-      return t('schedules:agenda.types.internalReservedUse');
-    }
-
-    return t('schedules:agenda.types.blockedSpace');
-  };
 
   /** Returns true when the given date+hour slot is already in the past */
   const isSlotInPast = (date: string, hour: number): boolean => {
@@ -376,72 +328,15 @@ function AdminScheduleBuilderPage() {
           <ScheduleGrid
             weekDate={selectedWeekDate}
             classes={activeWeekDetail?.classes || []}
+            events={(agendaEvents?.data ?? []).filter(
+              event => event.event_type === 'space_rental_external' || event.event_type === 'internal_reserved_use',
+            )}
             onSlotClick={handleSlotClick}
             onClassClick={selectedClass => handleClassClick(selectedClass as ScheduledClass)}
             onAddAtTime={!isArchived && canMutateCurrentWeek ? handleAddAtSameTime : undefined}
             dayColumnMinWidth={dayColumnMinWidth}
             scheduleStatus={weekObj?.status}
           />
-
-          <section className='bg-white rounded-lg border border-gray-200 p-4 md:p-6'>
-            <div className='flex flex-col gap-4 md:flex-row md:items-end md:justify-between'>
-              <div>
-                <h2 className='text-xl font-semibold text-gray-900'>{t('schedules:agenda.title')}</h2>
-                <p className='text-sm text-gray-500 mt-1'>{t('schedules:agenda.subtitle')}</p>
-              </div>
-              <div className='w-full md:w-72'>
-                <label className='text-xs font-medium text-gray-600'>{t('schedules:agenda.filterRoom')}</label>
-                <Select value={agendaRoomFilter} onValueChange={setAgendaRoomFilter}>
-                  <SelectTrigger>
-                    <SelectValue placeholder={t('schedules:agenda.filterRoom')} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value='all'>{t('schedules:agenda.filterAllRooms')}</SelectItem>
-                    {rooms.map(room => (
-                      <SelectItem key={room.id} value={room.id}>
-                        {room.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {isLoadingAgendaEvents ? (
-              <div className='py-8 flex justify-center'>
-                <SpinnerLoader />
-              </div>
-            ) : agendaEventsError ? (
-              <p className='text-sm text-alert-600 mt-4'>{t('schedules:agenda.loadError')}</p>
-            ) : (agendaEvents?.data ?? []).length === 0 ? (
-              <p className='text-sm text-gray-500 mt-4'>{t('schedules:agenda.empty')}</p>
-            ) : (
-              <div className='mt-4 divide-y divide-gray-100 rounded-md border border-gray-100'>
-                {(agendaEvents?.data ?? []).map(event => (
-                  <div
-                    key={`${event.source_id}-${event.start_time}`}
-                    className='px-4 py-3 grid gap-2 md:grid-cols-4 md:items-center'
-                  >
-                    <div className='md:col-span-2'>
-                      <p className='text-sm font-medium text-gray-900'>{formatAgendaTimeRange(event)}</p>
-                      <p className='text-xs text-gray-500 mt-1'>
-                        {t('schedules:agenda.roomLabel')}
-                        {roomNameById[event.room_id] ?? event.room_id}
-                      </p>
-                    </div>
-                    <p className='text-xs uppercase tracking-wide text-gray-600'>
-                      {t('schedules:agenda.eventTypeLabel')}
-                      {getAgendaEventTypeLabel(event.event_type)}
-                    </p>
-                    <p className='text-xs text-gray-600'>
-                      {t('schedules:agenda.statusLabel')}
-                      {event.status ?? t('schedules:agenda.noStatus')}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </section>
         </div>
       )}
 

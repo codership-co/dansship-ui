@@ -40,6 +40,12 @@ export enum PERMISSION {
   // INSTRUCTOR
   INSTRUCTOR_LIST = 'list:instructor',
 
+  // INSTRUCTOR PAYMENT DOCUMENTS
+  OWN_PAYMENT_DOCUMENT_MANAGE = 'manage:own_payment_document',
+  INSTRUCTOR_PAYMENT_DOCUMENT_READ = 'read:instructor_payment_document',
+  INSTRUCTOR_PAYMENT_DOCUMENT_VOID = 'void:instructor_payment_document',
+  INSTRUCTOR_PAY_RATE_MANAGE = 'manage:instructor_pay_rate',
+
   // ORDER
   ORDER_CREATE = 'create:order',
 

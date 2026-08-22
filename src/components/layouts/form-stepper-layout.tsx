@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconType } from 'react-icons';
 import { LuCircleArrowRight, LuCircleCheck } from 'react-icons/lu';
@@ -31,7 +32,14 @@ export const FormStepperLayout = <T extends React.Key>({
   canNavigateToStep,
 }: FormStepperLayoutProps<T>) => {
   const { t } = useTranslation();
+  const rootGridRef = useRef<HTMLElement>(null);
+  const formPaneRef = useRef<HTMLElement>(null);
   const stepIndex = steps.findIndex(step => step.step === currentStep);
+
+  useLayoutEffect(() => {
+    formPaneRef.current?.scrollTo({ top: 0, left: 0 });
+    rootGridRef.current?.scrollTo({ top: 0, left: 0 });
+  }, [currentStep]);
 
   if (stepIndex === -1 && noAvailableStepMessage) {
     return <p className='text-sm text-gray-600'>{noAvailableStepMessage}</p>;
@@ -40,6 +48,7 @@ export const FormStepperLayout = <T extends React.Key>({
   return (
     <section className='shadow-2xl rounded-xl md:rounded-2xl' data-component='FormStepperLayout'>
       <section
+        ref={rootGridRef}
         className={cn(
           'grid min-w-0 grid-rows-[auto_1fr] md:grid-rows-none md:grid-cols-[auto_1fr] bg-white rounded-xl md:rounded-2xl',
           className,
@@ -104,7 +113,10 @@ export const FormStepperLayout = <T extends React.Key>({
             );
           })}
         </section>
-        <section className='grid h-full min-w-0 grid-rows-[auto_1fr] overflow-x-clip overflow-y-auto px-6 py-6 sm:px-8 md:py-16 md:pr-8 md:pl-12'>
+        <section
+          ref={formPaneRef}
+          className='grid h-full min-w-0 grid-rows-[auto_1fr] overflow-x-clip overflow-y-auto px-6 py-6 sm:px-8 md:py-16 md:pr-8 md:pl-12'
+        >
           <section className='mb-10'>
             <div className='flex items-start gap-2'>
               <div>

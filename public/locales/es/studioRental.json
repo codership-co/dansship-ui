@@ -1,7 +1,11 @@
 {
   "browse": {
     "title": "Renta de Estudio",
-    "subtitle": "Consulta franjas libres u ocupadas y solicita una renta puntual o en serie.",
+    "subtitle": "Elige una sala y reserva una franja puntual o una serie.",
+    "rentRoom": "Rentar",
+    "noImage": "Sin imagen",
+    "noRooms": "No hay salas disponibles para rentar.",
+    "hourlyRateValue": "{{rate}} / hora",
     "room": "Sala",
     "roomPlaceholder": "Selecciona una sala",
     "roomHint": "Selecciona una sala para ver el calendario de ocupación.",
@@ -54,15 +58,13 @@
     "pricingBlocked": "Esta opción aún no tiene precio. Un administrador debe configurarlo antes de rentar."
   },
   "status": {
-    "draft": "Borrador",
     "pendingPayment": "Pago pendiente",
-    "pendingApproval": "Aprobación pendiente",
     "confirmed": "Confirmada",
     "cancelled": "Cancelada"
   },
   "myRequests": {
     "title": "Mis solicitudes de renta",
-    "subtitle": "Revisa solicitudes puntuales y series con su estado de aprobación y pago.",
+    "subtitle": "Revisa el estado de pago y confirmación de tus rentas.",
     "loading": "Cargando solicitudes...",
     "loadError": "No se pudieron cargar tus solicitudes.",
     "empty": "Aún no tienes solicitudes de renta.",
@@ -76,31 +78,17 @@
     "total": "Total",
     "createdAt": "Creada",
     "slots": "{{count}} franjas",
+    "pay": "Pagar",
     "cancel": "Cancelar solicitud",
     "cancelSeries": "Cancelar serie"
   },
   "admin": {
     "title": "Admin de renta de estudio",
-    "subtitle": "Gestiona aprobaciones, bloques ocupados (cerrados) y precios.",
+    "subtitle": "Configura precios, ventanas rentables y uso reservado interno.",
     "tabs": {
-      "approval": "Cola de aprobación",
       "reservedUse": "Uso reservado",
-      "blocks": "Bloques ocupados",
-      "pricing": "Precios",
-      "rules": "Reglas de disponibilidad"
-    },
-    "approval": {
-      "loading": "Cargando aprobaciones pendientes...",
-      "loadError": "No se pudo cargar la cola de aprobación.",
-      "empty": "No hay aprobaciones pendientes.",
-      "seriesSection": "Series",
-      "oneOffSection": "Solicitudes puntuales",
-      "seriesLabel": "Serie #{{id}}",
-      "total": "Total",
-      "slots": "{{count}} franjas",
-      "occurrences": "{{count}} ocurrencias",
-      "approve": "Aprobar",
-      "reject": "Rechazar"
+      "blocks": "Ventanas disponibles",
+      "pricing": "Precios"
     },
     "blocks": {
       "room": "Sala",
@@ -110,11 +98,11 @@
       "startTime": "Inicio",
       "endTime": "Fin",
       "notes": "Notas",
-      "add": "Agregar bloque ocupado",
-      "selectRoom": "Selecciona una sala para ver bloques ocupados.",
-      "loading": "Cargando bloques...",
-      "loadError": "No se pudieron cargar los bloques.",
-      "empty": "Sin bloques ocupados: el resto del horario (6:00–22:00) está disponible salvo clases u otras rentas.",
+      "add": "Agregar ventana rentable",
+      "selectRoom": "Selecciona una sala para ver ventanas rentables.",
+      "loading": "Cargando ventanas...",
+      "loadError": "No se pudieron cargar las ventanas.",
+      "empty": "Esta sala no es rentable hasta que agregues al menos una ventana disponible.",
       "active": "Activo",
       "inactive": "Inactivo",
       "delete": "Eliminar"
@@ -192,9 +180,48 @@
     "reservedUseCancelled": "Uso reservado cancelado",
     "reservedUseCancelFailed": "No se pudo cancelar el uso reservado",
     "pricingMustBePositive": "El precio por hora debe ser mayor a 0",
-    "leadTimeRequired": "Las rentas externas deben solicitarse con al menos 24 horas de anticipación.",
+    "leadTimeRequired": "Las rentas deben solicitarse con al menos 24 horas de anticipación.",
     "slotConflict": "El horario seleccionado ya no está disponible. Elige otra franja.",
-    "priceNotConfigured": "Esta opción aún no tiene precio configurado. Contacta al estudio."
+    "outsideAvailability": "Ese horario está fuera de las ventanas rentables de la sala.",
+    "priceNotConfigured": "Esta opción aún no tiene precio configurado. Contacta al estudio.",
+    "proofUploaded": "Comprobante enviado. El pago queda en revisión."
+  },
+  "wizard": {
+    "hour": "hora",
+    "oneOffHint": "Una sola franja en la fecha que elegiste.",
+    "seriesHint": "Repite el mismo horario cada semana.",
+    "selectedRange": "{{date}} · {{start}} – {{end}}",
+    "paymentIntro": "Al confirmar se crea la solicitud y el pago con el método que elijas.",
+    "confirmAndPay": "Confirmar y pagar",
+    "walletCovered": "El saldo de tu billetera cubre este monto. El pago queda en revisión.",
+    "continue": "Continuar",
+    "confirmationBody": "Tu solicitud quedó creada. Cuando el pago se apruebe, recibirás la confirmación y el código de acceso.",
+    "close": "Cerrar",
+    "goToRequests": "Ver mis solicitudes",
+    "steps": {
+      "resource": "Recurso",
+      "calendar": "Calendario",
+      "mode": "Modalidad",
+      "config": "Configuración",
+      "price": "Precio",
+      "payment": "Pago",
+      "confirm": "Confirmación"
+    },
+    "subtitles": {
+      "resource": "Elige sala completa o un recurso.",
+      "calendar": "Arrastra sobre horas libres para elegir la franja.",
+      "mode": "Renta puntual o serie semanal.",
+      "config": "Define duración o el cierre de la serie.",
+      "price": "Revisa el total e impuestos.",
+      "payment": "Confirma el pago igual que en la compra de plan.",
+      "confirm": "Listo. Sigue el estado en Mis solicitudes."
+    }
+  },
+  "result": {
+    "rentalStatus": "Estado de la renta",
+    "walletApplied": "Billetera aplicada",
+    "occurrences": "{{count}} sesiones",
+    "notFound": "No pudimos encontrar esta renta.\nInténtalo de nuevo."
   },
   "resourceTypes": {
     "pole": "Pole",
