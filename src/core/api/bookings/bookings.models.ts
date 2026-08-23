@@ -30,6 +30,7 @@ export interface BookingCancelPayload {
 export interface AdminBookClassPayload extends BookClassPayload {
   user_id: string;
   reason?: string;
+  as_attended?: boolean;
 }
 
 export interface AdminBookingUser {

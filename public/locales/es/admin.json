@@ -269,7 +269,16 @@
     "notFound": "No se pudo cargar la lista de esta clase.",
     "enrolled": "Inscritos ({{count}})",
     "studentName": "Estudiante",
-    "noStudents": "No hay estudiantes inscritos."
+    "noStudents": "No hay estudiantes inscritos.",
+    "registerRetroactive": "Registrar asistencia retroactiva",
+    "dialogTitle": "Registrar asistencia retroactiva",
+    "dialogDescription": "Busca a la estudiante por el correo con el que se registró en Dansship. Se debitará un crédito de su plan actual.",
+    "confirm": "Registrar asistencia",
+    "submitting": "Registrando...",
+    "success": "Asistencia registrada.",
+    "cuentaWarningTitle": "Ya hay una cuenta de cobro emitida para este mes",
+    "cuentaWarningBody": "La cuenta de cobro de la instructora para el mes de esta clase ya fue generada. Esta inscripción no la modifica sola: si corresponde, anúlala y vuelve a emitirla.",
+    "cuentaWarningEmptyRoster": "Esta clase no tenía reservas, así que es posible que no haya contado para el pago de la instructora. Si corresponde, anula la cuenta de cobro emitida y vuelve a emitirla."
   },
   "reports": {
     "title": "Reportes y Configuración de la Plataforma",

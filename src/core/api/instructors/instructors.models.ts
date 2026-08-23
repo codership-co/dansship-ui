@@ -75,6 +75,8 @@ export interface RosterStudent {
 export interface ClassRosterResponse {
   class_id: string;
   enrolled: Array<RosterStudent>;
+  can_register_retroactive_attendance?: boolean;
+  instructor_payment_document_issued?: boolean;
 }
 
 export interface InstructorUserSearchResult {
