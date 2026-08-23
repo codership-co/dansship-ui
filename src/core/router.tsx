@@ -42,6 +42,8 @@ import {
   SecureSignupPage,
   SecureStudioRentalBrowsePage,
   SecureStudioRentalRequestsPage,
+  SecureStudioRentalResultPage,
+  StudioRentalResultLoader,
   SecureVerifyEmailPage,
   UiPage,
   HomeLoader,
@@ -50,6 +52,7 @@ import {
   SecureSubscriptionPage,
   SecureBookingsPage,
   SecureWalletPage,
+  SecurePaymentDocumentsPage,
   SecureGiftsPage,
   SecureLegalPage,
 } from '@pages';
@@ -111,6 +114,7 @@ const routes: Array<RouteObject> = [
               { path: 'subscription', Component: SecureSubscriptionPage },
               { path: 'bookings', Component: SecureBookingsPage },
               { path: 'wallet', Component: SecureWalletPage },
+              { path: 'payment-documents', Component: SecurePaymentDocumentsPage },
               { path: 'gifts', Component: SecureGiftsPage },
             ],
           },
@@ -132,6 +136,7 @@ const routes: Array<RouteObject> = [
             children: [
               { path: 'browse', Component: SecureStudioRentalBrowsePage },
               { path: 'requests', Component: SecureStudioRentalRequestsPage },
+              { path: 'result', Component: SecureStudioRentalResultPage, loader: StudioRentalResultLoader },
             ],
           },
 

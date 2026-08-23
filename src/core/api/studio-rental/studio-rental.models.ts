@@ -1,7 +1,9 @@
-export type RentalRequestStatus = 'draft' | 'pending_payment' | 'pending_approval' | 'confirmed' | 'cancelled';
+import { PaymentMethod, PaymentStatus } from '../payments/payments.models';
+
+export type RentalRequestStatus = 'pending_payment' | 'confirmed' | 'cancelled';
 
 export type RentalRequestType = 'studio_rental' | 'internal_reserved_use';
-export type RentalPurpose = 'self_practice' | 'private_class' | 'workshop' | 'internal_reserved_use';
+export type RentalPurpose = 'self_practice' | 'internal_reserved_use';
 export type RentalRoleType = 'internal_instructor' | 'external_user';
 
 export type CalendarBlockKind = 'free' | 'occupied';
@@ -52,6 +54,10 @@ export interface RentalRequest {
   created_at: string;
   updated_at: string;
   slots: Array<RentalSlot>;
+  payment_intent_id?: string | null;
+  payment_status?: PaymentStatus | null;
+  payment_method_type?: PaymentMethod | null;
+  payment_proof_url?: string | null;
 }
 
 export interface RentalSlotCreate {
@@ -65,6 +71,7 @@ export interface CreateRentalRequestPayload {
   type?: RentalRequestType;
   purpose?: RentalPurpose;
   terms_accepted: true;
+  payment_method_type?: 'transfer' | 'card';
   slots: Array<RentalSlotCreate>;
 }
 
@@ -78,6 +85,7 @@ export interface CreateRentalSeriesPayload {
   series_end_date?: string | null;
   occurrence_count?: number | null;
   terms_accepted: true;
+  payment_method_type?: 'transfer' | 'card';
 }
 
 export interface RentalSeries {
@@ -104,6 +112,66 @@ export interface RentalSeries {
   created_at: string;
   updated_at: string;
   requests: Array<RentalRequest>;
+  payment_intent_id?: string | null;
+  payment_status?: PaymentStatus | null;
+  payment_method_type?: PaymentMethod | null;
+  payment_proof_url?: string | null;
+}
+
+export type RentalPaymentResultKind = 'one_off' | 'series';
+
+export interface RentalPaymentResultRoom {
+  id: string;
+  name: string;
+}
+
+export interface RentalPaymentResultResource {
+  id: string;
+  resource_type: RoomResourceType | (string & {});
+  position: number;
+  label?: string | null;
+}
+
+export interface RentalPaymentResultSlot {
+  start_time: string;
+  end_time: string;
+  price: string;
+}
+
+export interface RentalPaymentResultSeries {
+  day_of_week: DayOfWeek;
+  start_time: string;
+  end_time: string;
+  series_start_date: string;
+  series_end_date?: string | null;
+  occurrence_count?: number | null;
+  occurrence_total: number;
+}
+
+export interface RentalPaymentSnapshot {
+  id: string;
+  status: PaymentStatus;
+  payment_method_type: PaymentMethod;
+  amount: number;
+  wallet_amount_applied: number;
+  currency: string;
+  tax_type_name?: string | null;
+  tax_rate_percentage?: number | null;
+  tax_amount?: number | null;
+  base_amount?: number | null;
+  proof_url?: string | null;
+  created_at: string;
+  expires_at?: string | null;
+}
+
+export interface RentalPaymentResult {
+  kind: RentalPaymentResultKind;
+  rental_status: RentalRequestStatus;
+  room: RentalPaymentResultRoom;
+  resource?: RentalPaymentResultResource | null;
+  slots: Array<RentalPaymentResultSlot>;
+  series?: RentalPaymentResultSeries | null;
+  payment: RentalPaymentSnapshot;
 }
 
 export interface AdminListRequestsPayload {
@@ -162,6 +230,7 @@ export interface StudioRentalRoomOption {
   description?: string | null;
   hourly_rental_price?: string | null;
   tax_type_id?: string | null;
+  image_url?: string | null;
   resources: Array<RoomResourceOption>;
 }
 
@@ -201,10 +270,6 @@ export interface RoomAvailabilityBlockUpdatePayload {
 }
 
 export interface CancelRequestPayload {
-  reason?: string;
-}
-
-export interface AdminRejectPayload {
   reason?: string;
 }
 

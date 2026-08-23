@@ -130,7 +130,7 @@ All under `/admin`, wrapped with `SecurityGuard` + admin feature flag + `AdminPe
 
 | Route | Page | Backend domain(s) | Primary endpoints |
 | --- | --- | --- | --- |
-| `/admin` | `admin.page.tsx` → `SecureAdminPage` | schedules, studio_rentals | `GET /admin/agenda/events`, `GET /admin/studio-rentals/requests?status=pending_approval` |
+| `/admin` | `admin.page.tsx` → `SecureAdminPage` | schedules, studio_rentals | `GET /admin/agenda/events`, `GET /admin/studio-rentals/requests?status=pending_payment` |
 
 ### Agenda / schedules
 

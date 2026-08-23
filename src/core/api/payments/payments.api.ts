@@ -49,6 +49,19 @@ export class PaymentsAPI {
     );
   }
 
+  async createBoldCheckoutForIntent(intentId: string) {
+    return this.httpClient.callNoError<BoldCheckoutBootstrapResponse>(
+      {
+        path: `/payments/intents/${intentId}/bold/checkout`,
+        method: 'POST',
+      },
+      data => ({
+        ...data,
+        intent: normalizeIntent(data.intent),
+      }),
+    );
+  }
+
   async previewPayment(payload: PaymentPreviewRequest) {
     return this.httpClient.callNoError<PaymentPreviewResponse, PaymentPreviewRequest, PaymentPreviewMappedResponse>(
       {

@@ -48,7 +48,7 @@ export const HomeAdminDashboard = () => {
   } = usePromise(
     () =>
       DansshipAPI.studioRentalAdmin.adminListRequests({
-        status: 'pending_approval',
+        status: 'pending_payment',
       }),
     isAuthenticated && canManageStudioRental,
   );
@@ -78,10 +78,10 @@ export const HomeAdminDashboard = () => {
       visible: canReadAgenda,
     },
     {
-      id: 'approval',
-      to: `${PageURLS.admin.studioRental}?tab=approval`,
-      label: t('home:admin.cards.pendingApprovals'),
-      description: t('home:admin.cards.pendingApprovalsDescription'),
+      id: 'pending-payment',
+      to: `${PageURLS.admin.studioRental}?tab=pricing`,
+      label: t('home:admin.cards.pendingPayments'),
+      description: t('home:admin.cards.pendingPaymentsDescription'),
       metric: adminListResponse?.data?.length ?? 0,
       visible: canManageStudioRental,
     },
@@ -97,7 +97,7 @@ export const HomeAdminDashboard = () => {
     },
     {
       id: 'rules',
-      to: `${PageURLS.admin.studioRental}?tab=rules`,
+      to: `${PageURLS.admin.studioRental}?tab=blocks`,
       label: t('home:admin.cards.blockedSpaces'),
       description: t('home:admin.cards.blockedSpacesDescription'),
       metric: canReadAgenda ? adminAgendaEvents.filter(event => event.event_type === 'blocked_space').length : '-',

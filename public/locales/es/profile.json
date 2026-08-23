@@ -24,6 +24,73 @@
       "runningBalance": "Saldo"
     }
   },
+  "paymentDocuments": {
+    "nav": "Documentos de pago",
+    "title": "Documentos de pago",
+    "subtitle": "Carga tu RUT, certificado bancario y firma, y genera las cuentas de cobro de cada mes cerrado.",
+    "loading": "Cargando documentos de pago...",
+    "documentsTitle": "Documentos",
+    "cuentasTitle": "Cuentas de cobro",
+    "rut": "RUT",
+    "rutHint": "PDF o imagen. Reemplaza el archivo actual.",
+    "bankCertificate": "Certificado bancario",
+    "bankCertificateHint": "PDF o imagen. Reemplaza el archivo actual.",
+    "signature": "Firma",
+    "signatureHint": "Imagen de tu firma. Reemplaza el archivo actual.",
+    "viewCurrent": "Ver archivo actual",
+    "bankFieldsTitle": "Datos de la cuenta bancaria",
+    "bankName": "Banco",
+    "accountType": "Tipo de cuenta",
+    "accountTypePlaceholder": "Selecciona un tipo",
+    "accountTypeSavings": "Ahorros",
+    "accountTypeChecking": "Corriente",
+    "accountNumber": "Número de cuenta",
+    "saveBank": "Guardar datos bancarios",
+    "uploadSuccess": "Documento cargado correctamente.",
+    "uploadFailed": "No se pudo cargar el documento.",
+    "bankSaveSuccess": "Datos bancarios guardados.",
+    "bankSaveFailed": "No se pudieron guardar los datos bancarios.",
+    "generate": "Generar",
+    "generateSuccess": "Cuenta de cobro generada.",
+    "generateFailed": "No se pudo generar la cuenta de cobro. Verifica que exista una tarifa horaria y que el mes ya haya cerrado.",
+    "download": "Descargar",
+    "viewFailed": "No se pudo abrir el documento.",
+    "emptyMonths": "Aún no hay meses disponibles para generar cuentas de cobro.",
+    "columns": {
+      "period": "Periodo",
+      "status": "Estado",
+      "total": "Total"
+    },
+    "monthStatus": {
+      "issued": "Emitida",
+      "available": "Disponible",
+      "blocked": "Faltan documentos",
+      "in_progress": "Mes en curso"
+    },
+    "missing": {
+      "rut": "RUT",
+      "bank_certificate": "certificado bancario",
+      "bank_name": "banco",
+      "account_type": "tipo de cuenta",
+      "account_number": "número de cuenta",
+      "signature": "firma",
+      "cedula": "cédula"
+    },
+    "months": {
+      "1": "Enero",
+      "2": "Febrero",
+      "3": "Marzo",
+      "4": "Abril",
+      "5": "Mayo",
+      "6": "Junio",
+      "7": "Julio",
+      "8": "Agosto",
+      "9": "Septiembre",
+      "10": "Octubre",
+      "11": "Noviembre",
+      "12": "Diciembre"
+    }
+  },
   "gifts": {
     "nav": "Regalos",
     "title": "Mis regalos",

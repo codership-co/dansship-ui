@@ -1,9 +1,11 @@
 import { Button } from 'polpo/components';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 
 import { AdminPageLayout } from '@components/layouts';
 import { SpinnerLoader } from '@components/loaders';
+import { RetroactiveAttendanceDialog } from '@components/modules';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { DansshipAPI } from '@core/api';
@@ -14,24 +16,33 @@ import { usePromise } from '@hooks';
 function AdminClassRosterPage() {
   const { t } = useTranslation();
   const { classId = '' } = useParams<{ classId: string }>();
-  const { response, isLoading, error } = usePromise(
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { response, isLoading, error, reFetch } = usePromise(
     () => DansshipAPI.bookingsAdmin.getAdminClassRoster(classId),
     !!classId,
   );
   const roster = response?.data;
   const enrolled = roster?.enrolled ?? [];
   const hasError = Boolean(error) || Boolean(response && !response.ok);
+  const canRegisterRetroactive = Boolean(roster?.can_register_retroactive_attendance);
 
   return (
     <AdminPageLayout
       title={t('admin:roster.title')}
       dataComponent='AdminClassRosterPage'
       actions={
-        <Link to={PageURLS.admin.users} viewTransition>
-          <Button color='primary' size='small' variant='flat'>
-            {t('admin:users.details.backToList')}
-          </Button>
-        </Link>
+        <div className='flex flex-wrap items-center gap-2'>
+          {canRegisterRetroactive ? (
+            <Button color='primary' size='small' onClick={() => setIsDialogOpen(true)}>
+              {t('admin:roster.registerRetroactive')}
+            </Button>
+          ) : null}
+          <Link to={PageURLS.admin.users} viewTransition>
+            <Button color='primary' size='small' variant='flat'>
+              {t('admin:users.details.backToList')}
+            </Button>
+          </Link>
+        </div>
       }
     >
       {isLoading ? (
@@ -75,6 +86,16 @@ function AdminClassRosterPage() {
           </section>
         </div>
       )}
+      {classId ? (
+        <RetroactiveAttendanceDialog
+          classId={classId}
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          instructorPaymentDocumentIssued={Boolean(roster?.instructor_payment_document_issued)}
+          rosterIsEmpty={enrolled.length === 0}
+          onRegistered={() => void reFetch()}
+        />
+      ) : null}
     </AdminPageLayout>
   );
 }

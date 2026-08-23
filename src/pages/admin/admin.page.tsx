@@ -51,7 +51,7 @@ function AdminPage() {
   } = usePromise(
     () =>
       DansshipAPI.studioRentalAdmin.adminListRequests({
-        status: 'pending_approval',
+        status: 'pending_payment',
       }),
     canManageStudioRental,
   );
@@ -70,7 +70,7 @@ function AdminPage() {
     canReadAgenda,
   );
 
-  const pendingApprovals = listRequests?.data ?? [];
+  const pendingPayments = listRequests?.data ?? [];
   const agendaEvents = useMemo(() => agendaEventsList?.data ?? [], [agendaEventsList?.data]);
   const conflicts = useMemo(() => buildAgendaConflicts(agendaEvents), [agendaEvents]);
 
@@ -102,9 +102,9 @@ function AdminPage() {
       to: PageURLS.admin.studioRental,
       title: t('admin:workspace.cards.studioRental', { defaultValue: 'Studio Rental Ops' }),
       description: t('admin:workspace.cards.studioRentalDescription', {
-        defaultValue: 'Handle approvals, reserved use, and blocked-space rules.',
+        defaultValue: 'Manage reserved use, rentable windows, and pricing.',
       }),
-      metric: pendingApprovals.length,
+      metric: pendingPayments.length,
       visible: canManageStudioRental,
     },
     {
@@ -120,14 +120,14 @@ function AdminPage() {
   ].filter(item => item.visible);
 
   const queueItems = [
-    ...pendingApprovals.slice(0, 3).map(request => ({
-      id: `approval-${request.id}`,
+    ...pendingPayments.slice(0, 3).map(request => ({
+      id: `payment-${request.id}`,
       severity: 'high',
-      title: t('admin:workspace.queue.pendingApproval', {
-        defaultValue: 'Pending rental approval',
+      title: t('admin:workspace.queue.pendingPayment', {
+        defaultValue: 'Pending rental payment',
       }),
       subtitle: `#${request.id.slice(0, 8)} - ${request.slots.length} slot(s)`,
-      to: `${PageURLS.admin.studioRental}?tab=approval`,
+      to: `${PageURLS.admin.studioRental}?tab=pricing`,
     })),
     ...conflicts.slice(0, 3).map(conflict => ({
       id: `conflict-${conflict.id}`,
@@ -188,7 +188,7 @@ function AdminPage() {
           ) : null}
           {canManageStudioRental ? (
             <Button asChild size='sm' variant='outline'>
-              <Link to={`${PageURLS.admin.studioRental}?tab=rules`}>
+              <Link to={`${PageURLS.admin.studioRental}?tab=blocks`}>
                 {t('admin:workspace.actions.addBlockedSpace', { defaultValue: 'Add Blocked Space' })}
               </Link>
             </Button>

@@ -3,15 +3,16 @@ import { cn } from 'polpo/helpers';
 import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaFileUpload, FaSave } from 'react-icons/fa';
-import { LuCalendar, LuClipboardList, LuCreditCard, LuGift, LuPencil, LuWallet } from 'react-icons/lu';
+import { LuCalendar, LuClipboardList, LuCreditCard, LuFileText, LuGift, LuPencil, LuWallet } from 'react-icons/lu';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
 
 import { Section } from '@components/containers';
 import { ProfilePicture } from '@components/ui';
-import { FEATURE_FLAG, useAuth, useEnabledFeatureFlag } from '@contexts';
+import { FEATURE_FLAG, useAuth, useEnabledFeatureFlag, useOrPermissions } from '@contexts';
 import { DansshipAPI, PaymentProofContentType, PaymentProofContentTypesList } from '@core/api';
 import { PageURLS } from '@core/constants';
+import { PERMISSION } from '@core/permissions';
 import { usePromise } from '@hooks';
 
 interface ProfileHeaderProps {
@@ -24,6 +25,7 @@ export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
   const { user, uploadProfilePhoto } = useAuth();
   const [imageURL, setImageURL] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
+  const canManageOwnPaymentDocuments = useOrPermissions([PERMISSION.OWN_PAYMENT_DOCUMENT_MANAGE]);
   const isStudioRentalRequestsEnabled = useEnabledFeatureFlag([
     FEATURE_FLAG.areUserPagesEnabled,
     FEATURE_FLAG.isStudioRentalRequestsPageEnabled,
@@ -177,6 +179,15 @@ export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
                 {t('profile:wallet.nav')}
               </Button>
             </Link>
+
+            {canManageOwnPaymentDocuments && user.cuentaDeCobroEnabled !== false ? (
+              <Link to={PageURLS.profile.paymentDocuments}>
+                <Button variant='solid' color='primary' size='small' fullWidth>
+                  <LuFileText className='h-4 w-4' />
+                  {t('profile:paymentDocuments.nav')}
+                </Button>
+              </Link>
+            ) : null}
 
             <Link to={PageURLS.profile.gifts}>
               <Button variant='solid' color='primary' size='small' fullWidth>

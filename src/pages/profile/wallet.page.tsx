@@ -18,7 +18,7 @@ function WalletPage() {
   const hasError = Boolean(error) || Boolean(response && !response.ok);
 
   return (
-    <Section className='grid gap-6 py-8'>
+    <Section navbarPadding className='grid gap-6 pb-8'>
       <SectionHeading title={t('profile:wallet.title')} subtitle={t('profile:wallet.subtitle')} />
 
       {isLoading && !wallet ? (

@@ -290,7 +290,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       await DansshipAPI.auth.resetPassword(payload);
       toast.success(t('auth:resetPasswordSuccess'));
       navigate(PageURLS.auth.login);
-    } catch {
+    } catch (error) {
+      if (error instanceof DansshipAPIError) {
+        const isOtpInvalid =
+          error.body.error_code === DANSSHIP_ERROR_CODE.AUTH_OTP_INVALID || /otp/i.test(error.body.message);
+
+        if (isOtpInvalid) {
+          toast.error(t('auth:resetPasswordOtpInvalid'), {
+            description: t('auth:resetPasswordOtpInvalidDesc'),
+          });
+
+          return;
+        }
+      }
+
       toast.error(t('auth:resetPasswordFailed'));
     }
   }

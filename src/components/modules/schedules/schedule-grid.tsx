@@ -218,6 +218,17 @@ function clampRangeToFreeHours(
   return { date: dateString, startHour: start, endHour: endExclusive };
 }
 
+function hourFromClientY(columnEl: HTMLElement, clientY: number): number {
+  const y = clientY - columnEl.getBoundingClientRect().top;
+  const raw = GRID_START_HOUR + Math.floor(y / HOUR_HEIGHT_PX);
+
+  return Math.min(GRID_END_HOUR - 1, Math.max(GRID_START_HOUR, raw));
+}
+
+function formatHourLabel(hour: number): string {
+  return `${String(hour).padStart(2, '0')}:00`;
+}
+
 export function ScheduleGrid({
   weekDate,
   classes = [],
@@ -236,7 +247,10 @@ export function ScheduleGrid({
   const locale = useDateLocale();
   const dragAnchorRef = useRef<{ date: string; hour: number } | null>(null);
   const draftSelectionRef = useRef<HourRangeSelection | null>(null);
+  const allEventsRef = useRef<Array<GridEvent>>([]);
+  const onRangeSelectRef = useRef(onRangeSelect);
   const [draftSelection, setDraftSelection] = useState<HourRangeSelection | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   const days = useMemo(() => {
     const start = parseISO(weekDate);
@@ -259,30 +273,65 @@ export function ScheduleGrid({
     return events.length > 0 ? events : classes;
   }, [events, classes]);
 
-  useEffect(() => {
-    draftSelectionRef.current = draftSelection;
-  }, [draftSelection]);
+  allEventsRef.current = allEvents;
+  onRangeSelectRef.current = onRangeSelect;
+
+  const setDraft = (next: HourRangeSelection | null) => {
+    draftSelectionRef.current = next;
+    setDraftSelection(next);
+  };
 
   useEffect(() => {
     if (!enableRangeSelect) {
       return;
     }
 
-    const handlePointerUp = () => {
-      const draft = draftSelectionRef.current;
-      dragAnchorRef.current = null;
+    const handlePointerMove = (event: PointerEvent) => {
+      const anchor = dragAnchorRef.current;
 
-      if (draft && onRangeSelect) {
-        onRangeSelect(draft);
+      if (!anchor) {
+        return;
       }
 
-      setDraftSelection(null);
+      const column = document.querySelector(`[data-range-day="${anchor.date}"]`);
+
+      if (!(column instanceof HTMLElement)) {
+        return;
+      }
+
+      event.preventDefault();
+      const hour = hourFromClientY(column, event.clientY);
+      const next = clampRangeToFreeHours(anchor.date, anchor.hour, hour, allEventsRef.current);
+
+      if (next) {
+        setDraft(next);
+      }
     };
 
-    window.addEventListener('pointerup', handlePointerUp);
+    const handlePointerUp = () => {
+      if (!dragAnchorRef.current) {
+        return;
+      }
 
-    return () => window.removeEventListener('pointerup', handlePointerUp);
-  }, [enableRangeSelect, onRangeSelect]);
+      dragAnchorRef.current = null;
+      setIsDragging(false);
+      const draft = draftSelectionRef.current;
+
+      if (draft) {
+        onRangeSelectRef.current?.(draft);
+      }
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: false });
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+      window.removeEventListener('pointercancel', handlePointerUp);
+    };
+  }, [enableRangeSelect]);
 
   const classesByDate = useMemo(() => {
     const dict: Record<string, Array<GridEvent>> = {};
@@ -317,23 +366,8 @@ export function ScheduleGrid({
     }
 
     dragAnchorRef.current = { date: dateString, hour };
-    setDraftSelection(next);
-  };
-
-  const extendRangeSelect = (dateString: string, hour: number) => {
-    if (!enableRangeSelect || !dragAnchorRef.current) {
-      return;
-    }
-
-    if (dragAnchorRef.current.date !== dateString) {
-      return;
-    }
-
-    const next = clampRangeToFreeHours(dateString, dragAnchorRef.current.hour, hour, allEvents);
-
-    if (next) {
-      setDraftSelection(next);
-    }
+    setIsDragging(true);
+    setDraft(next);
   };
 
   return (
@@ -371,7 +405,27 @@ export function ScheduleGrid({
               <span className={`text-xs ${day.isPast ? 'text-gray-400' : 'text-gray-500'}`}>{day.shortDate}</span>
             </div>
 
-            <div className='relative w-full select-none' style={{ height: `${HOURS.length * HOUR_HEIGHT_PX}px` }}>
+            <div
+              data-range-day={day.dateString}
+              className={`relative w-full select-none ${enableRangeSelect ? 'touch-none' : ''} ${
+                isDragging && enableRangeSelect ? 'cursor-grabbing' : ''
+              }`}
+              style={{ height: `${HOURS.length * HOUR_HEIGHT_PX}px` }}
+              onPointerDown={event => {
+                if (!enableRangeSelect || day.isPast) {
+                  return;
+                }
+
+                const hour = hourFromClientY(event.currentTarget, event.clientY);
+
+                if (hourOverlapsOccupied(day.dateString, hour, allEvents)) {
+                  return;
+                }
+
+                event.preventDefault();
+                beginRangeSelect(day.dateString, hour);
+              }}
+            >
               {HOURS.map((hour, idx) => {
                 const occupied = hourOverlapsOccupied(day.dateString, hour, allEvents);
 
@@ -383,29 +437,16 @@ export function ScheduleGrid({
                         ? 'bg-gray-50 cursor-default'
                         : occupied
                           ? 'cursor-not-allowed'
-                          : 'cursor-pointer hover:bg-accent/40 transition-colors'
+                          : `cursor-pointer hover:bg-accent/40 ${enableRangeSelect ? '' : 'transition-colors'}`
                     }`}
                     style={{ top: `${idx * HOUR_HEIGHT_PX}px` }}
                     onPointerDown={event => {
-                      if (day.isPast || occupied) {
-                        return;
-                      }
-
-                      if (enableRangeSelect) {
-                        event.preventDefault();
-                        beginRangeSelect(day.dateString, hour);
-
+                      if (enableRangeSelect || day.isPast || occupied) {
                         return;
                       }
 
                       onSlotClick?.(day.dateString, hour);
-                    }}
-                    onPointerEnter={() => {
-                      if (day.isPast || occupied) {
-                        return;
-                      }
-
-                      extendRangeSelect(day.dateString, hour);
+                      event.stopPropagation();
                     }}
                   ></div>
                 );
@@ -413,12 +454,16 @@ export function ScheduleGrid({
 
               {activeSelection && activeSelection.date === day.dateString ? (
                 <div
-                  className='pointer-events-none absolute inset-x-1 z-15 rounded border border-emerald-400 bg-emerald-200/50'
+                  className='pointer-events-none absolute inset-x-1 z-30 overflow-hidden rounded-md border-2 border-primary bg-primary/20 shadow-sm'
                   style={{
                     top: `${(activeSelection.startHour - GRID_START_HOUR) * HOUR_HEIGHT_PX}px`,
                     height: `${Math.max(activeSelection.endHour - activeSelection.startHour, 1) * HOUR_HEIGHT_PX}px`,
                   }}
-                />
+                >
+                  <span className='absolute left-2 top-1 text-[11px] font-semibold text-primary'>
+                    {formatHourLabel(activeSelection.startHour)} – {formatHourLabel(activeSelection.endHour)}
+                  </span>
+                </div>
               ) : null}
 
               {(classesByDate[day.dateString] || []).map(({ cls, layout }) => {
@@ -482,6 +527,8 @@ export function ScheduleGrid({
                     key={id}
                     onClick={() => (isClassCancelled || !isClassPast) && onClassClick?.(cls)}
                     className={`group absolute rounded shadow-sm p-1 z-20 flex flex-col ${
+                      enableRangeSelect ? 'pointer-events-none' : ''
+                    } ${
                       isMuted
                         ? `bg-gray-100 border border-gray-300 opacity-60 ${isClassCancelled ? 'cursor-pointer' : 'cursor-default'}`
                         : `border cursor-pointer transition-colors ${bgClass}`

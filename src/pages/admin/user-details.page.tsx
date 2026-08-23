@@ -10,6 +10,7 @@ import {
   UserDetailsActions,
   UserDetailsHeader,
   UserInstructorClassesTab,
+  UserPaymentDocumentsTab,
   UserRolesManager,
   UserSubscriptionsTab,
   UserWalletTab,
@@ -27,6 +28,7 @@ const PAYMENTS_TAB = 'payments';
 const BOOKINGS_TAB = 'bookings';
 const BENEFITS_TAB = 'benefits';
 const WALLET_TAB = 'wallet';
+const PAYMENT_DOCUMENTS_TAB = 'payment-documents';
 const INSTRUCTOR_CLASSES_TAB = 'instructor-classes';
 
 function UserDetailsPage() {
@@ -43,7 +45,10 @@ function UserDetailsPage() {
   const canReadBenefits = useOrPermissions(AdminPermissions.benefits);
   const canManageWallet = useOrPermissions(AdminPermissions.wallet);
   const canManageSchedule = useOrPermissions([PERMISSION.SCHEDULE_MANAGE]);
+  const canReadPaymentDocuments = useOrPermissions([PERMISSION.INSTRUCTOR_PAYMENT_DOCUMENT_READ]);
+  const canVoidPaymentDocuments = useOrPermissions([PERMISSION.INSTRUCTOR_PAYMENT_DOCUMENT_VOID]);
   const showInstructorClasses = Boolean(user?.has_instructor_profile) && canManageSchedule;
+  const showPaymentDocuments = Boolean(user?.has_instructor_profile) && canReadPaymentDocuments;
 
   const requestedTab = searchParams.get('tab') ?? PROFILE_TAB;
   const availableTabs = [
@@ -53,6 +58,7 @@ function UserDetailsPage() {
     ...(canManageBookings ? [BOOKINGS_TAB] : []),
     ...(canReadBenefits ? [BENEFITS_TAB] : []),
     ...(canManageWallet ? [WALLET_TAB] : []),
+    ...(showPaymentDocuments ? [PAYMENT_DOCUMENTS_TAB] : []),
     ...(showInstructorClasses ? [INSTRUCTOR_CLASSES_TAB] : []),
   ];
   const activeTab = availableTabs.includes(requestedTab) ? requestedTab : PROFILE_TAB;
@@ -107,6 +113,11 @@ function UserDetailsPage() {
               {canManageWallet ? (
                 <TabsTrigger value={WALLET_TAB}>{t('admin:users.details.tabs.wallet')}</TabsTrigger>
               ) : null}
+              {showPaymentDocuments ? (
+                <TabsTrigger value={PAYMENT_DOCUMENTS_TAB}>
+                  {t('admin:users.details.tabs.paymentDocuments')}
+                </TabsTrigger>
+              ) : null}
               {showInstructorClasses ? (
                 <TabsTrigger value={INSTRUCTOR_CLASSES_TAB}>
                   {t('admin:users.details.tabs.instructorClasses')}
@@ -150,6 +161,14 @@ function UserDetailsPage() {
             {canManageWallet ? (
               <TabsContent value={WALLET_TAB}>
                 {activeTab === WALLET_TAB && userId ? <UserWalletTab userId={userId} /> : null}
+              </TabsContent>
+            ) : null}
+
+            {showPaymentDocuments ? (
+              <TabsContent value={PAYMENT_DOCUMENTS_TAB}>
+                {activeTab === PAYMENT_DOCUMENTS_TAB && userId ? (
+                  <UserPaymentDocumentsTab userId={userId} canVoid={canVoidPaymentDocuments} />
+                ) : null}
               </TabsContent>
             ) : null}
 

@@ -1,4 +1,5 @@
 export * from './admin-users';
+export * from './admin-class-roster';
 export * from './schedules';
 export * from './admin-inventory';
 export * from './admin-merch';
@@ -15,3 +16,4 @@ export * from './figures';
 export * from './home';
 export * from './onboarding';
 export * from './payments';
+export * from './studio-rental';

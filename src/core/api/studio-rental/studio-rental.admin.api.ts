@@ -7,7 +7,6 @@ import type {
   AdminListInternalReservedUsesParams,
   AdminListRequestsPayload,
   AdminListSeriesPayload,
-  AdminRejectPayload,
   CreateRoomResourcePayload,
   InternalReservedUseCreatePayload,
   ListAvailabilityBlocksParams,
@@ -36,36 +35,6 @@ export class StudioRentalAdminAPI {
       path: '/admin/studio-rentals/series',
       method: 'GET',
       params: payload,
-    });
-  }
-
-  async adminApproveRequest(id: string) {
-    return this.httpClient.callNoError<RentalRequest>({
-      path: `/admin/studio-rentals/requests/${id}/approve`,
-      method: 'POST',
-    });
-  }
-
-  async adminRejectRequest(id: string, payload: AdminRejectPayload) {
-    return this.httpClient.callNoError<RentalRequest, AdminRejectPayload>({
-      path: `/admin/studio-rentals/requests/${id}/reject`,
-      method: 'POST',
-      data: payload,
-    });
-  }
-
-  async adminApproveSeries(id: string) {
-    return this.httpClient.callNoError<RentalSeries>({
-      path: `/admin/studio-rentals/series/${id}/approve`,
-      method: 'POST',
-    });
-  }
-
-  async adminRejectSeries(id: string, payload: AdminRejectPayload) {
-    return this.httpClient.callNoError<RentalSeries, AdminRejectPayload>({
-      path: `/admin/studio-rentals/series/${id}/reject`,
-      method: 'POST',
-      data: payload,
     });
   }
 

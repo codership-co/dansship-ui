@@ -10,6 +10,7 @@ import { DoorCodeAdminAPI } from './door-code/door-code.admin.api';
 import { FiguresAdminAPI } from './figures/figures.admin.api';
 import { FiguresAPI } from './figures/figures.api';
 import { GiftsAPI } from './gifts/gifts.api';
+import { InstructorPaymentsAdminAPI, InstructorPaymentsAPI } from './instructor-payments/instructor-payments.api';
 import { InstructorsAdminAPI } from './instructors/instructors.admin.api';
 import { InstructorsAPI } from './instructors/instructors.api';
 import { InventoryAdminApi } from './inventory/inventory.admin.api';
@@ -56,6 +57,8 @@ export class DansshipAPI {
   static figures = new FiguresAPI(this.httpClient);
   static figuresAdmin = new FiguresAdminAPI(this.httpClient);
   static gifts = new GiftsAPI(this.httpClient);
+  static instructorPayments = new InstructorPaymentsAPI(this.httpClient);
+  static instructorPaymentsAdmin = new InstructorPaymentsAdminAPI(this.httpClient);
   static instructors = new InstructorsAPI(this.httpClient);
   static instructorsAdmin = new InstructorsAdminAPI(this.httpClient);
   static inventoryAdmin = new InventoryAdminApi(this.httpClient);

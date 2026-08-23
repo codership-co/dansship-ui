@@ -21,6 +21,7 @@ export interface AuthUser {
   roles?: Array<string>;
   permissions?: Array<string>;
   has_instructor_profile?: boolean;
+  cuenta_de_cobro_enabled?: boolean | null;
   profile_completion_percent?: number;
   instructor_profile?: {
     id: string;
@@ -64,6 +65,7 @@ export interface User {
   onboardingPendingSteps?: Array<string>;
   updatedAt?: string;
   hasInstructorProfile?: boolean;
+  cuentaDeCobroEnabled?: boolean | null;
   profileCompletionPercent?: number;
   instructorProfile?: {
     id: string;

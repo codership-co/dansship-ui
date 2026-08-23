@@ -22,15 +22,18 @@ import { cn, formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
 
 interface CheckoutPaymentProofFormProps {
-  plan: PublicPlan;
+  plan?: PublicPlan;
   paymentMethod: PaymentMethod;
   finalPrice: number;
   amountToCharge: number;
   walletAmountApplied: number;
   onClose: () => void;
   onBack: () => void;
-  checkoutData: CheckoutFormValues;
+  checkoutData?: CheckoutFormValues;
   onSubmit: (intentId: string) => void;
+  summaryTitle?: string;
+  currency?: string;
+  onCreateIntent?: () => Promise<string | null>;
 }
 
 export function CheckoutPaymentProofForm({
@@ -43,6 +46,9 @@ export function CheckoutPaymentProofForm({
   onBack,
   checkoutData,
   onSubmit,
+  summaryTitle,
+  currency,
+  onCreateIntent,
 }: CheckoutPaymentProofFormProps) {
   const { t } = useTranslation();
   const { call: createIntent, isLoading: isCreating } = useCallablePromise((payload: CreatePaymentIntentPayload) =>
@@ -51,20 +57,99 @@ export function CheckoutPaymentProofForm({
   const { call: createBoldCheckout, isLoading: isCreatingBoldCheckout } = useCallablePromise(
     (payload: CreatePaymentIntentPayload) => DansshipAPI.payments.createBoldCheckout(payload),
   );
+  const { call: createBoldCheckoutForIntent, isLoading: isCreatingLinkedBoldCheckout } = useCallablePromise(
+    (intentId: string) => DansshipAPI.payments.createBoldCheckoutForIntent(intentId),
+  );
   const { call: uploadProof, isLoading: isUploadingProof } = useCallablePromise((id: string, file: File) =>
     DansshipAPI.payments.uploadProof(id, file),
   );
   const isWalletMethod = paymentMethod === PaymentMethod.WALLET || amountToCharge === 0;
   const isCardMethod = paymentMethod === PaymentMethod.CARD && !isWalletMethod;
   const requiresProof = paymentMethod === PaymentMethod.TRANSFER && !isWalletMethod;
-  const isBusy = isCreating || isCreatingBoldCheckout || isUploadingProof;
+  const [isCreatingLinked, setIsCreatingLinked] = useState(false);
+  const isBusy =
+    isCreating || isCreatingBoldCheckout || isUploadingProof || isCreatingLinked || isCreatingLinkedBoldCheckout;
   const [selectedProofFile, setSelectedProofFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const displayTitle = summaryTitle ?? plan?.name ?? '';
+  const displayCurrency = currency ?? plan?.currency ?? 'COP';
 
   const onConfirm = async () => {
     if (requiresProof && !selectedProofFile) {
       toast.error(t('payments:proofRequiredTitle'));
 
+      return;
+    }
+
+    if (onCreateIntent) {
+      setIsCreatingLinked(true);
+
+      try {
+        const intentId = await onCreateIntent();
+
+        if (!intentId) {
+          return;
+        }
+
+        if (isCardMethod) {
+          const { data, ok, error } = await withSentrySpan(
+            'checkout.bold',
+            'ui.action',
+            { intent_id: intentId, payment_method: paymentMethod },
+            () => createBoldCheckoutForIntent(intentId),
+          );
+
+          if (!ok) {
+            toast.error(t('payments:createFailedDesc'));
+            captureUnexpectedException(error ?? new Error('Bold checkout intent create failed'), {
+              tags: { flow: 'checkout.bold', intent_id: intentId },
+            });
+
+            return;
+          }
+
+          try {
+            onClose();
+            addSentryBreadcrumb('checkout.bold', 'Opening Bold embedded checkout', { intent_id: intentId });
+
+            void openBoldEmbeddedCheckout(data.checkout).catch(boldError => {
+              toast.error(t('payments:boldLoadFailed'));
+              captureUnexpectedException(boldError, {
+                tags: { flow: 'checkout.bold.open', intent_id: intentId },
+              });
+            });
+          } catch (boldError) {
+            toast.error(t('payments:boldLoadFailed'));
+            captureUnexpectedException(boldError, {
+              tags: { flow: 'checkout.bold.open', intent_id: intentId },
+            });
+          }
+
+          return;
+        }
+
+        if (requiresProof && selectedProofFile) {
+          try {
+            await withSentrySpan('checkout.proofUpload', 'ui.action', { intent_id: intentId }, () =>
+              uploadProof(intentId, selectedProofFile),
+            );
+          } catch (uploadError) {
+            toast.error(t('payments:proofUploadFailed'));
+            captureUnexpectedException(uploadError, {
+              tags: { flow: 'checkout.proofUpload', intent_id: intentId },
+            });
+          }
+        }
+
+        onSubmit(intentId);
+      } finally {
+        setIsCreatingLinked(false);
+      }
+
+      return;
+    }
+
+    if (!plan || !checkoutData) {
       return;
     }
 
@@ -193,21 +278,21 @@ export function CheckoutPaymentProofForm({
       <section className='grid gap-8 content-start'>
         <section className={cn('grid gap-8', isCardMethod && 'lg:grid-cols-2')}>
           <div className='rounded-md border border-secondary bg-secondary-400/40 py-2 px-4'>
-            <label className='block'>{plan.name}</label>
+            <label className='block'>{displayTitle}</label>
             <label className='block'>
-              {t('payments:total')}: {formatPrice(finalPrice, plan.currency)}
+              {t('payments:total')}: {formatPrice(finalPrice, displayCurrency)}
             </label>
             {walletAmountApplied > 0 ? (
               <>
                 <label className='block text-primary'>
-                  {t('subscriptions:walletApplied')}: -{formatPrice(walletAmountApplied, plan.currency)}
+                  {t('subscriptions:walletApplied')}: -{formatPrice(walletAmountApplied, displayCurrency)}
                 </label>
                 <label className='block font-semibold'>
-                  {t('subscriptions:amountToCharge')}: {formatPrice(amountToCharge, plan.currency)}
+                  {t('subscriptions:amountToCharge')}: {formatPrice(amountToCharge, displayCurrency)}
                 </label>
               </>
             ) : null}
-            {checkoutData.is_gift ? (
+            {plan && checkoutData?.is_gift ? (
               <div className='mt-2 grid gap-1 text-sm text-gray-700'>
                 <label className='block font-medium text-gray-900'>{t('gifts:checkoutGiftSummaryTitle')}</label>
                 <label className='block'>
@@ -227,7 +312,7 @@ export function CheckoutPaymentProofForm({
                 ) : null}
                 <label className='block text-gray-600'>{t('gifts:startDateGiftNote')}</label>
               </div>
-            ) : checkoutData.start_date ? (
+            ) : plan && checkoutData?.start_date ? (
               <label className='block'>
                 {t('payments:startDate')}: {format(checkoutData.start_date, 'yyyy-MM-dd')}
               </label>

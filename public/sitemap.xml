@@ -14,6 +14,7 @@
   <url><loc>https://dansship.com/payments/result</loc></url>
   <url><loc>https://dansship.com/studio-rental/browse</loc></url>
   <url><loc>https://dansship.com/studio-rental/requests</loc></url>
+  <url><loc>https://dansship.com/studio-rental/result</loc></url>
 
   <!-- Auth -->
   <url><loc>https://dansship.com/auth/login</loc></url>
