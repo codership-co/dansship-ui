@@ -1,6 +1,8 @@
 import { format, subDays } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ReportDateRange } from '@components/modules/admin-reports/report-date-range';
@@ -17,10 +19,12 @@ import {
   TableRow,
 } from '@components/ui';
 import { DansshipAPI } from '@core/api';
-import { usePromise } from '@hooks';
+import { PageURLS } from '@core/constants';
+import { useDateLocale, usePromise } from '@hooks';
 
 export function StudentReports() {
   const { t } = useTranslation();
+  const dateLocale = useDateLocale();
   const initialDateRange = {
     start: format(subDays(new Date(), 30), 'yyyy-MM-dd'),
     end: format(new Date(), 'yyyy-MM-dd'),
@@ -49,15 +53,34 @@ export function StudentReports() {
     true,
     deps,
   );
+  const { response: trialWithoutPlanData, isLoading: trialWithoutPlanLoading } = usePromise(
+    () => DansshipAPI.reportsAdmin.getTrialStudentsWithoutPlan(appliedDateRange.start, appliedDateRange.end),
+    true,
+    deps,
+  );
+  const { response: activeListData, isLoading: activeListLoading } = usePromise(
+    () => DansshipAPI.reportsAdmin.getActiveStudentsList(appliedDateRange.start, appliedDateRange.end),
+    true,
+    deps,
+  );
   const { response: usageData, isLoading: usageLoading } = usePromise(
     () => DansshipAPI.reportsAdmin.getSubscriptionUsage(appliedDateRange.start, appliedDateRange.end),
     true,
     deps,
   );
 
-  const isLoading = activeLoading || acquisitionLoading || renewalLoading || conversionLoading || usageLoading;
+  const isLoading =
+    activeLoading ||
+    acquisitionLoading ||
+    renewalLoading ||
+    conversionLoading ||
+    trialWithoutPlanLoading ||
+    activeListLoading ||
+    usageLoading;
   const conversion = conversionData?.data;
   const usage = usageData?.data;
+  const trialWithoutPlan = trialWithoutPlanData?.data?.items ?? [];
+  const activeList = activeListData?.data?.items ?? [];
 
   return (
     <div className='space-y-8'>
@@ -74,6 +97,86 @@ export function StudentReports() {
         </div>
       ) : (
         <div className='grid grid-cols-1 gap-8'>
+          <Card className='border-input shadow-sm'>
+            <CardHeader className='border-b border-gray-100 bg-gray-50/50 pb-4'>
+              <CardTitle className='text-lg text-gray-800'>{t('reports:students.trialWithoutPlanTitle')}</CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-3 p-0'>
+              <p className='px-4 pt-4 text-sm text-gray-600'>{t('reports:students.trialWithoutPlanDescription')}</p>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('reports:students.student')}</TableHead>
+                    <TableHead>{t('reports:students.email')}</TableHead>
+                    <TableHead>{t('reports:students.trialGrantedAt')}</TableHead>
+                    <TableHead />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {trialWithoutPlan.length === 0 ? (
+                    <EmptyRow cols={4} />
+                  ) : (
+                    trialWithoutPlan.map(row => (
+                      <TableRow key={row.user_id}>
+                        <TableCell className='font-medium'>{row.student_name}</TableCell>
+                        <TableCell>{row.email}</TableCell>
+                        <TableCell>
+                          {format(new Date(row.trial_granted_at), 'MMM d, yyyy', { locale: dateLocale })}
+                        </TableCell>
+                        <TableCell className='text-right'>
+                          <Link to={PageURLS.admin.userDetails(row.user_id)} viewTransition>
+                            <Button color='primary' size='small' variant='flat' className='whitespace-nowrap'>
+                              {t('reports:students.viewStudent')}
+                            </Button>
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <Card className='border-input shadow-sm'>
+            <CardHeader className='border-b border-gray-100 bg-gray-50/50 pb-4'>
+              <CardTitle className='text-lg text-gray-800'>{t('reports:students.activeListTitle')}</CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-3 p-0'>
+              <p className='px-4 pt-4 text-sm text-gray-600'>{t('reports:students.activeListDescription')}</p>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('reports:students.student')}</TableHead>
+                    <TableHead>{t('reports:students.email')}</TableHead>
+                    <TableHead>{t('reports:students.plans')}</TableHead>
+                    <TableHead />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {activeList.length === 0 ? (
+                    <EmptyRow cols={4} />
+                  ) : (
+                    activeList.map(row => (
+                      <TableRow key={row.user_id}>
+                        <TableCell className='font-medium'>{row.student_name}</TableCell>
+                        <TableCell>{row.email}</TableCell>
+                        <TableCell>{row.plans.join(', ')}</TableCell>
+                        <TableCell className='text-right'>
+                          <Link to={PageURLS.admin.userDetails(row.user_id)} viewTransition>
+                            <Button color='primary' size='small' variant='flat' className='whitespace-nowrap'>
+                              {t('reports:students.viewStudent')}
+                            </Button>
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
           <Card className='border-input shadow-sm'>
             <CardHeader className='border-b border-gray-100 bg-gray-50/50 pb-4'>
               <CardTitle className='text-lg text-gray-800'>{t('reports:students.activeTitle')}</CardTitle>

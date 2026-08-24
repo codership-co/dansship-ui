@@ -3,6 +3,7 @@ import { HttpClient } from 'polpo-http-client';
 import { DansshipAPIError } from '@core/api';
 
 import type {
+  ActiveStudentsListReport,
   ActiveStudentsReport,
   AcquisitionReport,
   AttendanceReport,
@@ -13,6 +14,7 @@ import type {
   GiftValueReport,
   InstructorCancellationReport,
   InstructorPerformanceReport,
+  NetRevenueByClassTypeReport,
   OccupancyFilters,
   RenewalChurnReport,
   RevenueIndicatorsReport,
@@ -22,6 +24,7 @@ import type {
   SubscriptionUsageReport,
   TaxCollectedReport,
   TrialConversionReport,
+  TrialStudentsWithoutPlanReport,
   UnderutilizedScheduleReport,
   WalletLiabilityReport,
 } from './reports.models';
@@ -162,6 +165,30 @@ export class ReportsAdminAPI {
   async getTrialConversion(startDate?: string, endDate?: string) {
     return this.httpClient.callNoError<TrialConversionReport>({
       path: '/admin/reports/trial-conversion',
+      method: 'GET',
+      params: this.dateParams(startDate, endDate),
+    });
+  }
+
+  async getTrialStudentsWithoutPlan(startDate?: string, endDate?: string) {
+    return this.httpClient.callNoError<TrialStudentsWithoutPlanReport>({
+      path: '/admin/reports/trial-students-without-plan',
+      method: 'GET',
+      params: this.dateParams(startDate, endDate),
+    });
+  }
+
+  async getActiveStudentsList(startDate?: string, endDate?: string) {
+    return this.httpClient.callNoError<ActiveStudentsListReport>({
+      path: '/admin/reports/active-students-list',
+      method: 'GET',
+      params: this.dateParams(startDate, endDate),
+    });
+  }
+
+  async getNetRevenueByClassType(startDate?: string, endDate?: string) {
+    return this.httpClient.callNoError<NetRevenueByClassTypeReport>({
+      path: '/admin/reports/net-revenue-by-class-type',
       method: 'GET',
       params: this.dateParams(startDate, endDate),
     });

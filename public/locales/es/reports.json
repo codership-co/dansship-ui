@@ -135,7 +135,23 @@
     "remaining": "Clases restantes",
     "avgRemaining": "Promedio restantes",
     "expirationRate": "Tasa de vencimiento",
-    "renewalRate": "Tasa de renovación"
+    "renewalRate": "Tasa de renovación",
+    "trialWithoutPlanTitle": "Prueba sin plan (seguimiento)",
+    "trialWithoutPlanDescription": "Estudiantes con clase de prueba en el período que no compraron un plan en los 30 días siguientes.",
+    "trialGrantedAt": "Prueba otorgada",
+    "student": "Estudiante",
+    "email": "Correo",
+    "viewStudent": "Ver estudiante",
+    "activeListTitle": "Estudiantes activos y sus planes",
+    "activeListDescription": "Estudiantes con al menos una suscripción activa (no sistema). Los filtros de fecha no aplican.",
+    "plans": "Planes"
+  },
+  "classTypeNetRevenue": {
+    "title": "Ingreso neto por tipo de clase",
+    "description": "Valor proporcional por reserva a partir del pago del plan (base − billetera) / clases incluidas. Las reservas de clases bono valen cero.",
+    "classType": "Tipo de clase",
+    "bookings": "Reservas",
+    "netRevenue": "Ingreso neto"
   },
   "rentals": {
     "revenueTitle": "Ingresos de alquiler",

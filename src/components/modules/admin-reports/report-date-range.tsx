@@ -64,6 +64,12 @@ export function ReportDateRange({ dateRange, appliedDateRange, onDateRangeChange
 
 export function formatMoney(value: string | number | undefined): string {
   const amount = typeof value === 'number' ? value : parseFloat(value ?? '0');
+  const safe = Number.isFinite(amount) ? amount : 0;
+  const negative = safe < 0;
+  const absolute = Math.abs(safe);
+  const [integerPart, fractionPart = '00'] = absolute.toFixed(2).split('.');
+  const withThousands = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  const formatted = fractionPart === '00' ? `$${withThousands}` : `$${withThousands},${fractionPart}`;
 
-  return `$${Number.isFinite(amount) ? amount.toFixed(2) : '0.00'}`;
+  return negative ? `-${formatted}` : formatted;
 }

@@ -67,6 +67,11 @@ export function FinancialReports() {
     true,
     deps,
   );
+  const { response: classTypeNetData, isLoading: classTypeNetLoading } = usePromise(
+    () => DansshipAPI.reportsAdmin.getNetRevenueByClassType(appliedDateRange.start, appliedDateRange.end),
+    true,
+    deps,
+  );
 
   const cash = cashData?.data;
   const tax = taxData?.data;
@@ -74,7 +79,15 @@ export function FinancialReports() {
   const gifts = giftData?.data;
   const benefits = benefitData?.data?.counts;
   const pricing = pricingData?.data;
-  const isLoading = cashLoading || taxLoading || walletLoading || giftLoading || benefitLoading || pricingLoading;
+  const classTypeNet = classTypeNetData?.data?.items ?? [];
+  const isLoading =
+    cashLoading ||
+    taxLoading ||
+    walletLoading ||
+    giftLoading ||
+    benefitLoading ||
+    pricingLoading ||
+    classTypeNetLoading;
 
   const giftRows = useMemo(() => (gifts ? [gifts.pending_claim, gifts.claimed, gifts.expired] : []), [gifts]);
 
@@ -317,6 +330,37 @@ export function FinancialReports() {
                         <TableCell>{row.week}</TableCell>
                         <TableCell className='text-right'>{row.subscription_count}</TableCell>
                         <TableCell className='text-right'>{formatMoney(row.net_revenue)}</TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <Card className='border-input shadow-sm'>
+            <CardHeader className='border-b border-gray-100 bg-gray-50/50 pb-4'>
+              <CardTitle className='text-lg text-gray-800'>{t('reports:classTypeNetRevenue.title')}</CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-3 p-0'>
+              <p className='px-4 pt-4 text-sm text-gray-600'>{t('reports:classTypeNetRevenue.description')}</p>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('reports:classTypeNetRevenue.classType')}</TableHead>
+                    <TableHead className='text-right'>{t('reports:classTypeNetRevenue.bookings')}</TableHead>
+                    <TableHead className='text-right'>{t('reports:classTypeNetRevenue.netRevenue')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {classTypeNet.length === 0 ? (
+                    <EmptyRow cols={3} />
+                  ) : (
+                    classTypeNet.map(row => (
+                      <TableRow key={row.class_definition_id}>
+                        <TableCell className='font-medium'>{row.class_type_name}</TableCell>
+                        <TableCell className='text-right'>{row.booking_count}</TableCell>
+                        <TableCell className='text-right font-semibold'>{formatMoney(row.net_revenue)}</TableCell>
                       </TableRow>
                     ))
                   )}
