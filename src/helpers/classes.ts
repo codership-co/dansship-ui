@@ -1,3 +1,4 @@
+import { isPastBookingDeadline } from './booking-eligibility';
 import { addDaysToFormat, toColombiaDateKey } from './date';
 
 import { MyBooking, PublishedClass, ScheduledClass } from '@core/api';
@@ -48,6 +49,10 @@ export const resolveActiveBookingDay = <T extends ScheduledClass>(
   return days.find(day => day.classes.length > 0);
 };
 
+/** 0 = still bookable; 1 = past booking deadline or cancelled. */
+const availabilityRank = (scheduledClass: ScheduledClass): number =>
+  !scheduledClass.is_cancelled && !isPastBookingDeadline(scheduledClass.start_time) ? 0 : 1;
+
 export const sortClassesByDay = <T extends ScheduledClass>(
   classes: Array<T>,
   weekMonday: string,
@@ -66,9 +71,15 @@ export const sortClassesByDay = <T extends ScheduledClass>(
 
   return Object.entries(rangeDays).map(([day, dayClasses]) => ({
     day,
-    classes: dayClasses.sort(
-      (first, second) => new Date(first.start_time).getTime() - new Date(second.start_time).getTime(),
-    ),
+    classes: dayClasses.sort((first, second) => {
+      const byAvailability = availabilityRank(first) - availabilityRank(second);
+
+      if (byAvailability !== 0) {
+        return byAvailability;
+      }
+
+      return new Date(first.start_time).getTime() - new Date(second.start_time).getTime();
+    }),
   }));
 };
 
