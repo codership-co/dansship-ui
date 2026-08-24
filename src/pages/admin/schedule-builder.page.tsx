@@ -5,10 +5,10 @@ import { LuChevronLeft, LuChevronRight } from 'react-icons/lu';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
-import { ClassSlotModal, ScheduleGrid } from '@components/modules';
+import { ClassSlotModal, CopyWeekDialog, ScheduleGrid } from '@components/modules';
 import { Button } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
-import { DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError, ScheduledClass } from '@core/api';
+import { DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError, ScheduledClass, type ScheduleWeek } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions, PERMISSION } from '@core/permissions';
 import { useClasses, usePromise, useRooms, useSchedules } from '@hooks';
@@ -53,6 +53,7 @@ function AdminScheduleBuilderPage() {
   const [currentDate, setCurrentDate] = useState<Date>(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPublishConfirmOpen, setIsPublishConfirmOpen] = useState(false);
+  const [isCopyWeekOpen, setIsCopyWeekOpen] = useState(false);
   const [editingClass, setEditingClass] = useState<ScheduledClass | null>(null);
   const [defaultSlot, setDefaultSlot] = useState<{ date: string; time: string } | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -73,14 +74,20 @@ function AdminScheduleBuilderPage() {
     editPublishedClass,
     cancelPublishedClass,
     removeClass,
+    copyWeekToNext,
     isPublishing,
     isCreatingClass,
     isUpdatingClass,
     isEditingPublishedClass,
     isCancellingPublishedClass,
     isRemovingClass,
+    isCopyingWeek,
   } = useSchedules({ weekStartDate: selectedWeekDate });
   const weekObj = useMemo(() => weeks.find(w => w.week_start_date === selectedWeekDate), [weeks, selectedWeekDate]);
+  const destinationWeekStart = useMemo(
+    () => format(addWeeks(startOfWeek(new Date(), { weekStartsOn: 1 }), 1), 'yyyy-MM-dd'),
+    [],
+  );
   const { rooms } = useRooms();
   const { classes } = useClasses();
 
@@ -246,6 +253,11 @@ function AdminScheduleBuilderPage() {
     setIsPublishConfirmOpen(false);
   };
 
+  const handleCopyWeekSuccess = (week: ScheduleWeek) => {
+    const [year, month, day] = week.week_start_date.split('-').map(Number);
+    setCurrentDate(startOfWeek(new Date(year, month - 1, day), { weekStartsOn: 1 }));
+  };
+
   if (isLoadingWeeks) {
     return (
       <div className='flex justify-center py-12 pt-20'>
@@ -317,6 +329,12 @@ function AdminScheduleBuilderPage() {
                 </Button>
               </div>
 
+              {canEditDraftSchedule && (
+                <Button type='button' variant='outline' onClick={() => setIsCopyWeekOpen(true)}>
+                  {t('schedules:copyWeek.button')}
+                </Button>
+              )}
+
               {weekObj?.status === 'draft' && canManageFullSchedule && (
                 <Button onClick={handlePublish} disabled={isPublishing}>
                   {t('schedules:publishSchedule')}
@@ -368,6 +386,17 @@ function AdminScheduleBuilderPage() {
         description={t('schedules:publishConfirm')}
         confirmLabel={t('schedules:publish')}
         isLoading={isPublishing}
+      />
+
+      <CopyWeekDialog
+        open={isCopyWeekOpen}
+        onOpenChange={setIsCopyWeekOpen}
+        weeks={weeks}
+        destinationWeekStart={destinationWeekStart}
+        defaultSourceWeekId={selectedWeekId || undefined}
+        isLoading={isCopyingWeek}
+        onConfirm={copyWeekToNext}
+        onSuccess={handleCopyWeekSuccess}
       />
     </div>
   );

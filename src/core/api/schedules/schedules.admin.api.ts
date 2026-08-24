@@ -6,6 +6,7 @@ import type {
   AddClassPayload,
   AgendaEvent,
   CancelPublishedClassPayload,
+  CopyWeekPayload,
   EditPublishedClassPayload,
   GetAgendaEventsPayload,
   GetWeeksPayload,
@@ -59,6 +60,14 @@ export class SchedulesAdminAPI {
     return this.httpClient.callNoError<ScheduleWeek>({
       path: `/admin/schedules/weeks/${weekId}/archive`,
       method: 'POST',
+    });
+  }
+
+  async copyWeek(payload: CopyWeekPayload) {
+    return this.httpClient.callNoError<ScheduleWeek, CopyWeekPayload>({
+      path: '/admin/schedules/weeks/copy',
+      method: 'POST',
+      data: payload,
     });
   }
 
