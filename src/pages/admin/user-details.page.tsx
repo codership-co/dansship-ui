@@ -6,10 +6,12 @@ import {
   AdminPaymentList,
   UserBenefitsTab,
   UserBookingsTab,
+  UserChannelsSection,
   UserDetails,
   UserDetailsActions,
   UserDetailsHeader,
   UserInstructorClassesTab,
+  UserNotesTab,
   UserPaymentDocumentsTab,
   UserRolesManager,
   UserSubscriptionsTab,
@@ -28,6 +30,7 @@ const PAYMENTS_TAB = 'payments';
 const BOOKINGS_TAB = 'bookings';
 const BENEFITS_TAB = 'benefits';
 const WALLET_TAB = 'wallet';
+const NOTES_TAB = 'notes';
 const PAYMENT_DOCUMENTS_TAB = 'payment-documents';
 const INSTRUCTOR_CLASSES_TAB = 'instructor-classes';
 
@@ -44,15 +47,18 @@ function UserDetailsPage() {
   const canManageBookings = useOrPermissions(AdminPermissions.bookings);
   const canReadBenefits = useOrPermissions(AdminPermissions.benefits);
   const canManageWallet = useOrPermissions(AdminPermissions.wallet);
+  const canManageUserContext = useOrPermissions(AdminPermissions.userContext);
   const canManageSchedule = useOrPermissions([PERMISSION.SCHEDULE_MANAGE]);
   const canReadPaymentDocuments = useOrPermissions([PERMISSION.INSTRUCTOR_PAYMENT_DOCUMENT_READ]);
   const canVoidPaymentDocuments = useOrPermissions([PERMISSION.INSTRUCTOR_PAYMENT_DOCUMENT_VOID]);
   const showInstructorClasses = Boolean(user?.has_instructor_profile) && canManageSchedule;
   const showPaymentDocuments = Boolean(user?.has_instructor_profile) && canReadPaymentDocuments;
 
-  const requestedTab = searchParams.get('tab') ?? PROFILE_TAB;
+  const requestedTabParam = searchParams.get('tab');
+  const requestedTab = requestedTabParam === 'context' ? NOTES_TAB : (requestedTabParam ?? PROFILE_TAB);
   const availableTabs = [
     PROFILE_TAB,
+    ...(canManageUserContext ? [NOTES_TAB] : []),
     ...(canManageSubscriptions ? [SUBSCRIPTIONS_TAB] : []),
     ...(canManagePayments ? [PAYMENTS_TAB] : []),
     ...(canManageBookings ? [BOOKINGS_TAB] : []),
@@ -98,6 +104,9 @@ function UserDetailsPage() {
           >
             <TabsList className='mb-4 h-auto flex-wrap gap-1 border border-gray-200 bg-white p-1 shadow-sm'>
               <TabsTrigger value={PROFILE_TAB}>{t('admin:users.details.tabs.profile')}</TabsTrigger>
+              {canManageUserContext ? (
+                <TabsTrigger value={NOTES_TAB}>{t('admin:users.details.tabs.notes')}</TabsTrigger>
+              ) : null}
               {canManageSubscriptions ? (
                 <TabsTrigger value={SUBSCRIPTIONS_TAB}>{t('admin:users.details.tabs.subscriptions')}</TabsTrigger>
               ) : null}
@@ -129,10 +138,17 @@ function UserDetailsPage() {
               {activeTab === PROFILE_TAB ? (
                 <div className='grid gap-6'>
                   <UserDetails user={user} isLoading={isLoading} hasError={hasError} />
+                  {canManageUserContext && userId ? <UserChannelsSection userId={userId} /> : null}
                   {userId ? <UserRolesManager userId={userId} onChanged={() => void reFetch()} /> : null}
                 </div>
               ) : null}
             </TabsContent>
+
+            {canManageUserContext ? (
+              <TabsContent value={NOTES_TAB}>
+                {activeTab === NOTES_TAB && userId ? <UserNotesTab userId={userId} /> : null}
+              </TabsContent>
+            ) : null}
 
             {canManageSubscriptions ? (
               <TabsContent value={SUBSCRIPTIONS_TAB}>
