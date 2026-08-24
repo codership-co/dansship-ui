@@ -7,6 +7,8 @@ export * from './ui.page';
 export * from './legal.page';
 export * from './classes.page';
 export * from './instructor.page';
+export * from './instructor-student-profile.page';
+
 export * from './figures.page';
 export * from './figure-saved.page';
 export * from './figures-details.page';

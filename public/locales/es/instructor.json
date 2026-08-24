@@ -75,5 +75,17 @@
     "dismissBanner": "Cerrar",
     "nextAvailable": "Próximo disponible",
     "classCancelledBadge": "Cancelada"
+  },
+  "studentProfile": {
+    "title": "Perfil del alumno",
+    "subtitle": "Información de onboarding para adaptar la clase.",
+    "backToSchedule": "Volver al horario",
+    "fullName": "Nombre completo",
+    "goals": "Objetivo",
+    "disciplines": "Disciplinas de interés",
+    "currentLevel": "Nivel actual",
+    "noData": "Sin información",
+    "notFound": "No se pudo cargar el perfil de este alumno.",
+    "loading": "Cargando perfil..."
   }
 }

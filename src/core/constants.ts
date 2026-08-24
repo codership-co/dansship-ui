@@ -105,6 +105,7 @@ export const PageURLS = {
   },
   instructor: {
     root: '/instructor',
+    studentProfile: (classId: string, userId: string) => `/instructor/classes/${classId}/roster/${userId}`,
   },
   admin: {
     root: '/admin',

@@ -2,10 +2,14 @@ import { format } from 'date-fns';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuCircleCheck, LuSearch, LuCircleX } from 'react-icons/lu';
+import { Link } from 'react-router';
 
 import { SpinnerLoader, Spinner } from '@components/loaders';
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Input } from '@components/ui';
+import { useOrPermissions } from '@contexts';
 import { DansshipAPI, InstructorUserSearchResult, RosterStudent } from '@core/api';
+import { PageURLS } from '@core/constants';
+import { InstructorPermissions } from '@core/permissions';
 import { captureUnexpectedException } from '@core/sentry';
 import { useDateLocale, usePromise, useInstructorRoster } from '@hooks';
 
@@ -17,6 +21,25 @@ interface ClassRosterProps {
 
 function studentDisplayName(student: RosterStudent) {
   return student.user_name || student.user_email || student.user_id;
+}
+
+function StudentName({ classId, student }: { classId: string; student: RosterStudent }) {
+  const canViewProfile = useOrPermissions(InstructorPermissions.studentProfile);
+  const name = studentDisplayName(student);
+
+  if (!canViewProfile) {
+    return name;
+  }
+
+  return (
+    <Link
+      to={PageURLS.instructor.studentProfile(classId, student.user_id)}
+      viewTransition
+      className='text-primary font-semibold hover:underline'
+    >
+      {name}
+    </Link>
+  );
 }
 
 interface AttendanceActionsProps {
@@ -245,7 +268,9 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
             enrolled.map(student => (
               <article key={student.id} className='rounded-xl border border-gray-200 bg-white p-4 grid gap-3'>
                 <div className='grid gap-1 min-w-0'>
-                  <p className='m-0 font-semibold text-gray-900 truncate'>{studentDisplayName(student)}</p>
+                  <p className='m-0 font-semibold text-gray-900 truncate'>
+                    <StudentName classId={classId} student={student} />
+                  </p>
                   <p className='m-0 text-sm text-gray-500 truncate'>{student.user_email || '-'}</p>
                 </div>
                 <AttendanceActions
@@ -280,7 +305,9 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
               ) : (
                 enrolled.map(student => (
                   <TableRow key={student.id}>
-                    <TableCell className='font-medium'>{studentDisplayName(student)}</TableCell>
+                    <TableCell className='font-medium'>
+                      <StudentName classId={classId} student={student} />
+                    </TableCell>
                     <TableCell>{student.user_email || '-'}</TableCell>
                     <TableCell className='text-right'>
                       <AttendanceActions
