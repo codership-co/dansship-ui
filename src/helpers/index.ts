@@ -9,6 +9,7 @@ export * from './delay-promise';
 export * from './figure-mappers';
 export * from './figure-utils';
 export * from './language';
+export * from './messaging-links';
 export * from './payments';
 export * from './plans';
 export * from './role-redirect';

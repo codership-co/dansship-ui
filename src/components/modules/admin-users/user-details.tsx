@@ -7,7 +7,7 @@ import { SpinnerLoader } from '@components/loaders';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { type AdminUserDetailsResponse, type AdminUserHealthProfile, type AdminUserPreferences } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { formatDate } from '@helpers';
+import { buildRegisteredPhoneWhatsAppLink, formatDate } from '@helpers';
 
 interface UserDetailsHeaderProps {
   userId: string;
@@ -60,7 +60,7 @@ function displayList(values: Array<string> | null | undefined): string {
   return values.join(', ');
 }
 
-function DetailField({ label, value }: { label: string; value: string }) {
+function DetailField({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div>
       <dt className='text-xs uppercase tracking-[0.06em] text-muted-foreground'>{label}</dt>
@@ -170,10 +170,11 @@ export function UserDetails({ user, isLoading, hasError }: UserDetailsProps) {
     );
   }
 
-  const phone =
+  const phoneLabel =
     user.phone_country_code || user.phone_number
       ? `${user.phone_country_code ?? ''} ${user.phone_number ?? ''}`.trim()
       : '-';
+  const phoneHref = buildRegisteredPhoneWhatsAppLink(user.phone_country_code, user.phone_number);
   const document =
     user.document_type || user.document_value ? `${user.document_type ?? ''} ${user.document_value ?? ''}`.trim() : '-';
   const instructor = user.instructor_profile;
@@ -190,7 +191,23 @@ export function UserDetails({ user, isLoading, hasError }: UserDetailsProps) {
           label={t('admin:users.details.birthDate')}
           value={user.birth_date ? formatDate(user.birth_date, i18n.language) : '-'}
         />
-        <DetailField label={t('admin:users.details.phoneNumber')} value={phone} />
+        <DetailField
+          label={t('admin:users.details.phoneNumber')}
+          value={
+            phoneHref ? (
+              <a
+                href={phoneHref}
+                target='_blank'
+                rel='noreferrer'
+                className='text-primary underline underline-offset-2'
+              >
+                {phoneLabel}
+              </a>
+            ) : (
+              phoneLabel
+            )
+          }
+        />
         <DetailField label={t('admin:users.details.documentNumber')} value={document} />
         <DetailField label={t('admin:users.details.city')} value={displayValue(user.city)} />
         <DetailField label={t('admin:users.details.address')} value={displayValue(user.address)} />

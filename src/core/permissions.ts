@@ -10,6 +10,7 @@ export enum PERMISSION {
   // USERS
   USER_READ = 'read:user',
   USER_MANAGE = 'manage:user',
+  USER_CONTEXT_MANAGE = 'manage:user_context',
 
   // ATTENDANCE
   ATTENDANCE_MARK = 'mark:attendance',
@@ -134,6 +135,7 @@ export const StudentPermissions = {
 
 export const AdminPermissions = {
   users: [PERMISSION.USER_MANAGE],
+  userContext: [PERMISSION.USER_CONTEXT_MANAGE],
   roles: [PERMISSION.ROLE_MANAGE],
   scheduleBuilder: [PERMISSION.SCHEDULE_MANAGE, PERMISSION.SCHEDULE_DRAFT_CREATE],
   scheduleManage: [PERMISSION.SCHEDULE_MANAGE],

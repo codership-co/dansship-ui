@@ -35,7 +35,7 @@
     "title": "Gestión de Usuarios",
     "subtitle": "Consulta usuarios y abre el detalle de uno para revisar su información.",
     "searchLabel": "Buscar usuario",
-    "searchPlaceholder": "Correo, teléfono o nombre (mín. 3 caracteres)",
+    "searchPlaceholder": "Correo, teléfono, nombre o identificador de canal (mín. 3 caracteres)",
     "instructorFilter": "Solo instructores",
     "loading": "Cargando usuarios...",
     "empty": "No hay usuarios para mostrar.",
@@ -114,6 +114,7 @@
       },
       "tabs": {
         "profile": "Perfil",
+        "notes": "Notas",
         "subscriptions": "Suscripciones",
         "payments": "Pagos",
         "bookings": "Reservas",
@@ -168,6 +169,38 @@
           "manual": "Manual",
           "checkout_apply": "Compra de plan",
           "checkout_reversal": "Reverso de compra"
+        }
+      },
+      "notesAndChannels": {
+        "notesTitle": "Notas internas",
+        "noteLabel": "Nota",
+        "notePlaceholder": "Observación para el equipo interno",
+        "addNote": "Agregar nota",
+        "notesEmpty": "Este usuario no tiene notas internas.",
+        "unknownAuthor": "Autor desconocido",
+        "noteSuccess": "Nota agregada.",
+        "noteFailed": "No se pudo agregar la nota.",
+        "confirmNoteTitle": "¿Agregar esta nota?",
+        "confirmNoteDescription": "La nota quedará registrada de forma permanente. No se puede editar ni eliminar.",
+        "channelsTitle": "Canales de Meta Business",
+        "platform": "Plataforma",
+        "identifier": "Identificador",
+        "identifierPlaceholder": "Número, @usuario o handle",
+        "addChannel": "Agregar canal",
+        "channelsEmpty": "Este usuario no tiene canales registrados.",
+        "markFavorite": "Marcar como favorito",
+        "favoriteBadge": "Favorito",
+        "channelSuccess": "Canal agregado.",
+        "channelFailed": "No se pudo agregar el canal.",
+        "favoriteSuccess": "Canal marcado como favorito.",
+        "favoriteFailed": "No se pudo marcar el canal como favorito.",
+        "confirmChannelTitle": "¿Agregar este canal?",
+        "confirmChannelDescription": "Se registrará {{platform}} · {{identifier}} en el perfil del usuario.",
+        "confirmFavoriteTitle": "¿Marcar este canal como favorito?",
+        "confirmFavoriteDescription": "El favorito anterior se reemplazará por {{identifier}}.",
+        "platforms": {
+          "whatsapp": "WhatsApp",
+          "instagram": "Instagram"
         }
       },
       "paymentDocuments": {

@@ -7,4 +7,6 @@ export * from './user-bookings-tab';
 export * from './user-benefits-tab';
 export * from './user-instructor-classes-tab';
 export * from './user-wallet-tab';
+export * from './user-notes-tab';
+export * from './user-channels-section';
 export * from './user-payment-documents-tab';
