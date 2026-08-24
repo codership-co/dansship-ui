@@ -169,6 +169,39 @@ export interface TrialConversionReport {
   conversion_rate: number;
 }
 
+export interface TrialStudentWithoutPlanItem {
+  user_id: string;
+  student_name: string;
+  email: string;
+  trial_granted_at: string;
+}
+
+export interface TrialStudentsWithoutPlanReport {
+  items: Array<TrialStudentWithoutPlanItem>;
+}
+
+export interface ActiveStudentListItem {
+  user_id: string;
+  student_name: string;
+  email: string;
+  plans: Array<string>;
+}
+
+export interface ActiveStudentsListReport {
+  items: Array<ActiveStudentListItem>;
+}
+
+export interface NetRevenueByClassTypeItem {
+  class_definition_id: string;
+  class_type_name: string;
+  booking_count: number;
+  net_revenue: string;
+}
+
+export interface NetRevenueByClassTypeReport {
+  items: Array<NetRevenueByClassTypeItem>;
+}
+
 export interface SubscriptionUsageReport {
   active_subscriptions: number;
   total_remaining_classes: number;

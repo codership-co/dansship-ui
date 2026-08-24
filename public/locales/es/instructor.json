@@ -78,7 +78,7 @@
   },
   "studentProfile": {
     "title": "Perfil del alumno",
-    "subtitle": "Información de onboarding para adaptar la clase.",
+    "subtitle": "Información para adaptar la clase.",
     "backToSchedule": "Volver al horario",
     "fullName": "Nombre completo",
     "goals": "Objetivo",
