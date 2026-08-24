@@ -270,7 +270,19 @@ export function ScheduleGrid({
   }, [weekDate, locale]);
 
   const allEvents = useMemo(() => {
-    return events.length > 0 ? events : classes;
+    /*
+     * Schedule builder passes classes + rental overlay events separately; merge both.
+     * Other surfaces pass only one of the two props.
+     */
+    if (events.length === 0) {
+      return classes;
+    }
+
+    if (classes.length === 0) {
+      return events;
+    }
+
+    return [...classes, ...events];
   }, [events, classes]);
 
   allEventsRef.current = allEvents;

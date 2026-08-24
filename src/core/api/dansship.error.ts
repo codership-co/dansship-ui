@@ -52,6 +52,11 @@ export enum DANSSHIP_ERROR_CODE {
   INVALID_SCHEDULE_STATE = 'INVALID_SCHEDULE_STATE', // BUSINESS_RULE_VIOLATION = Schedule state transition is invalid (e.g., can only edit unpublished schedules) |
   AGENDA_INVALID_RANGE = 'AGENDA_INVALID_RANGE', // VALIDATION_ERROR = Invalid date range for agenda query (e.g., start_date > end_date) |
   AGENDA_ROOM_OCCUPANCY_CONFLICT = 'AGENDA_ROOM_OCCUPANCY_CONFLICT', // CONFLICT = Room occupancy rule violation (cross-domain scheduling conflict) |
+  SCHEDULE_WEEK_COPY_CONFLICT = 'SCHEDULE_WEEK_COPY_CONFLICT', // CONFLICT = Week copy rejected; see details.conflicting_classes |
+  SCHEDULE_WEEK_COPY_DESTINATION_NOT_EMPTY = 'SCHEDULE_WEEK_COPY_DESTINATION_NOT_EMPTY', // CONFLICT = Next week already has classes; copy does not merge |
+  SCHEDULE_WEEK_COPY_EMPTY_SOURCE = 'SCHEDULE_WEEK_COPY_EMPTY_SOURCE', // VALIDATION_ERROR = Source week has no classes to copy |
+  SCHEDULE_WEEK_COPY_AMBIGUOUS_SLOT = 'SCHEDULE_WEEK_COPY_AMBIGUOUS_SLOT', // VALIDATION_ERROR = Multiple active classes in the same copy slot |
+  SCHEDULE_WEEK_COPY_INVALID_SOURCE = 'SCHEDULE_WEEK_COPY_INVALID_SOURCE', // VALIDATION_ERROR = Source week cannot be copied onto itself |
 
   // Bookings
   CLASS_FULL = 'CLASS_FULL',

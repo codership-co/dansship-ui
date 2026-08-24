@@ -10,6 +10,7 @@ import {
   DansshipAPI,
   type CancelPublishedClassPayload,
   type EditPublishedClassPayload,
+  type ScheduleWeek,
   type UpdateClassPayload,
 } from '@core/api';
 
@@ -60,6 +61,9 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
   const { call: cancelPublishedClassPromise, isLoading: isCanceling } = useCallablePromise(
     (targetWeekId: string, classId: string, payload: CancelPublishedClassPayload) =>
       DansshipAPI.schedulesAdmin.cancelPublishedClass(targetWeekId, classId, payload),
+  );
+  const { call: copyWeekPromise, isLoading: isCopyingWeek } = useCallablePromise((sourceWeekId: string) =>
+    DansshipAPI.schedulesAdmin.copyWeek({ source_week_id: sourceWeekId }),
   );
 
   const refreshScheduleData = useCallback(async () => {
@@ -160,6 +164,23 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
     },
     [t, cancelPublishedClassPromise, refreshScheduleData],
   );
+  const copyWeekToNext = useCallback(
+    async (sourceWeekId: string) => {
+      const result = await copyWeekPromise(sourceWeekId);
+
+      if (result.ok) {
+        toast.success(t('schedules:copyWeek.success'));
+        await reFetchWeeks();
+      }
+
+      return result as {
+        ok: boolean;
+        data: ScheduleWeek | null;
+        error: (typeof result)['error'];
+      };
+    },
+    [t, copyWeekPromise, reFetchWeeks],
+  );
 
   return {
     weeks: weeks?.data ?? [],
@@ -173,12 +194,14 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
     removeClass,
     editPublishedClass,
     cancelPublishedClass,
+    copyWeekToNext,
     isPublishing,
     isCreatingClass: isAdding,
     isUpdatingClass: isUpdating,
     isEditingPublishedClass: isEditing,
     isCancellingPublishedClass: isCanceling,
     isRemovingClass: isRemoving,
+    isCopyingWeek,
     reFetchWeeks,
     reFetchWeekDetails,
   };

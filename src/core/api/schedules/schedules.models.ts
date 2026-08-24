@@ -78,6 +78,23 @@ export interface CancelPublishedClassPayload {
   cancellation_note?: string | null;
 }
 
+export interface CopyWeekPayload {
+  source_week_id: string;
+}
+
+export type WeekCopyConflictType = 'room_occupancy' | 'instructor' | 'room';
+
+export interface WeekCopyConflict {
+  source_class_id: string;
+  room_id: string;
+  instructor_id: string | null;
+  start_time: string;
+  end_time: string;
+  conflict_type: WeekCopyConflictType | string;
+  message: string;
+  conflicting_source_id?: string | null;
+}
+
 export interface UpcomingWeekResponse<TClass = ScheduledClass> {
   requested_week_start: string;
   resolved_week_start: string;
