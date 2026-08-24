@@ -94,6 +94,9 @@ export enum PERMISSION {
   ROSTER_ADD = 'add:roster',
   ROSTER_READ = 'read:roster',
 
+  // STUDENT PROFILE
+  STUDENT_PROFILE_READ = 'read:student_profile',
+
   // SCHEDULE
   SCHEDULE_MANAGE = 'manage:schedule',
   SCHEDULE_DRAFT_CREATE = 'create:schedule_draft',
@@ -124,6 +127,7 @@ export const InstructorPermissions = {
     PERMISSION.ATTENDANCE_MARK,
     PERMISSION.ROSTER_ADD,
   ],
+  studentProfile: [PERMISSION.STUDENT_PROFILE_READ],
 };
 
 export const StudentPermissions = {

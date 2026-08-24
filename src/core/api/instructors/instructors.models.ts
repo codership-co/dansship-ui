@@ -79,6 +79,14 @@ export interface ClassRosterResponse {
   instructor_payment_document_issued?: boolean;
 }
 
+export interface InstructorStudentProfile {
+  user_id: string;
+  full_name: string;
+  goals: Array<string>;
+  disciplines: Array<string>;
+  current_level: string | null;
+}
+
 export interface InstructorUserSearchResult {
   id: string;
   email: string;

@@ -34,6 +34,7 @@ import {
   SecureForgotPasswordPage,
   SecureInstructorOnboardingPage,
   SecureInstructorHomePage,
+  SecureInstructorStudentProfilePage,
   SecureLoginPage,
   SecureOnboardingPage,
   SecurePaymentsResultPage,
@@ -105,7 +106,13 @@ const routes: Array<RouteObject> = [
           { path: 'figures', Component: SecureFiguresPage },
           { path: 'figures/:id', Component: SecureFiguresDetailsPage },
           { path: 'classes', Component: SecureClassesPage },
-          { path: 'instructor', Component: SecureInstructorHomePage },
+          {
+            path: 'instructor',
+            children: [
+              { index: true, Component: SecureInstructorHomePage },
+              { path: 'classes/:classId/roster/:userId', Component: SecureInstructorStudentProfilePage },
+            ],
+          },
 
           {
             path: 'profile',

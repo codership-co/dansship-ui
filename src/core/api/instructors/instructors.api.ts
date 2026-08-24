@@ -6,6 +6,7 @@ import {
   type AvailabilityApiItem,
   type InstructorAvailability,
   type ClassRosterResponse,
+  type InstructorStudentProfile,
   type CreateInstructorCertificationPayload,
   type CreateInstructorProfilePayload,
   DAY_TO_INDEX,
@@ -109,6 +110,13 @@ export class InstructorsAPI {
   async getClassRoster(classId: string) {
     return this.httpClient.callNoError<ClassRosterResponse>({
       path: `/instructors/classes/${classId}/roster`,
+      method: 'GET',
+    });
+  }
+
+  async getClassRosterStudentProfile(classId: string, userId: string) {
+    return this.httpClient.callNoError<InstructorStudentProfile>({
+      path: `/instructors/classes/${classId}/roster/${userId}`,
       method: 'GET',
     });
   }
