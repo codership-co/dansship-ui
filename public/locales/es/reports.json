@@ -170,6 +170,7 @@
     "oneOff": "Suelto",
     "statuses": {
       "pending_payment": "Pendiente de pago",
+      "on_hold": "En reserva",
       "confirmed": "Confirmado",
       "cancelled": "Cancelado"
     }

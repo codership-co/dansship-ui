@@ -1,6 +1,7 @@
 import { PaymentMethod, PaymentStatus } from '../payments/payments.models';
 
-export type RentalRequestStatus = 'pending_payment' | 'confirmed' | 'cancelled';
+export type RentalRequestStatus = 'pending_payment' | 'on_hold' | 'confirmed' | 'cancelled';
+export type RentalPaymentOption = 'full' | 'fifty_fifty';
 
 export type RentalRequestType = 'studio_rental' | 'internal_reserved_use';
 export type RentalPurpose = 'self_practice' | 'internal_reserved_use';
@@ -49,6 +50,8 @@ export interface RentalRequest {
   status: RentalRequestStatus;
   total_price: string;
   currency: string;
+  payment_option?: RentalPaymentOption | null;
+  balance_due_date?: string | null;
   terms_accepted?: boolean;
   cancellation_reason?: string | null;
   created_at: string;
@@ -72,6 +75,7 @@ export interface CreateRentalRequestPayload {
   purpose?: RentalPurpose;
   terms_accepted: true;
   payment_method_type?: 'transfer' | 'card';
+  payment_option?: RentalPaymentOption;
   slots: Array<RentalSlotCreate>;
 }
 
@@ -86,6 +90,7 @@ export interface CreateRentalSeriesPayload {
   occurrence_count?: number | null;
   terms_accepted: true;
   payment_method_type?: 'transfer' | 'card';
+  payment_option?: RentalPaymentOption;
 }
 
 export interface RentalSeries {
@@ -103,6 +108,8 @@ export interface RentalSeries {
   status: RentalRequestStatus;
   total_price: string;
   currency: string;
+  payment_option?: RentalPaymentOption;
+  balance_due_date?: string | null;
   tax_type_id: string;
   benefit_definition_id?: string | null;
   benefit_code_snapshot?: string | null;
@@ -172,6 +179,8 @@ export interface RentalPaymentResult {
   slots: Array<RentalPaymentResultSlot>;
   series?: RentalPaymentResultSeries | null;
   payment: RentalPaymentSnapshot;
+  payment_option?: RentalPaymentOption | null;
+  balance_due_date?: string | null;
 }
 
 export interface AdminListRequestsPayload {

@@ -23,6 +23,7 @@ import { useCallablePromise } from '@hooks';
 
 const rentalStatusKey: Record<RentalRequestStatus, string> = {
   pending_payment: 'studioRental:status.pendingPayment',
+  on_hold: 'studioRental:status.onHold',
   confirmed: 'studioRental:status.confirmed',
   cancelled: 'studioRental:status.cancelled',
 };
@@ -111,7 +112,7 @@ function StudioRentalResultPage() {
 
   const payment = result?.payment;
   const canUploadProof =
-    result?.rental_status === 'pending_payment' &&
+    (result?.rental_status === 'pending_payment' || result?.rental_status === 'on_hold') &&
     payment?.payment_method_type === PaymentMethod.TRANSFER &&
     (payment.status === PaymentStatus.PENDING || payment.status === PaymentStatus.PENDING_MANUAL_REVIEW);
   const resourceLabel = result?.resource
@@ -133,6 +134,14 @@ function StudioRentalResultPage() {
           label: t('studioRental:result.rentalStatus'),
           value: result ? t(rentalStatusKey[result.rental_status]) : '',
         },
+        ...(result?.rental_status === 'on_hold' && result.balance_due_date
+          ? [
+              {
+                label: t('studioRental:result.balanceDue', { date: result.balance_due_date }),
+                value: '',
+              },
+            ]
+          : []),
         { label: '', value: '' },
         ...(payment.base_amount !== null && payment.base_amount !== undefined
           ? [{ label: t('payments:subtotal'), value: formatPrice(payment.base_amount, payment.currency) }]
