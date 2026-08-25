@@ -14,8 +14,8 @@
     "balanceLabel": "Saldo disponible",
     "balanceHint": "Este saldo se aplica automáticamente en la compra de planes.",
     "empty": "Aún no tienes movimientos en tu billetera.",
-    "credit": "Crédito",
-    "debit": "Débito",
+    "credit": "Saldo a favor",
+    "debit": "Usado",
     "columns": {
       "date": "Fecha",
       "type": "Tipo",
