@@ -53,7 +53,7 @@ function LegalPage() {
                 <p>{t('legal:documents.classTermsAndConditions.description')}</p>
               </section>
 
-              <PDFViewer url='/assets/legal/terminos-y-condiciones-para-compras.pdf' />
+              <PDFViewer url='/assets/legal/terminos-y-condiciones-servicio.pdf' />
             </Tabs.TabPanel>
           </section>
         </Tabs>

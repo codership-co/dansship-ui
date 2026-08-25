@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { LiaFileContractSolid } from 'react-icons/lia';
 import { LuInstagram, LuMusic2 } from 'react-icons/lu';
-import { RiContactsBook2Line } from 'react-icons/ri';
+import { RiWhatsappLine } from 'react-icons/ri';
 import { Link } from 'react-router';
 
 import { Section } from '@components/containers';
@@ -32,10 +32,16 @@ export function Footer() {
                 <LiaFileContractSolid className='h-4 w-4' />
                 {t('home:sharedFooter.legal.title')}
               </Link>
-              <Link to='/contact' className='inline-flex items-center gap-2 transition hover:text-primary'>
-                <RiContactsBook2Line className='h-4 w-4' />
+              <a
+                href='https://wa.me/+573161017878?text=Hola%20Dansship%2C%20tengo%20una%20pregunta'
+                target='_blank'
+                rel='noreferrer'
+                className='inline-flex items-center gap-2 transition hover:text-primary'
+              >
+                <RiWhatsappLine className='h-4 w-4' />
                 {t('home:sharedFooter.support.contact')}
-              </Link>
+              </a>
+
               <a
                 href='https://www.instagram.com/dansship'
                 target='_blank'

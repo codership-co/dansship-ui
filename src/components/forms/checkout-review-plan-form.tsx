@@ -388,7 +388,7 @@ export const CheckoutReviewPlanFormInput = ({
                   LinkTerms: (
                     <a
                       target='_blank'
-                      href='/assets/legal/terminos-y-condiciones-para-compras.pdf'
+                      href='/assets/legal/terminos-y-condiciones-servicio.pdf'
                       className='text-info underline'
                     />
                   ),
