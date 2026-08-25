@@ -145,6 +145,7 @@ export interface PaymentPreviewRequest {
   start_time?: string;
   end_time?: string;
   duration_hours?: number | string;
+  payment_option?: 'full' | 'fifty_fifty';
 }
 
 export interface PaymentPreviewResponse {
@@ -165,6 +166,9 @@ export interface PaymentPreviewResponse {
   discount_benefit_code?: string | null;
   wallet_amount_applied?: string;
   amount_to_charge?: string;
+  payment_option?: 'full' | 'fifty_fifty';
+  deposit_amount?: string | null;
+  balance_amount?: string | null;
 }
 
 export interface PaymentPreviewMappedResponse {
@@ -185,4 +189,7 @@ export interface PaymentPreviewMappedResponse {
   discount_benefit_code: string | null;
   wallet_amount_applied: number;
   amount_to_charge: number;
+  payment_option: 'full' | 'fifty_fifty';
+  deposit_amount: number | null;
+  balance_amount: number | null;
 }

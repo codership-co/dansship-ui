@@ -282,11 +282,13 @@ export function CheckoutPaymentProofForm({
             <label className='block'>
               {t('payments:total')}: {formatPrice(finalPrice, displayCurrency)}
             </label>
-            {walletAmountApplied > 0 ? (
+            {walletAmountApplied > 0 || amountToCharge !== finalPrice ? (
               <>
-                <label className='block text-primary'>
-                  {t('subscriptions:walletApplied')}: -{formatPrice(walletAmountApplied, displayCurrency)}
-                </label>
+                {walletAmountApplied > 0 ? (
+                  <label className='block text-primary'>
+                    {t('subscriptions:walletApplied')}: -{formatPrice(walletAmountApplied, displayCurrency)}
+                  </label>
+                ) : null}
                 <label className='block font-semibold'>
                   {t('subscriptions:amountToCharge')}: {formatPrice(amountToCharge, displayCurrency)}
                 </label>

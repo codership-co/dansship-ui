@@ -42,6 +42,7 @@ import {
   PaymentMethod,
   PaymentPreviewMappedResponse,
   PaymentPreviewRequest,
+  type RentalPaymentOption,
   type StudioRentalRoomOption,
 } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -129,6 +130,7 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
   const [seriesEndDate, setSeriesEndDate] = useState(formatDateInput(addDays(today, 28)));
   const [occurrenceCount, setOccurrenceCount] = useState('4');
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [paymentOption, setPaymentOption] = useState<RentalPaymentOption>('full');
   const [preview, setPreview] = useState<PaymentPreviewMappedResponse | null>(null);
   const [createdIntentId, setCreatedIntentId] = useState<string | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
@@ -213,6 +215,7 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
           room_id: room.id,
           resource_id: resourceId,
           duration_hours: duration * count,
+          payment_option: paymentOption,
         });
         setPreview(ok && data ? data : null);
 
@@ -231,6 +234,7 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
         resource_id: resourceId,
         start_time: selectedRangeIso.start_time,
         end_time: selectedRangeIso.end_time,
+        payment_option: paymentOption,
       });
       setPreview(ok && data ? data : null);
     };
@@ -238,6 +242,7 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
     void runPreview();
   }, [
     occurrenceCount,
+    paymentOption,
     previewPayment,
     requestMode,
     resourceId,
@@ -287,6 +292,7 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
         purpose: 'self_practice',
         terms_accepted: true,
         payment_method_type: paymentMethod === PaymentMethod.CARD ? 'card' : 'transfer',
+        payment_option: paymentOption,
         slots: [
           {
             room_id: room.id,
@@ -318,6 +324,7 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
       series_start_date: seriesStartDate,
       terms_accepted: true,
       payment_method_type: paymentMethod === PaymentMethod.CARD ? 'card' : 'transfer',
+      payment_option: paymentOption,
       ...(seriesTermination === 'end_date'
         ? { series_end_date: seriesEndDate, occurrence_count: null }
         : { occurrence_count: Number(occurrenceCount), series_end_date: null }),
@@ -543,6 +550,32 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
 
   const priceForm = (
     <div className='grid gap-4 content-start'>
+      <div className='space-y-2'>
+        <Label>{t('studioRental:browse.paymentOption')}</Label>
+        <div className='flex flex-wrap gap-2'>
+          <Button
+            type='button'
+            variant={paymentOption === 'full' ? 'default' : 'outline'}
+            size='sm'
+            onClick={() => setPaymentOption('full')}
+          >
+            {t('studioRental:browse.paymentOptionFull')}
+          </Button>
+          <Button
+            type='button'
+            variant={paymentOption === 'fifty_fifty' ? 'default' : 'outline'}
+            size='sm'
+            onClick={() => setPaymentOption('fifty_fifty')}
+          >
+            {t('studioRental:browse.paymentOptionFiftyFifty')}
+          </Button>
+        </div>
+        <p className='text-xs text-muted-foreground'>
+          {paymentOption === 'fifty_fifty'
+            ? t('studioRental:browse.paymentOptionFiftyFiftyHint')
+            : t('studioRental:browse.paymentOptionFullHint')}
+        </p>
+      </div>
       {isLoadingPreview ? (
         <SpinnerLoader message={t('studioRental:browse.previewLoading')} />
       ) : preview ? (
@@ -553,9 +586,31 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
           <p>
             {t('studioRental:browse.taxAmount')}: {formatPrice(preview.tax_amount, 'COP')}
           </p>
-          <p className='font-semibold'>
+          <p>
             {t('studioRental:browse.finalPrice')}: {formatPrice(preview.final_price, 'COP')}
           </p>
+          {paymentOption === 'fifty_fifty' ? (
+            <>
+              <p className='pt-2 text-base font-semibold'>
+                {t('studioRental:browse.dueNow')}:{' '}
+                {formatPrice(
+                  preview.amount_to_charge > 0
+                    ? preview.amount_to_charge
+                    : (preview.deposit_amount ?? preview.final_price / 2),
+                  'COP',
+                )}
+              </p>
+              <p>
+                {t('studioRental:browse.balanceLater')}:{' '}
+                {formatPrice(preview.balance_amount ?? preview.final_price / 2, 'COP')}
+              </p>
+              <p className='text-xs text-muted-foreground'>{t('studioRental:browse.balanceDueHint')}</p>
+            </>
+          ) : (
+            <p className='pt-2 text-base font-semibold'>
+              {t('studioRental:browse.dueNow')}: {formatPrice(preview.amount_to_charge, 'COP')}
+            </p>
+          )}
         </div>
       ) : (
         <p className='text-sm text-muted-foreground'>{t('studioRental:browse.pricingBlocked')}</p>

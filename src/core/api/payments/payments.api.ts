@@ -83,6 +83,11 @@ export class PaymentsAPI {
         discount_benefit_code: data.discount_benefit_code ?? null,
         wallet_amount_applied: toNumber(data.wallet_amount_applied),
         amount_to_charge: toNumber(data.amount_to_charge, toNumber(data.final_price)),
+        payment_option: data.payment_option === 'fifty_fifty' ? 'fifty_fifty' : 'full',
+        deposit_amount:
+          data.deposit_amount !== null && data.deposit_amount !== undefined ? toNumber(data.deposit_amount) : null,
+        balance_amount:
+          data.balance_amount !== null && data.balance_amount !== undefined ? toNumber(data.balance_amount) : null,
       }),
     );
   }

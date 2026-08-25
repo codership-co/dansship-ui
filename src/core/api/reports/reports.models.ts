@@ -240,6 +240,7 @@ export interface StudioRentalUtilizationReport {
 
 export interface StudioRentalFunnelCounts {
   pending_payment: number;
+  on_hold?: number;
   confirmed: number;
   cancelled: number;
 }

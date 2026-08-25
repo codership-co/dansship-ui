@@ -183,6 +183,7 @@ function FunnelTable({
   title: string;
   counts?: {
     pending_payment: number;
+    on_hold?: number;
     confirmed: number;
     cancelled: number;
   };
@@ -207,6 +208,10 @@ function FunnelTable({
           <TableRow>
             <TableCell>{t('reports:rentals.statuses.pending_payment')}</TableCell>
             <TableCell className='text-right'>{counts?.pending_payment ?? 0}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>{t('reports:rentals.statuses.on_hold')}</TableCell>
+            <TableCell className='text-right'>{counts?.on_hold ?? 0}</TableCell>
           </TableRow>
           <TableRow>
             <TableCell>{t('reports:rentals.statuses.confirmed')}</TableCell>

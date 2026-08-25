@@ -26,6 +26,7 @@ import { useCallablePromise, usePromise } from '@hooks';
 
 const rentalStatusKey: Record<RentalRequestStatus, string> = {
   pending_payment: 'studioRental:status.pendingPayment',
+  on_hold: 'studioRental:status.onHold',
   confirmed: 'studioRental:status.confirmed',
   cancelled: 'studioRental:status.cancelled',
 };
@@ -61,6 +62,7 @@ function RequestListCard({
   title,
   subtitle,
   status,
+  balanceDueDate,
   clickable,
   onOpen,
   actions,
@@ -68,6 +70,7 @@ function RequestListCard({
   title: string;
   subtitle: string;
   status: RentalRequestStatus;
+  balanceDueDate?: string | null;
   clickable: boolean;
   onOpen?: () => void;
   actions?: ReactNode;
@@ -106,6 +109,11 @@ function RequestListCard({
         <div className='min-w-0'>
           <p className='truncate text-sm font-semibold'>{title}</p>
           <p className='truncate text-sm text-muted-foreground'>{subtitle}</p>
+          {status === 'on_hold' && balanceDueDate ? (
+            <p className='mt-1 text-xs text-muted-foreground'>
+              {t('studioRental:myRequests.balanceDue', { date: balanceDueDate })}
+            </p>
+          ) : null}
         </div>
         <span className='shrink-0 rounded-full bg-background px-2 py-1 text-xs'>{t(rentalStatusKey[status])}</span>
       </div>
@@ -203,7 +211,7 @@ function StudioRentalRequestsPage() {
   );
 
   const canPay = (rentalStatus: RentalRequestStatus, payment: PaymentSummary) => {
-    if (rentalStatus !== 'pending_payment' || !payment.intentId) {
+    if ((rentalStatus !== 'pending_payment' && rentalStatus !== 'on_hold') || !payment.intentId) {
       return false;
     }
 
@@ -272,6 +280,7 @@ function StudioRentalRequestsPage() {
                       title={t('studioRental:myRequests.seriesLabel', { id: series.id.slice(0, 8) })}
                       subtitle={`${roomNameById[series.room_id] ?? series.room_id} · ${t(`common:days.${series.day_of_week}`)} ${series.start_time.slice(0, 5)}–${series.end_time.slice(0, 5)} · ${formatPrice(Number(series.total_price), series.currency)}`}
                       status={series.status}
+                      balanceDueDate={series.balance_due_date}
                       clickable={Boolean(payment.intentId)}
                       onOpen={() => {
                         if (payment.intentId) {
@@ -283,7 +292,11 @@ function StudioRentalRequestsPage() {
                           <>
                             {showPay ? (
                               <Button size='sm' onClick={() => setPayingIntentId(payment.intentId)}>
-                                {t('studioRental:myRequests.pay')}
+                                {t(
+                                  series.status === 'on_hold'
+                                    ? 'studioRental:myRequests.payBalance'
+                                    : 'studioRental:myRequests.pay',
+                                )}
                               </Button>
                             ) : null}
                             {showCancel ? (
@@ -321,6 +334,7 @@ function StudioRentalRequestsPage() {
                       title={`#${request.id.slice(0, 8)}`}
                       subtitle={`${formatPrice(Number(request.total_price ?? 0), request.currency)} · ${format(new Date(request.created_at), 'PP')}`}
                       status={request.status}
+                      balanceDueDate={request.balance_due_date}
                       clickable={Boolean(payment.intentId)}
                       onOpen={() => {
                         if (payment.intentId) {
@@ -332,7 +346,11 @@ function StudioRentalRequestsPage() {
                           <>
                             {showPay ? (
                               <Button size='sm' onClick={() => setPayingIntentId(payment.intentId)}>
-                                {t('studioRental:myRequests.pay')}
+                                {t(
+                                  request.status === 'on_hold'
+                                    ? 'studioRental:myRequests.payBalance'
+                                    : 'studioRental:myRequests.pay',
+                                )}
                               </Button>
                             ) : null}
                             {showCancel ? (
