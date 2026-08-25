@@ -72,6 +72,15 @@ export const useMyBookings = () => {
         const { error } = await cancelClassPromise(id);
 
         if (error) {
+          if (
+            error instanceof DansshipAPIError &&
+            error.body.error_code === DANSSHIP_ERROR_CODE.BOOKING_NOT_CANCELLABLE
+          ) {
+            toast.success(t('bookings:cancelSuccess'));
+
+            return true;
+          }
+
           toast.error(t('bookings:cancellationFailedDesc'));
           captureUnexpectedException(error, {
             skipIfExpected: 'booking',

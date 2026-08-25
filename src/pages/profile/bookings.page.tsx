@@ -13,6 +13,8 @@ const statusLabel = (status: BookingStatus, t: (key: string) => string) => {
   switch (status) {
     case 'active':
       return t('bookings:status.active');
+    case 'cancelled':
+      return t('bookings:status.cancelled');
     case 'attended':
       return t('bookings:status.attended');
     case 'no_show':
@@ -53,9 +55,11 @@ function BookingsPage() {
     response: myBookingsResponse,
     isLoading: isLoadingMyBookings,
     error: myBookingsError,
+    reFetch,
   } = usePromise(() => DansshipAPI.bookings.getMyBookings());
   const { cancelClass, isCancelingClass } = useMyBookings();
   const [bookingToCancel, setBookingToCancel] = useState<MyBooking | null>(null);
+  const [isRefreshingBookings, setIsRefreshingBookings] = useState(false);
 
   const sortedBookings = useMemo(
     () =>
@@ -70,7 +74,13 @@ function BookingsPage() {
 
     const ok = await cancelClass(bookingToCancel.id);
 
-    if (ok) {
+    if (!ok) return;
+
+    setIsRefreshingBookings(true);
+    try {
+      await reFetch();
+    } finally {
+      setIsRefreshingBookings(false);
       setBookingToCancel(null);
     }
   };
@@ -83,7 +93,7 @@ function BookingsPage() {
       </div>
 
       <div className='bg-white rounded-lg shadow-sm border border-gray-100 p-6'>
-        {isLoadingMyBookings ? (
+        {isLoadingMyBookings && !myBookingsResponse ? (
           <p className='text-gray-500'>{t('bookings:loading')}</p>
         ) : myBookingsError || myBookingsResponse?.error ? (
           <p className='text-alert-600'>{t('bookings:loadError')}</p>
@@ -118,7 +128,7 @@ function BookingsPage() {
                     <Button
                       variant='outline'
                       size='sm'
-                      disabled={isCancelingClass}
+                      disabled={isCancelingClass || isRefreshingBookings}
                       onClick={() => setBookingToCancel(booking)}
                     >
                       {t('bookings:cancelBooking')}
@@ -134,17 +144,17 @@ function BookingsPage() {
       <ConfirmDialog
         open={Boolean(bookingToCancel)}
         onOpenChange={open => {
-          if (!open) {
+          if (!open && !isCancelingClass && !isRefreshingBookings) {
             setBookingToCancel(null);
           }
         }}
         onConfirm={handleConfirmCancel}
         title={t('bookings:cancelBookingTitle')}
         description={t('bookings:cancelBookingConfirm')}
-        confirmLabel={isCancelingClass ? t('bookings:cancelling') : t('bookings:cancelBooking')}
+        confirmLabel={isCancelingClass || isRefreshingBookings ? t('bookings:cancelling') : t('bookings:cancelBooking')}
         cancelLabel={t('common:keep')}
         confirmVariant='destructive'
-        isLoading={isCancelingClass}
+        isLoading={isCancelingClass || isRefreshingBookings}
       />
     </div>
   );
