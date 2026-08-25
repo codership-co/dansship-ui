@@ -9,11 +9,11 @@
     },
     "termsAndConditions": {
       "tab": "Términos y condiciones",
-      "description": "Al navegar y utilizar este sitio web, aceptas cumplir con nuestros Términos y Condiciones. Si no estás de acuerdo con alguna parte de estos términos, te solicitamos que no utilices nuestros servicios."
+      "description": "Al navegar y utilizar este sitio web, aceptas cumplir con nuestros Términos y Condiciones."
     },
     "classTermsAndConditions": {
-      "tab": "Términos y condiciones de enseñanza",
-      "description": "Al comprar y asistir a nuestras clases y servicios, aceptas cumplir con nuestros Términos y Condiciones de enseñanza. Si no estás de acuerdo con alguna parte de estos términos, te solicitamos que no utilices nuestros servicios."
+      "tab": "Términos y condiciones de planes y servicio",
+      "description": "Al comprar y asistir a nuestras clases y servicios, aceptas cumplir con nuestros Términos y Condiciones de planes y servicio."
     }
   }
 }

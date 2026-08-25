@@ -32,10 +32,16 @@ export function Footer() {
                 <LiaFileContractSolid className='h-4 w-4' />
                 {t('home:sharedFooter.legal.title')}
               </Link>
-              <Link to='/contact' className='inline-flex items-center gap-2 transition hover:text-primary'>
+              <a
+                href='https://wa.me/+573161017878?text=Hola%20Dansship%2C%20tengo%20una%20pregunta'
+                target='_blank'
+                rel='noreferrer'
+                className='inline-flex items-center gap-2 transition hover:text-primary'
+              >
                 <RiContactsBook2Line className='h-4 w-4' />
                 {t('home:sharedFooter.support.contact')}
-              </Link>
+              </a>
+
               <a
                 href='https://www.instagram.com/dansship'
                 target='_blank'
