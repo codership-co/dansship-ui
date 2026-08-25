@@ -4,6 +4,7 @@ import { LuCalendarDays, LuGraduationCap, LuMail, LuShield, LuShieldCheck, LuUse
 import { PiCaretLeft } from 'react-icons/pi';
 
 import { Container, SectionHeading } from '@components/containers';
+import { LoginMethodsSection } from '@components/modules/profile/login-methods-section';
 import { Badge } from '@components/ui';
 import { useAuth, useOrPermissions } from '@contexts';
 import { AdminPermissions } from '@core/permissions';
@@ -77,6 +78,8 @@ export function ProfileAbout() {
             </div>
           )}
         </div>
+
+        <LoginMethodsSection />
 
         <Accordion className='gap-4' noSeparators multiple>
           <AccordionItem

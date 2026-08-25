@@ -7,6 +7,7 @@ import { Link, useLocation } from 'react-router';
 import { z } from 'zod';
 
 import { EmailField, PasswordFieldset } from '@components/form-fields';
+import { GoogleSignInButton, isGoogleSignInConfigured } from '@components/forms/google-sign-in-button';
 import { useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
 
@@ -33,7 +34,7 @@ export type SignUpFormData = z.infer<ReturnType<typeof createSignUpSchema>>;
 
 export function SignUpForm() {
   const { t } = useTranslation();
-  const { signUp } = useAuth();
+  const { signUp, googleLogin } = useAuth();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [termsAndConditions, setTermsAndConditions] = useState(false);
@@ -54,6 +55,16 @@ export function SignUpForm() {
   const internalSubmit = async (data: SignUpFormData) => {
     setIsLoading(true);
     await signUp(data);
+    setIsLoading(false);
+  };
+
+  const handleGoogleCredential = async (credential: string) => {
+    if (!termsAndConditions) {
+      return;
+    }
+
+    setIsLoading(true);
+    await googleLogin(credential);
     setIsLoading(false);
   };
 
@@ -105,6 +116,22 @@ export function SignUpForm() {
       <Button color='primary' type='submit' isLoading={isLoading} disabled={!termsAndConditions} fullWidth>
         {t('auth:signup.createAccount')}
       </Button>
+
+      {isGoogleSignInConfigured() ? (
+        <>
+          <div className='relative flex items-center justify-center'>
+            <div className='absolute inset-x-0 h-px bg-border' />
+            <span className='relative bg-background px-3 text-xs text-muted-foreground'>{t('auth:google.or')}</span>
+          </div>
+
+          <GoogleSignInButton
+            text='signup_with'
+            disabled={isLoading || !termsAndConditions}
+            onCredential={handleGoogleCredential}
+            className='w-full'
+          />
+        </>
+      ) : null}
 
       <div className='text-center text-sm'>
         <span className='text-gray-600'>{t('auth:signup.hasAccount')}</span>{' '}

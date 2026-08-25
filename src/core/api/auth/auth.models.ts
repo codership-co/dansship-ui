@@ -21,6 +21,8 @@ export interface AuthUser {
   roles?: Array<string>;
   permissions?: Array<string>;
   has_instructor_profile?: boolean;
+  has_password?: boolean;
+  has_google?: boolean;
   cuenta_de_cobro_enabled?: boolean | null;
   profile_completion_percent?: number;
   instructor_profile?: {
@@ -65,6 +67,8 @@ export interface User {
   onboardingPendingSteps?: Array<string>;
   updatedAt?: string;
   hasInstructorProfile?: boolean;
+  hasPassword?: boolean;
+  hasGoogle?: boolean;
   cuentaDeCobroEnabled?: boolean | null;
   profileCompletionPercent?: number;
   instructorProfile?: {
@@ -95,6 +99,15 @@ export interface User {
 export interface LoginPayload {
   email: string;
   password: string;
+}
+
+export interface GoogleCredentialPayload {
+  credential: string;
+}
+
+export interface SetPasswordPayload {
+  password: string;
+  confirm_password: string;
 }
 
 export interface RegisterPayload {

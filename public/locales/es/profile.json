@@ -1,6 +1,12 @@
 {
   "memberSince": "Miembro desde",
   "profile": "Mi perfil",
+  "loginMethods": {
+    "title": "Métodos de acceso",
+    "subtitle": "Administra cómo inicias sesión en Dansship",
+    "password": "Contraseña",
+    "google": "Google"
+  },
   "subscription": "Mis Suscripciones",
   "subscriptions": "Mis Suscripciones",
   "bookings": "Mis reservas",

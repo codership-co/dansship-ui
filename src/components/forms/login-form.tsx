@@ -7,6 +7,7 @@ import { Link, useLocation } from 'react-router';
 import { z } from 'zod';
 
 import { EmailField, PasswordField } from '@components/form-fields';
+import { GoogleSignInButton, isGoogleSignInConfigured } from '@components/forms/google-sign-in-button';
 import { useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
 
@@ -27,7 +28,7 @@ export type LoginFormData = z.infer<ReturnType<typeof createLoginSchema>>;
 
 export function LoginForm() {
   const { t } = useTranslation();
-  const { login } = useAuth();
+  const { login, googleLogin } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
   const location = useLocation();
   const state = location.state;
@@ -60,6 +61,12 @@ export function LoginForm() {
     setIsLoading(false);
   };
 
+  const handleGoogleCredential = async (credential: string) => {
+    setIsLoading(true);
+    await googleLogin(credential);
+    setIsLoading(false);
+  };
+
   return (
     <form onSubmit={handleSubmit(internalSubmit)} className='grid gap-6' data-sentry-mask>
       <EmailField
@@ -89,17 +96,33 @@ export function LoginForm() {
         {defaultEmail ? t('auth:instructorOnboarding.completeProfile') : t('auth:login.signIn')}
       </Button>
       {!defaultEmail ? (
-        <div className='text-center text-sm'>
-          <span className='text-gray-600'>{t('auth:login.noAccount')}</span>{' '}
-          <Link
-            to={PageURLS.auth.signup}
-            state={location.state}
-            viewTransition
-            className='font-medium text-primary hover:text-primary/90'
-          >
-            {t('auth:login.signUp')}
-          </Link>
-        </div>
+        <>
+          {isGoogleSignInConfigured() ? (
+            <>
+              <div className='relative flex items-center justify-center'>
+                <div className='absolute inset-x-0 h-px bg-border' />
+                <span className='relative bg-background px-3 text-xs text-muted-foreground'>{t('auth:google.or')}</span>
+              </div>
+              <GoogleSignInButton
+                text='signin_with'
+                disabled={isLoading}
+                onCredential={handleGoogleCredential}
+                className='w-full'
+              />
+            </>
+          ) : null}
+          <div className='text-center text-sm'>
+            <span className='text-gray-600'>{t('auth:login.noAccount')}</span>{' '}
+            <Link
+              to={PageURLS.auth.signup}
+              state={location.state}
+              viewTransition
+              className='font-medium text-primary hover:text-primary/90'
+            >
+              {t('auth:login.signUp')}
+            </Link>
+          </div>
+        </>
       ) : null}
     </form>
   );
