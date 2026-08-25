@@ -13,6 +13,7 @@
   "cancellationNotAllowed": "Esta reserva no se puede cancelar.",
   "status": {
     "active": "Reservado",
+    "cancelled": "Cancelada",
     "attended": "Asistió",
     "noShow": "No asistió"
   },
