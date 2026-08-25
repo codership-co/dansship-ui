@@ -14,6 +14,7 @@ const createVerifyEmailFormSchema = (t: TFunction) =>
   z.object({
     email: z
       .string()
+      .trim()
       .min(1, { message: t('validation:required') })
       .email({ message: t('validation:email') }),
   });

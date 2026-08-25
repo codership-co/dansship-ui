@@ -15,6 +15,7 @@ const createSignUpSchema = (t: (key: string) => string) =>
     .object({
       email: z
         .string()
+        .trim()
         .min(1, { message: t('validation:required') })
         .email({ message: t('validation:email') }),
       password: z
