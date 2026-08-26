@@ -6,11 +6,13 @@ import { mapAuthUserToUser } from '@core/api/auth/auth.helpers';
 import type {
   AuthUser,
   ForgotPasswordPayload,
+  GoogleCredentialPayload,
   LoginPayload,
   RegisterPayload,
   RegisterResponse,
   ResendVerificationPayload,
   ResetPasswordPayload,
+  SetPasswordPayload,
   UpdatePreferredLanguagePayload,
   UpdateProfilePayload,
   User,
@@ -35,6 +37,39 @@ export class AuthAPI {
     return this.httpClient.call<AuthUser, LoginPayload, User>(
       {
         path: '/auth/signin',
+        method: 'POST',
+        data: payload,
+      },
+      mapAuthUserToUser,
+    );
+  }
+
+  async googleSignIn(payload: GoogleCredentialPayload) {
+    return this.httpClient.call<AuthUser, GoogleCredentialPayload, User>(
+      {
+        path: '/auth/google',
+        method: 'POST',
+        data: payload,
+      },
+      mapAuthUserToUser,
+    );
+  }
+
+  async linkGoogle(payload: GoogleCredentialPayload) {
+    return this.httpClient.call<AuthUser, GoogleCredentialPayload, User>(
+      {
+        path: '/auth/google/link',
+        method: 'POST',
+        data: payload,
+      },
+      mapAuthUserToUser,
+    );
+  }
+
+  async setPassword(payload: SetPasswordPayload) {
+    return this.httpClient.call<AuthUser, SetPasswordPayload, User>(
+      {
+        path: '/auth/password',
         method: 'POST',
         data: payload,
       },

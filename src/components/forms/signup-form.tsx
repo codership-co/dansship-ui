@@ -1,12 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Checkbox } from 'polpo/components';
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router';
 import { z } from 'zod';
 
 import { EmailField, PasswordFieldset } from '@components/form-fields';
+import { GoogleSignInButton, isGoogleSignInConfigured } from '@components/forms/google-sign-in-button';
 import { useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
 
@@ -33,10 +34,9 @@ export type SignUpFormData = z.infer<ReturnType<typeof createSignUpSchema>>;
 
 export function SignUpForm() {
   const { t } = useTranslation();
-  const { signUp } = useAuth();
+  const { signUp, googleLogin } = useAuth();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
-  const [termsAndConditions, setTermsAndConditions] = useState(false);
 
   const signUpSchema = createSignUpSchema(t);
 
@@ -54,6 +54,12 @@ export function SignUpForm() {
   const internalSubmit = async (data: SignUpFormData) => {
     setIsLoading(true);
     await signUp(data);
+    setIsLoading(false);
+  };
+
+  const handleGoogleCredential = async (credential: string) => {
+    setIsLoading(true);
+    await googleLogin(credential);
     setIsLoading(false);
   };
 
@@ -82,29 +88,24 @@ export function SignUpForm() {
         }}
       />
 
-      <Checkbox
-        label={
-          <Trans
-            className='text-small'
-            i18nKey='auth:signup.terms'
-            components={{
-              LinkTerms: (
-                <a target='_blank' href='/assets/legal/terminos-y-condiciones.pdf' className='text-info underline' />
-              ),
-              LinkPrivacy: (
-                <a target='_blank' href='/assets/legal/politica-privacidad.pdf' className='text-info underline' />
-              ),
-            }}
-          />
-        }
-        name='terms_and_conditions'
-        value={termsAndConditions}
-        setValue={() => setTermsAndConditions(p => !p)}
-      />
-
-      <Button color='primary' type='submit' isLoading={isLoading} disabled={!termsAndConditions} fullWidth>
+      <Button color='primary' type='submit' isLoading={isLoading} fullWidth>
         {t('auth:signup.createAccount')}
       </Button>
+
+      {isGoogleSignInConfigured() ? (
+        <>
+          <div className='relative flex items-center justify-center'>
+            <div className='absolute inset-x-0 h-px bg-border' />
+            <span className='relative bg-background px-3 text-xs text-muted-foreground'>{t('auth:google.or')}</span>
+          </div>
+          <GoogleSignInButton
+            text='signup_with'
+            disabled={isLoading}
+            onCredential={handleGoogleCredential}
+            className='w-full'
+          />
+        </>
+      ) : null}
 
       <div className='text-center text-sm'>
         <span className='text-gray-600'>{t('auth:signup.hasAccount')}</span>{' '}

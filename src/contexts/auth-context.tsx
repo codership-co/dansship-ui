@@ -16,6 +16,7 @@ import {
   RegisterResponse,
   type ResendVerificationPayload,
   type ResetPasswordPayload,
+  type SetPasswordPayload,
   type UpdateProfilePayload,
   type User,
   type VerifyEmailPayload,
@@ -38,6 +39,9 @@ interface CommonAuthContextState {
   ready: boolean;
   pendingPostLoginPath: string | null;
   login: (data: LoginPayload) => Promise<void>;
+  googleLogin: (credential: string) => Promise<void>;
+  linkGoogle: (credential: string) => Promise<void>;
+  setPassword: (data: SetPasswordPayload) => Promise<void>;
   signUp: (data: RegisterPayload) => Promise<void>;
   updateProfile: (data: UpdateProfilePayload) => Promise<void>;
   uploadProfilePhoto: (file: File) => Promise<User | undefined>;
@@ -154,33 +158,37 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }, [location.pathname, pendingPostLoginPath]);
 
+  async function completeAuthenticatedSession(data: User) {
+    localStorage.setItem(AUTH_SESSION_KEY, '1');
+    toast.success(t('auth:loginSuccess'));
+
+    const roleHome = await resolvePostLoginPath(data);
+    const roles = (data.roles ?? []).map(role => role.toLowerCase());
+    const prefersRoleHome = roles.includes('admin') || roles.includes('area_leader') || roles.includes('instructor');
+    let redirectPath = roleHome;
+
+    if (!prefersRoleHome) {
+      if (isValidReturnPath(fromPath)) {
+        redirectPath = fromPath;
+      } else {
+        const giftToken = consumePendingGiftClaimToken();
+
+        if (giftToken) {
+          redirectPath = `${PageURLS.gifts.claim}?token=${encodeURIComponent(giftToken)}`;
+        }
+      }
+    }
+
+    setPendingPostLoginPath(redirectPath);
+    setUser(data);
+    setSentryUser(data);
+    navigate(redirectPath, { replace: true });
+  }
+
   async function login(payload: LoginPayload) {
     try {
       const data = await DansshipAPI.auth.login(payload);
-      localStorage.setItem(AUTH_SESSION_KEY, '1');
-      toast.success(t('auth:loginSuccess'));
-
-      const roleHome = await resolvePostLoginPath(data);
-      const roles = (data.roles ?? []).map(role => role.toLowerCase());
-      const prefersRoleHome = roles.includes('admin') || roles.includes('area_leader') || roles.includes('instructor');
-      let redirectPath = roleHome;
-
-      if (!prefersRoleHome) {
-        if (isValidReturnPath(fromPath)) {
-          redirectPath = fromPath;
-        } else {
-          const giftToken = consumePendingGiftClaimToken();
-
-          if (giftToken) {
-            redirectPath = `${PageURLS.gifts.claim}?token=${encodeURIComponent(giftToken)}`;
-          }
-        }
-      }
-
-      setPendingPostLoginPath(redirectPath);
-      setUser(data);
-      setSentryUser(data);
-      navigate(redirectPath, { replace: true });
+      await completeAuthenticatedSession(data);
     } catch (error) {
       if (error instanceof DansshipAPIError) {
         if (error.body.error_code === DANSSHIP_ERROR_CODE.EMAIL_NOT_VERIFIED) {
@@ -203,6 +211,77 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
 
       toast.error(t('auth:loginFailed'));
+    }
+  }
+
+  async function googleLogin(credential: string) {
+    try {
+      const data = await DansshipAPI.auth.googleSignIn({ credential });
+      await completeAuthenticatedSession(data);
+    } catch (error) {
+      if (error instanceof DansshipAPIError) {
+        if (error.body.error_code === DANSSHIP_ERROR_CODE.GOOGLE_AUTH_NOT_ALLOWED_FOR_ADMIN) {
+          toast.error(t('auth:google.adminNotAllowed'));
+
+          return;
+        }
+
+        if (error.body.error_code === DANSSHIP_ERROR_CODE.GOOGLE_ACCOUNT_CONFLICT) {
+          toast.error(t('auth:google.conflict'));
+
+          return;
+        }
+
+        if (error.body.error_code === DANSSHIP_ERROR_CODE.GOOGLE_TOKEN_INVALID) {
+          toast.error(t('auth:google.invalidToken'));
+
+          return;
+        }
+
+        toast.error(t('auth:google.failed'));
+
+        return;
+      }
+
+      toast.error(t('auth:google.failed'));
+    }
+  }
+
+  async function linkGoogle(credential: string) {
+    try {
+      const data = await DansshipAPI.auth.linkGoogle({ credential });
+      setUser(data);
+      toast.success(t('auth:google.linkSuccess'));
+    } catch (error) {
+      if (error instanceof DansshipAPIError) {
+        if (error.body.error_code === DANSSHIP_ERROR_CODE.GOOGLE_AUTH_NOT_ALLOWED_FOR_ADMIN) {
+          toast.error(t('auth:google.adminNotAllowed'));
+
+          return;
+        }
+
+        if (error.body.error_code === DANSSHIP_ERROR_CODE.GOOGLE_ACCOUNT_CONFLICT) {
+          toast.error(t('auth:google.conflict'));
+
+          return;
+        }
+
+        toast.error(t('auth:google.linkFailed'));
+
+        return;
+      }
+
+      toast.error(t('auth:google.linkFailed'));
+    }
+  }
+
+  async function setPassword(payload: SetPasswordPayload) {
+    try {
+      const data = await DansshipAPI.auth.setPassword(payload);
+      setUser(data);
+      toast.success(t('auth:setPassword.success'));
+    } catch {
+      toast.error(t('auth:setPassword.failed'));
     }
   }
 
@@ -383,6 +462,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         ready,
         pendingPostLoginPath,
         login,
+        googleLogin,
+        linkGoogle,
+        setPassword,
         getProfile,
         signUp,
         updateProfile,
