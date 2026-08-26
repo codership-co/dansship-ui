@@ -39,12 +39,14 @@ export const OnboardingStudentTrack = () => {
             Icon: PiUserCircle,
             form: (
               <BasicProfileForm
+                requireTermsAcceptance
                 isLoading={isSubmittingStep}
                 error={error}
                 onSubmit={data =>
                   submitProfileStep({
                     ...data,
                     birth_date: data.birth_date.toISOString().slice(0, 10),
+                    terms_accepted: true,
                   })
                 }
               />

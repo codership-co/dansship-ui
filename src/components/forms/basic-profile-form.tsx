@@ -1,9 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TFunction } from 'i18next';
-import { Button } from 'polpo/components';
+import { Button, Checkbox } from 'polpo/components';
 import { ChangeEvent, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { useTranslation } from 'react-i18next';
+import { Controller, useForm } from 'react-hook-form';
+import { Trans, useTranslation } from 'react-i18next';
 import { LuBuilding, LuCalendar, LuHouse, LuIdCard, LuPhone, LuUser } from 'react-icons/lu';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -12,11 +12,11 @@ import { DateField, PhoneField, SelectField, TextField } from '@components/form-
 import { DansshipAPI, PaymentProofContentType, PaymentProofContentTypesList } from '@core/api';
 import { DOCUMENT_TYPE_OPTIONS } from '@core/constants';
 
-export const createBasicProfileSchema = (t: TFunction) => {
+export const createBasicProfileSchema = (t: TFunction, requireTermsAcceptance = false) => {
   const tenYearsAgo = new Date();
   tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10);
 
-  return z.object({
+  const baseSchema = z.object({
     full_name: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
     birth_date: z
       .date(t('auth:onboarding.validationRequired'))
@@ -27,6 +27,17 @@ export const createBasicProfileSchema = (t: TFunction) => {
     document_value: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
     city: z.string().optional(),
     address: z.string().optional(),
+    terms_accepted: z.boolean().optional(),
+  });
+
+  if (!requireTermsAcceptance) {
+    return baseSchema;
+  }
+
+  return baseSchema.extend({
+    terms_accepted: z.literal(true, {
+      message: t('auth:onboarding.termsRequired'),
+    }),
   });
 };
 
@@ -37,11 +48,18 @@ interface OnboardingBasicProfileFormProps {
   error: string | null;
   onSubmit: (values: BasicProfileFormValues) => void;
   defaultValues?: BasicProfileFormValues;
+  requireTermsAcceptance?: boolean;
 }
 
-export function BasicProfileForm({ isLoading, error, onSubmit, defaultValues }: OnboardingBasicProfileFormProps) {
+export function BasicProfileForm({
+  isLoading,
+  error,
+  onSubmit,
+  defaultValues,
+  requireTermsAcceptance = false,
+}: OnboardingBasicProfileFormProps) {
   const { t } = useTranslation();
-  const schema = createBasicProfileSchema(t);
+  const schema = createBasicProfileSchema(t, requireTermsAcceptance);
   const [profilePhoto, setProfilePhoto] = useState<File>();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
@@ -58,6 +76,7 @@ export function BasicProfileForm({ isLoading, error, onSubmit, defaultValues }: 
       document_value: '',
       city: '',
       address: '',
+      terms_accepted: false,
       ...defaultValues,
     },
   });
@@ -92,7 +111,14 @@ export function BasicProfileForm({ isLoading, error, onSubmit, defaultValues }: 
       }
     }
 
-    onSubmit(values);
+    if (requireTermsAcceptance) {
+      onSubmit({ ...values, terms_accepted: true });
+
+      return;
+    }
+
+    const { terms_accepted: _termsAccepted, ...profileValues } = values;
+    onSubmit(profileValues);
   };
 
   return (
@@ -205,6 +231,49 @@ export function BasicProfileForm({ isLoading, error, onSubmit, defaultValues }: 
             />
           </div>
         </div>
+
+        {requireTermsAcceptance ? (
+          <Controller
+            name='terms_accepted'
+            control={control}
+            render={({ field, fieldState }) => (
+              <div className='space-y-1'>
+                <Checkbox
+                  label={
+                    <Trans
+                      className='text-small'
+                      i18nKey='auth:onboarding.terms'
+                      components={{
+                        LinkTerms: (
+                          <a
+                            target='_blank'
+                            href='/assets/legal/terminos-y-condiciones.pdf'
+                            className='text-info underline'
+                            rel='noreferrer'
+                          />
+                        ),
+                        LinkPrivacy: (
+                          <a
+                            target='_blank'
+                            href='/assets/legal/politica-privacidad.pdf'
+                            className='text-info underline'
+                            rel='noreferrer'
+                          />
+                        ),
+                      }}
+                    />
+                  }
+                  name='terms_accepted'
+                  value={field.value === true}
+                  setValue={() => field.onChange(!(field.value === true))}
+                />
+                {fieldState.error?.message ? (
+                  <p className='text-sm text-alert-600'>{fieldState.error.message}</p>
+                ) : null}
+              </div>
+            )}
+          />
+        ) : null}
 
         {error ? <p className='text-sm text-alert-600'>{error}</p> : null}
 

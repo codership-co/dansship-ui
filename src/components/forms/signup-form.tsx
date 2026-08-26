@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Checkbox } from 'polpo/components';
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router';
 import { z } from 'zod';
 
@@ -37,7 +37,6 @@ export function SignUpForm() {
   const { signUp, googleLogin } = useAuth();
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
-  const [termsAndConditions, setTermsAndConditions] = useState(false);
 
   const signUpSchema = createSignUpSchema(t);
 
@@ -59,10 +58,6 @@ export function SignUpForm() {
   };
 
   const handleGoogleCredential = async (credential: string) => {
-    if (!termsAndConditions) {
-      return;
-    }
-
     setIsLoading(true);
     await googleLogin(credential);
     setIsLoading(false);
@@ -93,27 +88,7 @@ export function SignUpForm() {
         }}
       />
 
-      <Checkbox
-        label={
-          <Trans
-            className='text-small'
-            i18nKey='auth:signup.terms'
-            components={{
-              LinkTerms: (
-                <a target='_blank' href='/assets/legal/terminos-y-condiciones.pdf' className='text-info underline' />
-              ),
-              LinkPrivacy: (
-                <a target='_blank' href='/assets/legal/politica-privacidad.pdf' className='text-info underline' />
-              ),
-            }}
-          />
-        }
-        name='terms_and_conditions'
-        value={termsAndConditions}
-        setValue={() => setTermsAndConditions(p => !p)}
-      />
-
-      <Button color='primary' type='submit' isLoading={isLoading} disabled={!termsAndConditions} fullWidth>
+      <Button color='primary' type='submit' isLoading={isLoading} fullWidth>
         {t('auth:signup.createAccount')}
       </Button>
 
@@ -123,10 +98,9 @@ export function SignUpForm() {
             <div className='absolute inset-x-0 h-px bg-border' />
             <span className='relative bg-background px-3 text-xs text-muted-foreground'>{t('auth:google.or')}</span>
           </div>
-
           <GoogleSignInButton
             text='signup_with'
-            disabled={isLoading || !termsAndConditions}
+            disabled={isLoading}
             onCredential={handleGoogleCredential}
             className='w-full'
           />

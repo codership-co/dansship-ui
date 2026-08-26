@@ -70,6 +70,7 @@ export interface BasicProfilePayload {
   document_value: string;
   city?: string;
   address?: string;
+  terms_accepted?: true;
 }
 
 export interface HealthProfilePayload {
