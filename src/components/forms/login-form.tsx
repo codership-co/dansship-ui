@@ -99,9 +99,10 @@ export function LoginForm() {
         <>
           {isGoogleSignInConfigured() ? (
             <>
-              <div className='relative flex items-center justify-center'>
-                <div className='absolute inset-x-0 h-px bg-border' />
-                <span className='relative bg-background px-3 text-xs text-muted-foreground'>{t('auth:google.or')}</span>
+              <div className='flex items-center gap-3' role='separator' aria-label={t('auth:google.or')}>
+                <span className='h-px flex-1 bg-primary/15' />
+                <span className='shrink-0 text-sm text-gray-600'>{t('auth:google.or')}</span>
+                <span className='h-px flex-1 bg-primary/15' />
               </div>
               <GoogleSignInButton
                 text='signin_with'
