@@ -127,28 +127,28 @@ interface GoogleSignInButtonProps {
   className?: string;
 }
 
-function measureGisHitSize(host: HTMLElement): { width: number; height: number } {
+function measureGisHitSize(host: HTMLElement): { width: number; height: number } | null {
+  /*
+   * Use layout size (offset*), not getBoundingClientRect — rect includes CSS transforms
+   * and would collapse scale back to 1 after the first paint.
+   */
   const iframe = host.querySelector('iframe');
 
-  if (iframe) {
-    const rect = iframe.getBoundingClientRect();
-
-    if (rect.width > 0 && rect.height > 0) {
-      return { width: rect.width, height: rect.height };
-    }
+  if (iframe && iframe.offsetWidth > 0 && iframe.offsetHeight > 0) {
+    return { width: iframe.offsetWidth, height: iframe.offsetHeight };
   }
 
   const roleButton = host.querySelector('[role="button"]') as HTMLElement | null;
 
-  if (roleButton) {
-    const rect = roleButton.getBoundingClientRect();
-
-    if (rect.width > 0 && rect.height > 0) {
-      return { width: rect.width, height: rect.height };
-    }
+  if (roleButton && roleButton.offsetWidth > 0 && roleButton.offsetHeight > 0) {
+    return { width: roleButton.offsetWidth, height: roleButton.offsetHeight };
   }
 
-  return { width: GIS_ICON_SIZE_PX, height: GIS_ICON_SIZE_PX };
+  if (host.offsetWidth > 0 && host.offsetHeight > 0 && host.childElementCount > 0) {
+    return { width: host.offsetWidth, height: host.offsetHeight };
+  }
+
+  return null;
 }
 
 export function GoogleSignInButton({
@@ -234,27 +234,43 @@ export function GoogleSignInButton({
           locale: 'es',
         });
 
+        let stopWatching = () => {};
+
         const applyMeasure = () => {
           if (cancelled) {
             return;
           }
 
-          setGisSize(measureGisHitSize(host));
+          const measured = measureGisHitSize(host);
+
+          if (!measured) {
+            return;
+          }
+
+          setGisSize(measured);
           setGisReady(true);
+          // Lock after first layout measure so transform feedback cannot reset scale.
+          stopWatching();
         };
 
         // GIS injects iframe/button asynchronously; retry briefly until sized.
-        applyMeasure();
         const observer = new MutationObserver(applyMeasure);
         observer.observe(host, { childList: true, subtree: true });
-        const retryId = window.setTimeout(applyMeasure, 250);
-        const stopId = window.setTimeout(() => observer.disconnect(), 2000);
+        const retryId = window.setTimeout(applyMeasure, 100);
+        const retryId2 = window.setTimeout(applyMeasure, 300);
+        const stopId = window.setTimeout(() => {
+          applyMeasure();
+          observer.disconnect();
+        }, 2000);
 
-        const stopWatching = () => {
+        stopWatching = () => {
           observer.disconnect();
           window.clearTimeout(retryId);
+          window.clearTimeout(retryId2);
           window.clearTimeout(stopId);
         };
+
+        applyMeasure();
 
         if (cancelled) {
           stopWatching();
@@ -296,21 +312,20 @@ export function GoogleSignInButton({
         <span>{t(TEXT_I18N_KEY[text])}</span>
       </div>
       {/*
-        Invisible GIS icon scaled to the full control. Stretching the iframe with CSS
-        left a tiny inner hit area on mobile; transform scale maps the real control 1:1.
+        Invisible GIS icon scaled to the full control. Measure with offsetWidth (not
+        getBoundingClientRect) so the scale transform cannot feed back into the size.
       */}
       <div
-        ref={buttonRef}
-        aria-hidden={!gisReady}
         className='absolute top-0 left-0 z-10 origin-top-left'
         style={{
           opacity: 0.02,
           transform: `scale(${scaleX}, ${scaleY})`,
-          // Keep layout size at the unscaled GIS icon so scale math stays stable.
           width: gisSize.width,
           height: gisSize.height,
         }}
-      />
+      >
+        <div ref={buttonRef} aria-hidden={!gisReady} className='inline-block' />
+      </div>
     </div>
   );
 }
