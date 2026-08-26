@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { cn } from '@helpers';
 
 const GIS_SCRIPT_SRC = 'https://accounts.google.com/gsi/client';
 const GIS_SCRIPT_ID = 'google-identity-services';
+/** Google large icon button is ~40px; used as scale baseline before measure. */
+const GIS_ICON_SIZE_PX = 40;
 
 declare global {
   interface Window {
@@ -21,6 +23,7 @@ declare global {
           renderButton: (
             parent: HTMLElement,
             options: {
+              type?: 'standard' | 'icon';
               theme?: 'outline' | 'filled_blue' | 'filled_black';
               size?: 'large' | 'medium' | 'small';
               text?: 'signin_with' | 'signup_with' | 'continue_with' | 'signin';
@@ -124,6 +127,30 @@ interface GoogleSignInButtonProps {
   className?: string;
 }
 
+function measureGisHitSize(host: HTMLElement): { width: number; height: number } {
+  const iframe = host.querySelector('iframe');
+
+  if (iframe) {
+    const rect = iframe.getBoundingClientRect();
+
+    if (rect.width > 0 && rect.height > 0) {
+      return { width: rect.width, height: rect.height };
+    }
+  }
+
+  const roleButton = host.querySelector('[role="button"]') as HTMLElement | null;
+
+  if (roleButton) {
+    const rect = roleButton.getBoundingClientRect();
+
+    if (rect.width > 0 && rect.height > 0) {
+      return { width: rect.width, height: rect.height };
+    }
+  }
+
+  return { width: GIS_ICON_SIZE_PX, height: GIS_ICON_SIZE_PX };
+}
+
 export function GoogleSignInButton({
   onCredential,
   text = 'continue_with',
@@ -134,7 +161,9 @@ export function GoogleSignInButton({
   const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
   const callbackRef = useRef(onCredential);
-  const [buttonWidth, setButtonWidth] = useState(320);
+  const [containerSize, setContainerSize] = useState({ width: 320, height: 40 });
+  const [gisSize, setGisSize] = useState({ width: GIS_ICON_SIZE_PX, height: GIS_ICON_SIZE_PX });
+  const [gisReady, setGisReady] = useState(false);
   callbackRef.current = onCredential;
 
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim() ?? '';
@@ -153,20 +182,23 @@ export function GoogleSignInButton({
     };
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const node = containerRef.current;
 
     if (!node) {
       return;
     }
 
-    const updateWidth = () => {
-      const nextWidth = Math.max(Math.floor(node.getBoundingClientRect().width), 200);
-      setButtonWidth(nextWidth);
+    const updateSize = () => {
+      const rect = node.getBoundingClientRect();
+      setContainerSize({
+        width: Math.max(Math.floor(rect.width), 200),
+        height: Math.max(Math.floor(rect.height), 40),
+      });
     };
 
-    updateWidth();
-    const observer = new ResizeObserver(updateWidth);
+    updateSize();
+    const observer = new ResizeObserver(updateSize);
     observer.observe(node);
 
     return () => observer.disconnect();
@@ -178,6 +210,8 @@ export function GoogleSignInButton({
     }
 
     let cancelled = false;
+    let cleanupWatchers: (() => void) | undefined;
+    setGisReady(false);
 
     void loadGisScript()
       .then(() => {
@@ -189,15 +223,46 @@ export function GoogleSignInButton({
           ensureGisInitialized(clientId);
         }
 
-        buttonRef.current.innerHTML = '';
-        window.google.accounts.id.renderButton(buttonRef.current, {
+        const host = buttonRef.current;
+        host.innerHTML = '';
+        // Icon button is a compact square hit target we scale to the full custom control.
+        window.google.accounts.id.renderButton(host, {
+          type: 'icon',
           theme: 'outline',
           size: 'large',
-          text,
-          shape: 'rectangular',
-          width: buttonWidth,
+          shape: 'square',
           locale: 'es',
         });
+
+        const applyMeasure = () => {
+          if (cancelled) {
+            return;
+          }
+
+          setGisSize(measureGisHitSize(host));
+          setGisReady(true);
+        };
+
+        // GIS injects iframe/button asynchronously; retry briefly until sized.
+        applyMeasure();
+        const observer = new MutationObserver(applyMeasure);
+        observer.observe(host, { childList: true, subtree: true });
+        const retryId = window.setTimeout(applyMeasure, 250);
+        const stopId = window.setTimeout(() => observer.disconnect(), 2000);
+
+        const stopWatching = () => {
+          observer.disconnect();
+          window.clearTimeout(retryId);
+          window.clearTimeout(stopId);
+        };
+
+        if (cancelled) {
+          stopWatching();
+
+          return;
+        }
+
+        cleanupWatchers = stopWatching;
       })
       .catch(() => {
         // Button simply stays empty if GIS fails to load.
@@ -205,12 +270,16 @@ export function GoogleSignInButton({
 
     return () => {
       cancelled = true;
+      cleanupWatchers?.();
     };
-  }, [clientId, text, buttonWidth]);
+  }, [clientId]);
 
   if (!clientId) {
     return null;
   }
+
+  const scaleX = containerSize.width / gisSize.width;
+  const scaleY = containerSize.height / gisSize.height;
 
   return (
     <div
@@ -226,10 +295,21 @@ export function GoogleSignInButton({
         <GoogleMark className='size-5 shrink-0' />
         <span>{t(TEXT_I18N_KEY[text])}</span>
       </div>
-      {/* Near-invisible GIS hit target — iframe can ignore parent opacity:0 and paint white */}
+      {/*
+        Invisible GIS icon scaled to the full control. Stretching the iframe with CSS
+        left a tiny inner hit area on mobile; transform scale maps the real control 1:1.
+      */}
       <div
         ref={buttonRef}
-        className='absolute inset-0 z-10 opacity-[0.01] [&_div]:!h-full [&_div]:!w-full [&_iframe]:!h-full [&_iframe]:!w-full'
+        aria-hidden={!gisReady}
+        className='absolute top-0 left-0 z-10 origin-top-left'
+        style={{
+          opacity: 0.02,
+          transform: `scale(${scaleX}, ${scaleY})`,
+          // Keep layout size at the unscaled GIS icon so scale math stays stable.
+          width: gisSize.width,
+          height: gisSize.height,
+        }}
       />
     </div>
   );
