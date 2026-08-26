@@ -1,4 +1,7 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import { cn } from '@helpers';
 
 const GIS_SCRIPT_SRC = 'https://accounts.google.com/gsi/client';
 const GIS_SCRIPT_ID = 'google-identity-services';
@@ -84,6 +87,36 @@ function ensureGisInitialized(clientId: string): void {
   });
 }
 
+function GoogleMark({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox='0 0 24 24' aria-hidden='true'>
+      <path
+        fill='#4285F4'
+        d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'
+      />
+      <path
+        fill='#34A853'
+        d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z'
+      />
+      <path
+        fill='#FBBC05'
+        d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z'
+      />
+      <path
+        fill='#EA4335'
+        d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z'
+      />
+    </svg>
+  );
+}
+
+const TEXT_I18N_KEY = {
+  signin_with: 'auth:google.signInWith',
+  signup_with: 'auth:google.signUpWith',
+  continue_with: 'auth:google.continueWith',
+  signin: 'auth:google.signInWith',
+} as const;
+
 interface GoogleSignInButtonProps {
   onCredential: (credential: string) => void | Promise<void>;
   text?: 'signin_with' | 'signup_with' | 'continue_with' | 'signin';
@@ -97,8 +130,11 @@ export function GoogleSignInButton({
   disabled = false,
   className,
 }: GoogleSignInButtonProps) {
+  const { t } = useTranslation();
+  const containerRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLDivElement>(null);
   const callbackRef = useRef(onCredential);
+  const [buttonWidth, setButtonWidth] = useState(320);
   callbackRef.current = onCredential;
 
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim() ?? '';
@@ -115,6 +151,25 @@ export function GoogleSignInButton({
         gisCredentialHandler = null;
       }
     };
+  }, []);
+
+  useEffect(() => {
+    const node = containerRef.current;
+
+    if (!node) {
+      return;
+    }
+
+    const updateWidth = () => {
+      const nextWidth = Math.max(Math.floor(node.getBoundingClientRect().width), 200);
+      setButtonWidth(nextWidth);
+    };
+
+    updateWidth();
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(node);
+
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -140,7 +195,7 @@ export function GoogleSignInButton({
           size: 'large',
           text,
           shape: 'rectangular',
-          width: 320,
+          width: buttonWidth,
           locale: 'es',
         });
       })
@@ -151,7 +206,7 @@ export function GoogleSignInButton({
     return () => {
       cancelled = true;
     };
-  }, [clientId, text]);
+  }, [clientId, text, buttonWidth]);
 
   if (!clientId) {
     return null;
@@ -159,11 +214,23 @@ export function GoogleSignInButton({
 
   return (
     <div
-      className={className}
+      ref={containerRef}
+      className={cn('relative h-10 w-full overflow-hidden rounded-md', className)}
       aria-disabled={disabled || undefined}
       style={disabled ? { pointerEvents: 'none', opacity: 0.6 } : undefined}
     >
-      <div ref={buttonRef} className='flex justify-center min-h-10' />
+      <div
+        aria-hidden
+        className='pointer-events-none absolute inset-0 z-0 flex items-center justify-center gap-2 rounded-md border border-primary/15 bg-gray-200/80 px-3 text-sm font-medium text-primary'
+      >
+        <GoogleMark className='size-5 shrink-0' />
+        <span>{t(TEXT_I18N_KEY[text])}</span>
+      </div>
+      {/* Near-invisible GIS hit target — iframe can ignore parent opacity:0 and paint white */}
+      <div
+        ref={buttonRef}
+        className='absolute inset-0 z-10 opacity-[0.01] [&_div]:!h-full [&_div]:!w-full [&_iframe]:!h-full [&_iframe]:!w-full'
+      />
     </div>
   );
 }
