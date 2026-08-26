@@ -1,6 +1,7 @@
 import { format, parseISO, addDays, isBefore, startOfDay } from 'date-fns';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LuClipboardList } from 'react-icons/lu';
 
 import { useDateLocale } from '@hooks';
 
@@ -26,6 +27,8 @@ interface ScheduleGridProps {
   onSlotClick?: (date: string, timeHour: number) => void;
   onClassClick?: (event: GridEvent) => void;
   onAddAtTime?: (date: string, time: string) => void;
+  /** Admin-only: open the class roster without leaving the calendar. */
+  onViewRoster?: (classId: string) => void;
   dayColumnMinWidth?: number;
   scheduleStatus?: ScheduleStatus;
   /** Emphasizes a specific scheduled class in the grid (e.g. next upcoming). */
@@ -236,6 +239,7 @@ export function ScheduleGrid({
   onSlotClick,
   onClassClick,
   onAddAtTime,
+  onViewRoster,
   dayColumnMinWidth = 150,
   scheduleStatus,
   highlightedClassId,
@@ -515,6 +519,8 @@ export function ScheduleGrid({
                 const isMuted = isClassPast || isClassCancelled;
                 const isHighlighted = Boolean(highlightedClassId && id === highlightedClassId);
                 const occupancyKind = 'event_type' in cls ? cls.metadata?.kind : undefined;
+                const scheduledClassId = 'event_type' in cls ? null : cls.id;
+                const showRosterIcon = Boolean(onViewRoster && scheduledClassId);
 
                 let bgClass =
                   'bg-secondary/40 border-secondary hover:bg-secondary/60 hover:border-primary/40 text-primary';
@@ -553,6 +559,20 @@ export function ScheduleGrid({
                     }}
                     title={classInstructor ? `${className} with ${classInstructor}` : className}
                   >
+                    {showRosterIcon && scheduledClassId ? (
+                      <button
+                        type='button'
+                        className='absolute left-1 top-1 z-30 flex h-5 w-5 pointer-events-auto items-center justify-center rounded bg-primary text-primary-foreground hover:bg-primary/90'
+                        onClick={event => {
+                          event.stopPropagation();
+                          onViewRoster?.(scheduledClassId);
+                        }}
+                        title={t('admin:users.details.viewRoster')}
+                        aria-label={t('admin:users.details.viewRoster')}
+                      >
+                        <LuClipboardList className='h-3 w-3' aria-hidden />
+                      </button>
+                    ) : null}
                     {onAddAtTime && !isMuted && (
                       <button
                         type='button'
@@ -566,7 +586,7 @@ export function ScheduleGrid({
                         +
                       </button>
                     )}
-                    <div className='overflow-hidden flex flex-col'>
+                    <div className={`overflow-hidden flex flex-col ${showRosterIcon ? 'pl-6' : ''}`}>
                       <span className='text-xs font-semibold truncate leading-tight'>{className}</span>
                       {isClassCancelled && (
                         <span className='text-[10px] font-semibold uppercase text-gray-500 truncate leading-tight'>

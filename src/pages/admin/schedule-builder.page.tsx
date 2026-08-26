@@ -5,7 +5,7 @@ import { LuChevronLeft, LuChevronRight } from 'react-icons/lu';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
-import { ClassSlotModal, CopyWeekDialog, ScheduleGrid } from '@components/modules';
+import { AdminClassRosterDialog, ClassSlotModal, CopyWeekDialog, ScheduleGrid } from '@components/modules';
 import { Button } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
 import { DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError, ScheduledClass, type ScheduleWeek } from '@core/api';
@@ -50,11 +50,13 @@ function AdminScheduleBuilderPage() {
   const canCancelPublishedClass = useOrPermissions([PERMISSION.SCHEDULED_CLASS_CANCEL]);
   const canManageFullSchedule = useOrPermissions([PERMISSION.SCHEDULE_MANAGE]);
   const canEditDraftSchedule = useOrPermissions([PERMISSION.SCHEDULE_DRAFT_CREATE, PERMISSION.SCHEDULE_MANAGE]);
+  const canViewRoster = useOrPermissions(AdminPermissions.bookings);
   const [currentDate, setCurrentDate] = useState<Date>(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isPublishConfirmOpen, setIsPublishConfirmOpen] = useState(false);
   const [isCopyWeekOpen, setIsCopyWeekOpen] = useState(false);
   const [editingClass, setEditingClass] = useState<ScheduledClass | null>(null);
+  const [rosterView, setRosterView] = useState<{ classId: string; classTitle?: string } | null>(null);
   const [defaultSlot, setDefaultSlot] = useState<{ date: string; time: string } | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [dayColumnMinWidth, setDayColumnMinWidth] = useState<number>(150);
@@ -352,6 +354,17 @@ function AdminScheduleBuilderPage() {
             onSlotClick={handleSlotClick}
             onClassClick={selectedClass => handleClassClick(selectedClass as ScheduledClass)}
             onAddAtTime={!isArchived && canMutateCurrentWeek ? handleAddAtSameTime : undefined}
+            onViewRoster={
+              canViewRoster
+                ? classId => {
+                    const scheduledClass = (activeWeekDetail?.classes || []).find(cls => cls.id === classId);
+                    setRosterView({
+                      classId,
+                      classTitle: scheduledClass?.class_definition?.name,
+                    });
+                  }
+                : undefined
+            }
             dayColumnMinWidth={dayColumnMinWidth}
             scheduleStatus={weekObj?.status}
           />
@@ -397,6 +410,17 @@ function AdminScheduleBuilderPage() {
         isLoading={isCopyingWeek}
         onConfirm={copyWeekToNext}
         onSuccess={handleCopyWeekSuccess}
+      />
+
+      <AdminClassRosterDialog
+        classId={rosterView?.classId ?? ''}
+        classTitle={rosterView?.classTitle}
+        open={Boolean(rosterView)}
+        onOpenChange={open => {
+          if (!open) {
+            setRosterView(null);
+          }
+        }}
       />
     </div>
   );
