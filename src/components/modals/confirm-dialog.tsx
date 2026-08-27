@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import {
   Button,
   Dialog,
@@ -13,7 +15,7 @@ interface ConfirmDialogProps {
   onOpenChange: (open: boolean) => void;
   onConfirm: () => void | Promise<void>;
   title: string;
-  description?: string;
+  description?: ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
   confirmVariant?: 'default' | 'destructive';

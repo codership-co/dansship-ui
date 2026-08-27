@@ -10,6 +10,8 @@
   "cancelBooking": "Cancelar Reserva",
   "cancelBookingTitle": "¿Cancelar reserva?",
   "cancelBookingConfirm": "Esta acción liberará tu lugar en la clase. ¿Deseas continuar?",
+  "cancelBookingReimbursed": "Se devolverá esta clase a tu contador de clases.",
+  "cancelBookingNotReimbursed": "Esta cancelación NO devolverá la clase a tu contador. La ventana de reembolso ya pasó.",
   "cancellationNotAllowed": "Esta reserva no se puede cancelar.",
   "status": {
     "active": "Reservado",
