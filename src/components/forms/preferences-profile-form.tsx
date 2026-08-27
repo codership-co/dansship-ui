@@ -31,6 +31,7 @@ interface OnboardingPreferencesProfileFormProps {
   onComplete: (values: PreferencesProfileFormValues) => void;
   onSkip?: () => void;
   defaultValues?: PreferencesProfileFormValues;
+  submitLabel?: string;
 }
 
 export function PreferencesProfileForm({
@@ -39,6 +40,7 @@ export function PreferencesProfileForm({
   onComplete,
   onSkip,
   defaultValues,
+  submitLabel,
 }: OnboardingPreferencesProfileFormProps) {
   const { t } = useTranslation();
   const schema = createPreferencesProfileSchema();
@@ -157,7 +159,7 @@ export function PreferencesProfileForm({
 
         <div className='mt-6 flex flex-col items-center space-y-3'>
           <Button type='submit' isLoading={isLoading} color='primary' fullWidth>
-            {isLoading ? t('common:loading') : t('auth:onboarding.complete')}
+            {isLoading ? t('common:loading') : (submitLabel ?? t('auth:onboarding.complete'))}
           </Button>
           {onSkip && (
             <Button type='button' onClick={onSkip} color='tertiary' variant='text' isLoading={isLoading} fullWidth>

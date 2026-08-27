@@ -79,8 +79,13 @@
     "submitFailed": "No se pudo enviar la respuesta. Inténtalo de nuevo.",
     "dismissFailed": "No se pudo omitir la campaña. Inténtalo de nuevo.",
     "required": "Esta pregunta es obligatoria.",
+    "continue": "Continuar",
+    "step": "{{current}} de {{total}}",
     "selectOption": "Selecciona una opción",
     "writeAnswer": "Escribe tu respuesta"
+  },
+  "classLevel": {
+    "profileHint": "Puedes actualizar tu nivel más adelante desde tu perfil."
   },
   "validation": {
     "titleRequired": "El título es obligatorio",

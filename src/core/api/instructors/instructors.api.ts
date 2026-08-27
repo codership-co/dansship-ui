@@ -15,10 +15,12 @@ import {
   type InstructorCertificationContentType,
   type InstructorCertificationPresignedUpload,
   type InstructorCertificationUploadRequest,
+  type InstructorOperationalProfile,
   type InstructorProfile,
   type InstructorUserSearchResult,
   type ManualAddStudentPayload,
   type UpdateAvailabilityPayload,
+  type UpdateInstructorOperationalProfilePayload,
   type UpdateInstructorProfilePayload,
 } from './instructors.models';
 
@@ -55,6 +57,21 @@ export class InstructorsAPI {
   async updateProfile(payload: UpdateInstructorProfilePayload) {
     return this.httpClient.callNoError<InstructorProfile>({
       path: '/instructors/profile',
+      method: 'PUT',
+      data: payload,
+    });
+  }
+
+  async getOperationalProfile() {
+    return this.httpClient.callNoError<InstructorOperationalProfile>({
+      path: '/instructors/operational-profile',
+      method: 'GET',
+    });
+  }
+
+  async updateOperationalProfile(payload: UpdateInstructorOperationalProfilePayload) {
+    return this.httpClient.callNoError<InstructorOperationalProfile, UpdateInstructorOperationalProfilePayload>({
+      path: '/instructors/operational-profile',
       method: 'PUT',
       data: payload,
     });

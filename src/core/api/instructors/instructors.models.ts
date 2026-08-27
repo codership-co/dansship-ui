@@ -1,3 +1,5 @@
+import { type StudentClassLevelItem } from '../class-levels/class-levels.models';
+
 export const INDEX_TO_DAY: Record<number, AvailabilityApiItem['day_of_week']> = {
   0: 'monday',
   1: 'tuesday',
@@ -36,6 +38,25 @@ export interface CreateInstructorProfilePayload {
 
 export type UpdateInstructorProfilePayload = Partial<CreateInstructorProfilePayload>;
 
+export interface InstructorOperationalProfile {
+  instagram: string | null;
+  availability: Array<{
+    day_of_week: AvailabilityApiItem['day_of_week'];
+    start_time: string;
+    end_time: string;
+  }>;
+  disciplines: Array<{
+    discipline_name: string;
+    years_experience: number;
+  }>;
+}
+
+export type UpdateInstructorOperationalProfilePayload = {
+  instagram: string;
+  availability: InstructorOperationalProfile['availability'];
+  disciplines: InstructorOperationalProfile['disciplines'];
+};
+
 export interface AvailabilitySlot {
   // 0 = Monday, 6 = Sunday (normalized for UI)
   day_of_week: number;
@@ -68,6 +89,7 @@ export interface RosterStudent {
   user_id: string;
   user_name?: string;
   user_email?: string;
+  class_level?: 'beginner' | 'intermediate' | 'advanced' | null;
   status: 'active' | 'attended' | 'no_show' | 'cancelled';
   created_at: string;
 }
@@ -85,6 +107,7 @@ export interface InstructorStudentProfile {
   goals: Array<string>;
   disciplines: Array<string>;
   current_level: string | null;
+  class_levels?: Array<StudentClassLevelItem>;
 }
 
 export interface InstructorUserSearchResult {

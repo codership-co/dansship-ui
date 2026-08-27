@@ -162,6 +162,7 @@ export function CampaignsPanel() {
       />
       <CampaignResponsesDialog
         campaign={responsesCampaign}
+        classes={classes}
         open={Boolean(responsesCampaign)}
         onOpenChange={open => {
           if (!open) {

@@ -4,6 +4,7 @@ import { LuCalendarDays, LuGraduationCap, LuMail, LuShield, LuShieldCheck, LuUse
 import { PiCaretLeft } from 'react-icons/pi';
 
 import { Container, SectionHeading } from '@components/containers';
+import { ClassLevelsSection } from '@components/modules/profile/class-levels-section';
 import { LoginMethodsSection } from '@components/modules/profile/login-methods-section';
 import { Badge } from '@components/ui';
 import { useAuth, useOrPermissions } from '@contexts';
@@ -93,7 +94,7 @@ export function ProfileAbout() {
             icon={PiCaretLeft}
             subtitle={t('profile:studentSectionDescription')}
           >
-            :D
+            <ClassLevelsSection />
           </AccordionItem>
 
           {(user.isCoach || user.isInstructor) && (

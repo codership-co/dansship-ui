@@ -2,11 +2,13 @@ import { type ReactNode, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { CLASS_LEVEL_SELF_ASSESSMENT_TYPE, ClassLevelSelfAssessmentForm } from './class-level-self-assessment-form';
+
 import { Button, Checkbox, Label, Textarea } from '@components/ui';
-import { type CampaignQuestion, type PendingCampaign } from '@core/api';
+import { type CampaignAnswerValue, type CampaignQuestion, type PendingCampaign } from '@core/api';
 import { cn } from '@helpers';
 
-type AnswerValue = string | number | Array<string>;
+type AnswerValue = CampaignAnswerValue;
 
 interface CampaignQuestionFormProps {
   campaign: PendingCampaign;
@@ -15,7 +17,11 @@ interface CampaignQuestionFormProps {
   onDismiss?: () => void;
 }
 
-export const STRUCTURED_CAMPAIGN_RENDERERS: Record<string, (props: CampaignQuestionFormProps) => ReactNode> = {};
+export type { CampaignQuestionFormProps };
+
+export const STRUCTURED_CAMPAIGN_RENDERERS: Record<string, (props: CampaignQuestionFormProps) => ReactNode> = {
+  [CLASS_LEVEL_SELF_ASSESSMENT_TYPE]: ClassLevelSelfAssessmentForm,
+};
 
 export function CampaignQuestionForm({ campaign, isSubmitting, onSubmit, onDismiss }: CampaignQuestionFormProps) {
   const Renderer = campaign.structured_type ? STRUCTURED_CAMPAIGN_RENDERERS[campaign.structured_type] : undefined;

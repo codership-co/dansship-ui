@@ -81,6 +81,7 @@ interface OnboardingOperationalProfileFormProps {
     availability: Array<OnboardingAvailabilitySlot>;
     disciplines: OperationalProfileFormValues['disciplines'];
   }) => void;
+  submitLabel?: string;
 }
 
 const toApiTime = (value: string) => (value.length === 5 ? `${value}:00` : value);
@@ -91,6 +92,7 @@ export function OperationalProfileForm({
   error,
   defaultValues,
   onSubmit,
+  submitLabel,
 }: OnboardingOperationalProfileFormProps) {
   const { t } = useTranslation();
   const schema = createOperationalProfileSchema(t);
@@ -283,7 +285,7 @@ export function OperationalProfileForm({
         {error ? <p className='text-sm text-alert-600'>{error}</p> : null}
 
         <Button type='submit' isLoading={isLoading} color='primary' className='mt-20' fullWidth>
-          {t('auth:onboarding.continue')}
+          {submitLabel ?? t('auth:onboarding.continue')}
         </Button>
       </form>
     </div>

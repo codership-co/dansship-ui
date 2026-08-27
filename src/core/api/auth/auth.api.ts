@@ -124,6 +124,13 @@ export class AuthAPI {
     });
   }
 
+  async getSelfProfile() {
+    return this.httpClient.callNoError<AuthUser>({
+      path: '/auth/profile',
+      method: 'GET',
+    });
+  }
+
   async getProfile() {
     return this.httpClient.call<AuthUser, object, User>(
       {
