@@ -79,8 +79,10 @@ export interface PendingCampaignEnvelope {
   campaign: PendingCampaign | null;
 }
 
+export type CampaignAnswerValue = string | number | Array<string> | Record<string, string>;
+
 export interface CampaignSubmitPayload {
-  answers: Record<string, string | number | Array<string>>;
+  answers: Record<string, CampaignAnswerValue>;
 }
 
 export interface CampaignResponseItem {

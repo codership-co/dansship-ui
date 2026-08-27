@@ -311,6 +311,7 @@
     "enrolled": "Inscritos ({{count}})",
     "studentName": "Estudiante",
     "noStudents": "No hay estudiantes inscritos.",
+    "noLevel": "Sin nivel",
     "registerRetroactive": "Registrar asistencia retroactiva",
     "dialogTitle": "Registrar asistencia retroactiva",
     "dialogDescription": "Busca a la estudiante por el correo con el que se registró en Dansship. Se debitará un crédito de su plan actual.",

@@ -133,6 +133,8 @@
   },
   "certificationsSaveSuccess": "Certificaciones guardadas correctamente",
   "certificationsSaveFailed": "No se pudieron guardar las certificaciones",
+  "saveSuccess": "Cambios guardados correctamente",
+  "saveFailed": "No se pudieron guardar los cambios",
   "achievements": {
     "title": "Logros",
     "types": {
@@ -212,6 +214,15 @@
   "lastUpdated": "Última actualización",
   "studentSectionTitle": "Perfil de estudiante",
   "studentSectionDescription": "Actividad de aprendizaje y suscripciones asociadas a tu cuenta.",
+  "classLevels": {
+    "description": "Tu nivel percibido en cada tipo de clase que has tomado. Puedes actualizarlo cuando quieras.",
+    "empty": "Aún no has tomado ninguna clase. Tu nivel aparecerá aquí después de tu primera reserva.",
+    "placeholder": "Selecciona tu nivel",
+    "selectRequired": "Selecciona un nivel para guardar.",
+    "saveSuccess": "Nivel actualizado.",
+    "saveFailed": "No se pudo guardar el nivel. Inténtalo de nuevo.",
+    "loadFailed": "No se pudieron cargar tus niveles de clase."
+  },
   "instructorSectionDescription": "Información pública de enseñanza mostrada a los estudiantes.",
   "notSet": "Sin configurar",
   "adminSectionTitle": "Acceso de administrador",

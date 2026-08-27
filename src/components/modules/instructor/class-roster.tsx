@@ -11,6 +11,7 @@ import { DansshipAPI, InstructorUserSearchResult, RosterStudent } from '@core/ap
 import { PageURLS } from '@core/constants';
 import { InstructorPermissions } from '@core/permissions';
 import { captureUnexpectedException } from '@core/sentry';
+import { classLevelLabelKey } from '@helpers';
 import { useDateLocale, usePromise, useInstructorRoster } from '@hooks';
 
 interface ClassRosterProps {
@@ -21,6 +22,12 @@ interface ClassRosterProps {
 
 function studentDisplayName(student: RosterStudent) {
   return student.user_name || student.user_email || student.user_id;
+}
+
+function studentClassLevelLabel(student: RosterStudent, t: (key: string) => string) {
+  const key = classLevelLabelKey(student.class_level);
+
+  return key ? t(key) : t('instructor:roster.noLevel');
 }
 
 function StudentName({ classId, student }: { classId: string; student: RosterStudent }) {
@@ -271,7 +278,7 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
                   <p className='m-0 font-semibold text-gray-900 truncate'>
                     <StudentName classId={classId} student={student} />
                   </p>
-                  <p className='m-0 text-sm text-gray-500 truncate'>{student.user_email || '-'}</p>
+                  <p className='m-0 text-sm text-gray-500 truncate'>{studentClassLevelLabel(student, t)}</p>
                 </div>
                 <AttendanceActions
                   student={student}
@@ -291,7 +298,7 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
             <TableHeader>
               <TableRow>
                 <TableHead>{t('instructor:roster.studentName')}</TableHead>
-                <TableHead>{t('common:email')}</TableHead>
+                <TableHead>{t('common:level')}</TableHead>
                 <TableHead className='text-right'>{t('instructor:roster.attendance')}</TableHead>
               </TableRow>
             </TableHeader>
@@ -308,7 +315,7 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
                     <TableCell className='font-medium'>
                       <StudentName classId={classId} student={student} />
                     </TableCell>
-                    <TableCell>{student.user_email || '-'}</TableCell>
+                    <TableCell>{studentClassLevelLabel(student, t)}</TableCell>
                     <TableCell className='text-right'>
                       <AttendanceActions
                         student={student}

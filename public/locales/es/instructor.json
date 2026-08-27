@@ -44,7 +44,8 @@
     "attendanceUpdated": "Asistencia actualizada",
     "studentAddedSuccess": "Alumno agregado exitosamente",
     "studentAddFailed": "Error al agregar alumno",
-    "addFailedTitle": "Error al Agregar"
+    "addFailedTitle": "Error al Agregar",
+    "noLevel": "Sin nivel"
   },
   "profile": {
     "title": "Perfil de Instructor",
@@ -84,6 +85,7 @@
     "goals": "Objetivo",
     "disciplines": "Disciplinas de interés",
     "currentLevel": "Nivel actual",
+    "classLevels": "Nivel por tipo de clase",
     "noData": "Sin información",
     "notFound": "No se pudo cargar el perfil de este alumno.",
     "loading": "Cargando perfil..."

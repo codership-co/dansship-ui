@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { CampaignQuestionForm } from './campaign-question-form';
 
 import { useAuth } from '@contexts';
-import { DansshipAPI, DansshipAPIError } from '@core/api';
+import { DansshipAPI, DansshipAPIError, type CampaignAnswerValue } from '@core/api';
 import { useCallablePromise, usePromise } from '@hooks';
 
 const STUDENT_CAMPAIGN_PREFIXES = ['/classes', '/profile', '/figures', '/figure', '/studio-rental'];
@@ -29,7 +29,7 @@ export function CampaignOverlayHost() {
 
   const { response, reFetch } = usePromise(() => DansshipAPI.campaigns.getPending(), enabled, [pathname, enabled]);
   const { call: submitPromise, isLoading: isSubmitting } = useCallablePromise(
-    (campaignId: string, answers: Record<string, string | number | Array<string>>) =>
+    (campaignId: string, answers: Record<string, CampaignAnswerValue>) =>
       DansshipAPI.campaigns.submitResponse(campaignId, { answers }),
   );
   const { call: dismissPromise, isLoading: isDismissing } = useCallablePromise((campaignId: string) =>
@@ -101,7 +101,7 @@ export function CampaignOverlayHost() {
       onClose={() => {
         void persistDismiss();
       }}
-      className='w-[min(100dvw,32rem)] max-w-lg p-0'
+      className='w-[min(100dvw,32rem)] max-w-lg max-h-[min(90dvh,40rem)] overflow-y-auto p-0'
     >
       <CampaignQuestionForm
         campaign={campaign}

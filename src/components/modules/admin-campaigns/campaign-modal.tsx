@@ -34,6 +34,41 @@ const EMPTY_OPTION = '__none__';
 const createQuestionId = () =>
   typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
 
+const createQuestionSchema = (t: (key: string) => string) =>
+  z.discriminatedUnion('type', [
+    z.object({
+      type: z.literal('text'),
+      id: z.string(),
+      prompt: z.string().min(1, { message: t('campaigns:validation.questionRequired') }),
+      required: z.boolean(),
+    }),
+    z.object({
+      type: z.literal('multiple_choice'),
+      id: z.string(),
+      prompt: z.string().min(1, { message: t('campaigns:validation.questionRequired') }),
+      required: z.boolean(),
+      allow_multiple: z.boolean(),
+      options: z
+        .array(
+          z.object({
+            id: z.string(),
+            label: z.string().min(1, { message: t('campaigns:validation.optionRequired') }),
+          }),
+        )
+        .min(2, { message: t('campaigns:validation.minOptions') }),
+    }),
+    z.object({
+      type: z.literal('scale'),
+      id: z.string(),
+      prompt: z.string().min(1, { message: t('campaigns:validation.questionRequired') }),
+      required: z.boolean(),
+      min: z.coerce.number(),
+      max: z.coerce.number(),
+      min_label: z.string().optional(),
+      max_label: z.string().optional(),
+    }),
+  ]);
+
 const createCampaignSchema = (t: (key: string) => string) =>
   z
     .object({
@@ -46,61 +81,49 @@ const createCampaignSchema = (t: (key: string) => string) =>
       class_definition_id: z.string(),
       valid_from: z.string().optional(),
       valid_until: z.string().optional(),
-      questions: z.array(
-        z.discriminatedUnion('type', [
-          z.object({
-            type: z.literal('text'),
-            id: z.string(),
-            prompt: z.string().min(1, { message: t('campaigns:validation.questionRequired') }),
-            required: z.boolean(),
-          }),
-          z.object({
-            type: z.literal('multiple_choice'),
-            id: z.string(),
-            prompt: z.string().min(1, { message: t('campaigns:validation.questionRequired') }),
-            required: z.boolean(),
-            allow_multiple: z.boolean(),
-            options: z
-              .array(
-                z.object({
-                  id: z.string(),
-                  label: z.string().min(1, { message: t('campaigns:validation.optionRequired') }),
-                }),
-              )
-              .min(2, { message: t('campaigns:validation.minOptions') }),
-          }),
-          z.object({
-            type: z.literal('scale'),
-            id: z.string(),
-            prompt: z.string().min(1, { message: t('campaigns:validation.questionRequired') }),
-            required: z.boolean(),
-            min: z.coerce.number(),
-            max: z.coerce.number(),
-            min_label: z.string().optional(),
-            max_label: z.string().optional(),
-          }),
-        ]),
-      ),
+      questions: z.array(z.unknown()),
     })
     .superRefine((values, ctx) => {
-      if (values.kind === 'free' && values.questions.length === 0) {
+      if (values.kind === 'structured') {
+        if (!values.structured_type) {
+          ctx.addIssue({
+            code: 'custom',
+            message: t('campaigns:validation.structuredTypeRequired'),
+            path: ['structured_type'],
+          });
+        }
+
+        return;
+      }
+
+      if (values.questions.length === 0) {
         ctx.addIssue({
           code: 'custom',
           message: t('campaigns:validation.questionsRequired'),
           path: ['questions'],
         });
+
+        return;
       }
 
-      if (values.kind === 'structured' && !values.structured_type) {
-        ctx.addIssue({
-          code: 'custom',
-          message: t('campaigns:validation.structuredTypeRequired'),
-          path: ['structured_type'],
-        });
-      }
+      const questionSchema = createQuestionSchema(t);
 
       values.questions.forEach((question, index) => {
-        if (question.type === 'scale' && question.max <= question.min) {
+        const parsed = questionSchema.safeParse(question);
+
+        if (!parsed.success) {
+          parsed.error.issues.forEach(issue => {
+            ctx.addIssue({
+              code: 'custom',
+              message: issue.message,
+              path: ['questions', index, ...issue.path],
+            });
+          });
+
+          return;
+        }
+
+        if (parsed.data.type === 'scale' && parsed.data.max <= parsed.data.min) {
           ctx.addIssue({
             code: 'custom',
             message: t('campaigns:validation.scaleRange'),
@@ -110,7 +133,18 @@ const createCampaignSchema = (t: (key: string) => string) =>
       });
     });
 
-type CampaignFormValues = z.infer<ReturnType<typeof createCampaignSchema>>;
+type CampaignQuestionForm = z.infer<ReturnType<typeof createQuestionSchema>>;
+type CampaignFormValues = Omit<z.infer<ReturnType<typeof createCampaignSchema>>, 'questions'> & {
+  questions: Array<CampaignQuestionForm>;
+};
+
+function FieldError({ message }: { message?: string }) {
+  if (!message) {
+    return null;
+  }
+
+  return <p className='text-sm text-alert-500'>{message}</p>;
+}
 
 interface InstructorOption {
   id: string;
@@ -328,6 +362,7 @@ export function CampaignModal({
           <div className='space-y-2'>
             <Label htmlFor='campaign-title'>{t('campaigns:admin.modal.title')}</Label>
             <Input id='campaign-title' {...form.register('title')} />
+            <FieldError message={form.formState.errors.title?.message} />
           </div>
           <div className='space-y-2'>
             <Label htmlFor='campaign-description'>{t('campaigns:admin.modal.description')}</Label>
@@ -339,7 +374,21 @@ export function CampaignModal({
               <Select
                 disabled={Boolean(initialData)}
                 value={kind}
-                onValueChange={value => form.setValue('kind', value as CampaignKind)}
+                onValueChange={value => {
+                  const nextKind = value as CampaignKind;
+                  form.setValue('kind', nextKind);
+                  form.clearErrors('questions');
+
+                  if (nextKind === 'structured') {
+                    form.setValue('questions', []);
+
+                    return;
+                  }
+
+                  if (form.getValues('questions').length === 0) {
+                    form.setValue('questions', [emptyQuestion('text')]);
+                  }
+                }}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -358,11 +407,11 @@ export function CampaignModal({
                 ) : (
                   <Select
                     disabled={Boolean(initialData)}
-                    value={form.watch('structured_type')}
-                    onValueChange={value => form.setValue('structured_type', value)}
+                    value={form.watch('structured_type') || undefined}
+                    onValueChange={value => form.setValue('structured_type', value, { shouldValidate: true })}
                   >
                     <SelectTrigger>
-                      <SelectValue />
+                      <SelectValue placeholder={t('campaigns:admin.modal.structuredType')} />
                     </SelectTrigger>
                     <SelectContent>
                       {structuredTypes.map(type => (
@@ -373,6 +422,7 @@ export function CampaignModal({
                     </SelectContent>
                   </Select>
                 )}
+                <FieldError message={form.formState.errors.structured_type?.message} />
               </div>
             ) : null}
           </div>
@@ -463,6 +513,13 @@ export function CampaignModal({
                   </Button>
                 </div>
               </div>
+              <FieldError
+                message={
+                  typeof form.formState.errors.questions?.message === 'string'
+                    ? form.formState.errors.questions.message
+                    : form.formState.errors.questions?.root?.message
+                }
+              />
               {fields.map((field, index) => {
                 const questionType = form.watch(`questions.${index}.type`);
 
@@ -477,6 +534,13 @@ export function CampaignModal({
                     <Input
                       placeholder={t('campaigns:admin.modal.questionPrompt')}
                       {...form.register(`questions.${index}.prompt`)}
+                    />
+                    <FieldError
+                      message={
+                        (form.formState.errors.questions as Array<{ prompt?: { message?: string } }> | undefined)?.[
+                          index
+                        ]?.prompt?.message
+                      }
                     />
                     <label className='flex items-center gap-2 text-sm'>
                       <Checkbox

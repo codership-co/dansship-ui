@@ -34,6 +34,21 @@ export interface AuthUser {
     updated_at: string;
     completion_percent: number;
   } | null;
+  health_profile?: {
+    emergency_contact_name?: string | null;
+    emergency_contact_relative?: string | null;
+    emergency_contact_phone_country_code?: string | null;
+    emergency_contact_phone_number?: string | null;
+    eps?: string | null;
+    existing_medical_conditions?: string | null;
+  } | null;
+  preferences?: {
+    heard_about_us?: string | null;
+    current_level?: string | null;
+    goals?: Array<string>;
+    disciplines?: Array<string>;
+    preferred_schedules?: Array<string>;
+  } | null;
   created_at: string;
 }
 
@@ -154,6 +169,28 @@ export interface UpdateProfilePayload {
   preferred_language?: string;
   full_name?: string;
   display_name?: string;
+  birth_date?: string;
+  phone_country_code?: string;
+  phone_number?: string;
+  document_type?: string;
+  document_value?: string;
+  city?: string;
+  address?: string;
+  health_profile?: {
+    emergency_contact_name?: string | null;
+    emergency_contact_relative?: string | null;
+    emergency_contact_phone_country_code?: string | null;
+    emergency_contact_phone_number?: string | null;
+    eps?: string | null;
+    existing_medical_conditions?: string | null;
+  };
+  preferences?: {
+    heard_about_us?: string | null;
+    current_level?: string | null;
+    goals?: Array<string>;
+    disciplines?: Array<string>;
+    preferred_schedules?: Array<string>;
+  };
 }
 
 export interface UserPhotoUploadRequest {

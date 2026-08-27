@@ -47,8 +47,9 @@ interface OnboardingBasicProfileFormProps {
   isLoading: boolean;
   error: string | null;
   onSubmit: (values: BasicProfileFormValues) => void;
-  defaultValues?: BasicProfileFormValues;
+  defaultValues?: Partial<BasicProfileFormValues>;
   requireTermsAcceptance?: boolean;
+  submitLabel?: string;
 }
 
 export function BasicProfileForm({
@@ -57,6 +58,7 @@ export function BasicProfileForm({
   onSubmit,
   defaultValues,
   requireTermsAcceptance = false,
+  submitLabel,
 }: OnboardingBasicProfileFormProps) {
   const { t } = useTranslation();
   const schema = createBasicProfileSchema(t, requireTermsAcceptance);
@@ -278,7 +280,7 @@ export function BasicProfileForm({
         {error ? <p className='text-sm text-alert-600'>{error}</p> : null}
 
         <Button type='submit' isLoading={isLoading} color='primary' className='mt-12' fullWidth>
-          {isLoading ? t('common:loading') : t('auth:onboarding.continue')}
+          {isLoading ? t('common:loading') : (submitLabel ?? t('auth:onboarding.continue'))}
         </Button>
       </form>
     </div>

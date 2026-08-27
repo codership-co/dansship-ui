@@ -29,11 +29,21 @@ interface HealthProfileFormProps {
   isLoading: boolean;
   error: string | null;
   onContinue: (values: HealthDataFormValues) => void;
-  onSkip: () => void;
+  onSkip?: () => void;
   defaultValues?: HealthDataFormValues;
+  submitLabel?: string;
+  showSkip?: boolean;
 }
 
-export function HealthProfileForm({ isLoading, error, onContinue, onSkip, defaultValues }: HealthProfileFormProps) {
+export function HealthProfileForm({
+  isLoading,
+  error,
+  onContinue,
+  onSkip,
+  defaultValues,
+  submitLabel,
+  showSkip = true,
+}: HealthProfileFormProps) {
   const { t } = useTranslation();
   const schema = createHealthDataSchema(t);
 
@@ -106,11 +116,13 @@ export function HealthProfileForm({ isLoading, error, onContinue, onSkip, defaul
 
         <div className='mt-4 flex flex-col items-center space-y-3'>
           <Button type='submit' isLoading={isLoading} color='primary' fullWidth>
-            {isLoading ? t('common:loading') : t('auth:onboarding.continue')}
+            {isLoading ? t('common:loading') : (submitLabel ?? t('auth:onboarding.continue'))}
           </Button>
-          <Button type='button' onClick={onSkip} variant='text' color='tertiary' isLoading={isLoading} fullWidth>
-            {t('auth:onboarding.omitStep')}
-          </Button>
+          {showSkip && onSkip ? (
+            <Button type='button' onClick={onSkip} variant='text' color='tertiary' isLoading={isLoading} fullWidth>
+              {t('auth:onboarding.omitStep')}
+            </Button>
+          ) : null}
         </div>
       </form>
     </div>

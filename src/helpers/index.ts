@@ -13,3 +13,4 @@ export * from './messaging-links';
 export * from './payments';
 export * from './plans';
 export * from './role-redirect';
+export * from './class-level';
