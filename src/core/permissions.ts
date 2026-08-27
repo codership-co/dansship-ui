@@ -115,6 +115,9 @@ export enum PERMISSION {
   // BENEFIT
   BENEFIT_READ = 'read:benefit',
 
+  // CAMPAIGN
+  CAMPAIGN_MANAGE = 'manage:campaign',
+
   // NOTIFICATION
   NOTIFICATION_MANAGE = 'manage:notification',
 }
@@ -165,4 +168,5 @@ export const AdminPermissions = {
   financialReports: [PERMISSION.FINANCIAL_REPORT_READ],
   notifications: [PERMISSION.NOTIFICATION_MANAGE],
   studioRental: [PERMISSION.STUDIO_RENTAL_MANAGE],
+  campaigns: [PERMISSION.CAMPAIGN_MANAGE],
 };

@@ -124,6 +124,7 @@ export const PageURLS = {
     figures: '/admin/figures',
     studioRental: '/admin/studio-rental',
     doorCode: '/admin/door-code',
+    campaigns: '/admin/campaigns',
   },
   figures: '/figures',
   figuresById: (id: string | number) => `/figures/${id}`,

@@ -8,6 +8,8 @@ export interface Booking {
   scheduled_class_id: string;
   status: BookingStatus;
   created_at: string;
+  cancelled_at?: string | null;
+  credit_restored?: boolean | null;
   subscription_id?: string | null;
   plan_name?: string | null;
   is_cancellable?: boolean;

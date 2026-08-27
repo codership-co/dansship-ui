@@ -26,6 +26,7 @@ import {
   SecureAdminScheduleBuilderPage,
   SecureAdminStudioRentalPage,
   SecureAdminDoorCodePage,
+  SecureAdminCampaignsPage,
   SecureClassesPage,
   SecureFigureCompletedPage,
   SecureFigureSavedPage,
@@ -166,6 +167,7 @@ const routes: Array<RouteObject> = [
               { path: 'classes/:classId/roster', Component: SecureAdminClassRosterPage },
               { path: 'studio-rental', Component: SecureAdminStudioRentalPage },
               { path: 'door-code', Component: SecureAdminDoorCodePage },
+              { path: 'campaigns', Component: SecureAdminCampaignsPage },
             ],
           },
 

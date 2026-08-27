@@ -1,6 +1,7 @@
 import { Outlet, useLocation, useNavigation } from 'react-router';
 
 import { SpinnerLoader } from '@components/loaders';
+import { CampaignOverlayHost } from '@components/modules';
 import { Footer, Navbar } from '@components/navigation';
 import { SecurityGuard, useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';
@@ -24,6 +25,7 @@ export const RouterPageLayout = () => {
         />
       )}
       <Navbar />
+      <CampaignOverlayHost />
       <section className='relative z-10 h-full'>
         {(!ready || isRouterLoading) && !location?.pathname.startsWith('/auth') ? (
           <SpinnerLoader />

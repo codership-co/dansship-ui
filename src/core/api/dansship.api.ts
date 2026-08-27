@@ -5,6 +5,8 @@ import { BenefitsAdminAPI } from './benefits/benefits.admin.api';
 import { BillingAdminAPI } from './billing/billing.admin.api';
 import { BookingsAdminAPI } from './bookings/bookings.admin.api';
 import { BookingsAPI } from './bookings/bookings.api';
+import { CampaignsAdminAPI } from './campaigns/campaigns.admin.api';
+import { CampaignsAPI } from './campaigns/campaigns.api';
 import { DansshipAPIError, getResponseError, logger } from './dansship.error';
 import { DoorCodeAdminAPI } from './door-code/door-code.admin.api';
 import { FiguresAdminAPI } from './figures/figures.admin.api';
@@ -55,6 +57,8 @@ export class DansshipAPI {
   static billingAdmin = new BillingAdminAPI(this.httpClient);
   static bookings = new BookingsAPI(this.httpClient);
   static bookingsAdmin = new BookingsAdminAPI(this.httpClient);
+  static campaigns = new CampaignsAPI(this.httpClient);
+  static campaignsAdmin = new CampaignsAdminAPI(this.httpClient);
   static figures = new FiguresAPI(this.httpClient);
   static figuresAdmin = new FiguresAdminAPI(this.httpClient);
   static gifts = new GiftsAPI(this.httpClient);

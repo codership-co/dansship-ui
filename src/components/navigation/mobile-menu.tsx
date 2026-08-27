@@ -5,7 +5,7 @@ import { FaCartArrowDown, FaSignOutAlt } from 'react-icons/fa';
 import { GiAvoidance } from 'react-icons/gi';
 import { HiOutlineDocument } from 'react-icons/hi';
 import { HiMiniShoppingCart } from 'react-icons/hi2';
-import { LuKeyRound, LuX } from 'react-icons/lu';
+import { LuClipboardList, LuKeyRound, LuX } from 'react-icons/lu';
 import { MdOutlineInventory, MdOutlinePayments } from 'react-icons/md';
 import { RiAdminFill } from 'react-icons/ri';
 import { SiReasonstudios } from 'react-icons/si';
@@ -80,6 +80,13 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       orPermissions: AdminPermissions.doorCode,
       featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
       icon: LuKeyRound,
+    },
+    {
+      to: PageURLS.admin.campaigns,
+      label: t('nav:adminMenu.campaigns'),
+      orPermissions: AdminPermissions.campaigns,
+      featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
+      icon: LuClipboardList,
     },
     {
       to: PageURLS.admin.reports,

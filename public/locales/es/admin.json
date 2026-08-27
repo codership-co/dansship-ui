@@ -131,6 +131,8 @@
         "class": "Clase",
         "startTime": "Inicio",
         "room": "Sala",
+        "cancelledAt": "Cancelada el",
+        "reimbursed": "Reembolsada",
         "benefit": "Beneficio",
         "grantedAt": "Otorgado"
       },
