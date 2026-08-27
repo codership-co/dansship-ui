@@ -30,6 +30,10 @@ export interface BookingCancelPayload {
   cancellation_reason?: string;
 }
 
+export interface AdminReimburseCreditPayload {
+  reason?: string;
+}
+
 export interface AdminBookClassPayload extends BookClassPayload {
   user_id: string;
   reason?: string;

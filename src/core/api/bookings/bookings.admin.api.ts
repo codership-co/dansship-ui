@@ -2,7 +2,13 @@ import { HttpClient } from 'polpo-http-client';
 
 import { DansshipAPIError } from '@core/api';
 
-import type { AdminBookClassPayload, AdminBookingUser, Booking, MyBooking } from './bookings.models';
+import type {
+  AdminBookClassPayload,
+  AdminBookingUser,
+  AdminReimburseCreditPayload,
+  Booking,
+  MyBooking,
+} from './bookings.models';
 import type { ClassRosterResponse } from '../instructors/instructors.models';
 import type { UserListPage } from '../users/users.models';
 
@@ -37,6 +43,14 @@ export class BookingsAdminAPI {
       path: '/admin/bookings',
       method: 'GET',
       params: { user_id: userId },
+    });
+  }
+
+  async reimburseCredit(bookingId: string, payload: AdminReimburseCreditPayload = {}) {
+    return this.httpClient.callNoError<Booking, AdminReimburseCreditPayload>({
+      path: `/admin/bookings/${bookingId}/reimburse-credit`,
+      method: 'POST',
+      data: payload,
     });
   }
 
