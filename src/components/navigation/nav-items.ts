@@ -42,6 +42,7 @@ export function getAdminNavItem(t: Translate): NavItem {
       ...AdminPermissions.users,
       ...AdminPermissions.studioRental,
       ...AdminPermissions.doorCode,
+      ...AdminPermissions.campaigns,
     ],
     featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
     icon: RiAdminFill,

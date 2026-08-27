@@ -26,6 +26,7 @@ i18n
       'billing',
       'bookings',
       'browse',
+      'campaigns',
       'classes',
       'combo',
       'common',

@@ -14,3 +14,4 @@ export * from './studio-rental.page';
 export * from './agenda-conflicts.page';
 export * from './schedule-builder.page';
 export * from './door-code.page';
+export * from './campaigns.page';

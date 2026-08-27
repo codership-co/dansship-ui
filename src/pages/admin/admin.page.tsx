@@ -308,6 +308,7 @@ export const SecureAdminPage = SecurityGuard(AdminPage, {
     ...AdminPermissions.reports,
     ...AdminPermissions.scheduleManage,
     ...AdminPermissions.studioRental,
+    ...AdminPermissions.campaigns,
   ],
   requiresAuth: true,
   redirect: PageURLS.auth.login,

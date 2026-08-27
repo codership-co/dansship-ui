@@ -1,0 +1,94 @@
+{
+  "admin": {
+    "title": "Campañas",
+    "subtitle": "Crea encuestas libres o activa tipos estructurados para pedir información a las estudiantes.",
+    "create": "Nueva campaña",
+    "empty": "Aún no hay campañas.",
+    "createSuccess": "Campaña creada.",
+    "createFailed": "No se pudo crear la campaña.",
+    "updateSuccess": "Campaña actualizada.",
+    "updateFailed": "No se pudo actualizar la campaña.",
+    "deactivateSuccess": "Campaña desactivada.",
+    "deactivateFailed": "No se pudo desactivar la campaña.",
+    "reactivateSuccess": "Campaña reactivada.",
+    "reactivateFailed": "No se pudo reactivar la campaña.",
+    "deactivateTitle": "¿Desactivar campaña?",
+    "deactivateConfirm": "Las estudiantes dejarán de ver esta campaña hasta que la reactives.",
+    "columns": {
+      "title": "Título",
+      "kind": "Tipo",
+      "audience": "Audiencia",
+      "window": "Ventana",
+      "responses": "Respuestas"
+    },
+    "viewResponses": "Ver respuestas",
+    "responsesTitle": "Respuestas de {{title}}",
+    "responsesEmpty": "Nadie ha respondido ni omitido esta campaña todavía.",
+    "responsesLoadFailed": "No se pudieron cargar las respuestas.",
+    "responsesAnswered": "Respondida",
+    "responsesDismissed": "Omitida",
+    "responsesSkipped": "La estudiante omitió esta campaña.",
+    "responsesAnonymous": "Estudiante sin nombre",
+    "kind": {
+      "free": "Libre",
+      "structured": "Estructurada"
+    },
+    "planStatus": {
+      "any": "Todas las estudiantes",
+      "active": "Con plan activo",
+      "inactive": "Sin plan activo"
+    },
+    "modal": {
+      "createTitle": "Nueva campaña",
+      "editTitle": "Editar campaña",
+      "title": "Título",
+      "description": "Descripción (opcional)",
+      "kind": "Tipo de campaña",
+      "structuredType": "Tipo estructurado",
+      "noStructuredTypes": "Todavía no hay tipos estructurados registrados. Solo puedes crear campañas libres.",
+      "planStatus": "Estado del plan",
+      "instructor": "Instructora (opcional)",
+      "classDefinition": "Clase (opcional)",
+      "none": "Sin filtro",
+      "validFrom": "Desde (opcional)",
+      "validUntil": "Hasta (opcional)",
+      "questions": "Preguntas",
+      "addQuestion": "Añadir pregunta",
+      "questionPrompt": "Pregunta",
+      "questionType": "Tipo de pregunta",
+      "required": "Obligatoria",
+      "options": "Opciones",
+      "addOption": "Añadir opción",
+      "allowMultiple": "Permitir varias respuestas",
+      "scaleMin": "Mínimo",
+      "scaleMax": "Máximo",
+      "minLabel": "Etiqueta mínima (opcional)",
+      "maxLabel": "Etiqueta máxima (opcional)",
+      "questionTypes": {
+        "text": "Texto",
+        "multiple_choice": "Opción múltiple",
+        "scale": "Escala"
+      }
+    }
+  },
+  "overlay": {
+    "submit": "Enviar",
+    "submitting": "Enviando...",
+    "skip": "Ahora no",
+    "submitSuccess": "Gracias por tu respuesta.",
+    "submitFailed": "No se pudo enviar la respuesta. Inténtalo de nuevo.",
+    "dismissFailed": "No se pudo omitir la campaña. Inténtalo de nuevo.",
+    "required": "Esta pregunta es obligatoria.",
+    "selectOption": "Selecciona una opción",
+    "writeAnswer": "Escribe tu respuesta"
+  },
+  "validation": {
+    "titleRequired": "El título es obligatorio",
+    "questionRequired": "La pregunta es obligatoria",
+    "optionRequired": "La opción es obligatoria",
+    "minOptions": "Necesitas al menos dos opciones",
+    "scaleRange": "El máximo debe ser mayor que el mínimo",
+    "structuredTypeRequired": "Selecciona un tipo estructurado",
+    "questionsRequired": "Añade al menos una pregunta"
+  }
+}

@@ -33,6 +33,8 @@ export function UserBookingsTab({ userId }: { userId: string }) {
             <TableHead>{t('common:status')}</TableHead>
             <TableHead>{t('admin:users.details.columns.startTime')}</TableHead>
             <TableHead>{t('admin:users.details.columns.room')}</TableHead>
+            <TableHead>{t('admin:users.details.columns.cancelledAt')}</TableHead>
+            <TableHead>{t('admin:users.details.columns.reimbursed')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -46,6 +48,16 @@ export function UserBookingsTab({ userId }: { userId: string }) {
                   : '-'}
               </TableCell>
               <TableCell>{booking.scheduled_class?.room?.name ?? '-'}</TableCell>
+              <TableCell>
+                {booking.cancelled_at ? format(parseISO(booking.cancelled_at), 'MMM d, yyyy HH:mm', { locale }) : '-'}
+              </TableCell>
+              <TableCell>
+                {booking.credit_restored === true
+                  ? t('common:yes', { defaultValue: 'Sí' })
+                  : booking.credit_restored === false
+                    ? t('common:no', { defaultValue: 'No' })
+                    : '-'}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
