@@ -302,7 +302,18 @@ export function BookingModal({
           }
         }}
         title={t('bookings:cancelBookingTitle')}
-        description={t('bookings:cancelBookingConfirm')}
+        description={
+          selectedClass.user_booking_would_restore_credit === false ? (
+            <>
+              {t('bookings:cancelBookingConfirm')}{' '}
+              <span className='font-bold'>{t('bookings:cancelBookingNotReimbursed')}</span>
+            </>
+          ) : selectedClass.user_booking_would_restore_credit === true ? (
+            `${t('bookings:cancelBookingConfirm')} ${t('bookings:cancelBookingReimbursed')}`
+          ) : (
+            t('bookings:cancelBookingConfirm')
+          )
+        }
         confirmLabel={isLoading ? t('bookings:cancelling') : t('bookings:cancelBooking')}
         cancelLabel={t('common:keep')}
         confirmVariant='destructive'

@@ -150,7 +150,18 @@ function BookingsPage() {
         }}
         onConfirm={handleConfirmCancel}
         title={t('bookings:cancelBookingTitle')}
-        description={t('bookings:cancelBookingConfirm')}
+        description={
+          bookingToCancel?.would_restore_credit === false ? (
+            <>
+              {t('bookings:cancelBookingConfirm')}{' '}
+              <span className='font-bold'>{t('bookings:cancelBookingNotReimbursed')}</span>
+            </>
+          ) : bookingToCancel?.would_restore_credit === true ? (
+            `${t('bookings:cancelBookingConfirm')} ${t('bookings:cancelBookingReimbursed')}`
+          ) : (
+            t('bookings:cancelBookingConfirm')
+          )
+        }
         confirmLabel={isCancelingClass || isRefreshingBookings ? t('bookings:cancelling') : t('bookings:cancelBooking')}
         cancelLabel={t('common:keep')}
         confirmVariant='destructive'
