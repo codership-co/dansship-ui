@@ -211,13 +211,17 @@ export function InstructorPerformanceTable() {
                   <TableHead className='text-right'>
                     {t('reports:instructor.studentRetention', 'Student Retention')}
                   </TableHead>
+
+                  <TableHead className='text-right'>
+                    {t('reports:instructor.averageRating', 'Instructor CSAT')}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
 
               <TableBody>
                 {instructors.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={7} className='py-8 text-center text-gray-500'>
+                    <TableCell colSpan={8} className='py-8 text-center text-gray-500'>
                       {t('common:noData', 'No data available')}
                     </TableCell>
                   </TableRow>
@@ -246,6 +250,12 @@ export function InstructorPerformanceTable() {
                     </TableCell>
 
                     <TableCell className='text-right'>{row.student_retention.toFixed(1)}%</TableCell>
+
+                    <TableCell className='text-right'>
+                      {typeof row.average_instructor_rating !== 'number'
+                        ? '—'
+                        : `${row.average_instructor_rating.toFixed(2)} (${row.instructor_rating_count ?? 0})`}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

@@ -271,6 +271,8 @@ export interface InstructorPerformanceRow {
   attendance_reliability: number;
   cancellation_rate: number;
   student_retention: number;
+  average_instructor_rating?: number | null;
+  instructor_rating_count?: number;
 }
 
 export interface InstructorPerformanceReport {

@@ -73,6 +73,7 @@ export interface PendingCampaign {
   kind: CampaignKind;
   structured_type?: string | null;
   questions: Array<CampaignQuestion>;
+  delivery_context?: Record<string, unknown> | null;
 }
 
 export interface PendingCampaignEnvelope {

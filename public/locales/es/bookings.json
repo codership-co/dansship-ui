@@ -72,5 +72,11 @@
   "ownClassWarning": "No puedes reservar una clase que tú impartes.",
   "ownClassBadge": "Tu clase",
   "jumpedWeekBanner": "No hay clases esta semana — mostrando la semana del {{week}}.",
-  "dismissBanner": "Cerrar"
+  "dismissBanner": "Cerrar",
+  "rateClass": "Calificar",
+  "rateClassTitle": "Califica esta clase",
+  "submitRating": "Enviar calificación",
+  "rated": "Calificada",
+  "rateSuccess": "Gracias por tu calificación.",
+  "rateFailed": "No se pudo enviar la calificación. Inténtalo de nuevo."
 }

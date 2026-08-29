@@ -118,6 +118,9 @@ export enum PERMISSION {
   // CAMPAIGN
   CAMPAIGN_MANAGE = 'manage:campaign',
 
+  // CLASS FEEDBACK
+  CLASS_FEEDBACK_READ = 'read:class_feedback',
+
   // NOTIFICATION
   NOTIFICATION_MANAGE = 'manage:notification',
 }
@@ -169,4 +172,5 @@ export const AdminPermissions = {
   notifications: [PERMISSION.NOTIFICATION_MANAGE],
   studioRental: [PERMISSION.STUDIO_RENTAL_MANAGE],
   campaigns: [PERMISSION.CAMPAIGN_MANAGE],
+  classFeedback: [PERMISSION.CLASS_FEEDBACK_READ],
 };
