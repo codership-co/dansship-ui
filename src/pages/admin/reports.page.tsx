@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
+  ClassFeedbackTable,
   FinancialReports,
   InstructorPerformanceTable,
   NotificationSettings,
@@ -21,6 +22,7 @@ function AdminReportsPage() {
   const canStudents = useOrPermissions(AdminPermissions.studentReports);
   const canInstructors = useOrPermissions(AdminPermissions.instructorReports);
   const canRentals = useOrPermissions(AdminPermissions.studioRentalReports);
+  const canClassFeedback = useOrPermissions(AdminPermissions.classFeedback);
   const canNotifications = useOrPermissions(AdminPermissions.notifications);
 
   const tabs = useMemo(
@@ -30,10 +32,11 @@ function AdminReportsPage() {
         canFinance ? { value: 'finance', label: t('admin:reports.tabs.finance') } : null,
         canStudents ? { value: 'students', label: t('admin:reports.tabs.students') } : null,
         canInstructors ? { value: 'instructors', label: t('admin:reports.tabs.instructors') } : null,
+        canClassFeedback ? { value: 'class-feedback', label: t('admin:reports.tabs.classFeedback') } : null,
         canRentals ? { value: 'rentals', label: t('admin:reports.tabs.rentals') } : null,
         canNotifications ? { value: 'notifications', label: t('admin:reports.tabs.notifications') } : null,
       ].filter((tab): tab is { value: string; label: string } => tab !== null),
-    [canFinance, canInstructors, canNotifications, canOperations, canRentals, canStudents, t],
+    [canClassFeedback, canFinance, canInstructors, canNotifications, canOperations, canRentals, canStudents, t],
   );
   const defaultTab = tabs[0]?.value ?? 'operations';
   const [tab, setTab] = useState(defaultTab);
@@ -75,6 +78,11 @@ function AdminReportsPage() {
             <InstructorPerformanceTable />
           </TabsContent>
         )}
+        {canClassFeedback && (
+          <TabsContent value='class-feedback' className='outline-none'>
+            <ClassFeedbackTable />
+          </TabsContent>
+        )}
         {canRentals && (
           <TabsContent value='rentals' className='outline-none'>
             <StudioRentalReports />
@@ -97,6 +105,7 @@ export const SecureAdminReportsPage = SecurityGuard(AdminReportsPage, {
     PERMISSION.FINANCIAL_REPORT_READ,
     PERMISSION.STUDENT_REPORT_READ,
     PERMISSION.INSTRUCTOR_REPORT_READ,
+    PERMISSION.CLASS_FEEDBACK_READ,
     PERMISSION.STUDIO_RENTAL_REPORT_READ,
     PERMISSION.NOTIFICATION_MANAGE,
   ],

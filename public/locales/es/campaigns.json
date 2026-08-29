@@ -87,6 +87,16 @@
   "classLevel": {
     "profileHint": "Puedes actualizar tu nivel más adelante desde tu perfil."
   },
+  "classCsat": {
+    "classRating": "Calificación de la clase",
+    "instructorRating": "Calificación de la instructora",
+    "instructorRatingNamed": "Calificación de {{name}}",
+    "comment": "Comentario (opcional)",
+    "commentPlaceholder": "Cuéntanos cómo te fue en la clase",
+    "ratingsRequired": "Califica la clase y la instructora para enviar.",
+    "starLabel": "{{count}} de 5",
+    "classFallback": "Clase"
+  },
   "validation": {
     "titleRequired": "El título es obligatorio",
     "questionRequired": "La pregunta es obligatoria",

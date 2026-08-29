@@ -7,6 +7,7 @@ import { BookingsAdminAPI } from './bookings/bookings.admin.api';
 import { BookingsAPI } from './bookings/bookings.api';
 import { CampaignsAdminAPI } from './campaigns/campaigns.admin.api';
 import { CampaignsAPI } from './campaigns/campaigns.api';
+import { ClassFeedbackAdminAPI, ClassFeedbackAPI } from './class-feedback/class-feedback.api';
 import { ClassLevelsAPI } from './class-levels/class-levels.api';
 import { DansshipAPIError, getResponseError, logger } from './dansship.error';
 import { DoorCodeAdminAPI } from './door-code/door-code.admin.api';
@@ -60,6 +61,8 @@ export class DansshipAPI {
   static bookingsAdmin = new BookingsAdminAPI(this.httpClient);
   static campaigns = new CampaignsAPI(this.httpClient);
   static campaignsAdmin = new CampaignsAdminAPI(this.httpClient);
+  static classFeedback = new ClassFeedbackAPI(this.httpClient);
+  static classFeedbackAdmin = new ClassFeedbackAdminAPI(this.httpClient);
   static classLevels = new ClassLevelsAPI(this.httpClient);
   static figures = new FiguresAPI(this.httpClient);
   static figuresAdmin = new FiguresAdminAPI(this.httpClient);

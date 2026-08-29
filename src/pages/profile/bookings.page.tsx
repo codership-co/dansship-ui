@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@components/modals';
-import { Badge, Button } from '@components/ui';
+import { ClassCsatFields } from '@components/modules/campaigns/class-csat-form';
+import { Badge, Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { BookingStatus, DansshipAPI, MyBooking } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { resolvePlanDisplayName } from '@helpers';
+import { canRateBooking, resolvePlanDisplayName } from '@helpers';
 import { useMyBookings, usePromise } from '@hooks';
 
 const statusLabel = (status: BookingStatus, t: (key: string) => string) => {
@@ -41,6 +43,14 @@ const formatDateTime = (value: string, locale?: string) =>
     minute: '2-digit',
   });
 
+const canRate = (booking: MyBooking, ratedClassIds: Set<string>) =>
+  canRateBooking({
+    status: booking.status,
+    endTime: booking.scheduled_class.end_time,
+    instructorId: booking.scheduled_class.instructor_id ?? booking.scheduled_class.instructor?.id,
+    alreadyRated: ratedClassIds.has(booking.scheduled_class.id),
+  });
+
 const canCancel = (booking: MyBooking) => {
   const startsAt = new Date(booking.scheduled_class.start_time).getTime();
   const isFuture = startsAt > Date.now();
@@ -57,9 +67,19 @@ function BookingsPage() {
     error: myBookingsError,
     reFetch,
   } = usePromise(() => DansshipAPI.bookings.getMyBookings());
+  const { response: myFeedbackResponse, reFetch: reFetchFeedback } = usePromise(() =>
+    DansshipAPI.classFeedback.listMine(),
+  );
   const { cancelClass, isCancelingClass } = useMyBookings();
   const [bookingToCancel, setBookingToCancel] = useState<MyBooking | null>(null);
+  const [bookingToRate, setBookingToRate] = useState<MyBooking | null>(null);
   const [isRefreshingBookings, setIsRefreshingBookings] = useState(false);
+  const [isSubmittingRating, setIsSubmittingRating] = useState(false);
+
+  const ratedClassIds = useMemo(
+    () => new Set((myFeedbackResponse?.data?.items ?? []).map(item => item.scheduled_class_id)),
+    [myFeedbackResponse?.data?.items],
+  );
 
   const sortedBookings = useMemo(
     () =>
@@ -135,6 +155,16 @@ function BookingsPage() {
                     </Button>
                   </div>
                 )}
+
+                {ratedClassIds.has(booking.scheduled_class.id) && booking.status === 'attended' ? (
+                  <p className='text-sm text-gray-500 mt-4'>{t('bookings:rated')}</p>
+                ) : canRate(booking, ratedClassIds) ? (
+                  <div className='mt-4'>
+                    <Button variant='outline' size='sm' onClick={() => setBookingToRate(booking)}>
+                      {t('bookings:rateClass')}
+                    </Button>
+                  </div>
+                ) : null}
               </div>
             ))}
           </div>
@@ -167,6 +197,57 @@ function BookingsPage() {
         confirmVariant='destructive'
         isLoading={isCancelingClass || isRefreshingBookings}
       />
+
+      <Dialog
+        open={Boolean(bookingToRate)}
+        onOpenChange={open => {
+          if (!open && !isSubmittingRating) {
+            setBookingToRate(null);
+          }
+        }}
+      >
+        <DialogContent className='max-w-lg'>
+          <DialogHeader>
+            <DialogTitle>{t('bookings:rateClassTitle')}</DialogTitle>
+          </DialogHeader>
+          {bookingToRate ? (
+            <div className='space-y-4'>
+              <p className='font-medium text-gray-900'>
+                {bookingToRate.scheduled_class.class_definition?.name ?? t('bookings:classFallback')}
+              </p>
+              <ClassCsatFields
+                instructorName={bookingToRate.scheduled_class.instructor?.full_name}
+                classEndTime={bookingToRate.scheduled_class.end_time}
+                isSubmitting={isSubmittingRating}
+                submitLabel={t('bookings:submitRating')}
+                onSubmit={async values => {
+                  setIsSubmittingRating(true);
+                  try {
+                    const result = await DansshipAPI.classFeedback.create({
+                      scheduled_class_id: bookingToRate.scheduled_class.id,
+                      class_rating: values.class_rating,
+                      instructor_rating: values.instructor_rating,
+                      comment: values.comment,
+                    });
+
+                    if (!result.ok) {
+                      toast.error(t('bookings:rateFailed'));
+
+                      return;
+                    }
+
+                    toast.success(t('bookings:rateSuccess'));
+                    setBookingToRate(null);
+                    await Promise.all([reFetch(), reFetchFeedback()]);
+                  } finally {
+                    setIsSubmittingRating(false);
+                  }
+                }}
+              />
+            </div>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

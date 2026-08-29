@@ -5,6 +5,8 @@ import { LuClipboardList } from 'react-icons/lu';
 import { useLocation } from 'react-router';
 import { toast } from 'sonner';
 
+import { CLASS_CSAT_TYPE } from '../../../helpers/class-feedback';
+
 import { CampaignQuestionForm } from './campaign-question-form';
 
 import { useAuth } from '@contexts';
@@ -62,6 +64,12 @@ export function CampaignOverlayHost() {
     handledRef.current = true;
     setDismissedId(campaign.id);
     setIsOpen(false);
+
+    if (campaign.structured_type === CLASS_CSAT_TYPE) {
+      dismissingRef.current = false;
+
+      return true;
+    }
 
     try {
       const result = await dismissPromise(campaign.id);

@@ -2,6 +2,9 @@ import { type ReactNode, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { CLASS_CSAT_TYPE } from '../../../helpers/class-feedback';
+
+import { ClassCsatForm } from './class-csat-form';
 import { CLASS_LEVEL_SELF_ASSESSMENT_TYPE, ClassLevelSelfAssessmentForm } from './class-level-self-assessment-form';
 
 import { Button, Checkbox, Label, Textarea } from '@components/ui';
@@ -21,6 +24,7 @@ export type { CampaignQuestionFormProps };
 
 export const STRUCTURED_CAMPAIGN_RENDERERS: Record<string, (props: CampaignQuestionFormProps) => ReactNode> = {
   [CLASS_LEVEL_SELF_ASSESSMENT_TYPE]: ClassLevelSelfAssessmentForm,
+  [CLASS_CSAT_TYPE]: ClassCsatForm,
 };
 
 export function CampaignQuestionForm({ campaign, isSubmitting, onSubmit, onDismiss }: CampaignQuestionFormProps) {

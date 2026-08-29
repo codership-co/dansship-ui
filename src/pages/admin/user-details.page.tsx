@@ -11,6 +11,7 @@ import {
   UserDetailsActions,
   UserDetailsHeader,
   UserInstructorClassesTab,
+  UserInstructorCsatTab,
   UserNotesTab,
   UserPaymentDocumentsTab,
   UserRolesManager,
@@ -33,6 +34,7 @@ const WALLET_TAB = 'wallet';
 const NOTES_TAB = 'notes';
 const PAYMENT_DOCUMENTS_TAB = 'payment-documents';
 const INSTRUCTOR_CLASSES_TAB = 'instructor-classes';
+const INSTRUCTOR_CSAT_TAB = 'instructor-csat';
 
 function UserDetailsPage() {
   const { t } = useTranslation();
@@ -51,7 +53,9 @@ function UserDetailsPage() {
   const canManageSchedule = useOrPermissions([PERMISSION.SCHEDULE_MANAGE]);
   const canReadPaymentDocuments = useOrPermissions([PERMISSION.INSTRUCTOR_PAYMENT_DOCUMENT_READ]);
   const canVoidPaymentDocuments = useOrPermissions([PERMISSION.INSTRUCTOR_PAYMENT_DOCUMENT_VOID]);
+  const canReadClassFeedback = useOrPermissions(AdminPermissions.classFeedback);
   const showInstructorClasses = Boolean(user?.has_instructor_profile) && canManageSchedule;
+  const showInstructorCsat = Boolean(user?.instructor_profile?.id) && canReadClassFeedback;
   const showPaymentDocuments = Boolean(user?.has_instructor_profile) && canReadPaymentDocuments;
 
   const requestedTabParam = searchParams.get('tab');
@@ -66,6 +70,7 @@ function UserDetailsPage() {
     ...(canManageWallet ? [WALLET_TAB] : []),
     ...(showPaymentDocuments ? [PAYMENT_DOCUMENTS_TAB] : []),
     ...(showInstructorClasses ? [INSTRUCTOR_CLASSES_TAB] : []),
+    ...(showInstructorCsat ? [INSTRUCTOR_CSAT_TAB] : []),
   ];
   const activeTab = availableTabs.includes(requestedTab) ? requestedTab : PROFILE_TAB;
 
@@ -132,6 +137,9 @@ function UserDetailsPage() {
                   {t('admin:users.details.tabs.instructorClasses')}
                 </TabsTrigger>
               ) : null}
+              {showInstructorCsat ? (
+                <TabsTrigger value={INSTRUCTOR_CSAT_TAB}>{t('admin:users.details.tabs.instructorCsat')}</TabsTrigger>
+              ) : null}
             </TabsList>
 
             <TabsContent value={PROFILE_TAB}>
@@ -191,6 +199,14 @@ function UserDetailsPage() {
             {showInstructorClasses ? (
               <TabsContent value={INSTRUCTOR_CLASSES_TAB}>
                 {activeTab === INSTRUCTOR_CLASSES_TAB && userId ? <UserInstructorClassesTab userId={userId} /> : null}
+              </TabsContent>
+            ) : null}
+
+            {showInstructorCsat && user?.instructor_profile?.id ? (
+              <TabsContent value={INSTRUCTOR_CSAT_TAB}>
+                {activeTab === INSTRUCTOR_CSAT_TAB ? (
+                  <UserInstructorCsatTab instructorId={user.instructor_profile.id} />
+                ) : null}
               </TabsContent>
             ) : null}
           </Tabs>

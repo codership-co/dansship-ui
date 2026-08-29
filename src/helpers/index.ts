@@ -14,3 +14,4 @@ export * from './payments';
 export * from './plans';
 export * from './role-redirect';
 export * from './class-level';
+export * from './class-feedback';

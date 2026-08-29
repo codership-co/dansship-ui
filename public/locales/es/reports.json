@@ -186,7 +186,8 @@
     "occupancyRate": "Ocupación",
     "attendanceReliability": "Asistencia",
     "cancellationRate": "Cancelación",
-    "studentRetention": "Retención"
+    "studentRetention": "Retención",
+    "averageRating": "CSAT instructora"
   },
   "instructorCancellations": {
     "title": "Cancelaciones de instructores",
@@ -206,5 +207,20 @@
     "empty": "No hay cancelaciones en este período.",
     "trendTitle": "Tendencia semanal",
     "count": "Cantidad"
+  },
+  "classFeedback": {
+    "title": "Calificaciones de clases",
+    "averageClass": "Promedio de clase",
+    "averageInstructor": "Promedio de instructora",
+    "count": "Calificaciones",
+    "student": "Estudiante",
+    "class": "Clase",
+    "when": "Fecha",
+    "instructor": "Instructora",
+    "classStars": "Clase",
+    "instructorStars": "Instructora",
+    "comment": "Comentario",
+    "empty": "No hay calificaciones en este período.",
+    "anonymousName": "Estudiante sin nombre"
   }
 }

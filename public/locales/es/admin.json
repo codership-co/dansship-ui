@@ -121,7 +121,8 @@
         "benefits": "Beneficios",
         "wallet": "Billetera",
         "paymentDocuments": "Documentos de pago",
-        "instructorClasses": "Clases del instructor"
+        "instructorClasses": "Clases del instructor",
+        "instructorCsat": "CSAT"
       },
       "columns": {
         "plan": "Plan",
@@ -330,6 +331,7 @@
       "finance": "Finanzas",
       "students": "Estudiantes",
       "instructors": "Instructores",
+      "classFeedback": "CSAT de clases",
       "rentals": "Alquiler de estudio",
       "dashboard": "Operaciones",
       "instructorPerformance": "Instructores",
