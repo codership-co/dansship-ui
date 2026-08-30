@@ -1,93 +1,84 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
+import { Section } from '@components/containers';
 import { ConfirmDialog } from '@components/modals';
-import { ClassCsatFields } from '@components/modules/campaigns/class-csat-form';
-import { Badge, Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '@components/ui';
+import { ClassCsatFields, formatClassCsatHeadline } from '@components/modules/campaigns/class-csat-form';
+import {
+  HistoryBookingCard,
+  HistoryListSkeleton,
+  NextClassHero,
+  UpcomingBookingCard,
+  UpcomingListSkeleton,
+} from '@components/modules/my-bookings';
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
-import { BookingStatus, DansshipAPI, MyBooking } from '@core/api';
+import { DansshipAPI, MyBooking } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { canRateBooking, resolvePlanDisplayName } from '@helpers';
-import { useMyBookings, usePromise } from '@hooks';
-
-const statusLabel = (status: BookingStatus, t: (key: string) => string) => {
-  switch (status) {
-    case 'active':
-      return t('bookings:status.active');
-    case 'cancelled':
-      return t('bookings:status.cancelled');
-    case 'attended':
-      return t('bookings:status.attended');
-    case 'no_show':
-      return t('bookings:status.noShow');
-    default:
-      return status;
-  }
-};
-
-const statusVariant = (status: BookingStatus): 'default' | 'secondary' | 'destructive' | 'outline' => {
-  if (status === 'active') return 'default';
-
-  if (status === 'no_show') return 'destructive';
-
-  return 'outline';
-};
-
-const formatDateTime = (value: string, locale?: string) =>
-  new Date(value).toLocaleString(locale, {
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
-
-const canRate = (booking: MyBooking, ratedClassIds: Set<string>) =>
-  canRateBooking({
-    status: booking.status,
-    endTime: booking.scheduled_class.end_time,
-    instructorId: booking.scheduled_class.instructor_id ?? booking.scheduled_class.instructor?.id,
-    alreadyRated: ratedClassIds.has(booking.scheduled_class.id),
-  });
-
-const canCancel = (booking: MyBooking) => {
-  const startsAt = new Date(booking.scheduled_class.start_time).getTime();
-  const isFuture = startsAt > Date.now();
-  const planAllowsCancel = booking.is_cancellable !== false;
-
-  return isFuture && planAllowsCancel && booking.status === 'active';
-};
+import { useMyBookings, useMyBookingsHistory, usePromise } from '@hooks';
 
 function BookingsPage() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const {
-    response: myBookingsResponse,
-    isLoading: isLoadingMyBookings,
-    error: myBookingsError,
-    reFetch,
-  } = usePromise(() => DansshipAPI.bookings.getMyBookings());
+    response: upcomingResponse,
+    isLoading: isLoadingUpcoming,
+    error: upcomingError,
+    reFetch: reFetchUpcoming,
+  } = usePromise(() => DansshipAPI.bookings.getMyBookings({ scope: 'upcoming' }));
   const { response: myFeedbackResponse, reFetch: reFetchFeedback } = usePromise(() =>
     DansshipAPI.classFeedback.listMine(),
   );
+  const {
+    items: historyItems,
+    total: historyTotal,
+    isLoading: isLoadingHistory,
+    isLoadingMore,
+    error: historyError,
+    hasMore,
+    loadNextPage,
+    reFetch: reFetchHistory,
+  } = useMyBookingsHistory();
   const { cancelClass, isCancelingClass } = useMyBookings();
   const [bookingToCancel, setBookingToCancel] = useState<MyBooking | null>(null);
   const [bookingToRate, setBookingToRate] = useState<MyBooking | null>(null);
   const [isRefreshingBookings, setIsRefreshingBookings] = useState(false);
   const [isSubmittingRating, setIsSubmittingRating] = useState(false);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const ratedClassIds = useMemo(
     () => new Set((myFeedbackResponse?.data?.items ?? []).map(item => item.scheduled_class_id)),
     [myFeedbackResponse?.data?.items],
   );
 
-  const sortedBookings = useMemo(
-    () =>
-      [...(myBookingsResponse?.data ?? [])].sort(
-        (a, b) => new Date(b.scheduled_class.start_time).getTime() - new Date(a.scheduled_class.start_time).getTime(),
-      ),
-    [myBookingsResponse?.data],
-  );
+  const upcomingBookings = upcomingResponse?.data?.items ?? [];
+  const nextClass = upcomingBookings[0] ?? null;
+  const furtherUpcoming = upcomingBookings.slice(1);
+
+  useEffect(() => {
+    if (!hasMore) {
+      return;
+    }
+
+    const node = loadMoreRef.current;
+
+    if (!node) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0]?.isIntersecting) {
+          void loadNextPage();
+        }
+      },
+      { threshold: 0.1 },
+    );
+
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, [hasMore, loadNextPage, historyItems.length]);
 
   const handleConfirmCancel = async () => {
     if (!bookingToCancel) return;
@@ -98,78 +89,115 @@ function BookingsPage() {
 
     setIsRefreshingBookings(true);
     try {
-      await reFetch();
+      await Promise.all([reFetchUpcoming(), reFetchHistory()]);
     } finally {
       setIsRefreshingBookings(false);
       setBookingToCancel(null);
     }
   };
 
+  const upcomingFailed = Boolean(upcomingError || upcomingResponse?.error);
+  const historyFailed = Boolean(historyError);
+
+  const upcomingHeading =
+    upcomingBookings.length === 1
+      ? t('bookings:nextClassSection')
+      : upcomingBookings.length > 1
+        ? `${t('bookings:upcomingSection')} · ${upcomingBookings.length}`
+        : t('bookings:upcomingSection');
+
   return (
-    <div className='max-w-6xl mx-auto py-10 px-4 pt-20'>
-      <div className='mb-10'>
-        <h1 className='text-3xl font-bold text-gray-900'>{t('bookings:myBookingsTitle')}</h1>
-        <p className='text-gray-500 mt-2'>{t('bookings:myBookingsSubtitle')}</p>
-      </div>
+    <>
+      <Section navbarPadding className='pb-10'>
+        <header className='mb-6 flex flex-col gap-1'>
+          <h1 className='m-0 font-title text-[1.625rem] leading-[1.1] font-bold text-foreground'>
+            {t('bookings:myBookingsTitle')}
+          </h1>
+          <p className='m-0 text-[13px] leading-[1.4] text-muted-foreground'>{t('bookings:myBookingsSubtitle')}</p>
+        </header>
 
-      <div className='bg-white rounded-lg shadow-sm border border-gray-100 p-6'>
-        {isLoadingMyBookings && !myBookingsResponse ? (
-          <p className='text-gray-500'>{t('bookings:loading')}</p>
-        ) : myBookingsError || myBookingsResponse?.error ? (
-          <p className='text-alert-600'>{t('bookings:loadError')}</p>
-        ) : sortedBookings.length === 0 ? (
-          <p className='text-gray-500'>{t('bookings:empty')}</p>
-        ) : (
-          <div className='space-y-4'>
-            {sortedBookings.map(booking => (
-              <div key={booking.id} className='rounded-lg border border-gray-200 p-4'>
-                <div className='flex items-start justify-between gap-3'>
-                  <div>
-                    <p className='font-semibold text-gray-900'>
-                      {booking.scheduled_class.class_definition?.name ?? t('bookings:classFallback')}
-                    </p>
-                    <p className='text-sm text-gray-500 mt-1'>
-                      {formatDateTime(booking.scheduled_class.start_time, i18n.language)}
-                    </p>
-                    <p className='text-sm text-gray-500 mt-1'>
-                      {t('bookings:roomLabel')}: {booking.scheduled_class.room?.name ?? t('bookings:unknown')}
-                    </p>
-                    {booking.plan_name && (
-                      <p className='text-xs text-primary font-medium mt-1'>
-                        {t('subscriptions:planUsed', { name: resolvePlanDisplayName(booking.plan_name, t) })}
-                      </p>
-                    )}
-                  </div>
-                  <Badge variant={statusVariant(booking.status)}>{statusLabel(booking.status, t)}</Badge>
-                </div>
-
-                {canCancel(booking) && (
-                  <div className='mt-4'>
-                    <Button
-                      variant='outline'
-                      size='sm'
-                      disabled={isCancelingClass || isRefreshingBookings}
-                      onClick={() => setBookingToCancel(booking)}
-                    >
-                      {t('bookings:cancelBooking')}
-                    </Button>
-                  </div>
-                )}
-
-                {ratedClassIds.has(booking.scheduled_class.id) && booking.status === 'attended' ? (
-                  <p className='text-sm text-gray-500 mt-4'>{t('bookings:rated')}</p>
-                ) : canRate(booking, ratedClassIds) ? (
-                  <div className='mt-4'>
-                    <Button variant='outline' size='sm' onClick={() => setBookingToRate(booking)}>
-                      {t('bookings:rateClass')}
-                    </Button>
-                  </div>
-                ) : null}
-              </div>
-            ))}
+        <section className='mb-8 flex flex-col gap-2.5'>
+          <div className='flex items-center gap-2'>
+            <span className='size-1.5 rounded-full bg-primary' />
+            <h2 className='m-0 text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase'>
+              {isLoadingUpcoming || upcomingFailed ? t('bookings:upcomingSection') : upcomingHeading}
+            </h2>
           </div>
-        )}
-      </div>
+
+          {isLoadingUpcoming && !upcomingResponse ? (
+            <UpcomingListSkeleton />
+          ) : upcomingFailed ? (
+            <p className='text-alert-600'>{t('bookings:loadError')}</p>
+          ) : upcomingBookings.length === 0 ? (
+            <p className='rounded-2xl border border-dashed border-primary/20 bg-white/60 px-6 py-10 text-center text-muted-foreground'>
+              {t('bookings:emptyUpcoming')}
+            </p>
+          ) : (
+            <div className='space-y-3'>
+              {nextClass ? (
+                <NextClassHero
+                  booking={nextClass}
+                  isCancelDisabled={isCancelingClass || isRefreshingBookings}
+                  onCancel={setBookingToCancel}
+                />
+              ) : null}
+              {furtherUpcoming.map(booking => (
+                <UpcomingBookingCard
+                  key={booking.id}
+                  booking={booking}
+                  isCancelDisabled={isCancelingClass || isRefreshingBookings}
+                  onCancel={setBookingToCancel}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className='flex flex-col gap-2.5'>
+          <div className='flex items-baseline justify-between gap-3'>
+            <h2 className='m-0 text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase'>
+              {t('bookings:historySection')}
+            </h2>
+            {!isLoadingHistory && historyTotal > 0 ? (
+              <p className='text-[11px] text-muted-foreground'>
+                {t('bookings:historyCount', { loaded: historyItems.length, total: historyTotal })}
+              </p>
+            ) : null}
+          </div>
+
+          {isLoadingHistory && historyItems.length === 0 ? (
+            <HistoryListSkeleton />
+          ) : historyFailed && historyItems.length === 0 ? (
+            <p className='text-alert-600'>{t('bookings:loadError')}</p>
+          ) : historyItems.length === 0 ? (
+            <p className='rounded-2xl border border-dashed border-primary/20 bg-white/60 px-6 py-10 text-center text-muted-foreground'>
+              {t('bookings:emptyHistory')}
+            </p>
+          ) : (
+            <div className='space-y-3'>
+              {historyItems.map(booking => (
+                <HistoryBookingCard
+                  key={booking.id}
+                  booking={booking}
+                  alreadyRated={ratedClassIds.has(booking.scheduled_class.id)}
+                  onRate={setBookingToRate}
+                />
+              ))}
+              {hasMore ? (
+                <div ref={loadMoreRef} className='flex justify-center py-6'>
+                  {isLoadingMore ? (
+                    <p className='text-sm text-muted-foreground'>{t('bookings:loadingMore')}</p>
+                  ) : (
+                    <Button type='button' variant='ghost' onClick={() => void loadNextPage()}>
+                      {t('bookings:loadMore')}
+                    </Button>
+                  )}
+                </div>
+              ) : null}
+            </div>
+          )}
+        </section>
+      </Section>
 
       <ConfirmDialog
         open={Boolean(bookingToCancel)}
@@ -206,49 +234,57 @@ function BookingsPage() {
           }
         }}
       >
-        <DialogContent className='max-w-lg'>
+        <DialogContent
+          className='max-w-lg gap-3'
+          onOpenAutoFocus={event => {
+            event.preventDefault();
+          }}
+        >
           <DialogHeader>
-            <DialogTitle>{t('bookings:rateClassTitle')}</DialogTitle>
+            <DialogTitle>
+              {bookingToRate
+                ? t('bookings:rateClassTitle', {
+                    headline: formatClassCsatHeadline(
+                      bookingToRate.scheduled_class.class_definition?.name ?? t('bookings:classFallback'),
+                      bookingToRate.scheduled_class.start_time,
+                    ),
+                  })
+                : null}
+            </DialogTitle>
           </DialogHeader>
           {bookingToRate ? (
-            <div className='space-y-4'>
-              <p className='font-medium text-gray-900'>
-                {bookingToRate.scheduled_class.class_definition?.name ?? t('bookings:classFallback')}
-              </p>
-              <ClassCsatFields
-                instructorName={bookingToRate.scheduled_class.instructor?.full_name}
-                classEndTime={bookingToRate.scheduled_class.end_time}
-                isSubmitting={isSubmittingRating}
-                submitLabel={t('bookings:submitRating')}
-                onSubmit={async values => {
-                  setIsSubmittingRating(true);
-                  try {
-                    const result = await DansshipAPI.classFeedback.create({
-                      scheduled_class_id: bookingToRate.scheduled_class.id,
-                      class_rating: values.class_rating,
-                      instructor_rating: values.instructor_rating,
-                      comment: values.comment,
-                    });
+            <ClassCsatFields
+              instructorName={bookingToRate.scheduled_class.instructor?.full_name}
+              isSubmitting={isSubmittingRating}
+              submitLabel={t('bookings:submitRating')}
+              onSubmit={async values => {
+                setIsSubmittingRating(true);
+                try {
+                  const result = await DansshipAPI.classFeedback.create({
+                    scheduled_class_id: bookingToRate.scheduled_class.id,
+                    class_rating: values.class_rating,
+                    instructor_rating: values.instructor_rating,
+                    comment: values.comment,
+                  });
 
-                    if (!result.ok) {
-                      toast.error(t('bookings:rateFailed'));
+                  if (!result.ok) {
+                    toast.error(t('bookings:rateFailed'));
 
-                      return;
-                    }
-
-                    toast.success(t('bookings:rateSuccess'));
-                    setBookingToRate(null);
-                    await Promise.all([reFetch(), reFetchFeedback()]);
-                  } finally {
-                    setIsSubmittingRating(false);
+                    return;
                   }
-                }}
-              />
-            </div>
+
+                  toast.success(t('bookings:rateSuccess'));
+                  setBookingToRate(null);
+                  await Promise.all([reFetchUpcoming(), reFetchHistory(), reFetchFeedback()]);
+                } finally {
+                  setIsSubmittingRating(false);
+                }
+              }}
+            />
           ) : null}
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
 

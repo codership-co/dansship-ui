@@ -2,6 +2,8 @@ import type { ScheduledClass } from '../schedules/schedules.models';
 
 export type BookingStatus = 'active' | 'cancelled' | 'attended' | 'no_show';
 
+export type MyBookingsScope = 'upcoming' | 'history';
+
 export interface Booking {
   id: string;
   user_id: string;
@@ -9,6 +11,7 @@ export interface Booking {
   status: BookingStatus;
   created_at: string;
   cancelled_at?: string | null;
+  cancellation_reason?: string | null;
   credit_restored?: boolean | null;
   would_restore_credit?: boolean | null;
   subscription_id?: string | null;
@@ -20,6 +23,19 @@ export interface Booking {
 
 export interface MyBooking extends Booking {
   scheduled_class: ScheduledClass;
+}
+
+export interface GetMyBookingsParams {
+  scope: MyBookingsScope;
+  limit?: number;
+  offset?: number;
+}
+
+export interface MyBookingsPage {
+  items: Array<MyBooking>;
+  total: number;
+  limit: number;
+  offset: number;
 }
 
 export interface BookClassPayload {

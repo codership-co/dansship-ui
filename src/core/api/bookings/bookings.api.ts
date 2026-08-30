@@ -6,17 +6,19 @@ import type {
   BookClassPayload,
   Booking,
   BookingCancelPayload,
+  GetMyBookingsParams,
   MarkAttendancePayload,
-  MyBooking,
+  MyBookingsPage,
 } from './bookings.models';
 
 export class BookingsAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
-  async getMyBookings() {
-    return this.httpClient.callNoError<Array<MyBooking>>({
+  async getMyBookings(params: GetMyBookingsParams = { scope: 'upcoming' }) {
+    return this.httpClient.callNoError<MyBookingsPage>({
       path: '/bookings/me',
       method: 'GET',
+      params,
     });
   }
 

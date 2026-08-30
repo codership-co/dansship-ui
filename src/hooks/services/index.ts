@@ -11,6 +11,7 @@ export * from './use-class-groups';
 export * from './use-tax-types';
 export * from './use-instructor-profile';
 export * from './use-my-bookings';
+export * from './use-my-bookings-history';
 export * from './use-onboarding';
 export * from './use-instructor-onboarding';
 export * from './use-student-onboarding';

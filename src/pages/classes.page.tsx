@@ -37,9 +37,9 @@ function ClassesPage() {
       };
     }
 
-    const [{ data: mySubscriptions }, { data: myBookings }, { data: upcoming }] = await Promise.all([
+    const [{ data: mySubscriptions }, { data: myBookingsPage }, { data: upcoming }] = await Promise.all([
       DansshipAPI.subscriptions.getMySubscriptions(),
-      DansshipAPI.bookings.getMyBookings(),
+      DansshipAPI.bookings.getMyBookings({ scope: 'upcoming' }),
       DansshipAPI.schedules.getUpcomingWeek(currentWeek),
     ]);
 
@@ -49,7 +49,7 @@ function ClassesPage() {
       upcoming: upcoming ?? null,
       subscriptions: mySubscriptions?.subscriptions ?? [],
       isTrialEligible,
-      myBookings: myBookings ?? [],
+      myBookings: myBookingsPage?.items ?? [],
     };
   });
 
