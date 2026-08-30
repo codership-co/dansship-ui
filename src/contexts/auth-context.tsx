@@ -180,8 +180,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
 
     setPendingPostLoginPath(redirectPath);
-    setUser(data);
-    setSentryUser(data);
+    const profile = await getProfile();
+    setUser(profile ?? data);
+    setSentryUser(profile ?? data);
     navigate(redirectPath, { replace: true });
   }
 

@@ -60,6 +60,7 @@ export const mapAuthUserToUser = (authUser: AuthUser): User => {
     hasGoogle: authUser.has_google ?? false,
     cuentaDeCobroEnabled: authUser.cuenta_de_cobro_enabled,
     profileCompletionPercent: authUser.profile_completion_percent,
+    referralCode: authUser.referral_code ?? null,
     instructorProfile: authUser.instructor_profile
       ? {
           id: authUser.instructor_profile.id,

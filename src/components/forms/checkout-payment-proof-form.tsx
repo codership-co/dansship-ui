@@ -156,6 +156,7 @@ export function CheckoutPaymentProofForm({
     const {
       start_date,
       discount_code,
+      referral_code,
       is_gift,
       gift_recipient_name,
       gift_recipient_email,
@@ -168,6 +169,7 @@ export function CheckoutPaymentProofForm({
       plan_id: plan.id,
       payment_method_type: isWalletMethod ? PaymentMethod.WALLET : paymentMethod,
       discount_code: discount_code.trim() ? discount_code.trim() : undefined,
+      referral_code: !is_gift && referral_code?.trim() ? referral_code.trim() : undefined,
     };
 
     if (is_gift) {

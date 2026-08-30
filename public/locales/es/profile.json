@@ -1,6 +1,13 @@
 {
   "memberSince": "Miembro desde",
   "profile": "Mi perfil",
+  "referral": {
+    "title": "Tu código de referido",
+    "help": "Compártelo para que un amigo reciba descuento en su primer plan y tú ganes una clase.",
+    "copy": "Copiar",
+    "copied": "Código copiado",
+    "copyFailed": "No se pudo copiar el código"
+  },
   "loginMethods": {
     "title": "Métodos de acceso",
     "subtitle": "Administra cómo inicias sesión en Dansship",
