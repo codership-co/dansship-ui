@@ -16,11 +16,28 @@ import { captureUnexpectedException, withSentrySpan } from '@core/sentry';
 import { formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
 
+const referralRejectionKey = (reason: string | null | undefined): string | null => {
+  if (reason === 'Referral code not found') {
+    return 'subscriptions:invalidReferralCode';
+  }
+
+  if (reason === 'Cannot use your own referral code') {
+    return 'subscriptions:ownReferralCode';
+  }
+
+  if (reason === 'Not first plan purchase') {
+    return 'subscriptions:referralNotFirstPurchase';
+  }
+
+  return null;
+};
+
 const createCheckoutReviewSchema = (t: TFunction) =>
   z
     .object({
       start_date: z.date().optional(),
       discount_code: z.string(),
+      referral_code: z.string(),
       is_gift: z.boolean(),
       gift_recipient_name: z.string(),
       gift_recipient_email: z.string(),
@@ -112,6 +129,7 @@ export const DefaultPaymentData: PaymentData = {
 export const defaultCheckoutFormValues: CheckoutFormValues = {
   start_date: new Date(),
   discount_code: '',
+  referral_code: '',
   is_gift: false,
   gift_recipient_name: '',
   gift_recipient_email: '',
@@ -136,6 +154,7 @@ export const CheckoutReviewPlanFormInput = ({
   const { t } = useTranslation();
   const [termsAndConditions, setTermsAndConditions] = useState(false);
   const [giftEligibilityError, setGiftEligibilityError] = useState<string | null>(null);
+  const [isFirstPlanPurchase, setIsFirstPlanPurchase] = useState(true);
   const [paymentData, setPaymentData] = useState<PaymentData>({
     ...DefaultPaymentData,
     finalPrice: plan.price,
@@ -153,6 +172,7 @@ export const CheckoutReviewPlanFormInput = ({
   });
 
   const discountCode = useDebounce(watch('discount_code'), 800);
+  const referralCode = useDebounce(watch('referral_code'), 800);
   const isGift = watch('is_gift');
   const giftRecipientEmail = useDebounce(watch('gift_recipient_email'), 800);
 
@@ -180,6 +200,7 @@ export const CheckoutReviewPlanFormInput = ({
       const previewPayload: PaymentPreviewRequest = {
         plan_id: plan.id,
         discount_code: discountCode ? discountCode.toUpperCase() : undefined,
+        referral_code: !isGift && referralCode ? referralCode.toUpperCase() : undefined,
       };
       const trimmedGiftEmail = giftRecipientEmail.trim();
 
@@ -225,9 +246,16 @@ export const CheckoutReviewPlanFormInput = ({
         bonus_expires_days,
         bonus_benefit_name,
         discount_benefit_code,
+        is_first_plan_purchase,
         wallet_amount_applied,
         amount_to_charge,
       } = data;
+
+      setIsFirstPlanPurchase(Boolean(is_first_plan_purchase));
+
+      if (!is_first_plan_purchase) {
+        setValue('referral_code', '');
+      }
 
       const isPercentage = discount_type === 'percentage_discount' || discount_type === 'percentage';
       const isFixed = discount_type === 'fixed_discount' || discount_type === 'fixed_amount';
@@ -256,7 +284,7 @@ export const CheckoutReviewPlanFormInput = ({
         amountToCharge: amount_to_charge,
       });
     });
-  }, [discountCode, giftRecipientEmail, isGift, plan.currency, plan.id, previewPayment, t]);
+  }, [discountCode, giftRecipientEmail, isGift, plan.currency, plan.id, previewPayment, referralCode, setValue, t]);
 
   useEffect(() => {
     void getPaymentPreview();
@@ -319,11 +347,29 @@ export const CheckoutReviewPlanFormInput = ({
           label={t('subscriptions:discountCodeLabel')}
           helperText={paymentData.isValid ? t('subscriptions:codeValidationNote') : undefined}
           errorMessage={
-            !isLoading && !paymentData.isValid && paymentData.discountCode
+            !isLoading && !paymentData.isValid && paymentData.discountCode && !referralRejectionKey(paymentData.error)
               ? t('subscriptions:invalidDiscountCode')
               : undefined
           }
         />
+
+        {!isGift && isFirstPlanPurchase ? (
+          <TextField
+            inputClassName='uppercase'
+            control={control}
+            name='referral_code'
+            disabled={isLoading}
+            rightElement={isLoading ? <Spinner /> : undefined}
+            placeholder={t('subscriptions:referralCodePlaceholder')}
+            label={t('subscriptions:referralCodeLabel')}
+            helperText={t('subscriptions:referralCodeHelp')}
+            errorMessage={
+              !isLoading && !paymentData.isValid && referralCode
+                ? t(referralRejectionKey(paymentData.error) ?? 'subscriptions:invalidReferralCode')
+                : undefined
+            }
+          />
+        ) : null}
       </div>
 
       <section className='grid gap-2'>
@@ -339,11 +385,13 @@ export const CheckoutReviewPlanFormInput = ({
           {paymentData.applied && (
             <div className='mb-2 flex items-center justify-between gap-2'>
               <span className='min-w-0 break-words text-gray-500'>
-                {paymentData.discountBenefitCode === 'FIRST_PLAN_PCT_10'
-                  ? t('subscriptions:discountFirstPlan')
-                  : paymentData.discountCode
-                    ? t('subscriptions:discountCode')
-                    : t('subscriptions:discount')}
+                {paymentData.discountBenefitCode === 'REFERRAL_FIXED_20000'
+                  ? t('subscriptions:discountReferral')
+                  : paymentData.discountBenefitCode === 'FIRST_PLAN_PCT_10'
+                    ? t('subscriptions:discountFirstPlan')
+                    : paymentData.discountCode
+                      ? t('subscriptions:discountCode')
+                      : t('subscriptions:discount')}
               </span>
               <span className='shrink-0'>{isLoading ? <Spinner /> : paymentData.discountContext}</span>
             </div>
@@ -410,7 +458,10 @@ export const CheckoutReviewPlanFormInput = ({
           <Button
             isLoading={isLoading}
             disabled={
-              (Boolean(discountCode) && !paymentData.isValid) || !termsAndConditions || Boolean(giftEligibilityError)
+              (Boolean(discountCode) && !paymentData.isValid) ||
+              (Boolean(referralCode) && !paymentData.isValid) ||
+              !termsAndConditions ||
+              Boolean(giftEligibilityError)
             }
             color='primary'
             className='flex items-center'

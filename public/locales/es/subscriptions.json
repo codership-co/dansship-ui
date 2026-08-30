@@ -5,7 +5,8 @@
   "startsOn": "Inicia el {{date}}",
   "planUsed": "Plan: {{name}}",
   "systemPlans": {
-    "trialClass": "Clase de prueba"
+    "trialClass": "Clase de prueba",
+    "referralClass": "Clase por referido"
   },
   "noSubscriptions": "Sin Suscripciones Activas",
   "noSubscriptionsDesc": "Adquiere un plan para reservar clases.",
@@ -34,6 +35,13 @@
   "planSummary": "{{classes}} Clases - Válido por {{days}} días",
   "discountCodeLabel": "Código de Descuento (si tienes uno)",
   "discountCodePlaceholder": "Código",
+  "referralCodeLabel": "Código de referido (si tienes uno)",
+  "referralCodePlaceholder": "Código",
+  "referralCodeHelp": "Aplica un descuento en tu primera compra de plan.",
+  "invalidReferralCode": "Este código de referido no existe",
+  "ownReferralCode": "No puedes usar tu propio código de referido",
+  "referralNotFirstPurchase": "El descuento por referido solo aplica a tu primera compra de plan",
+  "discountReferral": "Descuento por referido",
   "terms": "Acepto los <LinkTerms>términos y condiciones de servicio</LinkTerms> para la compra de planes y suscripciones",
   "dateInPast": "No puedes seleccionar una fecha pasada",
   "enterCode": "Ingresa el código",

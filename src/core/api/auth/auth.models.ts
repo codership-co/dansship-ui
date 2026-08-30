@@ -25,6 +25,7 @@ export interface AuthUser {
   has_google?: boolean;
   cuenta_de_cobro_enabled?: boolean | null;
   profile_completion_percent?: number;
+  referral_code?: string | null;
   instructor_profile?: {
     id: string;
     bio: string | null;
@@ -86,6 +87,7 @@ export interface User {
   hasGoogle?: boolean;
   cuentaDeCobroEnabled?: boolean | null;
   profileCompletionPercent?: number;
+  referralCode?: string | null;
   instructorProfile?: {
     id: string;
     bio?: string | null;

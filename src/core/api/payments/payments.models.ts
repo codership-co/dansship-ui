@@ -26,6 +26,7 @@ export interface CreatePaymentIntentPayload {
   plan_id: string;
   payment_method_type: PaymentMethod;
   discount_code?: string;
+  referral_code?: string;
   start_date?: string;
   is_gift?: boolean;
   gift_recipient_name?: string;
@@ -138,6 +139,7 @@ export interface PaymentPreviewRequest {
   purchase_type?: PurchaseType;
   plan_id?: string;
   discount_code?: string;
+  referral_code?: string;
   is_gift?: boolean;
   gift_recipient_email?: string;
   room_id?: string;
@@ -164,6 +166,7 @@ export interface PaymentPreviewResponse {
   bonus_expires_days?: number | null;
   bonus_benefit_name?: string | null;
   discount_benefit_code?: string | null;
+  is_first_plan_purchase?: boolean;
   wallet_amount_applied?: string;
   amount_to_charge?: string;
   payment_option?: 'full' | 'fifty_fifty';
@@ -187,6 +190,7 @@ export interface PaymentPreviewMappedResponse {
   bonus_expires_days: number | null;
   bonus_benefit_name: string | null;
   discount_benefit_code: string | null;
+  is_first_plan_purchase: boolean;
   wallet_amount_applied: number;
   amount_to_charge: number;
   payment_option: 'full' | 'fifty_fifty';

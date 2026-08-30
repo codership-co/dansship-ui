@@ -6,6 +6,7 @@ import { PiCaretLeft } from 'react-icons/pi';
 import { Container, SectionHeading } from '@components/containers';
 import { ClassLevelsSection } from '@components/modules/profile/class-levels-section';
 import { LoginMethodsSection } from '@components/modules/profile/login-methods-section';
+import { ReferralCodeShare } from '@components/modules/profile/referral-code-share';
 import { Badge } from '@components/ui';
 import { useAuth, useOrPermissions } from '@contexts';
 import { AdminPermissions } from '@core/permissions';
@@ -43,6 +44,13 @@ export function ProfileAbout() {
         <p className='p-4 border-2 border-solid max-w-[70ch] border-primary/10 rounded-2xl m-0'>
           {user.instructorProfile?.bio || user.bio || t('profile:noBio')}
         </p>
+
+        {user.referralCode ? (
+          <ReferralCodeShare
+            code={user.referralCode}
+            className='max-w-[70ch] rounded-2xl border-2 border-solid border-primary/10 p-4'
+          />
+        ) : null}
 
         <div className='grid grid-cols-[repeat(1,auto)] justify-start gap-x-12 gap-y-4 pt-2 sm:grid-cols-[repeat(2,auto)]'>
           <div className='flex items-center gap-4'>

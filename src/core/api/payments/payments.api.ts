@@ -81,6 +81,7 @@ export class PaymentsAPI {
         bonus_expires_days: data.bonus_expires_days ?? null,
         bonus_benefit_name: data.bonus_benefit_name ?? null,
         discount_benefit_code: data.discount_benefit_code ?? null,
+        is_first_plan_purchase: data.is_first_plan_purchase ?? false,
         wallet_amount_applied: toNumber(data.wallet_amount_applied),
         amount_to_charge: toNumber(data.amount_to_charge, toNumber(data.final_price)),
         payment_option: data.payment_option === 'fifty_fifty' ? 'fifty_fifty' : 'full',
