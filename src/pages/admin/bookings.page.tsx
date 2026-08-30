@@ -20,7 +20,7 @@ import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { type AdminBookClassPayload, DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions } from '@core/permissions';
-import { getMonday, getNextMonday, getPrevMonday, isPastBookingDeadline } from '@helpers';
+import { getColombiaWeekRangeUtc, getMonday, getNextMonday, getPrevMonday, isPastBookingDeadline } from '@helpers';
 import { useCallablePromise, usePromise } from '@hooks';
 
 function AdminBookingsPage() {
@@ -41,11 +41,12 @@ function AdminBookingsPage() {
     [emailQuery],
   );
 
+  const { startAt, endAt } = getColombiaWeekRangeUtc(currentWeek);
   const {
     response: classes,
     isLoading: isLoadingClasses,
     error: hasClassesError,
-  } = usePromise(() => DansshipAPI.schedules.getPublishedClassesByRange(currentWeek, getNextMonday(currentWeek)));
+  } = usePromise(() => DansshipAPI.schedules.getPublishedClassesByRange(startAt, endAt), true, [currentWeek]);
 
   const { call: adminBookClassPromise, isLoading: isBooking } = useCallablePromise((payload: AdminBookClassPayload) =>
     DansshipAPI.bookingsAdmin.adminBookClass(payload),
