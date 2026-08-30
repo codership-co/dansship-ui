@@ -44,8 +44,11 @@ export function BookingModal({
   const locale = useDateLocale();
   const { bookClass, cancelClass, isBookingClass, isCancelingClass } = useMyBookings();
   const [confirmAction, setConfirmAction] = useState<BookingConfirmAction | null>(null);
-  const { response: myBookingsResponse } = usePromise(() => DansshipAPI.bookings.getMyBookings(), isAuthenticated);
-  const myBookings = myBookingsResponse?.data ?? [];
+  const { response: myBookingsResponse } = usePromise(
+    () => DansshipAPI.bookings.getMyBookings({ scope: 'upcoming' }),
+    isAuthenticated,
+  );
+  const myBookings = myBookingsResponse?.data?.items ?? [];
 
   if (!selectedClass) return null;
 

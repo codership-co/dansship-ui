@@ -88,13 +88,21 @@
     "profileHint": "Puedes actualizar tu nivel más adelante desde tu perfil."
   },
   "classCsat": {
-    "classRating": "Calificación de la clase",
-    "instructorRating": "Calificación de la instructora",
-    "instructorRatingNamed": "Calificación de {{name}}",
-    "comment": "Comentario (opcional)",
+    "title": "Califica {{headline}}",
+    "classRating": "¿Qué te pareció la clase?",
+    "instructorRating": "¿Qué te pareció la instructora?",
+    "instructorRatingNamed": "¿Qué te pareció {{name}}?",
+    "comment": "Cuéntanos sobre tu experiencia (opcional)",
     "commentPlaceholder": "Cuéntanos cómo te fue en la clase",
     "ratingsRequired": "Califica la clase y la instructora para enviar.",
-    "starLabel": "{{count}} de 5",
+    "starHint": "Elige cómo te sentiste",
+    "starScale": {
+      "1": "No fue lo mío",
+      "2": "Puede mejorar",
+      "3": "Estuvo bien",
+      "4": "¡Me encantó!",
+      "5": "¡Quiero repetirla!"
+    },
     "classFallback": "Clase"
   },
   "validation": {

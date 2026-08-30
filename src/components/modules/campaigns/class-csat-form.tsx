@@ -1,3 +1,4 @@
+import { format } from 'date-fns';
 import { cn } from 'polpo/helpers';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,11 +11,30 @@ import { type CampaignAnswerValue, type PendingCampaign } from '@core/api';
 interface ClassCsatFieldsProps {
   className?: string;
   instructorName?: string | null;
-  classEndTime?: string | null;
   isSubmitting?: boolean;
   submitLabel?: string;
   onSubmit: (values: { class_rating: number; instructor_rating: number; comment?: string }) => Promise<void>;
   onDismiss?: () => void;
+}
+
+function formatClassHour(value?: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  const parsed = new Date(value);
+
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+
+  return format(parsed, 'HH:mm');
+}
+
+export function formatClassCsatHeadline(sessionName: string, classTime?: string | null) {
+  const hour = formatClassHour(classTime);
+
+  return hour ? `${sessionName} - ${hour}` : sessionName;
 }
 
 function StarRating({
@@ -29,30 +49,38 @@ function StarRating({
   disabled?: boolean;
 }) {
   const { t } = useTranslation();
+  const [hovered, setHovered] = useState<number | null>(null);
+  const preview = hovered ?? value;
 
   return (
-    <div className='flex gap-1' role='radiogroup' aria-labelledby={id}>
-      {[1, 2, 3, 4, 5].map(star => {
-        const selected = value !== null && star <= value;
+    <div>
+      <div className='flex gap-1' role='radiogroup' aria-labelledby={id} onPointerLeave={() => setHovered(null)}>
+        {[1, 2, 3, 4, 5].map(star => {
+          const selected = preview !== null && star <= preview;
 
-        return (
-          <button
-            key={star}
-            type='button'
-            role='radio'
-            aria-checked={value === star}
-            disabled={disabled}
-            className={cn(
-              'h-10 w-10 rounded-full text-xl transition-colors',
-              selected ? 'text-primary' : 'text-gray-300 hover:text-primary/70',
-            )}
-            onClick={() => onChange(star)}
-            aria-label={t('campaigns:classCsat.starLabel', { count: star })}
-          >
-            ★
-          </button>
-        );
-      })}
+          return (
+            <button
+              key={star}
+              type='button'
+              role='radio'
+              aria-checked={value === star}
+              disabled={disabled}
+              className={cn(
+                'h-10 w-10 rounded-full text-xl transition-colors',
+                selected ? 'text-primary' : 'text-gray-300 hover:text-primary/70',
+              )}
+              onClick={() => onChange(star)}
+              onPointerEnter={() => setHovered(star)}
+              aria-label={t(`campaigns:classCsat.starScale.${star}`)}
+            >
+              ★
+            </button>
+          );
+        })}
+      </div>
+      <p className={cn('mt-1 h-5 text-sm font-medium text-primary', !preview && 'invisible')}>
+        {preview ? t(`campaigns:classCsat.starScale.${preview}`) : '\u00a0'}
+      </p>
     </div>
   );
 }
@@ -60,26 +88,16 @@ function StarRating({
 export function ClassCsatFields({
   className,
   instructorName,
-  classEndTime,
   isSubmitting,
   submitLabel,
   onSubmit,
   onDismiss,
 }: ClassCsatFieldsProps) {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [classRating, setClassRating] = useState<number | null>(null);
   const [instructorRating, setInstructorRating] = useState<number | null>(null);
   const [comment, setComment] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const formattedEnd = classEndTime
-    ? new Date(classEndTime).toLocaleString(i18n.language, {
-        weekday: 'short',
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : null;
 
   const handleSubmit = async () => {
     if (classRating === null || instructorRating === null) {
@@ -97,10 +115,8 @@ export function ClassCsatFields({
   };
 
   return (
-    <div className={cn('grid gap-6', className)}>
-      {formattedEnd ? <p className='text-sm text-gray-500'>{formattedEnd}</p> : null}
-
-      <div className='space-y-2'>
+    <div className={cn('grid gap-3', className)}>
+      <div className='space-y-1'>
         <Label id='class-csat-class-rating'>{t('campaigns:classCsat.classRating')}</Label>
         <StarRating
           id='class-csat-class-rating'
@@ -110,7 +126,7 @@ export function ClassCsatFields({
         />
       </div>
 
-      <div className='space-y-2'>
+      <div className='space-y-1'>
         <Label id='class-csat-instructor-rating'>
           {instructorName
             ? t('campaigns:classCsat.instructorRatingNamed', { name: instructorName })
@@ -124,7 +140,7 @@ export function ClassCsatFields({
         />
       </div>
 
-      <div className='space-y-2'>
+      <div className='space-y-1'>
         <Label htmlFor='class-csat-comment'>{t('campaigns:classCsat.comment')}</Label>
         <Textarea
           id='class-csat-comment'
@@ -176,14 +192,17 @@ export function ClassCsatForm({ campaign, isSubmitting, onSubmit, onDismiss }: C
   }
 
   return (
-    <div className='grid gap-4 p-6'>
-      <div>
-        <h2 className='text-xl font-semibold text-gray-900'>{campaign.title}</h2>
-        <p className='text-sm text-gray-600 mt-1'>{context.class_name || t('campaigns:classCsat.classFallback')}</p>
-      </div>
+    <div className='grid gap-3 p-6'>
+      <h2 className='text-xl font-semibold text-gray-900'>
+        {t('campaigns:classCsat.title', {
+          headline: formatClassCsatHeadline(
+            context.class_name?.trim() || t('campaigns:classCsat.classFallback'),
+            context.class_start_time ?? context.class_end_time,
+          ),
+        })}
+      </h2>
       <ClassCsatFields
         instructorName={context.instructor_name}
-        classEndTime={context.class_end_time}
         isSubmitting={isSubmitting}
         onDismiss={onDismiss}
         onSubmit={async values => {

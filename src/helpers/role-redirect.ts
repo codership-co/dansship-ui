@@ -87,9 +87,9 @@ export async function resolvePostLoginPath(
   }
 
   try {
-    const response = await DansshipAPI.bookings.getMyBookings();
+    const response = await DansshipAPI.bookings.getMyBookings({ scope: 'upcoming' });
 
-    if (response.ok && hasUpcomingActiveBookings(response.data ?? [])) {
+    if (response.ok && hasUpcomingActiveBookings(response.data?.items ?? [])) {
       return PageURLS.profile.bookings;
     }
   } catch {

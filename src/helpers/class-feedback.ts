@@ -5,6 +5,7 @@ export const CLASS_FEEDBACK_WINDOW_MS = 15 * 24 * 60 * 60 * 1000;
 export interface ClassFeedbackClassContext {
   scheduled_class_id: string;
   class_name?: string | null;
+  class_start_time?: string | null;
   class_end_time?: string | null;
   instructor_id?: string | null;
   instructor_name?: string | null;
@@ -26,6 +27,7 @@ export function parseClassCsatDeliveryContext(
   return {
     scheduled_class_id: scheduledClassId,
     class_name: typeof value.class_name === 'string' ? value.class_name : null,
+    class_start_time: typeof value.class_start_time === 'string' ? value.class_start_time : null,
     class_end_time: typeof value.class_end_time === 'string' ? value.class_end_time : null,
     instructor_id: typeof value.instructor_id === 'string' ? value.instructor_id : null,
     instructor_name: typeof value.instructor_name === 'string' ? value.instructor_name : null,
@@ -47,8 +49,13 @@ export function canRateBooking(options: {
   endTime: string;
   instructorId?: string | null;
   alreadyRated: boolean;
+  isCancelled?: boolean;
   now?: number;
 }) {
+  if (options.isCancelled) {
+    return false;
+  }
+
   if (options.status !== 'attended') {
     return false;
   }
