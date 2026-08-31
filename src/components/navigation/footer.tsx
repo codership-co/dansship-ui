@@ -5,7 +5,7 @@ import { RiWhatsappLine } from 'react-icons/ri';
 import { Link } from 'react-router';
 
 import { Section } from '@components/containers';
-import { GroovyLayout } from '@components/layouts';
+import { GroovyLayout } from '@components/layouts/groovy-layout';
 import { Logotype } from '@components/svg';
 import { PageURLS } from '@core/constants';
 
@@ -14,7 +14,7 @@ export function Footer() {
 
   return (
     <footer className='relative z-0 drop-shadow-[0_0.5rem_1em_#00000033]'>
-      <GroovyLayout background='var(--color-accent)' marginTop={1}>
+      <GroovyLayout background='var(--color-accent)' marginTop={1} particles={12}>
         <Section className='text-accent-foreground py-12'>
           <Logotype className='h-8 text-primary' />
           <div className='flex flex-col gap-6 md:flex-row md:items-center md:justify-between'>

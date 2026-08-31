@@ -1,21 +1,13 @@
-import { HomeHero, HomeOfferings, HomeAppFeature, HomeAdminDashboard, HomeMemberships } from '@components/modules';
-import { DansshipAPI, PublicPlan } from '@core/api';
+import { lazy, Suspense } from 'react';
 
-export interface HomeLoaderData {
-  publicPlans: Array<PublicPlan>;
-}
+import { HomeAdminDashboard } from '@components/modules/home/home-admin-dashboard';
+import { HomeAppFeature } from '@components/modules/home/home-app-feature';
+import { HomeHero } from '@components/modules/home/home-hero';
+import { HomeOfferings } from '@components/modules/home/home-offerings';
 
-export async function getHomeData(): Promise<HomeLoaderData> {
-  const publicPlans = await DansshipAPI.subscriptions.getPublicPlans();
-
-  return {
-    publicPlans: publicPlans.data ?? [],
-  };
-}
-
-export async function HomeLoader() {
-  return getHomeData();
-}
+const HomeMemberships = lazy(() =>
+  import('@components/modules/home/home-memberships').then(mod => ({ default: mod.HomeMemberships })),
+);
 
 export function HomePage() {
   return (
@@ -24,7 +16,9 @@ export function HomePage() {
       <HomeOfferings />
       <HomeAppFeature />
       <HomeAdminDashboard />
-      <HomeMemberships />
+      <Suspense fallback={<div className='min-h-64' aria-hidden />}>
+        <HomeMemberships />
+      </Suspense>
     </section>
   );
 }

@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 
-import { Gradients } from '@components/modules';
+import { Gradients } from '@components/modules/auth/gradients';
 import { Logotype } from '@components/svg';
 import { PageURLS } from '@core/constants';
 import { cn } from '@helpers';

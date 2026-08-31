@@ -5,8 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { LuClock, LuX } from 'react-icons/lu';
 
 import { Container, Section, SectionHeading } from '@components/containers';
-import { SpinnerLoader } from '@components/loaders';
-import { BookingCalendar, WeekSelector } from '@components/modules';
+import { BookingCalendar } from '@components/modules/classes/booking-calendar';
+import { WeekSelector } from '@components/modules/schedules/week-selector';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
 import { DansshipAPI, type ActiveSubscription, type PublishedClass } from '@core/api';
 import { getMonday } from '@helpers';
@@ -143,7 +143,11 @@ function ClassesPage() {
 
         {(isLoading && !response) || !weekReady ? (
           <Container>
-            <SpinnerLoader />
+            <div
+              className='min-h-[28rem] w-full rounded-xl bg-card/70'
+              aria-busy='true'
+              aria-label={t('common:loading')}
+            />
           </Container>
         ) : (
           response && (

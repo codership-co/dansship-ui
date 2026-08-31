@@ -2,7 +2,8 @@ import { type ReactNode } from 'react';
 import { type Control, Controller, type FieldValues, type Path } from 'react-hook-form';
 import { LuCircleAlert } from 'react-icons/lu';
 
-import { Input, Label } from '@components/ui';
+import { Input } from '@components/ui/input';
+import { Label } from '@components/ui/label';
 import { cn } from '@helpers';
 
 interface TextFieldProps<T extends FieldValues = Record<string, unknown>> {

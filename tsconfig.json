@@ -13,6 +13,7 @@
       "@helpers": ["./src/helpers"],
       "@hooks": ["./src/hooks"],
       "@pages": ["./src/pages"],
+      "@pages/*": ["./src/pages/*"],
     },
   },
 }

@@ -2,7 +2,7 @@ import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
-import { ErrorLayout } from '@components/layouts';
+import { ErrorLayout } from '@components/layouts/error-layout';
 import { Unauthorized } from '@components/svg';
 import { PageURLS } from '@core/constants';
 

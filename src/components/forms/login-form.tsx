@@ -6,7 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router';
 import { z } from 'zod';
 
-import { EmailField, PasswordField } from '@components/form-fields';
+import { EmailField } from '@components/form-fields/email-field';
+import { PasswordField } from '@components/form-fields/password-field';
 import { GoogleSignInButton, isGoogleSignInConfigured } from '@components/forms/google-sign-in-button';
 import { useAuth } from '@contexts';
 import { PageURLS } from '@core/constants';

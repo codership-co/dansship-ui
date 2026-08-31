@@ -37,7 +37,7 @@ interface GroovyLayoutProps {
 
 export function GroovyLayout({
   children,
-  particles: particlesCount = 100,
+  particles: particlesCount = 12,
   minDistance = 10,
   maxDistance = 15,
   className,
@@ -45,14 +45,19 @@ export function GroovyLayout({
   background = 'var(--color-primary)',
 }: GroovyLayoutProps) {
   const isSafari = useMemo(isSafariBrowser, []);
+  const prefersReducedMotion = useMemo(
+    () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    [],
+  );
+  const resolvedCount = prefersReducedMotion ? 0 : particlesCount;
   const particles = useMemo<Array<Particle>>(() => {
-    return Array.from({ length: particlesCount }, () => ({
+    return Array.from({ length: resolvedCount }, () => ({
       size: random(5, PARTICLE_MAX_SIZE),
       distance: random(minDistance, maxDistance),
       duration: random(5, 8),
       delay: random(-10, 0),
     }));
-  }, [maxDistance, minDistance, particlesCount]);
+  }, [maxDistance, minDistance, resolvedCount]);
 
   return (
     <section

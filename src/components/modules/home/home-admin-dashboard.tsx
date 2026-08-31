@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import { Section, SectionHeading } from '@components/containers';
-import { Button, Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui';
+import { Button } from '@components/ui/button';
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui/card';
 import { useAuth, useOrPermissions } from '@contexts';
 import { buildAgendaConflicts, DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';

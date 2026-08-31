@@ -4,7 +4,7 @@ import { LuArrowRight, LuDumbbell, LuMusic2, LuSparkles } from 'react-icons/lu';
 import { Link } from 'react-router';
 
 import { Section, SectionHeading } from '@components/containers';
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui';
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui/card';
 import { PageURLS } from '@core/constants';
 
 const offeringCards = [

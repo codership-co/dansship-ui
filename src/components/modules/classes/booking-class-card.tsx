@@ -3,7 +3,7 @@ import { Button } from 'polpo/components';
 import { cn } from 'polpo/helpers';
 import { useTranslation } from 'react-i18next';
 
-import { ProfilePicture } from '@components/ui';
+import { ProfilePicture } from '@components/ui/profile-picture';
 import { useAuth } from '@contexts';
 import { PublishedClass } from '@core/api';
 import { DEFAULT_ROOM_IMAGE } from '@core/constants';

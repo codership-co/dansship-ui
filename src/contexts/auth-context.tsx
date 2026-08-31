@@ -33,7 +33,9 @@ import {
   resolvePostLoginPath,
 } from '@helpers';
 import { useEventListener } from '@hooks';
-import { Error404Page, UnauthorizedPage, UnavailablePage } from '@pages';
+import { Error404Page } from '@pages/error/404.page';
+import { UnauthorizedPage } from '@pages/error/unauthorized.page';
+import { UnavailablePage } from '@pages/error/unavailable.page';
 
 interface CommonAuthContextState {
   ready: boolean;
