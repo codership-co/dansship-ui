@@ -109,7 +109,7 @@ export function CampaignOverlayHost() {
       onClose={() => {
         void persistDismiss();
       }}
-      className='w-[min(100dvw,32rem)] max-w-lg max-h-[min(90dvh,40rem)] overflow-y-auto p-0'
+      className='w-[min(calc(100vw-1.5rem),32rem)] max-w-[calc(100vw-1.5rem)] max-h-[min(90dvh,40rem)] overflow-y-auto p-0'
     >
       <CampaignQuestionForm
         campaign={campaign}

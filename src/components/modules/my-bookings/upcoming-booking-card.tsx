@@ -37,7 +37,7 @@ export function UpcomingBookingCard({ booking, isCancelDisabled, onCancel }: Upc
             : t('bookings:countdown.inDays', { count: countdown.days });
 
   return (
-    <article className='flex items-start gap-[13px] rounded-[14px] border border-primary/20 bg-white px-[13px] py-3'>
+    <article className='flex min-w-0 items-start gap-[13px] rounded-[14px] border border-primary/20 bg-white px-[13px] py-3'>
       <div className='flex w-[52px] shrink-0 flex-col items-center gap-px rounded-[11px] bg-primary py-2 text-center text-primary-foreground'>
         <span className='text-[9.5px] font-semibold tracking-[0.08em] uppercase opacity-75'>
           {format(start, 'EEE', { locale })}
@@ -47,9 +47,11 @@ export function UpcomingBookingCard({ booking, isCancelDisabled, onCancel }: Upc
       </div>
 
       <div className='min-w-0 flex-1'>
-        <div className='flex items-baseline justify-between gap-2'>
-          <h3 className='m-0 font-title text-base leading-none font-semibold text-foreground'>{className}</h3>
-          <p className='shrink-0 text-[11px] leading-none font-medium text-primary'>{relativeLabel}</p>
+        <div className='flex min-w-0 items-baseline justify-between gap-2'>
+          <h3 className='m-0 min-w-0 break-words font-title text-base leading-none font-semibold text-foreground'>
+            {className}
+          </h3>
+          <p className='shrink-0 text-right text-[11px] leading-none font-medium text-primary'>{relativeLabel}</p>
         </div>
         <p className='mt-1 text-[12.5px] leading-[1.4] text-muted-foreground'>
           {format(start, 'HH:mm')} – {format(new Date(cls.end_time), 'HH:mm')}
@@ -57,7 +59,7 @@ export function UpcomingBookingCard({ booking, isCancelDisabled, onCancel }: Upc
           {' · '}
           {cls.room?.name ?? t('bookings:unknown')}
         </p>
-        <div className='mt-2 flex flex-wrap items-center justify-between gap-2'>
+        <div className='mt-2 flex min-w-0 flex-wrap items-center justify-between gap-2'>
           <div className='flex min-w-0 items-center gap-2'>
             <ProfilePicture
               className='size-8'
@@ -65,11 +67,11 @@ export function UpcomingBookingCard({ booking, isCancelDisabled, onCancel }: Upc
               alt={instructorName ?? t('bookings:instructorTBA')}
               useAuthFallback={false}
             />
-            <p className='truncate text-sm font-medium text-foreground'>
+            <p className='min-w-0 truncate text-sm font-medium text-foreground'>
               {instructorName ?? t('bookings:instructorTBA')}
             </p>
             {planName ? (
-              <span className='rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground'>
+              <span className='max-w-full shrink-0 rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground'>
                 {planName}
               </span>
             ) : null}
