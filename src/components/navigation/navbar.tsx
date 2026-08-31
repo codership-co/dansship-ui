@@ -11,7 +11,7 @@ import { getPrimaryNavItems, type NavItem } from './nav-items';
 import { Section } from '@components/containers';
 import { LanguageSelector } from '@components/navigation/language-selector';
 import { Isotype } from '@components/svg';
-import { ProfilePicture } from '@components/ui';
+import { ProfilePicture } from '@components/ui/profile-picture';
 import { useAuth, useEnabledFeatureFlag, useFeatureFlags, usePermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';

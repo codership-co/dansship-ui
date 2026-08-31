@@ -1,15 +1,17 @@
 import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
-import { Link, useLoaderData } from 'react-router';
+import { Link } from 'react-router';
 
 import { Section, SectionHeading } from '@components/containers';
-import { PlanSelector } from '@components/modules';
+import { PlanSelector } from '@components/modules/payments/plan-selector';
+import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { HomeLoaderData } from '@pages';
+import { usePromise } from '@hooks';
 
 export const HomeMemberships = () => {
   const { t } = useTranslation();
-  const { publicPlans } = useLoaderData<HomeLoaderData>();
+  const { response, isLoading } = usePromise(() => DansshipAPI.subscriptions.getPublicPlans());
+  const publicPlans = response?.data ?? [];
 
   return (
     <Section id='planes' verticalPadding>
@@ -23,8 +25,8 @@ export const HomeMemberships = () => {
         })}
       />
 
-      <div className='mx-auto mt-8 max-w-6xl'>
-        <PlanSelector plans={publicPlans} />
+      <div className='mx-auto mt-8 min-h-64 max-w-6xl'>
+        {isLoading ? <div className='min-h-64' aria-hidden /> : <PlanSelector plans={publicPlans} />}
       </div>
 
       <section className='grid gap-2 justify-items-center'>

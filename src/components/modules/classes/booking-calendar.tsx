@@ -3,11 +3,12 @@ import { toCapitalize } from 'polpo/helpers';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { BookingClassCard } from './booking-class-card';
+import { BookingDaySelector } from './booking-day-selector';
 import { BookingModal } from './booking-modal';
 
 import { Container, SectionEmpty } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
-import { BookingClassCard, BookingDaySelector } from '@components/modules';
 import { DansshipAPI, ActiveSubscription, MyBooking, PublishedClass } from '@core/api';
 import {
   BookingDay,

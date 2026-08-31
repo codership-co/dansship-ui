@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
-import { LoginForm } from '@components/forms';
-import { AuthFormLayout } from '@components/layouts';
+import { LoginForm } from '@components/forms/login-form';
+import { AuthFormLayout } from '@components/layouts/auth-form-layout';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 
 function LoginPage() {

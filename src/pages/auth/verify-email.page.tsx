@@ -2,8 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useSearchParams } from 'react-router';
 
-import { VerificationStatus, VerifyEmailForm, VerifyEmailFormData } from '@components/forms';
-import { AuthFormLayout } from '@components/layouts';
+import { VerificationStatus, VerifyEmailForm, type VerifyEmailFormData } from '@components/forms/verify-email-form';
+import { AuthFormLayout } from '@components/layouts/auth-form-layout';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
 import { useCountdown } from '@hooks';
 

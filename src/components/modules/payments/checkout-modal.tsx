@@ -15,8 +15,8 @@ import {
   DefaultPaymentData,
   PaymentData,
 } from '@components/forms/checkout-review-plan-form';
-import { FormStepperLayout } from '@components/layouts';
-import { PlanCard } from '@components/modules';
+import { FormStepperLayout } from '@components/layouts/form-stepper-layout';
+import { PlanCard } from '@components/modules/payments/plan-card';
 import { PaymentMethod, type PublicPlan } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { addSentryBreadcrumb } from '@core/sentry';

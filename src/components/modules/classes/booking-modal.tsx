@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router';
 
 import { Container } from '@components/containers';
 import { ConfirmDialog } from '@components/modals';
-import { ProfilePicture } from '@components/ui';
+import { ProfilePicture } from '@components/ui/profile-picture';
 import { useAuth } from '@contexts';
 import { DansshipAPI, ActiveSubscription, PublishedClass } from '@core/api';
 import { DEFAULT_ROOM_IMAGE, PageURLS } from '@core/constants';

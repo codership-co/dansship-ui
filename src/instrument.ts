@@ -47,7 +47,7 @@ if (import.meta.env.PROD && dsn) {
     },
     tracesSampleRate: 0.1,
     tracePropagationTargets: ['localhost', apiUrl].filter(Boolean),
-    replaysSessionSampleRate: 0.1,
+    replaysSessionSampleRate: 0.01,
     replaysOnErrorSampleRate: 1.0,
   });
 }

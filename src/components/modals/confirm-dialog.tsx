@@ -1,14 +1,14 @@
 import type { ReactNode } from 'react';
 
+import { Button } from '@components/ui/button';
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@components/ui';
+} from '@components/ui/dialog';
 
 interface ConfirmDialogProps {
   open: boolean;

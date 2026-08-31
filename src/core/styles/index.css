@@ -12,6 +12,24 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Montserrat Alternates Fallback';
+  src: local('Segoe UI'), local('Arial');
+  size-adjust: 107%;
+  ascent-override: 92%;
+  descent-override: 23%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Josefin Sans Fallback';
+  src: local('Arial');
+  size-adjust: 98%;
+  ascent-override: 90%;
+  descent-override: 22%;
+  line-gap-override: 0%;
+}
+
 @theme {
   --animate-fade-in-down: fade-in-down 300ms ease-out forwards;
   --animate-glitch: glitch 1s linear infinite;
@@ -60,8 +78,8 @@
   /* ================================================
    * TYPOGRAPHY
    * ================================================ */
-  --font-main: 'Montserrat Alternates', 'Segoe UI', sans-serif;
-  --font-title: 'Josefin Sans', var(--font-main);
+  --font-main: 'Montserrat Alternates', 'Montserrat Alternates Fallback', 'Segoe UI', sans-serif;
+  --font-title: 'Josefin Sans', 'Josefin Sans Fallback', var(--font-main);
   --font-brand: guntertest, var(--font-title);
   --font-code: ui-monospace, Consolas, monospace;
   --text-small: 0.75rem;
@@ -153,6 +171,13 @@
 
   :root {
     --uplift: 10rem;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100dvh;
+    background-color: var(--color-background);
   }
 
   .polpo-button {

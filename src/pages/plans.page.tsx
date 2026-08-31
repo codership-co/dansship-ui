@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
 import { Section, SectionHeading } from '@components/containers';
-import { PlanSelector } from '@components/modules';
+import { PlanSelector } from '@components/modules/payments/plan-selector';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { usePromise } from '@hooks';

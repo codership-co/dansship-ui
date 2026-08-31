@@ -27,6 +27,21 @@ export default defineConfig({
   build: {
     manifest: true,
     sourcemap: 'hidden',
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules/@sentry')) {
+            return 'sentry';
+          }
+
+          if (id.includes('node_modules/@embedpdf')) {
+            return 'pdf';
+          }
+
+          return undefined;
+        },
+      },
+    },
   },
   resolve: {
     tsconfigPaths: true,

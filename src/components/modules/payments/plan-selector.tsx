@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 
 import { CheckoutModal } from './checkout-modal';
+import { PlanCard } from './plan-card';
 
-import { PlanCard } from '@components/modules';
 import { useAuth } from '@contexts';
 import { type PublicPlan } from '@core/api';
 import { PageURLS } from '@core/constants';

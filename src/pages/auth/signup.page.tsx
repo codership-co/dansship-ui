@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 
-import { SignUpForm } from '@components/forms';
-import { AuthFormLayout } from '@components/layouts';
+import { SignUpForm } from '@components/forms/signup-form';
+import { AuthFormLayout } from '@components/layouts/auth-form-layout';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 
 function SignupPage() {

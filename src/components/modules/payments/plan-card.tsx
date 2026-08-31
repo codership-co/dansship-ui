@@ -1,7 +1,7 @@
 import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui/card';
 import { PublicPlan } from '@core/api';
 import { cn } from '@helpers';
 

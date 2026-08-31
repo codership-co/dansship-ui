@@ -44,8 +44,12 @@ export const HomeHero = () => {
           style={{ gridArea: 'image' }}
         >
           <img
-            src='/assets/images/home/bailarina.png'
+            src='/assets/images/home/bailarina.webp'
             alt='Dansship'
+            width={862}
+            height={3571}
+            fetchPriority='high'
+            decoding='async'
             className='absolute left-1/2 top-1/2 max-w-[initial] w-7/8 -translate-x-1/2 translate-y-[-70%] block'
           />
         </section>

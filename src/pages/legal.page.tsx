@@ -2,7 +2,7 @@ import { Tabs } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 
 import { Section, SectionHeading } from '@components/containers';
-import { PDFViewer } from '@components/ui';
+import { PDFViewer } from '@components/ui/pdf-viewer';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 
 enum LegalTabs {
