@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 
 import { FEATURE_FLAG, useEnabledFeatureFlag } from './feature-flags.context';
 
+import { RootLoader } from '@components/loaders/root-loader';
 import {
   DANSSHIP_ERROR_CODE,
   DansshipAPI,
@@ -524,7 +525,7 @@ function AuthenticatedHomeRedirect() {
   }, [user, pendingPostLoginPath]);
 
   if (!path) {
-    return null;
+    return <RootLoader />;
   }
 
   return <Navigate to={path} replace />;
@@ -583,13 +584,17 @@ export function SecurityGuard(
   }: SecurityGuardOptions = {},
 ): React.ComponentType {
   function Guard() {
-    const { isAuthenticated, requireOnboarding } = useAuth();
+    const { isAuthenticated, requireOnboarding, ready } = useAuth();
     const location = useLocation();
     const validPermissions = usePermissions({ orPermissions, andPermissions });
     const validFeatureFlags = useEnabledFeatureFlag(featureFlags);
 
     return useMemo(() => {
       const { pathname } = location;
+
+      if (!ready && (requiresAuth || requiresNoAuth)) {
+        return <RootLoader />;
+      }
 
       if (requiresNoAuth && isAuthenticated) {
         return <AuthenticatedHomeRedirect />;
@@ -623,7 +628,7 @@ export function SecurityGuard(
       return <Component />;
       // Depend on pathname only so ?tab= / search updates do not remount page trees.
       // eslint-disable-next-line react-hooks/exhaustive-deps -- location used for Navigate state; pathname drives remounts
-    }, [isAuthenticated, location.pathname, requireOnboarding, validFeatureFlags, validPermissions]);
+    }, [isAuthenticated, location.pathname, ready, requireOnboarding, validFeatureFlags, validPermissions]);
   }
 
   return Guard as React.ComponentType;

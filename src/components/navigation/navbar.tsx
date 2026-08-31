@@ -22,7 +22,7 @@ export type { NavItem } from './nav-items';
 export const Navbar = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const { isAuthenticated, requireOnboarding } = useAuth();
+  const { isAuthenticated, requireOnboarding, ready } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -74,28 +74,28 @@ export const Navbar = () => {
 
       <div className='ml-auto flex items-center justify-end gap-2 sm:gap-4'>
         <LanguageSelector variant='dropdown' />
-        {!isAuthenticated && areAuthPagesEnabled && (
+        {ready && !isAuthenticated && areAuthPagesEnabled && (
           <NavLink to={PageURLS.auth.login} state={{ from: location }}>
             <Button color='primary' size='small' className='hidden xs:block'>
               {t('nav:signIn')}
             </Button>
           </NavLink>
         )}
-        {isAuthenticated && hasActivePlan && isMyAccountBookingsPageEnabled && (
+        {ready && isAuthenticated && hasActivePlan && isMyAccountBookingsPageEnabled && (
           <NavLink to={PageURLS.profile.bookings}>
             <Button color='primary' size='small' className='hidden xs:block'>
               {t('nav:myBookings')}
             </Button>
           </NavLink>
         )}
-        {isAuthenticated && !hasActivePlan && isMyAccountSubscriptionPageEnabled && (
+        {ready && isAuthenticated && !hasActivePlan && isMyAccountSubscriptionPageEnabled && (
           <NavLink to={PageURLS.profile.subscription}>
             <Button color='primary' size='small' className='hidden xs:block'>
               {t('nav:buy')}
             </Button>
           </NavLink>
         )}
-        {isAuthenticated && (
+        {ready && isAuthenticated && (
           <NavLink to={PageURLS.profile.root} end>
             {({ isActive }) => (
               <ProfilePicture

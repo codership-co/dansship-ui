@@ -83,13 +83,13 @@ export function NextClassHero({ booking, isCancelDisabled, onCancel }: NextClass
       <HeroWaves />
       <div className='pointer-events-none absolute -right-10 -bottom-[70px] size-[190px] rounded-full bg-accent opacity-[0.22]' />
 
-      <div className='relative flex flex-col gap-3.5'>
-        <div className='flex items-start justify-between gap-3'>
-          <div className='flex flex-col gap-1.5'>
+      <div className='relative flex min-w-0 flex-col gap-3.5'>
+        <div className='flex min-w-0 items-start justify-between gap-3'>
+          <div className='flex min-w-0 flex-1 flex-col gap-1.5'>
             <p className='text-[10.5px] font-semibold tracking-[0.14em] text-secondary uppercase'>
               {formatCountdownLabel(cls.start_time, t)}
             </p>
-            <h3 className='m-0 font-title text-[1.875rem] leading-[1.05] font-bold'>{className}</h3>
+            <h3 className='m-0 break-words font-title text-[1.875rem] leading-[1.05] font-bold'>{className}</h3>
           </div>
           <span className='flex-none rounded-full border border-white/32 bg-white/16 px-2.5 py-[5px] text-[10.5px] leading-[1.4] font-semibold'>
             {t('bookings:status.active')}
@@ -115,8 +115,8 @@ export function NextClassHero({ booking, isCancelDisabled, onCancel }: NextClass
           </div>
         </div>
 
-        <div className='flex flex-wrap items-center justify-between gap-3 border-t border-white/22 pt-3.5'>
-          <div className='flex min-w-0 items-center gap-2.5'>
+        <div className='flex min-w-0 flex-wrap items-center justify-between gap-3 border-t border-white/22 pt-3.5'>
+          <div className='flex min-w-0 flex-1 items-center gap-2.5'>
             {instructorPhoto ? (
               <ProfilePicture
                 className='size-[30px] border-0 bg-white/20'
@@ -143,13 +143,13 @@ export function NextClassHero({ booking, isCancelDisabled, onCancel }: NextClass
               variant='outline'
               size='lg'
               disabled={isCancelDisabled}
-              className='h-11 border-white/80 bg-transparent text-white hover:bg-white/10 hover:text-white'
+              className='h-11 max-w-full border-white/80 bg-transparent text-white hover:bg-white/10 hover:text-white'
               onClick={() => onCancel(booking)}
             >
               {t('bookings:cancelReservation')}
             </Button>
           ) : (
-            <p className='text-xs text-white/70'>
+            <p className='max-w-full text-xs break-words text-white/70'>
               {planName ? t('bookings:notCancellableWithPlan', { plan: planName }) : t('bookings:notCancellable')}
             </p>
           )}

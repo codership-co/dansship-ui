@@ -2,7 +2,7 @@ import { format } from 'date-fns';
 import { useTranslation } from 'react-i18next';
 
 import { Badge, Button, ProfilePicture } from '@components/ui';
-import { canRateBooking, isAcademyCancelledBooking, resolvePlanDisplayName } from '@helpers';
+import { canRateBooking, cn, isAcademyCancelledBooking, resolvePlanDisplayName } from '@helpers';
 import { useDateLocale } from '@hooks';
 
 import type { BookingStatus, MyBooking } from '@core/api';
@@ -66,7 +66,7 @@ export function HistoryBookingCard({ booking, alreadyRated, onRate }: HistoryBoo
   });
 
   return (
-    <article className='flex items-start gap-[13px] rounded-[15px] border border-border bg-white p-[13px]'>
+    <article className='flex min-w-0 items-start gap-[13px] rounded-[15px] border border-border bg-white p-[13px]'>
       <div className='flex w-[52px] shrink-0 flex-col items-center gap-0.5 rounded-[11px] bg-muted py-[9px] text-center'>
         <span className='text-[9.5px] font-semibold tracking-[0.08em] text-muted-foreground uppercase'>
           {format(start, 'EEE', { locale })}
@@ -78,9 +78,14 @@ export function HistoryBookingCard({ booking, alreadyRated, onRate }: HistoryBoo
       </div>
 
       <div className='min-w-0 flex-1'>
-        <div className='flex items-start justify-between gap-2'>
-          <h3 className='m-0 font-title text-base leading-[1.2] font-semibold text-foreground'>{className}</h3>
-          <Badge variant='outline' className={statusBadgeClass(booking)}>
+        <div className='flex min-w-0 items-start justify-between gap-2'>
+          <h3 className='m-0 min-w-0 break-words font-title text-base leading-[1.2] font-semibold text-foreground'>
+            {className}
+          </h3>
+          <Badge
+            variant='outline'
+            className={cn(statusBadgeClass(booking), 'max-w-[9.5rem] whitespace-normal text-center')}
+          >
             {statusLabel(booking, t)}
           </Badge>
         </div>
@@ -90,7 +95,7 @@ export function HistoryBookingCard({ booking, alreadyRated, onRate }: HistoryBoo
           {' · '}
           {cls.room?.name ?? t('bookings:unknown')}
         </p>
-        <div className='mt-3 flex flex-wrap items-center justify-between gap-2'>
+        <div className='mt-3 flex min-w-0 flex-wrap items-center justify-between gap-2'>
           <div className='flex min-w-0 items-center gap-2'>
             <ProfilePicture
               className='size-8'
@@ -98,11 +103,11 @@ export function HistoryBookingCard({ booking, alreadyRated, onRate }: HistoryBoo
               alt={instructorName ?? t('bookings:instructorTBA')}
               useAuthFallback={false}
             />
-            <p className='truncate text-sm font-medium text-foreground'>
+            <p className='min-w-0 truncate text-sm font-medium text-foreground'>
               {instructorName ?? t('bookings:instructorTBA')}
             </p>
             {planName ? (
-              <span className='rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground'>
+              <span className='max-w-full shrink-0 rounded-full bg-secondary px-2 py-0.5 text-xs font-medium text-secondary-foreground'>
                 {planName}
               </span>
             ) : null}

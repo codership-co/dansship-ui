@@ -108,7 +108,7 @@ function BookingsPage() {
 
   return (
     <>
-      <Section navbarPadding className='pb-10'>
+      <Section navbarPadding className='overflow-x-hidden pb-10'>
         <header className='mb-6 flex flex-col gap-1'>
           <h1 className='m-0 font-title text-[1.625rem] leading-[1.1] font-bold text-foreground'>
             {t('bookings:myBookingsTitle')}
@@ -154,12 +154,12 @@ function BookingsPage() {
         </section>
 
         <section className='flex flex-col gap-2.5'>
-          <div className='flex items-baseline justify-between gap-3'>
-            <h2 className='m-0 text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase'>
+          <div className='flex min-w-0 items-baseline justify-between gap-3'>
+            <h2 className='m-0 min-w-0 text-[11px] font-semibold tracking-[0.12em] text-muted-foreground uppercase'>
               {t('bookings:historySection')}
             </h2>
             {!isLoadingHistory && historyTotal > 0 ? (
-              <p className='text-[11px] text-muted-foreground'>
+              <p className='shrink-0 text-[11px] text-muted-foreground'>
                 {t('bookings:historyCount', { loaded: historyItems.length, total: historyTotal })}
               </p>
             ) : null}
