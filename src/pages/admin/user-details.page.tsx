@@ -107,7 +107,7 @@ function UserDetailsPage() {
               setSearchParams(value === PROFILE_TAB ? {} : { tab: value }, { replace: true });
             }}
           >
-            <TabsList className='mb-4 h-auto flex-wrap gap-1 border border-gray-200 bg-white p-1 shadow-sm'>
+            <TabsList className='mb-4 h-auto max-w-full flex-nowrap justify-start gap-1 overflow-x-auto border border-gray-200 bg-white p-1 shadow-sm [&_[data-slot=tabs-trigger]]:flex-none'>
               <TabsTrigger value={PROFILE_TAB}>{t('admin:users.details.tabs.profile')}</TabsTrigger>
               {canManageUserContext ? (
                 <TabsTrigger value={NOTES_TAB}>{t('admin:users.details.tabs.notes')}</TabsTrigger>

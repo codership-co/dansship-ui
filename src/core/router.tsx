@@ -7,11 +7,13 @@ import { RouterAuthLayout } from '@components/layouts/router-auth-layout';
 import { RouterPageLayout } from '@components/layouts/router-page-layout';
 import { RouterRootLayout } from '@components/layouts/router-root-layout';
 import { PageURLS } from '@core/constants';
+import { importWithStaleChunkRecovery } from '@helpers';
 import { SecureLoginPage } from '@pages/auth/login.page';
 import { SecureSignupPage } from '@pages/auth/signup.page';
 import { SecureVerifyEmailPage } from '@pages/auth/verify-email.page';
 import { SecureClassesPage } from '@pages/classes.page';
 import { Error404Page } from '@pages/error/404.page';
+import { RouteErrorPage } from '@pages/error/route-error.page';
 import { HomePage } from '@pages/home.page';
 
 function lazyNamed(
@@ -20,7 +22,7 @@ function lazyNamed(
   loaderName?: string,
 ): NonNullable<RouteObject['lazy']> {
   return async () => {
-    const mod = await importer();
+    const mod = await importWithStaleChunkRecovery(importer);
 
     return {
       Component: mod[exportName] as NonNullable<RouteObject['Component']>,
@@ -35,6 +37,7 @@ const routes: Array<RouteObject> = [
     Component: RouterRootLayout,
     middleware: [loggingMiddleware],
     hydrateFallbackElement: <ChromeFallback />,
+    errorElement: <RouteErrorPage />,
     children: [
       {
         path: 'auth',

@@ -3,6 +3,7 @@
     "BAD_REQUEST_GENERIC": "No pudimos procesar esta solicitud. Revisa los datos e intenta de nuevo.",
     "BOOKING_SUBSCRIPTION_NOT_ELIGIBLE": "Este usuario no tiene una suscripción activa con clases disponibles.",
     "BOOKING_SUBSCRIPTION_NOT_STARTED": "Tu plan aún no inicia para la fecha de esta clase.",
+    "BOOKING_SUBSCRIPTION_EXPIRED": "Tu plan ya no cubre la fecha de esta clase.",
     "BOOKING_LATE_JOIN_CLOSED": "El plazo para reservar esta clase ya cerró.",
     "BOOKING_CLASS_GROUP_NOT_COVERED": "El plan activo no cubre este tipo de clase.",
     "BOOKING_TIME_OVERLAP": "Este usuario ya tiene otra clase reservada en ese horario.",

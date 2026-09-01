@@ -4,9 +4,12 @@ import { Outlet, useLocation } from 'react-router';
 import { Footer, Navbar } from '@components/navigation';
 import { SecurityGuard } from '@contexts';
 import { PageURLS } from '@core/constants';
+import { importWithStaleChunkRecovery } from '@helpers';
 
 const CampaignOverlayHost = lazy(() =>
-  import('@components/modules/campaigns/campaign-overlay-host').then(mod => ({ default: mod.CampaignOverlayHost })),
+  importWithStaleChunkRecovery(() =>
+    import('@components/modules/campaigns/campaign-overlay-host').then(mod => ({ default: mod.CampaignOverlayHost })),
+  ),
 );
 
 const SecurityOutlet = SecurityGuard(Outlet);

@@ -13,6 +13,9 @@ import { Error404 } from '@components/svg';
 import '@core/i18n';
 import { Router } from '@core/router';
 import '@core/styles';
+import { listenForStaleChunkLoads } from '@helpers';
+
+listenForStaleChunkLoads();
 
 createRoot(document.getElementById('root')!, {
   onUncaughtError: reactErrorHandler(),

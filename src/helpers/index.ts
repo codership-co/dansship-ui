@@ -16,3 +16,4 @@ export * from './role-redirect';
 export * from './class-level';
 export * from './class-feedback';
 export * from './my-bookings';
+export * from './chunk-load';
