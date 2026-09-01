@@ -36,7 +36,7 @@ function SubscriptionPage() {
   const historicalSubscriptions = useMemo(
     () =>
       subscriptions
-        .filter(sub => sub.status === 'expired' || sub.status === 'canceled')
+        .filter(sub => sub.status === 'expired' || sub.status === 'canceled' || sub.status === 'completed')
         .sort((a, b) => new Date(b.expiration_date).getTime() - new Date(a.expiration_date).getTime()),
     [subscriptions],
   );

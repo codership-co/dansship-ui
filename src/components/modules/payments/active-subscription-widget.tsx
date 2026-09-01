@@ -25,7 +25,8 @@ function sortSubscriptions(subscriptions: Array<ActiveSubscription>): Array<Acti
       pending_payment: 0,
       active: 1,
       expired: 3,
-      canceled: 4,
+      completed: 4,
+      canceled: 5,
     };
     const aOrder = a.status === 'active' && isFuture(new Date(a.start_date)) ? 2 : order[a.status];
     const bOrder = b.status === 'active' && isFuture(new Date(b.start_date)) ? 2 : order[b.status];
