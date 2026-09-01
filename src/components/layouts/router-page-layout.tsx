@@ -1,16 +1,9 @@
-import { lazy, Suspense } from 'react';
 import { Outlet, useLocation } from 'react-router';
 
+import { CampaignOverlayHost } from '@components/modules/campaigns/campaign-overlay-host';
 import { Footer, Navbar } from '@components/navigation';
 import { SecurityGuard } from '@contexts';
 import { PageURLS } from '@core/constants';
-import { importWithStaleChunkRecovery } from '@helpers';
-
-const CampaignOverlayHost = lazy(() =>
-  importWithStaleChunkRecovery(() =>
-    import('@components/modules/campaigns/campaign-overlay-host').then(mod => ({ default: mod.CampaignOverlayHost })),
-  ),
-);
 
 const SecurityOutlet = SecurityGuard(Outlet);
 
@@ -30,9 +23,7 @@ export const RouterPageLayout = () => {
         />
       )}
       <Navbar />
-      <Suspense fallback={null}>
-        <CampaignOverlayHost />
-      </Suspense>
+      <CampaignOverlayHost />
       <section className='relative z-10 min-h-[60dvh]'>
         <SecurityOutlet />
       </section>
