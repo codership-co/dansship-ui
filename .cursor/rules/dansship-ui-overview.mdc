@@ -25,7 +25,7 @@ React 19 + TypeScript SPA (Vite). Stack: React Router 7, i18next, Tailwind v4, R
 | API clients | `src/core/api/<domain>/` via `DansshipAPI` |
 | Data hooks | `src/hooks/services/` |
 | Layouts / UI / features | `src/components/{layouts,ui,modules,forms,form-fields}/` |
-| Locales | `public/locales/es/<ns>.json` + namespaces in `src/core/i18n.ts` |
+| Locales | `src/locales/es/<ns>.json` (eager-bundled in `src/core/i18n.ts`) |
 | URLs / options | `src/core/constants.ts` (`PageURLS`) |
 | Permissions | `src/core/permissions.ts` |
 
@@ -33,7 +33,7 @@ React 19 + TypeScript SPA (Vite). Stack: React Router 7, i18next, Tailwind v4, R
 
 - Reuse existing module boundaries; do not invent new top-level folders.
 - New/changed routes: update `router.tsx` **and** page barrel exports.
-- New copy: update locale JSON **and** register namespace in `i18n.ts` if new.
+- New copy: add or update `src/locales/es/<ns>.json` (new namespace files are picked up by the glob in `i18n.ts`).
 - Shared primitives → `components/ui`; feature UI → `components/modules/<feature>`.
 - Auth/errors: use constants from `@core/constants`; pages consume normalized values (`errorCode`), not raw API envelopes.
 - Public routes must stay SPA-safe (`vercel.json` rewrite to `index.html`).

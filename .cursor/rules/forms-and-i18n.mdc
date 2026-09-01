@@ -1,6 +1,6 @@
 ---
 description: Forms, Zod schemas, and i18n namespace conventions
-globs: src/components/forms/**/*.{ts,tsx},src/components/form-fields/**/*.{ts,tsx},public/locales/**/*.json,src/core/i18n.ts
+globs: src/components/forms/**/*.{ts,tsx},src/components/form-fields/**/*.{ts,tsx},src/locales/**/*.json,src/core/i18n.ts
 alwaysApply: false
 ---
 
@@ -23,8 +23,8 @@ const createLoginSchema = (t: (key: string) => string) =>
 
 ## Locales
 
-- Files: `public/locales/es/<namespace>.json` (Spanish is the active language today)
-- New namespace: add JSON file **and** register in `ns` array in `src/core/i18n.ts`
+- Files: `src/locales/es/<namespace>.json` (Spanish is the active language today)
+- New namespace: add the JSON file; `src/core/i18n.ts` picks it up via glob
 - Option lists in `constants.ts` store **i18n keys** as labels, not translated strings
 
 Never hard-code user-facing Spanish/English in forms or pages when a namespace key exists or should exist.
