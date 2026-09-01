@@ -16,6 +16,7 @@ import {
   getClassBookingEligibility,
   isOwnInstructedClass,
   isPastBookingDeadline,
+  toColombiaDateKey,
 } from '@helpers';
 import { useDateLocale, usePromise, useMyBookings } from '@hooks';
 
@@ -114,6 +115,8 @@ export function BookingModal({
     eligibility.status === 'no_subscription' && !isBooked && !isPast && !isCancelled && !hasTimeOverlap && !isOwnClass;
   const showNotStartedWarning =
     eligibility.status === 'not_started' && !isBooked && !isPast && !isCancelled && !hasTimeOverlap && !isOwnClass;
+  const showExpiredWarning =
+    eligibility.status === 'expired' && !isBooked && !isPast && !isCancelled && !hasTimeOverlap && !isOwnClass;
   const showTrialNote = Boolean(eligibility.status === 'trial' && !isBooked && !isPast && !isCancelled && !isOwnClass);
 
   return (
@@ -228,6 +231,16 @@ export function BookingModal({
               </label>
             )}
 
+            {showExpiredWarning && eligibility.status === 'expired' && (
+              <label className='bg-alert-50 p-3 rounded text-alert-800 border border-alert-200'>
+                {t('bookings:subscriptionExpiredWarning', {
+                  date: format(parseISO(`${toColombiaDateKey(eligibility.expirationDate)}T12:00:00`), 'd MMM yyyy', {
+                    locale,
+                  }),
+                })}
+              </label>
+            )}
+
             {showTrialNote && (
               <label className='bg-primary/5 p-3 rounded text-primary border border-primary/20'>
                 {t('bookings:trialClassNote')}
@@ -269,7 +282,7 @@ export function BookingModal({
                 <label className='bg-gray-50 p-3 rounded text-gray-700 border border-gray-200 text-center'>
                   {t('bookings:ownClassBadge')}
                 </label>
-              ) : eligibility.status === 'no_subscription' ? (
+              ) : eligibility.status === 'no_subscription' || eligibility.status === 'expired' ? (
                 <Button color='primary' onClick={handleBuyPlan}>
                   {t('bookings:buyPlan')}
                 </Button>

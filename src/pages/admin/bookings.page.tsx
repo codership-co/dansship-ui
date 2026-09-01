@@ -69,6 +69,8 @@ function AdminBookingsPage() {
           toast.error(t('admin:bookings.classGroupNotCovered'));
         } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_STARTED) {
           toast.error(t('admin:bookings.subscriptionNotStarted'));
+        } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_EXPIRED) {
+          toast.error(t('admin:bookings.subscriptionExpired'));
         } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_ELIGIBLE) {
           toast.error(t('admin:bookings.subscriptionNotEligible'));
         } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP) {

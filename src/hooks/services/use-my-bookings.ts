@@ -36,6 +36,8 @@ export const useMyBookings = () => {
               toast.error(t('bookings:classGroupNotCoveredDesc'));
             } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_STARTED) {
               toast.error(t('bookings:subscriptionNotStartedDesc'));
+            } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_EXPIRED) {
+              toast.error(t('bookings:subscriptionExpiredDesc'));
             } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_ELIGIBLE) {
               toast.error(t('bookings:subscriptionNotEligibleDesc'));
             } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_LATE_JOIN_CLOSED) {

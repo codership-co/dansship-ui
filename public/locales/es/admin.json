@@ -373,6 +373,7 @@
     "errorDescription": "No se pudo crear la reserva.",
     "classGroupNotCovered": "El usuario no tiene un plan activo que cubra este tipo de clase.",
     "subscriptionNotStarted": "El plan del usuario aún no inicia para la fecha de esta clase.",
+    "subscriptionExpired": "El plan del usuario ya no cubre la fecha de esta clase.",
     "subscriptionNotEligible": "El usuario no tiene una suscripción activa con clases disponibles.",
     "timeOverlap": "El usuario ya tiene otra clase reservada en ese horario.",
     "lateJoinClosed": "El plazo para reservar esta clase ya cerró.",
