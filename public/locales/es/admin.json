@@ -144,6 +144,18 @@
       "reimburseSuccess": "Crédito reembolsado.",
       "reimburseFailed": "No se pudo reembolsar el crédito.",
       "emptySubscriptions": "Este usuario no tiene suscripciones.",
+      "extend": {
+        "action": "Extender",
+        "title": "Extender suscripción",
+        "description": "Se sumarán días a {{plan}}. Actualmente vence el {{expires}}.",
+        "newExpiration": "Nueva fecha de vencimiento: {{date}}.",
+        "days": "Días",
+        "reason": "Motivo (obligatorio)",
+        "reasonPlaceholder": "Ej. cortesía por clase cancelada",
+        "confirm": "Extender",
+        "success": "Suscripción extendida.",
+        "failed": "No se pudo extender la suscripción."
+      },
       "emptyBookings": "Este usuario no tiene reservas.",
       "emptyBenefits": "Este usuario no tiene beneficios aplicados.",
       "wallet": {

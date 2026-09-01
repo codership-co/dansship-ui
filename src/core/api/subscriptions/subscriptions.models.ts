@@ -24,7 +24,12 @@ export interface PurchaseSubscriptionPayload {
   start_date?: string;
 }
 
-export type SubscriptionStatus = 'pending_payment' | 'active' | 'expired' | 'canceled';
+export interface ExtendSubscriptionPayload {
+  days: number;
+  reason: string;
+}
+
+export type SubscriptionStatus = 'pending_payment' | 'active' | 'expired' | 'canceled' | 'completed';
 
 export interface SubscriptionSummary {
   total_remaining_classes: number;
