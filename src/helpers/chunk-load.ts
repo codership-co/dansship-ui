@@ -5,7 +5,7 @@ export function isDynamicImportError(error: unknown): boolean {
   const message =
     error instanceof Error ? `${error.name} ${error.message}` : typeof error === 'string' ? error : String(error ?? '');
 
-  return /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|Loading chunk [\w-]+ failed|Unable to preload CSS/i.test(
+  return /Failed to fetch dynamically imported module|Importing a module script failed|error loading dynamically imported module|Loading chunk [\w-]+ failed|Unable to preload CSS|not a valid JavaScript MIME type|Failed to load module script/i.test(
     message,
   );
 }
