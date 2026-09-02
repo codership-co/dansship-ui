@@ -67,6 +67,7 @@ function AdminClassRosterPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>{t('admin:roster.studentName')}</TableHead>
+                    <TableHead>{t('common:email')}</TableHead>
                     <TableHead>{t('common:level')}</TableHead>
                     <TableHead>{t('common:status')}</TableHead>
                   </TableRow>
@@ -74,7 +75,7 @@ function AdminClassRosterPage() {
                 <TableBody>
                   {enrolled.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={3} className='py-6 text-center text-muted-foreground'>
+                      <TableCell colSpan={4} className='py-6 text-center text-muted-foreground'>
                         {t('admin:roster.noStudents')}
                       </TableCell>
                     </TableRow>
@@ -82,6 +83,7 @@ function AdminClassRosterPage() {
                     enrolled.map(student => (
                       <TableRow key={student.id}>
                         <TableCell>{student.user_name || '-'}</TableCell>
+                        <TableCell>{student.user_email || '-'}</TableCell>
                         <TableCell>{rosterClassLevel(student, t)}</TableCell>
                         <TableCell>{student.status}</TableCell>
                       </TableRow>
