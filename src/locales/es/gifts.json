@@ -1,6 +1,10 @@
 {
   "purchaseForSelf": "Comprar para mí",
   "purchaseAsGift": "¿Es un regalo?",
+  "purchaseModeSelfTitle": "Para mí",
+  "purchaseModeSelfDescription": "El plan queda en tu cuenta.",
+  "purchaseModeGiftTitle": "Regalo",
+  "purchaseModeGiftDescription": "El destinatario elige la fecha de inicio al reclamarlo.",
   "recipientName": "Nombre del destinatario",
   "recipientNamePlaceholder": "Nombre de quien recibirá el regalo",
   "recipientEmail": "Correo del destinatario",

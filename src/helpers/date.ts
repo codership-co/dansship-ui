@@ -87,6 +87,10 @@ export function toColombiaDateKey(value: Date | string): string {
   return date.toLocaleDateString('en-CA', { timeZone: COLOMBIA_TIMEZONE });
 }
 
+export function isColombiaSeptember(value: Date | string = new Date()): boolean {
+  return toColombiaDateKey(value).slice(5, 7) === '09';
+}
+
 export function colombiaDayStartUtc(isoDate: string): string {
   const [year, month, day] = isoDate.split('-').map(Number);
 

@@ -34,6 +34,8 @@ export interface CreatePaymentIntentPayload {
   gift_message?: string;
   gift_is_anonymous?: boolean;
   gift_sender_display_name?: string;
+  is_duo?: boolean;
+  duo_partner_email?: string;
 }
 
 export interface BoldCheckoutConfig {
@@ -102,6 +104,8 @@ export interface PaymentIntent {
   metadata: Record<string, unknown> | null;
   is_gift?: boolean;
   gift_recipient_email?: string | null;
+  is_duo?: boolean;
+  duo_partner_email?: string | null;
   admin_notes: string | null;
   reviewed_by: string | null;
   reviewed_at: string | null;
@@ -148,6 +152,8 @@ export interface PaymentPreviewRequest {
   referral_code?: string;
   is_gift?: boolean;
   gift_recipient_email?: string;
+  is_duo?: boolean;
+  duo_partner_email?: string;
   room_id?: string;
   resource_id?: string | null;
   start_time?: string;

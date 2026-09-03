@@ -58,6 +58,11 @@ export function StudentReports() {
     true,
     deps,
   );
+  const { response: pendingDuoData, isLoading: pendingDuoLoading } = usePromise(
+    () => DansshipAPI.reportsAdmin.getPendingDuoAssignments(),
+    true,
+    deps,
+  );
   const { response: activeListData, isLoading: activeListLoading } = usePromise(
     () => DansshipAPI.reportsAdmin.getActiveStudentsList(appliedDateRange.start, appliedDateRange.end),
     true,
@@ -75,11 +80,13 @@ export function StudentReports() {
     renewalLoading ||
     conversionLoading ||
     trialWithoutPlanLoading ||
+    pendingDuoLoading ||
     activeListLoading ||
     usageLoading;
   const conversion = conversionData?.data;
   const usage = usageData?.data;
   const trialWithoutPlan = trialWithoutPlanData?.data?.items ?? [];
+  const pendingDuo = pendingDuoData?.data?.items ?? [];
   const activeList = activeListData?.data?.items ?? [];
 
   return (
@@ -97,6 +104,51 @@ export function StudentReports() {
         </div>
       ) : (
         <div className='grid grid-cols-1 gap-8'>
+          <Card className='border-input shadow-sm'>
+            <CardHeader className='border-b border-gray-100 bg-gray-50/50 pb-4'>
+              <CardTitle className='text-lg text-gray-800'>{t('reports:students.pendingDuoTitle')}</CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-3 p-0'>
+              <p className='px-4 pt-4 text-sm text-gray-600'>{t('reports:students.pendingDuoDescription')}</p>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('reports:students.student')}</TableHead>
+                    <TableHead>{t('reports:students.email')}</TableHead>
+                    <TableHead>{t('reports:students.partnerEmail')}</TableHead>
+                    <TableHead>{t('reports:students.purchasedAt')}</TableHead>
+                    <TableHead className='text-right'>{t('reports:students.daysPending')}</TableHead>
+                    <TableHead />
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pendingDuo.length === 0 ? (
+                    <EmptyRow cols={6} />
+                  ) : (
+                    pendingDuo.map(row => (
+                      <TableRow key={row.assignment_id}>
+                        <TableCell className='font-medium'>{row.buyer_name}</TableCell>
+                        <TableCell>{row.buyer_email}</TableCell>
+                        <TableCell>{row.partner_email}</TableCell>
+                        <TableCell>
+                          {format(new Date(row.purchased_at), 'MMM d, yyyy', { locale: dateLocale })}
+                        </TableCell>
+                        <TableCell className='text-right'>{row.days_pending}</TableCell>
+                        <TableCell className='text-right'>
+                          <Link to={PageURLS.admin.userDetails(row.buyer_user_id)} viewTransition>
+                            <Button color='primary' size='small' variant='flat' className='whitespace-nowrap'>
+                              {t('reports:students.viewStudent')}
+                            </Button>
+                          </Link>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
           <Card className='border-input shadow-sm'>
             <CardHeader className='border-b border-gray-100 bg-gray-50/50 pb-4'>
               <CardTitle className='text-lg text-gray-800'>{t('reports:students.trialWithoutPlanTitle')}</CardTitle>

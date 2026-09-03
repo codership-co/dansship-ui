@@ -1,40 +1,18 @@
-import { zodResolver } from '@hookform/resolvers/zod';
-import { addMonths } from 'date-fns';
 import { TFunction } from 'i18next';
 import { Button, Checkbox } from 'polpo/components';
-import { useDebounce } from 'polpo/hooks';
-import { useCallback, useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
-import { LuArrowRight, LuX } from 'react-icons/lu';
+import { LuArrowLeft, LuArrowRight } from 'react-icons/lu';
 import { z } from 'zod';
 
-import { DateField, EmailField, TextField } from '@components/form-fields';
-import { Spinner } from '@components/loaders';
-import { DansshipAPI, DansshipAPIError, PaymentPreviewRequest, PublicPlan } from '@core/api';
-import { captureUnexpectedException, withSentrySpan } from '@core/sentry';
+import { PaymentMethodSelector } from '@components/modules/payments/payment-method-selector';
+import { PaymentMethod, PublicPlan } from '@core/api';
 import { formatPrice } from '@helpers';
-import { useCallablePromise } from '@hooks';
 
-const referralRejectionKey = (reason: string | null | undefined): string | null => {
-  if (reason === 'Referral code not found') {
-    return 'subscriptions:invalidReferralCode';
-  }
-
-  if (reason === 'Cannot use your own referral code') {
-    return 'subscriptions:ownReferralCode';
-  }
-
-  if (reason === 'Not first plan purchase') {
-    return 'subscriptions:referralNotFirstPurchase';
-  }
-
-  return null;
-};
-
-const createCheckoutReviewSchema = (t: TFunction) =>
+export const createCheckoutReviewSchema = (t: TFunction) =>
   z
     .object({
+      purchase_mode: z.enum(['self', 'gift', 'duo']),
       start_date: z.date().optional(),
       discount_code: z.string(),
       referral_code: z.string(),
@@ -44,9 +22,10 @@ const createCheckoutReviewSchema = (t: TFunction) =>
       gift_message: z.string(),
       gift_is_anonymous: z.boolean(),
       gift_sender_display_name: z.string(),
+      duo_partner_email: z.string(),
     })
     .superRefine((data, ctx) => {
-      if (data.is_gift) {
+      if (data.purchase_mode === 'gift') {
         if (!data.gift_recipient_email.trim()) {
           ctx.addIssue({
             code: z.ZodIssueCode.custom,
@@ -62,6 +41,22 @@ const createCheckoutReviewSchema = (t: TFunction) =>
         }
 
         return;
+      }
+
+      if (data.purchase_mode === 'duo') {
+        if (!data.duo_partner_email.trim()) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: t('validation:required'),
+            path: ['duo_partner_email'],
+          });
+        } else if (!z.string().email().safeParse(data.duo_partner_email.trim()).success) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: t('validation:email'),
+            path: ['duo_partner_email'],
+          });
+        }
       }
 
       if (!data.start_date) {
@@ -127,6 +122,7 @@ export const DefaultPaymentData: PaymentData = {
 };
 
 export const defaultCheckoutFormValues: CheckoutFormValues = {
+  purchase_mode: 'self',
   start_date: new Date(),
   discount_code: '',
   referral_code: '',
@@ -136,243 +132,43 @@ export const defaultCheckoutFormValues: CheckoutFormValues = {
   gift_message: '',
   gift_is_anonymous: false,
   gift_sender_display_name: '',
+  duo_partner_email: '',
 };
 
-interface CheckoutReviewPlanFormInputProps {
+interface CheckoutPayFormProps {
   plan: PublicPlan;
-  onCancel: () => void;
-  onSubmit: (data: CheckoutFormValues, paymentData: PaymentData) => Promise<void>;
-  defaultFormValues: CheckoutFormValues;
+  checkoutData: CheckoutFormValues;
+  paymentData: PaymentData;
+  paymentMethod: PaymentMethod | null;
+  onPaymentMethodChange: (method: PaymentMethod) => void;
+  isWalletCovered: boolean;
+  onBack: () => void;
+  onSubmit: () => void;
 }
 
-export const CheckoutReviewPlanFormInput = ({
+export function CheckoutPayForm({
   plan,
-  onCancel,
+  checkoutData,
+  paymentData,
+  paymentMethod,
+  onPaymentMethodChange,
+  isWalletCovered,
+  onBack,
   onSubmit,
-  defaultFormValues,
-}: CheckoutReviewPlanFormInputProps) => {
+}: CheckoutPayFormProps) {
   const { t } = useTranslation();
   const [termsAndConditions, setTermsAndConditions] = useState(false);
-  const [giftEligibilityError, setGiftEligibilityError] = useState<string | null>(null);
-  const [isFirstPlanPurchase, setIsFirstPlanPurchase] = useState(true);
-  const [paymentData, setPaymentData] = useState<PaymentData>({
-    ...DefaultPaymentData,
-    finalPrice: plan.price,
-    amountToCharge: plan.price,
-  });
-  const { call: previewPayment, isLoading } = useCallablePromise((payload: PaymentPreviewRequest) =>
-    DansshipAPI.payments.previewPayment(payload),
-  );
-
-  const { handleSubmit, watch, control, setValue } = useForm<CheckoutFormValues>({
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    resolver: zodResolver(createCheckoutReviewSchema(t)),
-    defaultValues: defaultFormValues,
-  });
-
-  const discountCode = useDebounce(watch('discount_code'), 800);
-  const referralCode = useDebounce(watch('referral_code'), 800);
-  const isGift = watch('is_gift');
-  const giftRecipientEmail = useDebounce(watch('gift_recipient_email'), 800);
-
-  const handleGiftToggle = useCallback(() => {
-    const nextIsGift = !isGift;
-    setValue('is_gift', nextIsGift);
-    setGiftEligibilityError(null);
-
-    if (nextIsGift) {
-      setValue('start_date', undefined);
-
-      return;
-    }
-
-    setValue('start_date', new Date());
-    setValue('gift_recipient_name', '');
-    setValue('gift_recipient_email', '');
-    setValue('gift_message', '');
-    setValue('gift_is_anonymous', false);
-    setValue('gift_sender_display_name', '');
-  }, [isGift, setValue]);
-
-  const getPaymentPreview = useCallback(async () => {
-    void withSentrySpan('checkout.preview', 'ui.action', { plan_id: plan.id }, async () => {
-      const previewPayload: PaymentPreviewRequest = {
-        plan_id: plan.id,
-        discount_code: discountCode ? discountCode.toUpperCase() : undefined,
-        referral_code: !isGift && referralCode ? referralCode.toUpperCase() : undefined,
-      };
-      const trimmedGiftEmail = giftRecipientEmail.trim();
-
-      if (isGift && trimmedGiftEmail) {
-        previewPayload.is_gift = true;
-        previewPayload.gift_recipient_email = trimmedGiftEmail;
-      }
-
-      const { data, ok, error } = await previewPayment(previewPayload);
-
-      if (!ok) {
-        if (isGift && trimmedGiftEmail) {
-          const message =
-            error instanceof DansshipAPIError
-              ? error.body.message || t('gifts:giftEligibilityFailed')
-              : t('gifts:giftEligibilityFailed');
-          setGiftEligibilityError(message);
-        } else {
-          setGiftEligibilityError(null);
-        }
-
-        captureUnexpectedException(error ?? new Error('Payment preview failed'), {
-          tags: { flow: 'checkout.preview', plan_id: plan.id },
-        });
-
-        return;
-      }
-
-      setGiftEligibilityError(null);
-
-      const {
-        base_amount,
-        discount_applied,
-        discount_type,
-        discount_value,
-        final_price,
-        is_valid,
-        original_price,
-        rejection_reason,
-        tax_amount,
-        tax_rate_percentage,
-        bonus_classes_granted,
-        bonus_expires_days,
-        bonus_benefit_name,
-        discount_benefit_code,
-        is_first_plan_purchase,
-        wallet_amount_applied,
-        amount_to_charge,
-      } = data;
-
-      setIsFirstPlanPurchase(Boolean(is_first_plan_purchase));
-
-      if (!is_first_plan_purchase) {
-        setValue('referral_code', '');
-      }
-
-      const isPercentage = discount_type === 'percentage_discount' || discount_type === 'percentage';
-      const isFixed = discount_type === 'fixed_discount' || discount_type === 'fixed_amount';
-
-      setPaymentData({
-        isValid: is_valid,
-        discountCode: discountCode.toUpperCase(),
-        discountBenefitCode: discount_benefit_code,
-        error: rejection_reason || '',
-        applied: discount_applied,
-        discountValue: discount_value,
-        finalPrice: final_price,
-        baseAmount: base_amount,
-        originalPrice: original_price,
-        taxAmount: tax_amount,
-        taxContext: `${tax_rate_percentage}%`,
-        discountContext: isPercentage
-          ? `${discount_value}%`
-          : isFixed
-            ? formatPrice(discount_value, plan.currency)
-            : '',
-        bonusClassesGranted: bonus_classes_granted,
-        bonusExpiresDays: bonus_expires_days,
-        bonusBenefitName: bonus_benefit_name,
-        walletAmountApplied: wallet_amount_applied,
-        amountToCharge: amount_to_charge,
-      });
-    });
-  }, [discountCode, giftRecipientEmail, isGift, plan.currency, plan.id, previewPayment, referralCode, setValue, t]);
-
-  useEffect(() => {
-    void getPaymentPreview();
-  }, [getPaymentPreview]);
-
-  const handleInternalSubmit = useCallback(
-    async (formData: CheckoutFormValues) => {
-      const nextData: CheckoutFormValues = formData.is_gift
-        ? {
-            ...formData,
-            start_date: undefined,
-            gift_recipient_email: formData.gift_recipient_email.trim(),
-          }
-        : {
-            ...formData,
-            gift_recipient_name: '',
-            gift_recipient_email: '',
-            gift_message: '',
-            gift_is_anonymous: false,
-            gift_sender_display_name: '',
-          };
-
-      await onSubmit(nextData, paymentData);
-    },
-    [paymentData, onSubmit],
-  );
+  const isDuo = checkoutData.purchase_mode === 'duo';
 
   return (
-    <form onSubmit={handleSubmit(handleInternalSubmit)} className='grid grid-rows-[1fr_auto] h-full'>
-      <div className='grid gap-8 content-start'>
-        <div className='grid gap-2'>
-          <Checkbox label={t('gifts:purchaseAsGift')} name='is_gift' value={isGift} setValue={handleGiftToggle} />
-        </div>
-
-        {isGift ? (
-          <EmailField
-            control={control}
-            name='gift_recipient_email'
-            label={t('gifts:recipientEmail')}
-            placeholder={t('common:placeholder.email')}
-            errorMessage={giftEligibilityError ?? undefined}
-          />
-        ) : (
-          <DateField
-            control={control}
-            name='start_date'
-            min={new Date()}
-            max={addMonths(new Date(), 1)}
-            label={t('subscriptions:startDate')}
-          />
-        )}
-
-        <TextField
-          inputClassName='uppercase'
-          control={control}
-          name='discount_code'
-          disabled={isLoading}
-          rightElement={isLoading ? <Spinner /> : undefined}
-          placeholder={t('subscriptions:discountCodePlaceholder')}
-          label={t('subscriptions:discountCodeLabel')}
-          helperText={paymentData.isValid ? t('subscriptions:codeValidationNote') : undefined}
-          errorMessage={
-            !isLoading && !paymentData.isValid && paymentData.discountCode && !referralRejectionKey(paymentData.error)
-              ? t('subscriptions:invalidDiscountCode')
-              : undefined
-          }
-        />
-
-        {!isGift && isFirstPlanPurchase ? (
-          <TextField
-            inputClassName='uppercase'
-            control={control}
-            name='referral_code'
-            disabled={isLoading}
-            rightElement={isLoading ? <Spinner /> : undefined}
-            placeholder={t('subscriptions:referralCodePlaceholder')}
-            label={t('subscriptions:referralCodeLabel')}
-            helperText={t('subscriptions:referralCodeHelp')}
-            errorMessage={
-              !isLoading && !paymentData.isValid && referralCode
-                ? t(referralRejectionKey(paymentData.error) ?? 'subscriptions:invalidReferralCode')
-                : undefined
-            }
-          />
-        ) : null}
-      </div>
-
-      <section className='grid gap-2'>
+    <form
+      onSubmit={event => {
+        event.preventDefault();
+        onSubmit();
+      }}
+      className='grid h-full grid-rows-[1fr_auto]'
+    >
+      <div className='grid content-start gap-8'>
         <div>
           <div className='mb-2 flex items-center justify-between gap-2'>
             <span className='min-w-0 break-words text-gray-500'>{t('subscriptions:subtotal')}</span>
@@ -382,7 +178,7 @@ export const CheckoutReviewPlanFormInput = ({
             <span className='min-w-0 break-words text-gray-500'>{t('subscriptions:iva')}</span>
             <span className='shrink-0'>{formatPrice(paymentData.taxAmount, plan.currency)}</span>
           </div>
-          {paymentData.applied && (
+          {!isDuo && paymentData.applied && (
             <div className='mb-2 flex items-center justify-between gap-2'>
               <span className='min-w-0 break-words text-gray-500'>
                 {paymentData.discountBenefitCode === 'REFERRAL_FIXED_20000'
@@ -393,11 +189,11 @@ export const CheckoutReviewPlanFormInput = ({
                       ? t('subscriptions:discountCode')
                       : t('subscriptions:discount')}
               </span>
-              <span className='shrink-0'>{isLoading ? <Spinner /> : paymentData.discountContext}</span>
+              <span className='shrink-0'>{paymentData.discountContext}</span>
             </div>
           )}
 
-          {paymentData.bonusClassesGranted !== null && paymentData.bonusClassesGranted > 0 && (
+          {!isDuo && paymentData.bonusClassesGranted !== null && paymentData.bonusClassesGranted > 0 && (
             <div className='mb-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary'>
               {t('subscriptions:bonusClassesCheckoutNote', {
                 count: paymentData.bonusClassesGranted,
@@ -406,27 +202,31 @@ export const CheckoutReviewPlanFormInput = ({
             </div>
           )}
 
+          {paymentData.walletAmountApplied > 0 && (
+            <div className='mb-2 flex items-center justify-between gap-2'>
+              <span className='min-w-0 break-words text-primary'>{t('subscriptions:walletApplied')}</span>
+              <span className='shrink-0 text-primary'>
+                -{formatPrice(paymentData.walletAmountApplied, plan.currency)}
+              </span>
+            </div>
+          )}
+
           <div className='mt-4 flex items-center justify-between gap-2 border-t pt-4 text-lg font-bold'>
             <span className='min-w-0 break-words'>{t('subscriptions:totalDue')}</span>
-            <span className='shrink-0'>{formatPrice(paymentData.finalPrice, plan.currency)}</span>
+            <span className='shrink-0'>{formatPrice(paymentData.amountToCharge, plan.currency)}</span>
           </div>
-
-          {paymentData.walletAmountApplied > 0 && (
-            <>
-              <div className='mt-2 flex items-center justify-between gap-2 text-sm'>
-                <span className='min-w-0 break-words text-primary'>{t('subscriptions:walletApplied')}</span>
-                <span className='shrink-0 text-primary'>
-                  -{formatPrice(paymentData.walletAmountApplied, plan.currency)}
-                </span>
-              </div>
-              <div className='flex items-center justify-between gap-2 text-base font-semibold'>
-                <span className='min-w-0 break-words'>{t('subscriptions:amountToCharge')}</span>
-                <span className='shrink-0'>{formatPrice(paymentData.amountToCharge, plan.currency)}</span>
-              </div>
-            </>
-          )}
         </div>
 
+        {isWalletCovered ? (
+          <div className='rounded-md border border-primary/20 bg-primary/5 p-3 text-sm text-gray-700'>
+            <p className='m-0 font-semibold text-primary'>{t('subscriptions:walletFullyCoveredNote')}</p>
+          </div>
+        ) : (
+          <PaymentMethodSelector value={paymentMethod} onChange={onPaymentMethodChange} />
+        )}
+      </div>
+
+      <section className='grid gap-2'>
         <section className='w-full max-w-90 justify-self-end text-label'>
           <Checkbox
             label={
@@ -450,19 +250,13 @@ export const CheckoutReviewPlanFormInput = ({
         </section>
 
         <div className='flex flex-wrap justify-end gap-2 pt-4'>
-          <Button type='button' className='flex items-center' variant='outlined' color='primary' onClick={onCancel}>
-            <LuX />
-            {t('common:cancel')}
+          <Button type='button' className='flex items-center' variant='outlined' color='primary' onClick={onBack}>
+            <LuArrowLeft />
+            {t('common:back')}
           </Button>
 
           <Button
-            isLoading={isLoading}
-            disabled={
-              (Boolean(discountCode) && !paymentData.isValid) ||
-              (Boolean(referralCode) && !paymentData.isValid) ||
-              !termsAndConditions ||
-              Boolean(giftEligibilityError)
-            }
+            disabled={!termsAndConditions || (!isWalletCovered && !paymentMethod)}
             color='primary'
             className='flex items-center'
           >
@@ -473,4 +267,4 @@ export const CheckoutReviewPlanFormInput = ({
       </section>
     </form>
   );
-};
+}

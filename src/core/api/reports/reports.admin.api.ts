@@ -16,6 +16,7 @@ import type {
   InstructorPerformanceReport,
   NetRevenueByClassTypeReport,
   OccupancyFilters,
+  PendingDuoAssignmentsReport,
   RenewalChurnReport,
   RevenueIndicatorsReport,
   StudioRentalFunnelReport,
@@ -175,6 +176,13 @@ export class ReportsAdminAPI {
       path: '/admin/reports/trial-students-without-plan',
       method: 'GET',
       params: this.dateParams(startDate, endDate),
+    });
+  }
+
+  async getPendingDuoAssignments() {
+    return this.httpClient.callNoError<PendingDuoAssignmentsReport>({
+      path: '/admin/reports/pending-duo-assignments',
+      method: 'GET',
     });
   }
 
