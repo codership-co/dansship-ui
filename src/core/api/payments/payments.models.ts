@@ -95,6 +95,10 @@ export interface PaymentIntent {
   gateway_reference: string | null;
   proof_url: string | null;
   subscription_id: string | null;
+  tax_type_name_snapshot?: string | null;
+  tax_rate_percentage_snapshot?: number | null;
+  tax_amount?: number | null;
+  base_amount?: number | null;
   metadata: Record<string, unknown> | null;
   is_gift?: boolean;
   gift_recipient_email?: string | null;
@@ -118,6 +122,8 @@ export interface GetAdminPaymentsParams {
 
 export interface PaymentIntentDetail extends PaymentIntent {
   discount_code: string | null;
+  plan_name?: string | null;
+  referral_code?: string | null;
 }
 
 export interface PresignedUrlResponse {

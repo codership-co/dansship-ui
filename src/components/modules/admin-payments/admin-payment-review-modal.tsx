@@ -4,13 +4,15 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
 
+import { AdminPaymentPricingBreakdown } from './admin-payment-pricing-breakdown';
+
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
 import { PaymentStatusBadge } from '@components/modules';
 import { Badge, Dialog, DialogContent, DialogHeader, DialogTitle, Button, Textarea } from '@components/ui';
 import { PaymentIntent, PaymentIntentDetail, AdminPaymentReviewPayload, DansshipAPI, PaymentStatus } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { formatPrice, paymentPurchaseLabel, purchaseTypeLabel, purchaseTypeLabelKey } from '@helpers';
+import { paymentPurchaseLabel, purchaseTypeLabel, purchaseTypeLabelKey } from '@helpers';
 import { useDateLocale } from '@hooks';
 
 interface AdminPaymentReviewModalProps {
@@ -190,10 +192,6 @@ export function AdminPaymentReviewModal({
                   </p>
                 ) : null}
                 <p>
-                  <span className='font-medium'>{t('payments:total')}:</span>{' '}
-                  {formatPrice(current.amount, current.currency)}
-                </p>
-                <p>
                   <span className='font-medium'>{t('payments:methodLabel')}:</span>{' '}
                   {t(`payments.method.${current.payment_method_type}`)}
                 </p>
@@ -223,6 +221,8 @@ export function AdminPaymentReviewModal({
                   </>
                 ) : null}
               </div>
+
+              <AdminPaymentPricingBreakdown intent={current} />
 
               <div className='space-y-2'>
                 <p className='text-sm font-medium text-gray-900'>{t('payments:proofLabel')}</p>
