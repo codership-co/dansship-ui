@@ -159,6 +159,14 @@
     "syncBoldFailedDesc": "Intenta de nuevo en unos momentos.",
     "giftBadge": "Regalo",
     "giftRecipient": "Destinatario",
+    "pricingBreakdown": {
+      "title": "Desglose del pago",
+      "originalPrice": "Precio original",
+      "purchaseTotal": "Total de la compra",
+      "walletApplied": "Saldo de billetera aplicado",
+      "amountToPay": "Monto a pagar",
+      "referralCode": "Código de referido"
+    },
     "filter": {
       "all": "Todos los estados",
       "status": "Filtrar por estado"

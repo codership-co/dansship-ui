@@ -12,11 +12,34 @@ export function toNumber(value: unknown, fallback = 0): number {
   return fallback;
 }
 
+function toOptionalNumber(value: unknown): number | null {
+  if (value === null || value === undefined) {
+    return null;
+  }
+
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === 'string') {
+    const parsed = Number(value);
+
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return null;
+}
+
 export function normalizeIntent(intent: PaymentIntent): PaymentIntent {
   return {
     ...intent,
     amount: toNumber(intent.amount),
     wallet_amount_applied: toNumber(intent.wallet_amount_applied),
+    tax_rate_percentage_snapshot: toOptionalNumber(intent.tax_rate_percentage_snapshot),
+    tax_amount: toOptionalNumber(intent.tax_amount),
+    base_amount: toOptionalNumber(intent.base_amount),
   };
 }
 
