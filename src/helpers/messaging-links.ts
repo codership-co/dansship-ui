@@ -1,5 +1,12 @@
+const STUDIO_WHATSAPP_NUMBER = '+573161017878';
+const STUDIO_WHATSAPP_PREFILL = 'Hola Dansship, tengo una pregunta';
+
 export function buildWhatsAppLink(identifier: string): string {
   return `https://wa.me/${identifier.trim()}`;
+}
+
+export function buildStudioWhatsAppLink(text = STUDIO_WHATSAPP_PREFILL): string {
+  return `${buildWhatsAppLink(STUDIO_WHATSAPP_NUMBER)}?text=${encodeURIComponent(text)}`;
 }
 
 export function buildRegisteredPhoneWhatsAppLink(
