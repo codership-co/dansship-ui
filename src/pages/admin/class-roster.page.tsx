@@ -11,7 +11,7 @@ import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { DansshipAPI, type RosterStudent } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions } from '@core/permissions';
-import { classLevelLabelKey } from '@helpers';
+import { classLevelLabelKey, rosterStudentName } from '@helpers';
 import { usePromise } from '@hooks';
 
 function rosterClassLevel(student: RosterStudent, t: (key: string) => string) {
@@ -82,7 +82,7 @@ function AdminClassRosterPage() {
                   ) : (
                     enrolled.map(student => (
                       <TableRow key={student.id}>
-                        <TableCell>{student.user_name || '-'}</TableCell>
+                        <TableCell>{rosterStudentName(student)}</TableCell>
                         <TableCell>{student.user_email || '-'}</TableCell>
                         <TableCell>{rosterClassLevel(student, t)}</TableCell>
                         <TableCell>{student.status}</TableCell>

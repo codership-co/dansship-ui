@@ -15,7 +15,7 @@ import {
   TableRow,
 } from '@components/ui';
 import { DansshipAPI, type RosterStudent } from '@core/api';
-import { classLevelLabelKey } from '@helpers';
+import { classLevelLabelKey, rosterStudentName } from '@helpers';
 import { usePromise } from '@hooks';
 
 function rosterClassLevel(student: RosterStudent, t: (key: string) => string) {
@@ -85,7 +85,7 @@ export function AdminClassRosterDialog({ classId, open, onOpenChange, classTitle
                 ) : (
                   enrolled.map(student => (
                     <TableRow key={student.id}>
-                      <TableCell>{student.user_name || '-'}</TableCell>
+                      <TableCell>{rosterStudentName(student)}</TableCell>
                       <TableCell>{student.user_email || '-'}</TableCell>
                       <TableCell>{rosterClassLevel(student, t)}</TableCell>
                       <TableCell>{student.status}</TableCell>
