@@ -89,6 +89,7 @@ export interface AdminUserDetailsResponse {
   id: string;
   email: string;
   full_name: string;
+  photo_url: string | null;
   birth_date: string | null;
   display_name: string | null;
   phone_country_code: string | null;

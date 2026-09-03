@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import { SpinnerLoader } from '@components/loaders';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
+import { ProfilePicture, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { type AdminUserDetailsResponse, type AdminUserHealthProfile, type AdminUserPreferences } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { buildRegisteredPhoneWhatsAppLink, formatDate } from '@helpers';
@@ -12,21 +12,35 @@ import { buildRegisteredPhoneWhatsAppLink, formatDate } from '@helpers';
 interface UserDetailsHeaderProps {
   userId: string;
   email?: string | null;
+  fullName?: string | null;
+  photoUrl?: string | null;
   isLoading?: boolean;
 }
 
-export function UserDetailsHeader({ userId, email, isLoading = false }: UserDetailsHeaderProps) {
+export function UserDetailsHeader({ userId, email, fullName, photoUrl, isLoading = false }: UserDetailsHeaderProps) {
   const { t } = useTranslation();
 
   return (
     <div className='flex flex-wrap items-center justify-between gap-3'>
-      <div>
+      <div className='flex items-center gap-4'>
         {isLoading && !email ? (
-          <div className='h-7 w-56 animate-pulse rounded-md bg-muted' aria-hidden />
-        ) : email ? (
-          <h4 className='text-primary'>{email}</h4>
-        ) : null}
-        <p className='mt-1 font-mono text-sm text-muted-foreground'>{userId}</p>
+          <div className='size-20 shrink-0 animate-pulse rounded-full bg-muted' aria-hidden />
+        ) : (
+          <ProfilePicture
+            className='size-20 shrink-0 border-2 border-primary'
+            image={photoUrl || undefined}
+            alt={fullName || email || undefined}
+            useAuthFallback={false}
+          />
+        )}
+        <div>
+          {isLoading && !email ? (
+            <div className='h-7 w-56 animate-pulse rounded-md bg-muted' aria-hidden />
+          ) : email ? (
+            <h4 className='text-primary'>{email}</h4>
+          ) : null}
+          <p className='mt-1 font-mono text-sm text-muted-foreground'>{userId}</p>
+        </div>
       </div>
 
       <Link to={PageURLS.admin.users} viewTransition>
