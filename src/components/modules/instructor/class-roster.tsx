@@ -11,7 +11,7 @@ import { DansshipAPI, InstructorUserSearchResult, RosterStudent } from '@core/ap
 import { PageURLS } from '@core/constants';
 import { InstructorPermissions } from '@core/permissions';
 import { captureUnexpectedException } from '@core/sentry';
-import { classLevelLabelKey } from '@helpers';
+import { classLevelLabelKey, rosterStudentName } from '@helpers';
 import { useDateLocale, usePromise, useInstructorRoster } from '@hooks';
 
 interface ClassRosterProps {
@@ -21,7 +21,7 @@ interface ClassRosterProps {
 }
 
 function studentDisplayName(student: RosterStudent) {
-  return student.user_name || student.user_email || student.user_id;
+  return rosterStudentName(student, student.user_id);
 }
 
 function studentClassLevelLabel(student: RosterStudent, t: (key: string) => string) {

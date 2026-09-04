@@ -88,6 +88,7 @@ export interface RosterStudent {
   id: string;
   user_id: string;
   user_name?: string;
+  user_full_name?: string;
   user_email?: string;
   class_level?: 'beginner' | 'intermediate' | 'advanced' | null;
   status: 'active' | 'attended' | 'no_show' | 'cancelled';
