@@ -16,12 +16,10 @@ import {
   SecureAdminBookingsPage,
   SecureAdminCampaignsPage,
   SecureAdminClassRosterPage,
-  SecureAdminDoorCodePage,
   SecureAdminFiguresPage,
   SecureAdminInventoryPage,
   SecureAdminMerchPage,
   SecureAdminMerchPosPage,
-  SecureAdminPage,
   SecureAdminPaymentsPage,
   SecureAdminReportsPage,
   SecureAdminScheduleBuilderPage,
@@ -164,7 +162,7 @@ const routes: Array<RouteObject> = [
           {
             path: 'admin',
             children: [
-              { index: true, Component: SecureAdminPage },
+              { index: true, loader: () => redirect(PageURLS.admin.reports) },
               { path: 'agenda', Component: SecureAdminAgendaPage },
               { path: 'agenda/conflicts', Component: SecureAdminAgendaConflictsPage },
               { path: 'inventory', Component: SecureAdminInventoryPage },
@@ -179,7 +177,10 @@ const routes: Array<RouteObject> = [
               { path: 'users/:userId', Component: SecureAdminUserDetailsPage },
               { path: 'classes/:classId/roster', Component: SecureAdminClassRosterPage },
               { path: 'studio-rental', Component: SecureAdminStudioRentalPage },
-              { path: 'door-code', Component: SecureAdminDoorCodePage },
+              {
+                path: 'door-code',
+                loader: () => redirect(`${PageURLS.admin.inventory}?tab=doorCode`),
+              },
               { path: 'campaigns', Component: SecureAdminCampaignsPage },
             ],
           },

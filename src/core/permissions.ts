@@ -174,3 +174,10 @@ export const AdminPermissions = {
   campaigns: [PERMISSION.CAMPAIGN_MANAGE],
   classFeedback: [PERMISSION.CLASS_FEEDBACK_READ],
 };
+
+/** Page + menu access for Inventario y Facturación (tabs are gated individually). */
+export const AdminInventoryPagePermissions = [
+  ...AdminPermissions.inventory,
+  ...AdminPermissions.doorCode,
+  PERMISSION.INSTRUCTOR_PAY_RATE_MANAGE,
+];

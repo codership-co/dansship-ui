@@ -5,7 +5,7 @@ import { FaCartArrowDown, FaSignOutAlt } from 'react-icons/fa';
 import { GiAvoidance } from 'react-icons/gi';
 import { HiOutlineDocument } from 'react-icons/hi';
 import { HiMiniShoppingCart } from 'react-icons/hi2';
-import { LuClipboardList, LuKeyRound, LuX } from 'react-icons/lu';
+import { LuClipboardList, LuX } from 'react-icons/lu';
 import { MdOutlineInventory, MdOutlinePayments } from 'react-icons/md';
 import { RiAdminFill } from 'react-icons/ri';
 import { SiReasonstudios } from 'react-icons/si';
@@ -14,7 +14,7 @@ import { TfiAgenda } from 'react-icons/tfi';
 import { useLocation, useNavigate } from 'react-router';
 
 import {
-  getAdminNavItem,
+  getAdminMenuPermissions,
   getMobileProfileNavItem,
   getPrimaryNavItems,
   getScheduleBuilderNavItem,
@@ -26,7 +26,7 @@ import { LanguageSelector } from '@components/navigation/language-selector';
 import { Isotype, Logotype } from '@components/svg';
 import { FEATURE_FLAG, useAuth, useOrPermissions } from '@contexts';
 import { PageURLS } from '@core/constants';
-import { AdminPermissions } from '@core/permissions';
+import { AdminInventoryPagePermissions, AdminPermissions } from '@core/permissions';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -38,21 +38,16 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, isAuthenticated } = useAuth();
-  const adminNavItem = getAdminNavItem(t);
   const scheduleBuilderNavItem = getScheduleBuilderNavItem(t);
-  const canAccessAdminMenu = useOrPermissions([
-    ...(adminNavItem.orPermissions ?? []),
-    ...(scheduleBuilderNavItem.orPermissions ?? []),
-  ]);
+  const canAccessAdminMenu = useOrPermissions(getAdminMenuPermissions());
 
   const primaryMenuItems: Array<NavItem> = [
     ...(isAuthenticated ? [getMobileProfileNavItem(t)] : []),
-    ...getPrimaryNavItems(t, { isAuthenticated, includeAdmin: false }),
+    ...getPrimaryNavItems(t, { isAuthenticated }),
   ];
 
   const adminMenuItems: Array<NavItem> = [
     scheduleBuilderNavItem,
-    adminNavItem,
     {
       to: PageURLS.admin.agenda,
       label: t('nav:adminMenu.agenda'),
@@ -75,13 +70,6 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       icon: SiReasonstudios,
     },
     {
-      to: PageURLS.admin.doorCode,
-      label: t('nav:adminMenu.doorCode'),
-      orPermissions: AdminPermissions.doorCode,
-      featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
-      icon: LuKeyRound,
-    },
-    {
       to: PageURLS.admin.campaigns,
       label: t('nav:adminMenu.campaigns'),
       orPermissions: AdminPermissions.campaigns,
@@ -98,7 +86,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     {
       to: PageURLS.admin.inventory,
       label: t('nav:adminMenu.inventoryBilling'),
-      orPermissions: AdminPermissions.inventory,
+      orPermissions: AdminInventoryPagePermissions,
       featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
       icon: MdOutlineInventory,
     },
