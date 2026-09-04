@@ -96,7 +96,13 @@ function UserDetailsPage() {
       }
     >
       <section className='grid gap-6'>
-        <UserDetailsHeader userId={userId} email={user?.email} isLoading={isLoading && !user} />
+        <UserDetailsHeader
+          userId={userId}
+          email={user?.email}
+          fullName={user?.full_name}
+          photoUrl={user?.photo_url}
+          isLoading={isLoading && !user}
+        />
 
         {hasError && !user ? (
           <UserDetails user={user} isLoading={false} hasError />
