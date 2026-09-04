@@ -49,7 +49,17 @@ export function BookingModal({
     () => DansshipAPI.bookings.getMyBookings({ scope: 'upcoming' }),
     isAuthenticated,
   );
+  const { response: mySubscriptionsResponse } = usePromise(
+    () => DansshipAPI.subscriptions.getMySubscriptions(),
+    isAuthenticated,
+  );
   const myBookings = myBookingsResponse?.data?.items ?? [];
+  const fetchedSubscriptions = mySubscriptionsResponse?.data?.subscriptions;
+  const resolvedSubscriptions = isAuthenticated ? (fetchedSubscriptions ?? subscriptions) : subscriptions;
+  const resolvedTrialEligible = isAuthenticated
+    ? (mySubscriptionsResponse?.data?.summary?.trial_eligible ?? isTrialEligible)
+    : false;
+  const subscriptionsReady = !isAuthenticated || mySubscriptionsResponse !== null || subscriptions.length > 0;
 
   if (!selectedClass) return null;
 
@@ -110,14 +120,38 @@ export function BookingModal({
     navigate(PageURLS.profile.user(selectedClass.instructor.id));
   };
 
-  const eligibility = getClassBookingEligibility(subscriptions, selectedClass.start_time, isTrialEligible);
+  const eligibility = getClassBookingEligibility(
+    resolvedSubscriptions,
+    selectedClass.start_time,
+    resolvedTrialEligible,
+  );
   const showSubscriptionWarning =
-    eligibility.status === 'no_subscription' && !isBooked && !isPast && !isCancelled && !hasTimeOverlap && !isOwnClass;
+    subscriptionsReady &&
+    eligibility.status === 'no_subscription' &&
+    !isBooked &&
+    !isPast &&
+    !isCancelled &&
+    !hasTimeOverlap &&
+    !isOwnClass;
   const showNotStartedWarning =
-    eligibility.status === 'not_started' && !isBooked && !isPast && !isCancelled && !hasTimeOverlap && !isOwnClass;
+    subscriptionsReady &&
+    eligibility.status === 'not_started' &&
+    !isBooked &&
+    !isPast &&
+    !isCancelled &&
+    !hasTimeOverlap &&
+    !isOwnClass;
   const showExpiredWarning =
-    eligibility.status === 'expired' && !isBooked && !isPast && !isCancelled && !hasTimeOverlap && !isOwnClass;
-  const showTrialNote = Boolean(eligibility.status === 'trial' && !isBooked && !isPast && !isCancelled && !isOwnClass);
+    subscriptionsReady &&
+    eligibility.status === 'expired' &&
+    !isBooked &&
+    !isPast &&
+    !isCancelled &&
+    !hasTimeOverlap &&
+    !isOwnClass;
+  const showTrialNote = Boolean(
+    subscriptionsReady && eligibility.status === 'trial' && !isBooked && !isPast && !isCancelled && !isOwnClass,
+  );
 
   return (
     <>
@@ -282,6 +316,10 @@ export function BookingModal({
                 <label className='bg-gray-50 p-3 rounded text-gray-700 border border-gray-200 text-center'>
                   {t('bookings:ownClassBadge')}
                 </label>
+              ) : !subscriptionsReady ? (
+                <Button color='primary' isLoading>
+                  {t('common:loading')}
+                </Button>
               ) : eligibility.status === 'no_subscription' || eligibility.status === 'expired' ? (
                 <Button color='primary' onClick={handleBuyPlan}>
                   {t('bookings:buyPlan')}

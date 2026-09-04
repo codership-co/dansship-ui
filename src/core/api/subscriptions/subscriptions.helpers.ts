@@ -28,7 +28,10 @@ export function normalizePlan(plan: PublicPlan): PublicPlan {
 export function normalizeSubscription(subscription: ActiveSubscription): ActiveSubscription {
   return {
     ...subscription,
-    remaining_classes: toNumber(subscription.remaining_classes),
+    remaining_classes:
+      subscription.remaining_classes === null || subscription.remaining_classes === undefined
+        ? null
+        : toNumber(subscription.remaining_classes),
     bonus_classes_remaining: toNumber(subscription.bonus_classes_remaining ?? 0),
     original_price: toNumber(subscription.original_price),
     final_price: toNumber(subscription.final_price),

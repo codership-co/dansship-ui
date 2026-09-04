@@ -15,7 +15,7 @@ import { useDateLocale, usePromise } from '@hooks';
 function ClassesPage() {
   const { t } = useTranslation();
   const locale = useDateLocale();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, ready } = useAuth();
   const currentWeek = getMonday(new Date());
   const [week, setWeek] = useState(() => currentWeek);
   const [nearestWeek, setNearestWeek] = useState<string | null>(null);
@@ -25,33 +25,37 @@ function ClassesPage() {
   const [weekReady, setWeekReady] = useState(false);
   const hasAppliedUpcoming = useRef(false);
 
-  const { response, isLoading, reFetch } = usePromise(async () => {
-    if (!isAuthenticated) {
-      const { data: upcoming } = await DansshipAPI.schedules.getUpcomingWeek(currentWeek);
+  const { response, isLoading, reFetch } = usePromise(
+    async () => {
+      if (!isAuthenticated) {
+        const { data: upcoming } = await DansshipAPI.schedules.getUpcomingWeek(currentWeek);
+
+        return {
+          upcoming: upcoming ?? null,
+          subscriptions: [] as Array<ActiveSubscription>,
+          isTrialEligible: false,
+          myBookings: [],
+        };
+      }
+
+      const [{ data: mySubscriptions }, { data: myBookingsPage }, { data: upcoming }] = await Promise.all([
+        DansshipAPI.subscriptions.getMySubscriptions(),
+        DansshipAPI.bookings.getMyBookings({ scope: 'upcoming' }),
+        DansshipAPI.schedules.getUpcomingWeek(currentWeek),
+      ]);
+
+      const isTrialEligible = mySubscriptions?.summary?.trial_eligible ?? false;
 
       return {
         upcoming: upcoming ?? null,
-        subscriptions: [] as Array<ActiveSubscription>,
-        isTrialEligible: false,
-        myBookings: [],
+        subscriptions: mySubscriptions?.subscriptions ?? [],
+        isTrialEligible,
+        myBookings: myBookingsPage?.items ?? [],
       };
-    }
-
-    const [{ data: mySubscriptions }, { data: myBookingsPage }, { data: upcoming }] = await Promise.all([
-      DansshipAPI.subscriptions.getMySubscriptions(),
-      DansshipAPI.bookings.getMyBookings({ scope: 'upcoming' }),
-      DansshipAPI.schedules.getUpcomingWeek(currentWeek),
-    ]);
-
-    const isTrialEligible = mySubscriptions?.summary?.trial_eligible ?? false;
-
-    return {
-      upcoming: upcoming ?? null,
-      subscriptions: mySubscriptions?.subscriptions ?? [],
-      isTrialEligible,
-      myBookings: myBookingsPage?.items ?? [],
-    };
-  });
+    },
+    ready,
+    [isAuthenticated],
+  );
 
   useEffect(() => {
     if (!response || hasAppliedUpcoming.current) {

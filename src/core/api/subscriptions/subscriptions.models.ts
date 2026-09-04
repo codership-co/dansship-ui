@@ -64,7 +64,7 @@ export interface ActiveSubscription {
   discount_value_snapshot?: number | null;
   discount_type_snapshot?: string | null;
 
-  remaining_classes: number;
+  remaining_classes: number | null;
   bonus_classes_remaining?: number;
   bonus_expires_at?: string | null;
   start_date: string;

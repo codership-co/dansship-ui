@@ -129,7 +129,9 @@ export function ActiveSubscriptionWidget() {
           const expDate = new Date(sub.expiration_date);
           const daysLeft = differenceInDays(expDate, new Date());
           const totalClasses = sub.class_count_snapshot;
-          const percentage = totalClasses > 0 ? (sub.remaining_classes / totalClasses) * 100 : 0;
+          const remaining = sub.remaining_classes;
+          const percentage =
+            remaining !== null && totalClasses > 0 ? (remaining / totalClasses) * 100 : remaining === null ? 100 : 0;
           const isFutureStart = isFuture(new Date(sub.start_date));
 
           return (
@@ -162,11 +164,11 @@ export function ActiveSubscriptionWidget() {
                   <div className='flex flex-col'>
                     <span className='mb-1 text-sm text-gray-500'>{t('subscriptions:classesRemaining')}</span>
 
-                    <span className='text-2xl font-bold text-gray-900'>{sub.remaining_classes}</span>
+                    <span className='text-2xl font-bold text-gray-900'>{remaining ?? '∞'}</span>
 
                     <div className='mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-100'>
                       <div
-                        className={`h-full rounded-full ${sub.remaining_classes <= 1 ? 'bg-alert-500' : 'bg-primary'}`}
+                        className={`h-full rounded-full ${remaining !== null && remaining <= 1 ? 'bg-alert-500' : 'bg-primary'}`}
                         style={{ width: `${percentage}%` }}
                       />
                     </div>

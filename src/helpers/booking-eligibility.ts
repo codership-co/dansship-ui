@@ -13,7 +13,7 @@ export type ClassBookingEligibility =
   | { status: 'no_subscription' };
 
 function hasCreditsForClass(subscription: ActiveSubscription, classStart: Date): boolean {
-  if (subscription.remaining_classes > 0) {
+  if (subscription.remaining_classes === null || subscription.remaining_classes > 0) {
     return true;
   }
 

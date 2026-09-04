@@ -116,7 +116,7 @@ export function UserSubscriptionsTab({ userId }: { userId: string }) {
               <TableRow key={subscription.id}>
                 <TableCell>{subscription.plan_name_snapshot}</TableCell>
                 <TableCell>{subscription.status}</TableCell>
-                <TableCell>{subscription.remaining_classes}</TableCell>
+                <TableCell>{subscription.remaining_classes ?? '∞'}</TableCell>
                 <TableCell>
                   {subscription.start_date ? format(parseISO(subscription.start_date), 'MMM d, yyyy', { locale }) : '-'}
                 </TableCell>
