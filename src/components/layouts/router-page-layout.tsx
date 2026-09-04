@@ -1,11 +1,15 @@
 import { Outlet, useLocation } from 'react-router';
 
 import { CampaignOverlayHost } from '@components/modules/campaigns/campaign-overlay-host';
-import { Footer, Navbar } from '@components/navigation';
+import { Footer, Navbar, WhatsAppBubble } from '@components/navigation';
 import { SecurityGuard } from '@contexts';
 import { PageURLS } from '@core/constants';
 
 const SecurityOutlet = SecurityGuard(Outlet);
+
+function shouldShowWhatsAppBubble(pathname: string) {
+  return !pathname.startsWith(PageURLS.admin.root) && !pathname.startsWith(PageURLS.instructor.root);
+}
 
 export const RouterPageLayout = () => {
   const { pathname } = useLocation();
@@ -28,6 +32,7 @@ export const RouterPageLayout = () => {
         <SecurityOutlet />
       </section>
       <Footer />
+      {shouldShowWhatsAppBubble(pathname) && <WhatsAppBubble />}
     </section>
   );
 };

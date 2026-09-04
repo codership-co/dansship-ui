@@ -8,6 +8,7 @@ import { Section } from '@components/containers';
 import { GroovyLayout } from '@components/layouts/groovy-layout';
 import { Logotype } from '@components/svg';
 import { PageURLS } from '@core/constants';
+import { buildStudioWhatsAppLink } from '@helpers';
 
 export function Footer() {
   const { t } = useTranslation();
@@ -33,7 +34,7 @@ export function Footer() {
                 {t('home:sharedFooter.legal.title')}
               </Link>
               <a
-                href='https://wa.me/+573161017878?text=Hola%20Dansship%2C%20tengo%20una%20pregunta'
+                href={buildStudioWhatsAppLink()}
                 target='_blank'
                 rel='noreferrer'
                 className='inline-flex items-center gap-2 transition hover:text-primary'

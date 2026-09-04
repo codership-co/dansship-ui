@@ -1,4 +1,5 @@
 export * from './footer';
+export * from './whatsapp-bubble';
 export * from './navbar';
 export * from './mobile-menu';
 export * from './nav-items';

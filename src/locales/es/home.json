@@ -159,5 +159,8 @@
       "tiktok": "TikTok"
     },
     "copyright": "© {{year}} {{studio}}."
+  },
+  "whatsappBubble": {
+    "label": "Contáctanos por WhatsApp"
   }
 }
