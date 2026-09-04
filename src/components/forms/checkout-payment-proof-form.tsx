@@ -163,24 +163,37 @@ export function CheckoutPaymentProofForm({
       gift_message,
       gift_is_anonymous,
       gift_sender_display_name,
+      purchase_mode,
+      duo_partner_email,
     } = checkoutData;
 
+    const isDuoCheckout = purchase_mode === 'duo';
     const payload: CreatePaymentIntentPayload = {
       plan_id: plan.id,
       payment_method_type: isWalletMethod ? PaymentMethod.WALLET : paymentMethod,
-      discount_code: discount_code.trim() ? discount_code.trim() : undefined,
-      referral_code: !is_gift && referral_code?.trim() ? referral_code.trim() : undefined,
     };
 
-    if (is_gift) {
-      payload.is_gift = true;
-      payload.gift_recipient_name = gift_recipient_name.trim();
-      payload.gift_recipient_email = gift_recipient_email.trim();
-      payload.gift_message = gift_message.trim() ? gift_message.trim() : undefined;
-      payload.gift_is_anonymous = gift_is_anonymous;
-      payload.gift_sender_display_name = gift_is_anonymous ? undefined : gift_sender_display_name.trim() || undefined;
-    } else if (start_date) {
-      payload.start_date = start_date.toISOString();
+    if (isDuoCheckout) {
+      payload.is_duo = true;
+      payload.duo_partner_email = duo_partner_email.trim();
+
+      if (start_date) {
+        payload.start_date = start_date.toISOString();
+      }
+    } else {
+      payload.discount_code = discount_code.trim() ? discount_code.trim() : undefined;
+      payload.referral_code = !is_gift && referral_code?.trim() ? referral_code.trim() : undefined;
+
+      if (is_gift) {
+        payload.is_gift = true;
+        payload.gift_recipient_name = gift_recipient_name.trim();
+        payload.gift_recipient_email = gift_recipient_email.trim();
+        payload.gift_message = gift_message.trim() ? gift_message.trim() : undefined;
+        payload.gift_is_anonymous = gift_is_anonymous;
+        payload.gift_sender_display_name = gift_is_anonymous ? undefined : gift_sender_display_name.trim() || undefined;
+      } else if (start_date) {
+        payload.start_date = start_date.toISOString();
+      }
     }
 
     if (isCardMethod) {
@@ -296,7 +309,19 @@ export function CheckoutPaymentProofForm({
                 </label>
               </>
             ) : null}
-            {plan && checkoutData?.is_gift ? (
+            {plan && checkoutData?.purchase_mode === 'duo' ? (
+              <div className='mt-2 grid gap-1 text-sm text-gray-700'>
+                <label className='block font-medium text-gray-900'>{t('payments:checkoutDuoSummaryTitle')}</label>
+                <label className='block'>
+                  {t('payments:checkoutDuoPartner')}: {checkoutData.duo_partner_email}
+                </label>
+                {checkoutData.start_date ? (
+                  <label className='block'>
+                    {t('payments:checkoutDuoSharedStart', { date: format(checkoutData.start_date, 'yyyy-MM-dd') })}
+                  </label>
+                ) : null}
+              </div>
+            ) : plan && checkoutData?.is_gift ? (
               <div className='mt-2 grid gap-1 text-sm text-gray-700'>
                 <label className='block font-medium text-gray-900'>{t('gifts:checkoutGiftSummaryTitle')}</label>
                 <label className='block'>

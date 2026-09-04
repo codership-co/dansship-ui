@@ -1,31 +1,29 @@
-import { ActionModal, Button } from 'polpo/components';
+import { ActionModal } from 'polpo/components';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LuArrowLeft, LuArrowRight, LuCreditCard, LuGift, LuList, LuReceipt } from 'react-icons/lu';
+import { LuCreditCard, LuGift, LuList, LuReceipt } from 'react-icons/lu';
 import { useNavigate } from 'react-router';
-
-import { PaymentMethodSelector } from './payment-method-selector';
 
 import { CheckoutGiftDetailsForm } from '@components/forms/checkout-gift-details-form';
 import { CheckoutPaymentProofForm } from '@components/forms/checkout-payment-proof-form';
+import { CheckoutPurchaseModeForm } from '@components/forms/checkout-purchase-mode-form';
 import {
   CheckoutFormValues,
-  CheckoutReviewPlanFormInput,
+  CheckoutPayForm,
   defaultCheckoutFormValues,
   DefaultPaymentData,
   PaymentData,
 } from '@components/forms/checkout-review-plan-form';
 import { FormStepperLayout } from '@components/layouts/form-stepper-layout';
-import { PlanCard } from '@components/modules/payments/plan-card';
 import { PaymentMethod, type PublicPlan } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { addSentryBreadcrumb } from '@core/sentry';
 import { cn } from '@helpers';
 
 export enum CheckoutStep {
-  REVIEW = 'REVIEW',
+  MODE = 'MODE',
   GIFT = 'GIFT',
-  METHOD = 'METHOD',
+  PAY = 'PAY',
   CONFIRM = 'CONFIRM',
 }
 
@@ -60,7 +58,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
   const { t } = useTranslation();
 
   const navigate = useNavigate();
-  const [step, setStep] = useState<CheckoutStep>(CheckoutStep.REVIEW);
+  const [step, setStep] = useState<CheckoutStep>(CheckoutStep.MODE);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const [checkoutData, setCheckoutData] = useState<CheckoutFormValues>({
     ...defaultCheckoutFormValues,
@@ -74,29 +72,29 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
 
   const isWalletCovered = paymentData.amountToCharge === 0 && paymentData.walletAmountApplied > 0;
   const isGiftCheckout = checkoutData.is_gift;
+  const planSubtitle = t('subscriptions:checkoutPlanSubtitle', {
+    name: plan.name,
+    validity: t('subscriptions:validForDays', { count: plan.validity_days }),
+  });
 
-  const goAfterReviewOrGift = useCallback(
-    (nextPaymentData: PaymentData) => {
-      const fullyCovered = nextPaymentData.amountToCharge === 0 && nextPaymentData.walletAmountApplied > 0;
+  const applyPaymentPreview = useCallback((nextPaymentData: PaymentData) => {
+    setPaymentData(nextPaymentData);
 
-      if (fullyCovered) {
-        setPaymentMethod(PaymentMethod.WALLET);
-        addSentryBreadcrumb('checkout.step', 'Moved to wallet confirm step', { plan_id: plan.id });
-        setStep(CheckoutStep.CONFIRM);
+    const fullyCovered = nextPaymentData.amountToCharge === 0 && nextPaymentData.walletAmountApplied > 0;
 
-        return;
-      }
+    if (fullyCovered) {
+      setPaymentMethod(PaymentMethod.WALLET);
 
-      addSentryBreadcrumb('checkout.step', 'Moved to payment method step', { plan_id: plan.id });
-      setStep(CheckoutStep.METHOD);
-    },
-    [plan.id],
-  );
+      return;
+    }
 
-  const handleReviewSubmit = useCallback(
+    setPaymentMethod(current => (current === PaymentMethod.WALLET ? null : current));
+  }, []);
+
+  const handleModeSubmit = useCallback(
     async (data: CheckoutFormValues, nextPaymentData: PaymentData) => {
       setCheckoutData(data);
-      setPaymentData(nextPaymentData);
+      applyPaymentPreview(nextPaymentData);
 
       if (data.is_gift) {
         addSentryBreadcrumb('checkout.step', 'Moved to gift details step', { plan_id: plan.id });
@@ -105,40 +103,43 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
         return;
       }
 
-      goAfterReviewOrGift(nextPaymentData);
+      addSentryBreadcrumb('checkout.step', 'Moved to pay step', { plan_id: plan.id });
+      setStep(CheckoutStep.PAY);
     },
-    [goAfterReviewOrGift, plan.id],
+    [applyPaymentPreview, plan.id],
   );
 
   const handleGiftSubmit = useCallback(
     async (data: CheckoutFormValues) => {
       setCheckoutData(data);
-      goAfterReviewOrGift(paymentData);
+      addSentryBreadcrumb('checkout.step', 'Moved to pay step', { plan_id: plan.id });
+      setStep(CheckoutStep.PAY);
     },
-    [goAfterReviewOrGift, paymentData],
+    [plan.id],
   );
 
-  const confirmBackStep = isWalletCovered
-    ? isGiftCheckout
-      ? CheckoutStep.GIFT
-      : CheckoutStep.REVIEW
-    : CheckoutStep.METHOD;
+  const handlePaySubmit = useCallback(() => {
+    addSentryBreadcrumb('checkout.step', 'Moved to confirm step', {
+      plan_id: plan.id,
+      payment_method: paymentMethod ?? (isWalletCovered ? PaymentMethod.WALLET : undefined),
+    });
+    setStep(CheckoutStep.CONFIRM);
+  }, [isWalletCovered, paymentMethod, plan.id]);
 
-  const methodBackStep = isGiftCheckout ? CheckoutStep.GIFT : CheckoutStep.REVIEW;
+  const payBackStep = isGiftCheckout ? CheckoutStep.GIFT : CheckoutStep.MODE;
 
   const steps = [
     {
-      title: t('payments:checkoutTitle'),
-      subtitle: '',
-      step: CheckoutStep.REVIEW,
+      title: t('subscriptions:purchaseTypeLabel'),
+      subtitle: planSubtitle,
+      step: CheckoutStep.MODE,
       Icon: LuList,
       form: (
-        <section className='grid h-full grid-rows-[auto_1fr] items-start gap-8'>
-          <PlanCard plan={plan} className='border-none' asIndividual />
-          <CheckoutReviewPlanFormInput
+        <section className='grid h-full grid-rows-[1fr] items-start'>
+          <CheckoutPurchaseModeForm
             plan={plan}
             onCancel={onClose}
-            onSubmit={handleReviewSubmit}
+            onSubmit={handleModeSubmit}
             defaultFormValues={checkoutData}
           />
         </section>
@@ -154,58 +155,31 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
             form: (
               <CheckoutGiftDetailsForm
                 defaultFormValues={checkoutData}
-                onBack={() => setStep(CheckoutStep.REVIEW)}
+                onBack={() => setStep(CheckoutStep.MODE)}
                 onSubmit={handleGiftSubmit}
               />
             ),
           },
         ]
       : []),
-    ...(isWalletCovered
-      ? []
-      : [
-          {
-            title: t('payments:selectMethod'),
-            subtitle: '',
-            step: CheckoutStep.METHOD,
-            Icon: LuCreditCard,
-            form: (
-              <section className='grid grid-rows-[1fr_auto] h-full'>
-                <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
-
-                <div className='flex flex-wrap justify-end gap-2 pt-4'>
-                  <Button
-                    type='button'
-                    color='primary'
-                    className='flex items-center'
-                    variant='outlined'
-                    onClick={() => setStep(methodBackStep)}
-                  >
-                    <LuArrowLeft />
-                    {t('common:back')}
-                  </Button>
-
-                  <Button
-                    type='button'
-                    color='primary'
-                    className='flex items-center'
-                    disabled={!paymentMethod}
-                    onClick={() => {
-                      addSentryBreadcrumb('checkout.step', 'Moved to confirm step', {
-                        plan_id: plan.id,
-                        payment_method: paymentMethod ?? undefined,
-                      });
-                      setStep(CheckoutStep.CONFIRM);
-                    }}
-                  >
-                    {t('common:next')}
-                    <LuArrowRight />
-                  </Button>
-                </div>
-              </section>
-            ),
-          },
-        ]),
+    {
+      title: t('payments:selectMethod'),
+      subtitle: '',
+      step: CheckoutStep.PAY,
+      Icon: LuCreditCard,
+      form: (
+        <CheckoutPayForm
+          plan={plan}
+          checkoutData={checkoutData}
+          paymentData={paymentData}
+          paymentMethod={paymentMethod}
+          onPaymentMethodChange={setPaymentMethod}
+          isWalletCovered={isWalletCovered}
+          onBack={() => setStep(payBackStep)}
+          onSubmit={handlePaySubmit}
+        />
+      ),
+    },
     {
       title: t('payments:confirmationTitle'),
       subtitle: '',
@@ -220,7 +194,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
           amountToCharge={paymentData.amountToCharge}
           walletAmountApplied={paymentData.walletAmountApplied}
           onClose={onClose}
-          onBack={() => setStep(confirmBackStep)}
+          onBack={() => setStep(CheckoutStep.PAY)}
           onSubmit={(intentId: string) => {
             navigate(`${PageURLS.paymentsResult}?intentId=${intentId}`);
           }}

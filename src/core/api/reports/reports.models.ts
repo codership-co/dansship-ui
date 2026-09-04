@@ -180,6 +180,21 @@ export interface TrialStudentsWithoutPlanReport {
   items: Array<TrialStudentWithoutPlanItem>;
 }
 
+export interface PendingDuoAssignmentItem {
+  assignment_id: string;
+  buyer_user_id: string;
+  buyer_name: string;
+  buyer_email: string;
+  partner_email: string;
+  plan_name?: string | null;
+  purchased_at: string;
+  days_pending: number;
+}
+
+export interface PendingDuoAssignmentsReport {
+  items: Array<PendingDuoAssignmentItem>;
+}
+
 export interface ActiveStudentListItem {
   user_id: string;
   student_name: string;

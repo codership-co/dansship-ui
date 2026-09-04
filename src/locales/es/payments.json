@@ -21,6 +21,9 @@
   "intentId": "ID de pago",
   "ammount": "Monto pagado",
   "startDate": "Fecha de inicio",
+  "checkoutDuoSummaryTitle": "Plan Duo",
+  "checkoutDuoPartner": "Acompañante",
+  "checkoutDuoSharedStart": "Ambas suscripciones inician el {{date}}",
   "createdAt": "Fecha de compra",
   "methodLabel": "Método de pago",
   "planLabel": "Plan",
@@ -159,6 +162,8 @@
     "syncBoldFailedDesc": "Intenta de nuevo en unos momentos.",
     "giftBadge": "Regalo",
     "giftRecipient": "Destinatario",
+    "duoBadge": "Plan Duo",
+    "duoPartner": "Acompañante",
     "pricingBreakdown": {
       "title": "Desglose del pago",
       "originalPrice": "Precio original",

@@ -184,11 +184,21 @@ export function AdminPaymentReviewModal({
                       {t('payments:admin.giftBadge')}
                     </Badge>
                   ) : null}
+                  {current.is_duo ? (
+                    <Badge variant='outlineTertiary' size='small'>
+                      {t('payments:admin.duoBadge')}
+                    </Badge>
+                  ) : null}
                 </p>
                 {current.is_gift && current.gift_recipient_email ? (
                   <p>
                     <span className='font-medium'>{t('payments:admin.giftRecipient')}:</span>{' '}
                     {current.gift_recipient_email}
+                  </p>
+                ) : null}
+                {current.is_duo && current.duo_partner_email ? (
+                  <p>
+                    <span className='font-medium'>{t('payments:admin.duoPartner')}:</span> {current.duo_partner_email}
                   </p>
                 ) : null}
                 <p>

@@ -178,6 +178,11 @@ export function AdminPaymentList({
                                 {t('payments:admin.giftBadge')}
                               </Badge>
                             ) : null}
+                            {intent.is_duo ? (
+                              <Badge variant='outlineTertiary' size='small'>
+                                {t('payments:admin.duoBadge')}
+                              </Badge>
+                            ) : null}
                           </div>
                         </TableCell>
 
