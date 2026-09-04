@@ -82,7 +82,8 @@ export function CheckoutPurchaseModeForm({
   defaultFormValues,
 }: CheckoutPurchaseModeFormProps) {
   const { t } = useTranslation();
-  const showDuo = plan.classes_included > 0 && plan.classes_included % 2 === 0 && isColombiaSeptember();
+  const classesIncluded = plan.classes_included ?? 0;
+  const showDuo = classesIncluded > 0 && classesIncluded % 2 === 0 && isColombiaSeptember();
   const initialMode = resolvePurchaseMode(defaultFormValues);
   const [giftEligibilityError, setGiftEligibilityError] = useState<string | null>(null);
   const [duoPartnerError, setDuoPartnerError] = useState<string | null>(null);
@@ -117,7 +118,7 @@ export function CheckoutPurchaseModeForm({
   const duoPartnerEmail = watch('duo_partner_email');
   const isGift = purchaseMode === 'gift';
   const isDuo = purchaseMode === 'duo';
-  const duoHalfClasses = Math.floor(plan.classes_included / 2);
+  const duoHalfClasses = Math.floor(classesIncluded / 2);
 
   const handlePurchaseModeChange = useCallback(
     (nextMode: CheckoutPurchaseMode) => {

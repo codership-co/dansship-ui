@@ -33,7 +33,9 @@ export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
   const { response: savedFiguresResponse } = usePromise(() => DansshipAPI.figures.getSavedFigures());
   const { response: mySubscriptionsResponse } = usePromise(() => DansshipAPI.subscriptions.getMySubscriptions());
   const savedFigures = savedFiguresResponse?.data ?? [];
+  const subscriptions = mySubscriptionsResponse?.data?.subscriptions ?? [];
   const summary = mySubscriptionsResponse?.data?.summary ?? null;
+  const hasUnlimitedClasses = subscriptions.some(sub => sub.status === 'active' && sub.remaining_classes === null);
 
   if (!user) return null;
 
@@ -114,7 +116,9 @@ export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
               </article>
 
               <article className='w-20 grid justify-items-center'>
-                <h4 className='m-0'>{summary?.total_remaining_classes}</h4>
+                <h4 className='m-0'>
+                  {hasUnlimitedClasses ? t('subscriptions:unlimitedClasses') : summary?.total_remaining_classes}
+                </h4>
                 <small className='m-0'>{t('subscriptions:totalRemaining')}</small>
               </article>
 

@@ -1,8 +1,8 @@
 const SYSTEM_PLAN_I18N_KEYS: Record<string, string> = {
   SYSTEM_TRIAL_CLASS: 'subscriptions:systemPlans.trialClass',
   'Clase de prueba': 'subscriptions:systemPlans.trialClass',
-  SYSTEM_REFERRAL_CLASS: 'subscriptions:systemPlans.referralClass',
-  'Clase por referido': 'subscriptions:systemPlans.referralClass',
+  SYSTEM_INSTRUCTOR_CLASS: 'subscriptions:systemPlans.instructorClass',
+  'Clases de instructor': 'subscriptions:systemPlans.instructorClass',
 };
 
 /** Maps internal system plan codes to localized display names. */

@@ -20,7 +20,7 @@ export function normalizePlan(plan: PublicPlan): PublicPlan {
   return {
     ...plan,
     price: toNumber(plan.price),
-    classes_included: toNumber(plan.classes_included),
+    classes_included: plan.classes_included === null ? null : toNumber(plan.classes_included),
     validity_days: toNumber(plan.validity_days),
   };
 }
@@ -35,7 +35,8 @@ export function normalizeSubscription(subscription: ActiveSubscription): ActiveS
     bonus_classes_remaining: toNumber(subscription.bonus_classes_remaining ?? 0),
     original_price: toNumber(subscription.original_price),
     final_price: toNumber(subscription.final_price),
-    class_count_snapshot: toNumber(subscription.class_count_snapshot),
+    class_count_snapshot:
+      subscription.class_count_snapshot === null ? null : toNumber(subscription.class_count_snapshot),
     price_snapshot: toNumber(subscription.price_snapshot),
     benefit_value_snapshot:
       subscription.benefit_value_snapshot !== null && subscription.benefit_value_snapshot !== undefined

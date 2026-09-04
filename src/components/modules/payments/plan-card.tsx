@@ -55,7 +55,7 @@ export function PlanCard({ plan, onSelectPlan, isFeatured, hoverable, className,
             <CardDescription className='text-label'>
               {plan.description ||
                 t('subscriptions:planDescFallback', {
-                  count: plan.classes_included,
+                  count: plan.classes_included ?? 0,
                 })}
             </CardDescription>
           </CardHeader>

@@ -376,6 +376,8 @@
     "subscriptionExpired": "El plan del usuario ya no cubre la fecha de esta clase.",
     "subscriptionNotEligible": "El usuario no tiene una suscripción activa con clases disponibles.",
     "timeOverlap": "El usuario ya tiene otra clase reservada en ese horario.",
+    "instructorOwnClass": "El instructor no puede reservar la clase que está asignado a dictar.",
+    "instructorTeachingOverlap": "El instructor no puede reservar una clase en el mismo horario en el que está asignado a dictar.",
     "lateJoinClosed": "El plazo para reservar esta clase ya cerró.",
     "classFull": "Esta clase está llena.",
     "validationUser": "Selecciona un usuario.",

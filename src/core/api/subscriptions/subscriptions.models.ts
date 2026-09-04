@@ -4,7 +4,7 @@ export interface PublicPlan {
   description?: string;
   price: number;
   currency: string;
-  classes_included: number;
+  classes_included: number | null;
   validity_days: number;
   features?: Array<string>;
   is_recommended?: boolean;
@@ -50,7 +50,7 @@ export interface ActiveSubscription {
   status: SubscriptionStatus;
 
   plan_name_snapshot: string;
-  class_count_snapshot: number;
+  class_count_snapshot: number | null;
   price_snapshot: number;
   expiration_policy_snapshot: string;
 

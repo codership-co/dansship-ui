@@ -75,6 +75,10 @@ function AdminBookingsPage() {
           toast.error(t('admin:bookings.subscriptionNotEligible'));
         } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP) {
           toast.error(t('admin:bookings.timeOverlap'));
+        } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_INSTRUCTOR_OWN_CLASS) {
+          toast.error(t('admin:bookings.instructorOwnClass'));
+        } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_INSTRUCTOR_TEACHING_OVERLAP) {
+          toast.error(t('admin:bookings.instructorTeachingOverlap'));
         } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_LATE_JOIN_CLOSED) {
           toast.error(t('admin:bookings.lateJoinClosed'));
         } else if (

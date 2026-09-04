@@ -6,7 +6,8 @@
   "planUsed": "Plan: {{name}}",
   "systemPlans": {
     "trialClass": "Clase de prueba",
-    "referralClass": "Clase por referido"
+    "referralClass": "Clase por referido",
+    "instructorClass": "Clases de instructor"
   },
   "noSubscriptions": "Sin Suscripciones Activas",
   "noSubscriptionsDesc": "Adquiere un plan para reservar clases.",
@@ -16,7 +17,9 @@
   "summary": "Resumen de Suscripciones",
   "classesPackage": "paquete de clases",
   "classesRemaining": "Clases Restantes",
+  "unlimitedClasses": "Ilimitadas",
   "expires": "Expira",
+  "noExpiration": "Sin vencimiento",
   "daysLeft": "{{count}} días restantes",
   "expired": "Expirado",
   "noPlansAvailable": "No Hay Planes Disponibles",
