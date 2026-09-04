@@ -35,7 +35,7 @@ export const Navbar = () => {
   const { areAuthPagesEnabled, isMyAccountBookingsPageEnabled, isMyAccountSubscriptionPageEnabled } = useFeatureFlags();
 
   const hasActivePlan = (response?.data?.summary?.active_count ?? 0) > 0;
-  const navLinks = getPrimaryNavItems(t, { isAuthenticated, includeAdmin: true });
+  const navLinks = getPrimaryNavItems(t, { isAuthenticated });
 
   return (
     <Section

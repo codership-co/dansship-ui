@@ -1,13 +1,13 @@
 {
   "inventory": {
     "title": "Gestión de Inventario y Facturación",
-    "subtitle": "Administra salas, catálogo de clases, planes y la tarifa horaria de instructores.",
+    "subtitle": "Administra salas, catálogo de clases, planes, la tarifa horaria de instructores y el código de la puerta.",
     "tabs": {
       "rooms": "Salas",
       "classCatalog": "Catálogo de Clases",
       "plans": "Planes",
-      "discounts": "Descuentos",
-      "payRates": "Tarifa de instructores"
+      "payRates": "Tarifa de instructores",
+      "doorCode": "Código de Puerta"
     },
     "payRates": {
       "loading": "Cargando tarifa horaria...",

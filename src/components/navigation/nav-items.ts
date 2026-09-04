@@ -1,10 +1,9 @@
 import { GrSchedules } from 'react-icons/gr';
 import { LuBellElectric, LuBookImage, LuCalendarHeart, LuDoorOpen, LuFootprints, LuUser } from 'react-icons/lu';
-import { RiAdminFill } from 'react-icons/ri';
 
 import { FEATURE_FLAG } from '@contexts';
 import { PageURLS } from '@core/constants';
-import { AdminPermissions, InstructorPermissions, PERMISSION } from '@core/permissions';
+import { AdminInventoryPagePermissions, AdminPermissions, InstructorPermissions, PERMISSION } from '@core/permissions';
 
 import type { IconType } from 'react-icons';
 
@@ -22,31 +21,24 @@ type Translate = (key: string) => string;
 
 interface PrimaryNavOptions {
   isAuthenticated: boolean;
-  /** Desktop center nav includes Admin; mobile keeps Admin in its own section. */
-  includeAdmin?: boolean;
 }
 
-export function getAdminNavItem(t: Translate): NavItem {
-  return {
-    to: PageURLS.admin.root,
-    label: t('nav:admin'),
-    orPermissions: [
-      ...AdminPermissions.scheduleManage,
-      ...AdminPermissions.inventory,
-      ...AdminPermissions.bookings,
-      ...AdminPermissions.payments,
-      ...AdminPermissions.merch,
-      ...AdminPermissions.merchPos,
-      ...AdminPermissions.figures,
-      ...AdminPermissions.reports,
-      ...AdminPermissions.users,
-      ...AdminPermissions.studioRental,
-      ...AdminPermissions.doorCode,
-      ...AdminPermissions.campaigns,
-    ],
-    featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
-    icon: RiAdminFill,
-  };
+/** Permissions that reveal the hamburger Admin section. */
+export function getAdminMenuPermissions(): Array<PERMISSION> {
+  return [
+    ...AdminPermissions.scheduleBuilder,
+    ...AdminPermissions.scheduleManage,
+    ...AdminInventoryPagePermissions,
+    ...AdminPermissions.bookings,
+    ...AdminPermissions.payments,
+    ...AdminPermissions.merch,
+    ...AdminPermissions.merchPos,
+    ...AdminPermissions.figures,
+    ...AdminPermissions.reports,
+    ...AdminPermissions.users,
+    ...AdminPermissions.studioRental,
+    ...AdminPermissions.campaigns,
+  ];
 }
 
 export function getScheduleBuilderNavItem(t: Translate): NavItem {
@@ -65,11 +57,8 @@ export function getScheduleBuilderNavItem(t: Translate): NavItem {
  * Signed-in: Mi Horario (instructor) → Classes → Bookings → Studio rental → Plans→subscription
  * Figuras/Progreso omitted when authenticated (not prod-ready).
  */
-export function getPrimaryNavItems(
-  t: Translate,
-  { isAuthenticated, includeAdmin = true }: PrimaryNavOptions,
-): Array<NavItem> {
-  const items: Array<NavItem> = !isAuthenticated
+export function getPrimaryNavItems(t: Translate, { isAuthenticated }: PrimaryNavOptions): Array<NavItem> {
+  return !isAuthenticated
     ? [
         {
           to: PageURLS.classes,
@@ -127,12 +116,6 @@ export function getPrimaryNavItems(
           icon: LuBellElectric,
         },
       ];
-
-  if (includeAdmin) {
-    items.push(getAdminNavItem(t));
-  }
-
-  return items;
 }
 
 /** Mobile-only profile entry prepended for signed-in users. */

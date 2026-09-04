@@ -1,4 +1,3 @@
-export * from './admin.page';
 export * from './merch.page';
 export * from './user-list.page';
 export * from './user-details.page';
@@ -13,5 +12,4 @@ export * from './merch-pos.page';
 export * from './studio-rental.page';
 export * from './agenda-conflicts.page';
 export * from './schedule-builder.page';
-export * from './door-code.page';
 export * from './campaigns.page';
