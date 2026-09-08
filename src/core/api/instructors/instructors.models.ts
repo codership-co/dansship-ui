@@ -93,11 +93,13 @@ export interface RosterStudent {
   class_level?: 'beginner' | 'intermediate' | 'advanced' | null;
   status: 'active' | 'attended' | 'no_show' | 'cancelled';
   created_at: string;
+  is_instructor_benefit?: boolean;
 }
 
 export interface ClassRosterResponse {
   class_id: string;
   enrolled: Array<RosterStudent>;
+  capacity: number;
   can_register_retroactive_attendance?: boolean;
   instructor_payment_document_issued?: boolean;
 }

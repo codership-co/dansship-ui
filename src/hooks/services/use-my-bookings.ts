@@ -32,6 +32,10 @@ export const useMyBookings = () => {
               toast.error(t('bookings:classFullDesc'));
             } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP) {
               toast.error(t('bookings:timeOverlapDesc'));
+            } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_INSTRUCTOR_OWN_CLASS) {
+              toast.error(t('bookings:instructorOwnClassDesc'));
+            } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_INSTRUCTOR_TEACHING_OVERLAP) {
+              toast.error(t('bookings:instructorTeachingOverlapDesc'));
             } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_GROUP_NOT_COVERED) {
               toast.error(t('bookings:classGroupNotCoveredDesc'));
             } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_SUBSCRIPTION_NOT_STARTED) {

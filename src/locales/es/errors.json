@@ -7,6 +7,8 @@
     "BOOKING_LATE_JOIN_CLOSED": "El plazo para reservar esta clase ya cerró.",
     "BOOKING_CLASS_GROUP_NOT_COVERED": "El plan activo no cubre este tipo de clase.",
     "BOOKING_TIME_OVERLAP": "Este usuario ya tiene otra clase reservada en ese horario.",
+    "BOOKING_INSTRUCTOR_OWN_CLASS": "No puedes reservar la clase que estás asignado a dictar.",
+    "BOOKING_INSTRUCTOR_TEACHING_OVERLAP": "No puedes reservar una clase en el mismo horario en el que estás asignado a dictar.",
     "BOOKING_CLASS_FULL": "Esta clase está llena por ahora.",
     "BOOKING_NOT_CANCELLABLE": "Esta reserva ya no se puede cancelar."
   },

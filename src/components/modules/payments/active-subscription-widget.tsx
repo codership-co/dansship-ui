@@ -46,6 +46,13 @@ export function ActiveSubscriptionWidget() {
   const subscriptions = mySubscriptionsResponse?.data?.subscriptions ?? [];
   const summary = mySubscriptionsResponse?.data?.summary;
   const currentSubscriptions = subscriptions.filter(sub => sub.status === 'active' || sub.status === 'pending_payment');
+  const hasUnlimitedClasses = currentSubscriptions.some(
+    sub => sub.status === 'active' && sub.remaining_classes === null,
+  );
+  const nextBoundedExpiration = currentSubscriptions
+    .filter(sub => sub.status === 'active' && sub.remaining_classes !== null)
+    .map(sub => new Date(sub.expiration_date).getTime())
+    .sort((a, b) => a - b)[0];
 
   if (isLoading) {
     return (
@@ -84,7 +91,9 @@ export function ActiveSubscriptionWidget() {
                 <span className='text-sm font-medium'>{t('subscriptions:totalRemaining')}</span>
               </div>
 
-              <span className='text-3xl font-extrabold text-gray-900'>{summary?.total_remaining_classes}</span>
+              <span className='text-3xl font-extrabold text-gray-900'>
+                {hasUnlimitedClasses ? t('subscriptions:unlimitedClasses') : summary?.total_remaining_classes}
+              </span>
             </div>
 
             <div className='flex flex-col'>
@@ -112,11 +121,13 @@ export function ActiveSubscriptionWidget() {
               </div>
 
               <span className='text-xl font-bold text-gray-900'>
-                {summary?.next_expiration
-                  ? format(new Date(summary?.next_expiration), 'MMM d, yyyy', {
-                      locale,
-                    })
-                  : '—'}
+                {nextBoundedExpiration !== undefined
+                  ? format(new Date(nextBoundedExpiration), 'MMM d, yyyy', { locale })
+                  : hasUnlimitedClasses
+                    ? t('subscriptions:noExpiration')
+                    : summary?.next_expiration
+                      ? format(new Date(summary.next_expiration), 'MMM d, yyyy', { locale })
+                      : '—'}
               </span>
             </div>
           </div>
@@ -129,9 +140,13 @@ export function ActiveSubscriptionWidget() {
           const expDate = new Date(sub.expiration_date);
           const daysLeft = differenceInDays(expDate, new Date());
           const totalClasses = sub.class_count_snapshot;
-          const remaining = sub.remaining_classes;
+          const isUnlimited = sub.remaining_classes === null;
           const percentage =
-            remaining !== null && totalClasses > 0 ? (remaining / totalClasses) * 100 : remaining === null ? 100 : 0;
+            !isUnlimited && totalClasses !== null && totalClasses > 0
+              ? ((sub.remaining_classes ?? 0) / totalClasses) * 100
+              : isUnlimited
+                ? 100
+                : 0;
           const isFutureStart = isFuture(new Date(sub.start_date));
 
           return (
@@ -140,7 +155,9 @@ export function ActiveSubscriptionWidget() {
                 <CardTitle className='text-lg'>{resolvePlanDisplayName(sub.plan_name_snapshot, t)}</CardTitle>
 
                 <CardDescription className='mt-1'>
-                  {sub.class_count_snapshot} {t('subscriptions:classesPackage')}
+                  {sub.class_count_snapshot === null
+                    ? t('subscriptions:unlimitedClasses')
+                    : `${sub.class_count_snapshot} ${t('subscriptions:classesPackage')}`}
                 </CardDescription>
               </CardHeader>
 
@@ -164,11 +181,15 @@ export function ActiveSubscriptionWidget() {
                   <div className='flex flex-col'>
                     <span className='mb-1 text-sm text-gray-500'>{t('subscriptions:classesRemaining')}</span>
 
-                    <span className='text-2xl font-bold text-gray-900'>{remaining ?? '∞'}</span>
+                    <span className='text-2xl font-bold text-gray-900'>
+                      {isUnlimited ? t('subscriptions:unlimitedClasses') : sub.remaining_classes}
+                    </span>
 
                     <div className='mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-100'>
                       <div
-                        className={`h-full rounded-full ${remaining !== null && remaining <= 1 ? 'bg-alert-500' : 'bg-primary'}`}
+                        className={`h-full rounded-full ${
+                          !isUnlimited && (sub.remaining_classes ?? 0) <= 1 ? 'bg-alert-500' : 'bg-primary'
+                        }`}
                         style={{ width: `${percentage}%` }}
                       />
                     </div>
@@ -177,13 +198,19 @@ export function ActiveSubscriptionWidget() {
                   <div className='flex flex-col'>
                     <span className='mb-1 text-sm text-gray-500'>{t('subscriptions:expires')}</span>
 
-                    <span className='text-lg font-bold text-gray-900'>
-                      {format(expDate, 'MMM d, yyyy', { locale })}
-                    </span>
+                    {isUnlimited ? (
+                      <span className='text-lg font-bold text-gray-900'>{t('subscriptions:noExpiration')}</span>
+                    ) : (
+                      <>
+                        <span className='text-lg font-bold text-gray-900'>
+                          {format(expDate, 'MMM d, yyyy', { locale })}
+                        </span>
 
-                    <p className={`mt-1 text-sm font-medium ${daysLeft <= 3 ? 'text-alert-500' : 'text-gray-500'}`}>
-                      {daysLeft > 0 ? t('subscriptions:daysLeft', { count: daysLeft }) : t('subscriptions:expired')}
-                    </p>
+                        <p className={`mt-1 text-sm font-medium ${daysLeft <= 3 ? 'text-alert-500' : 'text-gray-500'}`}>
+                          {daysLeft > 0 ? t('subscriptions:daysLeft', { count: daysLeft }) : t('subscriptions:expired')}
+                        </p>
+                      </>
+                    )}
                   </div>
                 </div>
 

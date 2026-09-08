@@ -89,6 +89,8 @@
   "bookingFailedDesc": "No se pudo reservar la clase.",
   "lateJoinClosedDesc": "El plazo para reservar esta clase ya cerró.",
   "timeOverlapDesc": "Ya tienes otra clase reservada en ese horario.",
+  "instructorOwnClassDesc": "No puedes reservar la clase que estás asignado a dictar.",
+  "instructorTeachingOverlapDesc": "No puedes reservar una clase en el mismo horario en el que estás asignado a dictar.",
   "classGroupNotCoveredDesc": "Tu plan activo no cubre este tipo de clase.",
   "subscriptionNotStartedDesc": "Tu plan aún no inicia para la fecha de esta clase.",
   "subscriptionExpiredDesc": "Tu plan ya no cubre la fecha de esta clase.",

@@ -29,7 +29,8 @@
   },
   "roster": {
     "title": "Lista de Alumnos",
-    "enrolledStudents": "Alumnos Inscritos ({{count}})",
+    "enrolledStudents": "Estudiantes ({{count}}/{{capacity}})",
+    "instructorAttendees": "Instructores asistentes",
     "searchPlaceholder": "Buscar alumno por correo",
     "adding": "Agregando...",
     "manualAdd": "Agregar Manual",
