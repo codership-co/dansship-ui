@@ -11,7 +11,7 @@ import { DansshipAPI, InstructorUserSearchResult, RosterStudent } from '@core/ap
 import { PageURLS } from '@core/constants';
 import { InstructorPermissions } from '@core/permissions';
 import { captureUnexpectedException } from '@core/sentry';
-import { classLevelLabelKey, rosterStudentName } from '@helpers';
+import { classLevelLabelKey, rosterStudentName, splitRosterAttendees } from '@helpers';
 import { useDateLocale, usePromise, useInstructorRoster } from '@hooks';
 
 interface ClassRosterProps {
@@ -96,6 +96,96 @@ function AttendanceActions({
         </div>
       ) : null}
     </div>
+  );
+}
+
+interface RosterAttendeeListProps {
+  classId: string;
+  attendees: Array<RosterStudent>;
+  emptyLabel: string;
+  isPastStartTime: boolean;
+  updatingBookingId: string | null;
+  isAttendanceBusy: boolean;
+  onAttendance: (bookingId: string, status: 'attended' | 'no_show') => void;
+}
+
+function RosterAttendeeList({
+  classId,
+  attendees,
+  emptyLabel,
+  isPastStartTime,
+  updatingBookingId,
+  isAttendanceBusy,
+  onAttendance,
+}: RosterAttendeeListProps) {
+  const { t } = useTranslation();
+
+  return (
+    <>
+      <div className='lg:hidden space-y-3'>
+        {attendees.length === 0 ? (
+          <p className='text-center py-6 text-gray-500 text-sm'>{emptyLabel}</p>
+        ) : (
+          attendees.map(student => (
+            <article key={student.id} className='rounded-xl border border-gray-200 bg-white p-4 grid gap-3'>
+              <div className='grid gap-1 min-w-0'>
+                <p className='m-0 font-semibold text-gray-900 truncate'>
+                  <StudentName classId={classId} student={student} />
+                </p>
+                <p className='m-0 text-sm text-gray-500 truncate'>{studentClassLevelLabel(student, t)}</p>
+              </div>
+              <AttendanceActions
+                student={student}
+                isPastStartTime={isPastStartTime}
+                isUpdating={updatingBookingId === student.id}
+                isDisabled={isAttendanceBusy}
+                onAttendance={onAttendance}
+                stacked
+              />
+            </article>
+          ))
+        )}
+      </div>
+
+      <div className='hidden lg:block border rounded-md bg-white'>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>{t('instructor:roster.studentName')}</TableHead>
+              <TableHead>{t('common:level')}</TableHead>
+              <TableHead className='text-right'>{t('instructor:roster.attendance')}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {attendees.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={3} className='text-center py-6 text-gray-500'>
+                  {emptyLabel}
+                </TableCell>
+              </TableRow>
+            ) : (
+              attendees.map(student => (
+                <TableRow key={student.id}>
+                  <TableCell className='font-medium'>
+                    <StudentName classId={classId} student={student} />
+                  </TableCell>
+                  <TableCell>{studentClassLevelLabel(student, t)}</TableCell>
+                  <TableCell className='text-right'>
+                    <AttendanceActions
+                      student={student}
+                      isPastStartTime={isPastStartTime}
+                      isUpdating={updatingBookingId === student.id}
+                      isDisabled={isAttendanceBusy}
+                      onAttendance={onAttendance}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </>
   );
 }
 
@@ -204,6 +294,8 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
   }
 
   const enrolled = roster?.data?.enrolled?.filter(s => s.status !== 'cancelled') ?? [];
+  const { students, instructorAttendees } = splitRosterAttendees(enrolled);
+  const capacity = roster?.data?.capacity ?? 0;
 
   const searchDropdown =
     isDropdownOpen && trimmedSearch.length > 2 ? (
@@ -237,7 +329,7 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
       <div className='space-y-4'>
         <div className='flex flex-col gap-4 lg:flex-row lg:justify-between lg:items-end'>
           <h3 className='text-lg font-semibold text-gray-800 m-0'>
-            {t('instructor:roster.enrolledStudents', { count: enrolled.length })}
+            {t('instructor:roster.enrolledStudents', { count: students.length, capacity })}
           </h3>
 
           <div className='relative flex flex-col gap-2 sm:flex-row sm:items-center w-full lg:w-auto' ref={dropdownRef}>
@@ -268,70 +360,31 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
           </div>
         </div>
 
-        <div className='lg:hidden space-y-3'>
-          {enrolled.length === 0 ? (
-            <p className='text-center py-6 text-gray-500 text-sm'>{t('instructor:roster.noStudents')}</p>
-          ) : (
-            enrolled.map(student => (
-              <article key={student.id} className='rounded-xl border border-gray-200 bg-white p-4 grid gap-3'>
-                <div className='grid gap-1 min-w-0'>
-                  <p className='m-0 font-semibold text-gray-900 truncate'>
-                    <StudentName classId={classId} student={student} />
-                  </p>
-                  <p className='m-0 text-sm text-gray-500 truncate'>{studentClassLevelLabel(student, t)}</p>
-                </div>
-                <AttendanceActions
-                  student={student}
-                  isPastStartTime={isPastStartTime}
-                  isUpdating={updatingBookingId === student.id}
-                  isDisabled={isAttendanceBusy}
-                  onAttendance={handleAttendance}
-                  stacked
-                />
-              </article>
-            ))
-          )}
-        </div>
-
-        <div className='hidden lg:block border rounded-md bg-white'>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t('instructor:roster.studentName')}</TableHead>
-                <TableHead>{t('common:level')}</TableHead>
-                <TableHead className='text-right'>{t('instructor:roster.attendance')}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {enrolled.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={3} className='text-center py-6 text-gray-500'>
-                    {t('instructor:roster.noStudents')}
-                  </TableCell>
-                </TableRow>
-              ) : (
-                enrolled.map(student => (
-                  <TableRow key={student.id}>
-                    <TableCell className='font-medium'>
-                      <StudentName classId={classId} student={student} />
-                    </TableCell>
-                    <TableCell>{studentClassLevelLabel(student, t)}</TableCell>
-                    <TableCell className='text-right'>
-                      <AttendanceActions
-                        student={student}
-                        isPastStartTime={isPastStartTime}
-                        isUpdating={updatingBookingId === student.id}
-                        isDisabled={isAttendanceBusy}
-                        onAttendance={handleAttendance}
-                      />
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+        <RosterAttendeeList
+          classId={classId}
+          attendees={students}
+          emptyLabel={t('instructor:roster.noStudents')}
+          isPastStartTime={isPastStartTime}
+          updatingBookingId={updatingBookingId}
+          isAttendanceBusy={isAttendanceBusy}
+          onAttendance={handleAttendance}
+        />
       </div>
+
+      {instructorAttendees.length > 0 ? (
+        <div className='space-y-4'>
+          <h3 className='text-lg font-semibold text-gray-800 m-0'>{t('instructor:roster.instructorAttendees')}</h3>
+          <RosterAttendeeList
+            classId={classId}
+            attendees={instructorAttendees}
+            emptyLabel={t('instructor:roster.noStudents')}
+            isPastStartTime={isPastStartTime}
+            updatingBookingId={updatingBookingId}
+            isAttendanceBusy={isAttendanceBusy}
+            onAttendance={handleAttendance}
+          />
+        </div>
+      ) : null}
 
       {!isPastStartTime && (
         <p className='text-sm text-gray-500 italic mt-4 text-center'>{t('instructor:roster.attendanceNote')}</p>
