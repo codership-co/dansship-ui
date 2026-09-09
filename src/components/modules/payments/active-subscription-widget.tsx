@@ -5,9 +5,10 @@ import { LuActivity, LuCalendarDays, LuTicket, LuClock, LuLayers } from 'react-i
 import { Container, SectionEmpty } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui';
-import { type ActiveSubscription, DansshipAPI, type SubscriptionStatus } from '@core/api';
+import { useStudentSession } from '@contexts';
+import { type ActiveSubscription, type SubscriptionStatus } from '@core/api';
 import { resolvePlanDisplayName } from '@helpers';
-import { useDateLocale, usePromise } from '@hooks';
+import { useDateLocale } from '@hooks';
 
 function statusBadgeVariant(status: SubscriptionStatus): 'default' | 'secondary' | 'destructive' | 'outline' {
   if (status === 'active') return 'default';
@@ -40,11 +41,7 @@ function sortSubscriptions(subscriptions: Array<ActiveSubscription>): Array<Acti
 export function ActiveSubscriptionWidget() {
   const { t } = useTranslation();
   const locale = useDateLocale();
-  const { response: mySubscriptionsResponse, isLoading } = usePromise(() =>
-    DansshipAPI.subscriptions.getMySubscriptions(),
-  );
-  const subscriptions = mySubscriptionsResponse?.data?.subscriptions ?? [];
-  const summary = mySubscriptionsResponse?.data?.summary;
+  const { subscriptions, summary, isLoadingSubscriptions: isLoading } = useStudentSession();
   const currentSubscriptions = subscriptions.filter(sub => sub.status === 'active' || sub.status === 'pending_payment');
   const hasUnlimitedClasses = currentSubscriptions.some(
     sub => sub.status === 'active' && sub.remaining_classes === null,

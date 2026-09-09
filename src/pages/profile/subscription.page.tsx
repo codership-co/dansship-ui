@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Section, SectionEmpty, SectionHeading } from '@components/containers';
 import { ActiveSubscriptionWidget, PlanSelector, UserPaymentHistory } from '@components/modules';
 import { Badge } from '@components/ui';
-import { FEATURE_FLAG, SecurityGuard } from '@contexts';
+import { FEATURE_FLAG, SecurityGuard, useStudentSession } from '@contexts';
 import { DansshipAPI, PaymentStatus, SubscriptionStatus } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { resolvePlanDisplayName } from '@helpers';
@@ -25,12 +25,9 @@ function statusBadgeVariant(status: SubscriptionStatus) {
 function SubscriptionPage() {
   const { t } = useTranslation();
   const locale = useDateLocale();
-  const { response: mySubscriptionsResponse } = usePromise(() => DansshipAPI.subscriptions.getMySubscriptions());
-  const { response: availablePlans } = usePromise(() => DansshipAPI.subscriptions.getActivePlans());
-
-  const subscriptions = useMemo(
-    () => mySubscriptionsResponse?.data?.subscriptions ?? [],
-    [mySubscriptionsResponse?.data?.subscriptions],
+  const { subscriptions } = useStudentSession();
+  const { response: availablePlans, isLoading: isLoadingPlans } = usePromise(() =>
+    DansshipAPI.subscriptions.getActivePlans(),
   );
 
   const historicalSubscriptions = useMemo(
@@ -50,7 +47,7 @@ function SubscriptionPage() {
 
       <Section>
         <SectionHeading title={t('subscriptions:store.availablePlans')} />
-        <PlanSelector plans={availablePlans?.data ?? []} />
+        <PlanSelector plans={availablePlans?.data ?? []} isLoading={isLoadingPlans || availablePlans === null} />
       </Section>
 
       <Section>
