@@ -7,6 +7,7 @@ import type {
   AdminBookingUser,
   AdminReimburseCreditPayload,
   Booking,
+  MarkAttendancePayload,
   MyBooking,
 } from './bookings.models';
 import type { ClassRosterResponse } from '../instructors/instructors.models';
@@ -58,6 +59,14 @@ export class BookingsAdminAPI {
     return this.httpClient.callNoError<ClassRosterResponse>({
       path: `/admin/classes/${classId}/roster`,
       method: 'GET',
+    });
+  }
+
+  async adjustAttendance(bookingId: string, payload: MarkAttendancePayload) {
+    return this.httpClient.callNoError<Booking, MarkAttendancePayload>({
+      path: `/admin/bookings/${bookingId}/attendance`,
+      method: 'PUT',
+      data: payload,
     });
   }
 }

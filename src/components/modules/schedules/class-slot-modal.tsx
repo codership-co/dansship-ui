@@ -261,6 +261,7 @@ export function ClassSlotModal({
 
   const isBusy = Boolean(isLoading || isDeleting);
   const isReadOnlyCancelled = isPublishedEdit && isCancelled;
+  const isPublishedScheduleLocked = isPublishedEdit && Boolean(initialData?.has_active_bookings);
 
   const handleDelete = async () => {
     if (!onDelete) return;
@@ -285,7 +286,7 @@ export function ClassSlotModal({
 
         {isPublishedEdit && (
           <div className='shrink-0 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800'>
-            {t('schedules:publishedEditInfo')}
+            {isPublishedScheduleLocked ? t('schedules:publishedEditInfo') : t('schedules:publishedEditEmptyInfo')}
           </div>
         )}
 
@@ -305,7 +306,7 @@ export function ClassSlotModal({
               <Select
                 value={watchClassDefId}
                 onValueChange={val => setValue('class_definition_id', val, { shouldValidate: true })}
-                disabled={isPublishedEdit}
+                disabled={isPublishedScheduleLocked}
               >
                 <SelectTrigger>
                   <SelectValue placeholder={t('schedules:selectClassCatalog')} />
@@ -398,7 +399,7 @@ export function ClassSlotModal({
 
             <div className='space-y-2'>
               <Label htmlFor='date'>{t('common:date')}</Label>
-              <Input id='date' type='date' {...register('date')} disabled={isPublishedEdit} />
+              <Input id='date' type='date' {...register('date')} disabled={isPublishedScheduleLocked} />
               {errors.date && <p className='text-sm text-alert-500'>{errors.date.message}</p>}
             </div>
 
@@ -408,7 +409,7 @@ export function ClassSlotModal({
                 <Select
                   value={watch('start_time')}
                   onValueChange={val => setValue('start_time', val, { shouldValidate: true })}
-                  disabled={isPublishedEdit}
+                  disabled={isPublishedScheduleLocked}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder={t('schedules:selectStartTime')} />
@@ -429,7 +430,7 @@ export function ClassSlotModal({
                 <Select
                   value={watch('end_time')}
                   onValueChange={val => setValue('end_time', val, { shouldValidate: true })}
-                  disabled={isPublishedEdit}
+                  disabled={isPublishedScheduleLocked}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder={t('schedules:selectEndTime')} />

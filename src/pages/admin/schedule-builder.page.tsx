@@ -184,15 +184,21 @@ function AdminScheduleBuilderPage() {
       const endIso = new Date(`${data.date}T${data.end_time}:00`).toISOString();
 
       if (editingClass && isPublished) {
-        /*
-         * Published schedule: use restricted published-edit endpoint
-         * Always send instructor_id so TBA (null) can unassign an existing instructor
-         */
-        const publishedPayload = {
-          room_id: data.room_id,
-          instructor_id: resolveInstructorId(data.instructor_id),
-          capacity: data.capacity || undefined,
-        };
+        const canFullyEdit = !editingClass.has_active_bookings;
+        const publishedPayload = canFullyEdit
+          ? {
+              class_definition_id: data.class_definition_id,
+              room_id: data.room_id,
+              instructor_id: resolveInstructorId(data.instructor_id),
+              start_time: startIso,
+              end_time: endIso,
+              capacity: data.capacity || undefined,
+            }
+          : {
+              room_id: data.room_id,
+              instructor_id: resolveInstructorId(data.instructor_id),
+              capacity: data.capacity || undefined,
+            };
         await editPublishedClass(selectedWeekId, editingClass.id, publishedPayload);
       } else {
         // Draft schedule: full create/update

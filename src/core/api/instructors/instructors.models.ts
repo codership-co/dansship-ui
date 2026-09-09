@@ -100,6 +100,7 @@ export interface ClassRosterResponse {
   class_id: string;
   enrolled: Array<RosterStudent>;
   capacity: number;
+  start_time?: string;
   can_register_retroactive_attendance?: boolean;
   instructor_payment_document_issued?: boolean;
 }
