@@ -8,12 +8,12 @@ import { usePromise } from '@hooks';
 
 function PlansPage() {
   const { t } = useTranslation();
-  const { response: availablePlans } = usePromise(() => DansshipAPI.subscriptions.getActivePlans());
+  const { response: availablePlans, isLoading } = usePromise(() => DansshipAPI.subscriptions.getActivePlans());
 
   return (
     <Section navbarPadding>
       <SectionHeading title={t('subscriptions:store.availablePlans')} subtitle={t('subscriptions:store.subtitle')} />
-      <PlanSelector plans={availablePlans?.data ?? []} />
+      <PlanSelector plans={availablePlans?.data ?? []} isLoading={isLoading || availablePlans === null} />
     </Section>
   );
 }

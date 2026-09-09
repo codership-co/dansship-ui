@@ -8,8 +8,8 @@ import { useNavigate } from 'react-router';
 import { Container } from '@components/containers';
 import { ConfirmDialog } from '@components/modals';
 import { ProfilePicture } from '@components/ui/profile-picture';
-import { useAuth } from '@contexts';
-import { DansshipAPI, ActiveSubscription, PublishedClass } from '@core/api';
+import { useAuth, useStudentSession } from '@contexts';
+import { ActiveSubscription, PublishedClass } from '@core/api';
 import { DEFAULT_ROOM_IMAGE, PageURLS } from '@core/constants';
 import {
   formatTimeDifference,
@@ -18,7 +18,7 @@ import {
   isPastBookingDeadline,
   toColombiaDateKey,
 } from '@helpers';
-import { useDateLocale, usePromise, useMyBookings } from '@hooks';
+import { useDateLocale, useMyBookings } from '@hooks';
 
 type BookingConfirmAction = 'cancel';
 
@@ -45,21 +45,20 @@ export function BookingModal({
   const locale = useDateLocale();
   const { bookClass, cancelClass, isBookingClass, isCancelingClass } = useMyBookings();
   const [confirmAction, setConfirmAction] = useState<BookingConfirmAction | null>(null);
-  const { response: myBookingsResponse } = usePromise(
-    () => DansshipAPI.bookings.getMyBookings({ scope: 'upcoming' }),
-    isAuthenticated,
-  );
-  const { response: mySubscriptionsResponse } = usePromise(
-    () => DansshipAPI.subscriptions.getMySubscriptions(),
-    isAuthenticated,
-  );
-  const myBookings = myBookingsResponse?.data?.items ?? [];
-  const fetchedSubscriptions = mySubscriptionsResponse?.data?.subscriptions;
-  const resolvedSubscriptions = isAuthenticated ? (fetchedSubscriptions ?? subscriptions) : subscriptions;
-  const resolvedTrialEligible = isAuthenticated
-    ? (mySubscriptionsResponse?.data?.summary?.trial_eligible ?? isTrialEligible)
-    : false;
-  const subscriptionsReady = !isAuthenticated || mySubscriptionsResponse !== null || subscriptions.length > 0;
+  const {
+    bookings: sessionBookings,
+    subscriptions: sessionSubscriptions,
+    isTrialEligible: sessionTrialEligible,
+    isLoadingSubscriptions,
+  } = useStudentSession();
+  const myBookings = sessionBookings;
+  const resolvedSubscriptions = isAuthenticated
+    ? sessionSubscriptions.length > 0
+      ? sessionSubscriptions
+      : subscriptions
+    : subscriptions;
+  const resolvedTrialEligible = isAuthenticated ? sessionTrialEligible : isTrialEligible;
+  const subscriptionsReady = !isAuthenticated || !isLoadingSubscriptions || resolvedSubscriptions.length > 0;
 
   if (!selectedClass) return null;
 

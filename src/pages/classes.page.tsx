@@ -6,9 +6,10 @@ import { LuClock, LuX } from 'react-icons/lu';
 
 import { Container, Section, SectionHeading } from '@components/containers';
 import { BookingCalendar } from '@components/modules/classes/booking-calendar';
+import { ClassesCalendarSkeleton } from '@components/modules/classes/classes-calendar-skeleton';
 import { WeekSelector } from '@components/modules/schedules/week-selector';
-import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
-import { DansshipAPI, type ActiveSubscription, type PublishedClass } from '@core/api';
+import { FEATURE_FLAG, SecurityGuard, useAuth, useStudentSession } from '@contexts';
+import { DansshipAPI, type PublishedClass } from '@core/api';
 import { getMonday } from '@helpers';
 import { useDateLocale, usePromise } from '@hooks';
 
@@ -16,6 +17,7 @@ function ClassesPage() {
   const { t } = useTranslation();
   const locale = useDateLocale();
   const { isAuthenticated, ready } = useAuth();
+  const { subscriptions, bookings, isTrialEligible, reFetch: reFetchSession } = useStudentSession();
   const currentWeek = getMonday(new Date());
   const [week, setWeek] = useState(() => currentWeek);
   const [nearestWeek, setNearestWeek] = useState<string | null>(null);
@@ -24,34 +26,13 @@ function ClassesPage() {
   const [showJumpedBanner, setShowJumpedBanner] = useState(false);
   const [weekReady, setWeekReady] = useState(false);
   const hasAppliedUpcoming = useRef(false);
+  const hasUserChangedWeek = useRef(false);
 
-  const { response, isLoading, reFetch } = usePromise(
+  const { response, reFetch } = usePromise(
     async () => {
-      if (!isAuthenticated) {
-        const { data: upcoming } = await DansshipAPI.schedules.getUpcomingWeek(currentWeek);
+      const { data: upcoming } = await DansshipAPI.schedules.getUpcomingWeek(currentWeek);
 
-        return {
-          upcoming: upcoming ?? null,
-          subscriptions: [] as Array<ActiveSubscription>,
-          isTrialEligible: false,
-          myBookings: [],
-        };
-      }
-
-      const [{ data: mySubscriptions }, { data: myBookingsPage }, { data: upcoming }] = await Promise.all([
-        DansshipAPI.subscriptions.getMySubscriptions(),
-        DansshipAPI.bookings.getMyBookings({ scope: 'upcoming' }),
-        DansshipAPI.schedules.getUpcomingWeek(currentWeek),
-      ]);
-
-      const isTrialEligible = mySubscriptions?.summary?.trial_eligible ?? false;
-
-      return {
-        upcoming: upcoming ?? null,
-        subscriptions: mySubscriptions?.subscriptions ?? [],
-        isTrialEligible,
-        myBookings: myBookingsPage?.items ?? [],
-      };
+      return upcoming ?? null;
     },
     ready,
     [isAuthenticated],
@@ -63,23 +44,22 @@ function ClassesPage() {
     }
 
     hasAppliedUpcoming.current = true;
-    const upcoming = response.upcoming;
 
-    if (upcoming) {
-      setWeek(upcoming.resolved_week_start);
-      setNearestWeek(upcoming.resolved_week_start);
-      setInitialClasses(upcoming.classes);
-      setInitialFocusDay(upcoming.focus_day);
-      setShowJumpedBanner(upcoming.jumped);
+    if (!hasUserChangedWeek.current) {
+      setWeek(response.resolved_week_start);
+      setNearestWeek(response.resolved_week_start);
+      setInitialClasses(response.classes);
+      setInitialFocusDay(response.focus_day);
+      setShowJumpedBanner(response.jumped);
     } else {
-      setInitialClasses(null);
-      setInitialFocusDay(null);
+      setNearestWeek(response.resolved_week_start);
     }
 
     setWeekReady(true);
   }, [response]);
 
   const handleSetWeek = (nextWeek: string) => {
+    hasUserChangedWeek.current = true;
     setInitialClasses(null);
     setInitialFocusDay(null);
     setWeek(nextWeek);
@@ -108,22 +88,20 @@ function ClassesPage() {
       <SectionHeading title={t('classes:title')} subtitle={t('classes:subtitle')} />
 
       <section className='grid gap-8'>
-        {weekReady && (
-          <Container>
-            <WeekSelector week={week} setWeek={handleSetWeek} disablePastWeeks>
-              <Button
-                size='small'
-                color='secondary'
-                disabled={!nearestWeek || nearestWeek === week}
-                variant='flat'
-                onClick={() => void goToNextAvailable()}
-              >
-                <span className='hidden sm:inline'>{t('bookings:nextAvailable')}</span>
-                <LuClock className='size-4' />
-              </Button>
-            </WeekSelector>
-          </Container>
-        )}
+        <Container>
+          <WeekSelector week={week} setWeek={handleSetWeek} disablePastWeeks>
+            <Button
+              size='small'
+              color='secondary'
+              disabled={!weekReady || !nearestWeek || nearestWeek === week}
+              variant='flat'
+              onClick={() => void goToNextAvailable()}
+            >
+              <span className='hidden sm:inline'>{t('bookings:nextAvailable')}</span>
+              <LuClock className='size-4' />
+            </Button>
+          </WeekSelector>
+        </Container>
 
         {showJumpedBanner && weekReady && (
           <Container>
@@ -145,26 +123,22 @@ function ClassesPage() {
           </Container>
         )}
 
-        {(isLoading && !response) || !weekReady ? (
-          <Container>
-            <div
-              className='min-h-[28rem] w-full rounded-xl bg-card/70'
-              aria-busy='true'
-              aria-label={t('common:loading')}
-            />
-          </Container>
+        {!weekReady ? (
+          <div aria-busy='true' aria-label={t('common:loading')}>
+            <ClassesCalendarSkeleton />
+          </div>
         ) : (
-          response && (
-            <BookingCalendar
-              week={week}
-              initialClasses={initialClasses}
-              initialFocusDay={initialFocusDay}
-              myBookings={response.myBookings}
-              subscriptions={response.subscriptions}
-              isTrialEligible={response.isTrialEligible}
-              onBookingChange={() => void reFetch()}
-            />
-          )
+          <BookingCalendar
+            week={week}
+            initialClasses={initialClasses}
+            initialFocusDay={initialFocusDay}
+            myBookings={bookings}
+            subscriptions={subscriptions}
+            isTrialEligible={isTrialEligible}
+            onBookingChange={async () => {
+              await Promise.all([reFetchSession(), reFetch()]);
+            }}
+          />
         )}
       </section>
     </Section>

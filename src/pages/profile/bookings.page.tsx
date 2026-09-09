@@ -13,7 +13,7 @@ import {
   UpcomingListSkeleton,
 } from '@components/modules/my-bookings';
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '@components/ui';
-import { FEATURE_FLAG, SecurityGuard } from '@contexts';
+import { FEATURE_FLAG, SecurityGuard, useStudentSession } from '@contexts';
 import { DansshipAPI, MyBooking } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { useMyBookings, useMyBookingsHistory, usePromise } from '@hooks';
@@ -21,11 +21,12 @@ import { useMyBookings, useMyBookingsHistory, usePromise } from '@hooks';
 function BookingsPage() {
   const { t } = useTranslation();
   const {
-    response: upcomingResponse,
-    isLoading: isLoadingUpcoming,
-    error: upcomingError,
-    reFetch: reFetchUpcoming,
-  } = usePromise(() => DansshipAPI.bookings.getMyBookings({ scope: 'upcoming' }));
+    bookings: upcomingBookings,
+    bookingsResponse: upcomingResponse,
+    isLoadingBookings: isLoadingUpcoming,
+    bookingsError: upcomingError,
+    reFetchBookings: reFetchUpcoming,
+  } = useStudentSession();
   const { response: myFeedbackResponse, reFetch: reFetchFeedback } = usePromise(() =>
     DansshipAPI.classFeedback.listMine(),
   );
@@ -51,7 +52,6 @@ function BookingsPage() {
     [myFeedbackResponse?.data?.items],
   );
 
-  const upcomingBookings = upcomingResponse?.data?.items ?? [];
   const nextClass = upcomingBookings[0] ?? null;
   const furtherUpcoming = upcomingBookings.slice(1);
 

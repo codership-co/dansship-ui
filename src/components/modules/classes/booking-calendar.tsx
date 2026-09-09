@@ -8,7 +8,7 @@ import { BookingDaySelector } from './booking-day-selector';
 import { BookingModal } from './booking-modal';
 
 import { Container, SectionEmpty } from '@components/containers';
-import { SpinnerLoader } from '@components/loaders';
+import { ClassesCalendarSkeleton } from '@components/modules/classes/classes-calendar-skeleton';
 import { DansshipAPI, ActiveSubscription, MyBooking, PublishedClass } from '@core/api';
 import {
   BookingDay,
@@ -82,6 +82,9 @@ export function BookingCalendar({
       return;
     }
 
+    setClasses([]);
+    setClassesByDay([]);
+    setActiveDay(undefined);
     void refreshClasses(week);
   }, [initialClasses, initialFocusDay, refreshClasses, week]);
 
@@ -97,9 +100,9 @@ export function BookingCalendar({
 
   if (isLoading && classes.length === 0) {
     return (
-      <Container>
-        <SpinnerLoader />
-      </Container>
+      <div aria-busy='true' aria-label={t('common:loading')}>
+        <ClassesCalendarSkeleton />
+      </div>
     );
   }
 

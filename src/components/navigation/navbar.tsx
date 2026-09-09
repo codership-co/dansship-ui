@@ -12,29 +12,24 @@ import { Section } from '@components/containers';
 import { LanguageSelector } from '@components/navigation/language-selector';
 import { Isotype } from '@components/svg';
 import { ProfilePicture } from '@components/ui/profile-picture';
-import { useAuth, useEnabledFeatureFlag, useFeatureFlags, usePermissions } from '@contexts';
-import { DansshipAPI } from '@core/api';
+import { useAuth, useEnabledFeatureFlag, useFeatureFlags, usePermissions, useStudentSession } from '@contexts';
 import { PageURLS } from '@core/constants';
-import { usePromise } from '@hooks';
 
 export type { NavItem } from './nav-items';
 
 export const Navbar = () => {
   const { t } = useTranslation();
   const location = useLocation();
-  const { isAuthenticated, requireOnboarding, ready } = useAuth();
+  const { isAuthenticated, ready } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
   }, [location.pathname]);
-  const { response } = usePromise(
-    () => DansshipAPI.subscriptions.getMySubscriptions(),
-    isAuthenticated && !requireOnboarding,
-  );
+  const { summary } = useStudentSession();
   const { areAuthPagesEnabled, isMyAccountBookingsPageEnabled, isMyAccountSubscriptionPageEnabled } = useFeatureFlags();
 
-  const hasActivePlan = (response?.data?.summary?.active_count ?? 0) > 0;
+  const hasActivePlan = (summary?.active_count ?? 0) > 0;
   const navLinks = getPrimaryNavItems(t, { isAuthenticated });
 
   return (

@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 
 import { Section } from '@components/containers';
 import { ProfilePicture } from '@components/ui';
-import { FEATURE_FLAG, useAuth, useEnabledFeatureFlag, useOrPermissions } from '@contexts';
+import { FEATURE_FLAG, useAuth, useEnabledFeatureFlag, useOrPermissions, useStudentSession } from '@contexts';
 import { DansshipAPI, PaymentProofContentType, PaymentProofContentTypesList } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { PERMISSION } from '@core/permissions';
@@ -31,10 +31,8 @@ export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
     FEATURE_FLAG.isStudioRentalRequestsPageEnabled,
   ]);
   const { response: savedFiguresResponse } = usePromise(() => DansshipAPI.figures.getSavedFigures());
-  const { response: mySubscriptionsResponse } = usePromise(() => DansshipAPI.subscriptions.getMySubscriptions());
+  const { subscriptions, summary } = useStudentSession();
   const savedFigures = savedFiguresResponse?.data ?? [];
-  const subscriptions = mySubscriptionsResponse?.data?.subscriptions ?? [];
-  const summary = mySubscriptionsResponse?.data?.summary ?? null;
   const hasUnlimitedClasses = subscriptions.some(sub => sub.status === 'active' && sub.remaining_classes === null);
 
   if (!user) return null;
