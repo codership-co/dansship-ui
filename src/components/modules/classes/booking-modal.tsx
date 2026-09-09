@@ -171,6 +171,11 @@ export function BookingModal({
             <h3 className='text-center text-primary'>
               {selectedClass.class_definition?.name || t('bookings:classDefault')}
             </h3>
+            {selectedClass.class_definition?.description ? (
+              <p className='m-0 text-center text-sm text-muted-foreground whitespace-pre-wrap'>
+                {selectedClass.class_definition.description}
+              </p>
+            ) : null}
 
             <section
               role={selectedClass.instructor?.id ? 'button' : undefined}

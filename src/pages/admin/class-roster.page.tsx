@@ -5,57 +5,13 @@ import { Link, useParams } from 'react-router';
 
 import { AdminPageLayout } from '@components/layouts';
 import { SpinnerLoader } from '@components/loaders';
-import { RetroactiveAttendanceDialog } from '@components/modules';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
+import { AdminRosterTable, RetroactiveAttendanceDialog } from '@components/modules';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
-import { DansshipAPI, type RosterStudent } from '@core/api';
+import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions } from '@core/permissions';
-import { classLevelLabelKey, rosterStudentName, splitRosterAttendees } from '@helpers';
+import { splitRosterAttendees } from '@helpers';
 import { usePromise } from '@hooks';
-
-function rosterClassLevel(student: RosterStudent, t: (key: string) => string) {
-  const key = classLevelLabelKey(student.class_level);
-
-  return key ? t(key) : t('admin:roster.noLevel');
-}
-
-function AdminRosterTable({ attendees, emptyLabel }: { attendees: Array<RosterStudent>; emptyLabel: string }) {
-  const { t } = useTranslation();
-
-  return (
-    <div className='rounded-md border bg-white/50'>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>{t('admin:roster.studentName')}</TableHead>
-            <TableHead>{t('common:email')}</TableHead>
-            <TableHead>{t('common:level')}</TableHead>
-            <TableHead>{t('common:status')}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {attendees.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={4} className='py-6 text-center text-muted-foreground'>
-                {emptyLabel}
-              </TableCell>
-            </TableRow>
-          ) : (
-            attendees.map(student => (
-              <TableRow key={student.id}>
-                <TableCell>{rosterStudentName(student)}</TableCell>
-                <TableCell>{student.user_email || '-'}</TableCell>
-                <TableCell>{rosterClassLevel(student, t)}</TableCell>
-                <TableCell>{student.status}</TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-    </div>
-  );
-}
 
 function AdminClassRosterPage() {
   const { t } = useTranslation();
@@ -71,6 +27,7 @@ function AdminClassRosterPage() {
   const capacity = roster?.capacity ?? 0;
   const hasError = Boolean(error) || Boolean(response && !response.ok);
   const canRegisterRetroactive = Boolean(roster?.can_register_retroactive_attendance);
+  const isPastStartTime = Boolean(roster?.start_time && new Date(roster.start_time) < new Date());
 
   return (
     <AdminPageLayout
@@ -99,16 +56,29 @@ function AdminClassRosterPage() {
         <p className='py-12 text-center text-sm text-muted-foreground'>{t('admin:roster.notFound')}</p>
       ) : (
         <div className='grid gap-8'>
+          {!isPastStartTime ? (
+            <p className='text-sm text-muted-foreground'>{t('admin:roster.attendanceNote')}</p>
+          ) : null}
           <section className='grid gap-3'>
             <h5 className='text-sm font-semibold'>
               {t('admin:roster.enrolled', { count: students.length, capacity })}
             </h5>
-            <AdminRosterTable attendees={students} emptyLabel={t('admin:roster.noStudents')} />
+            <AdminRosterTable
+              attendees={students}
+              emptyLabel={t('admin:roster.noStudents')}
+              isPastStartTime={isPastStartTime}
+              onAttendanceUpdated={() => void reFetch()}
+            />
           </section>
           {instructorAttendees.length > 0 ? (
             <section className='grid gap-3'>
               <h5 className='text-sm font-semibold'>{t('admin:roster.instructorAttendees')}</h5>
-              <AdminRosterTable attendees={instructorAttendees} emptyLabel={t('admin:roster.noStudents')} />
+              <AdminRosterTable
+                attendees={instructorAttendees}
+                emptyLabel={t('admin:roster.noStudents')}
+                isPastStartTime={isPastStartTime}
+                onAttendanceUpdated={() => void reFetch()}
+              />
             </section>
           ) : null}
         </div>

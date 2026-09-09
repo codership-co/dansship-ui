@@ -15,9 +15,16 @@ export interface ScheduledClass {
   cancelled_at?: string | null;
   cancelled_by_user_id?: string | null;
 
-  class_definition?: { id: string; name: string; duration_minutes: number; level?: string | null };
+  class_definition?: {
+    id: string;
+    name: string;
+    description?: string | null;
+    duration_minutes: number;
+    level?: string | null;
+  };
   room?: { id: string; name: string; image_url?: string | null };
   instructor?: { id: string; user_id: string; email: string; full_name: string; photo_url?: string | null } | null;
+  has_active_bookings?: boolean;
 }
 
 export interface InstructorClassesResponse {
@@ -69,8 +76,11 @@ export interface AddClassPayload {
 export interface UpdateClassPayload extends Partial<AddClassPayload> {}
 
 export interface EditPublishedClassPayload {
+  class_definition_id?: string;
   room_id?: string;
   instructor_id?: string | null;
+  start_time?: string;
+  end_time?: string;
   capacity?: number;
 }
 
