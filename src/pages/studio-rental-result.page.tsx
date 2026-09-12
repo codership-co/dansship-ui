@@ -243,6 +243,11 @@ function StudioRentalResultPage() {
                     canUploadProof ? 'justify-end' : 'justify-center',
                   )}
                 >
+                  {canUploadProof && !payment.proof_url && (
+                    <p className='m-0 w-full rounded-lg bg-amber-50 px-4 py-3 text-center text-sm text-amber-900'>
+                      {t('payments:proofMissingOnResult')}
+                    </p>
+                  )}
                   {canUploadProof && (
                     <Button
                       size='small'

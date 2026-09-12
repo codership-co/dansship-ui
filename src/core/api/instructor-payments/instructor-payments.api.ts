@@ -1,5 +1,7 @@
 import { HttpClient } from 'polpo-http-client';
 
+import { uploadFileWithPresignedRetry } from '../common/put-file-to-presigned-url';
+
 import {
   type AdminPaymentDocumentsResponse,
   type AdminPaymentProfileUpdatePayload,
@@ -25,20 +27,6 @@ import {
 import { DansshipAPIError } from '@core/api';
 
 import type { PresignedUrlResponse, ProofViewUrlResponse } from '../payments/payments.models';
-
-async function putFileToPresignedUrl(file: File, uploadUrl: string) {
-  const uploadResponse = await fetch(uploadUrl, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': file.type,
-    },
-    body: file,
-  });
-
-  if (!uploadResponse.ok) {
-    throw new Error('Failed to upload instructor payment document');
-  }
-}
 
 export class InstructorPaymentsAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
@@ -73,15 +61,15 @@ export class InstructorPaymentsAPI {
       throw new Error('Invalid payment document content type');
     }
 
-    const { data } = await this.getUploadUrl(kind, file.type);
+    return uploadFileWithPresignedRetry(
+      file,
+      async () => {
+        const { data } = await this.getUploadUrl(kind, file.type);
 
-    if (!data?.upload_url || !data.file_key) {
-      throw new Error('Failed to get instructor payment document upload url');
-    }
-
-    await putFileToPresignedUrl(file, data.upload_url);
-
-    return data.file_key;
+        return data;
+      },
+      async fileKey => fileKey,
+    );
   }
 
   async getFileViewUrl(kind: PaymentDocumentKind) {

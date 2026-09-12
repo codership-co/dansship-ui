@@ -1,5 +1,7 @@
 import { HttpClient } from 'polpo-http-client';
 
+import { uploadFileWithPresignedRetry } from '../common/put-file-to-presigned-url';
+
 import { normalizeIntent, toNumber } from './payments.helpers';
 
 import {
@@ -143,20 +145,14 @@ export class PaymentsAPI {
   }
 
   async uploadProof(id: string, file: File) {
-    const data = await this.getProofUploadUrl(id, {
-      content_type: file.type as PaymentProofContentType,
-    });
-    const uploadResponse = await fetch(data.upload_url, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': file.type,
-      },
-      body: file,
-    });
-
-    if (uploadResponse.ok) {
-      return this.confirmProofUpload(id, { file_key: data.file_key });
-    }
+    return uploadFileWithPresignedRetry(
+      file,
+      () =>
+        this.getProofUploadUrl(id, {
+          content_type: file.type as PaymentProofContentType,
+        }),
+      fileKey => this.confirmProofUpload(id, { file_key: fileKey }),
+    );
   }
 
   async getProofViewUrl(id: string) {
