@@ -71,11 +71,12 @@ function PaymentsResultPage() {
       try {
         await uploadProofPromise(id, file);
         toast.success(t('payments:proofUploadSuccess'));
+        revalidator.revalidate();
       } catch {
         toast.error(t('payments:proofUploadFailedDesc'));
       }
     },
-    [uploadProofPromise, t],
+    [revalidator, t, uploadProofPromise],
   );
 
   const handleUploadProof = (intentId: string) => {
@@ -191,6 +192,11 @@ function PaymentsResultPage() {
                     canUploadProof ? 'justify-end' : 'justify-center',
                   )}
                 >
+                  {canUploadProof && !intent.proof_url && (
+                    <p className='m-0 w-full rounded-lg bg-amber-50 px-4 py-3 text-center text-sm text-amber-900'>
+                      {t('payments:proofMissingOnResult')}
+                    </p>
+                  )}
                   {canUploadProof && (
                     <Button
                       size='small'

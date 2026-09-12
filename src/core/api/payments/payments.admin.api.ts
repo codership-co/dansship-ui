@@ -1,5 +1,7 @@
 import { HttpClient } from 'polpo-http-client';
 
+import { uploadFileWithPresignedRetry } from '../common/put-file-to-presigned-url';
+
 import { normalizeAdminList, normalizeIntent } from './payments.helpers';
 
 import { DansshipAPIError, PaymentProofContentType } from '@core/api';
@@ -68,20 +70,14 @@ export class PaymentsAdminAPI {
   }
 
   async uploadAdminProof(id: string, file: File) {
-    const data = await this.getAdminProofUploadUrl(id, {
-      content_type: file.type as PaymentProofContentType,
-    });
-    const uploadResponse = await fetch(data.upload_url, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': file.type,
-      },
-      body: file,
-    });
-
-    if (uploadResponse.ok) {
-      return this.confirmAdminProofUpload(id, { file_key: data.file_key });
-    }
+    return uploadFileWithPresignedRetry(
+      file,
+      () =>
+        this.getAdminProofUploadUrl(id, {
+          content_type: file.type as PaymentProofContentType,
+        }),
+      fileKey => this.confirmAdminProofUpload(id, { file_key: fileKey }),
+    );
   }
 
   async reviewPayment(id: string, payload: AdminPaymentReviewPayload) {

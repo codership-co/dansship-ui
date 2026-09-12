@@ -134,7 +134,7 @@ export function CheckoutPaymentProofForm({
               uploadProof(intentId, selectedProofFile),
             );
           } catch (uploadError) {
-            toast.error(t('payments:proofUploadFailed'));
+            toast.error(t('payments:proofUploadFailedCheckout'));
             captureUnexpectedException(uploadError, {
               tags: { flow: 'checkout.proofUpload', intent_id: intentId },
             });
@@ -259,7 +259,7 @@ export function CheckoutPaymentProofForm({
           uploadProof(intent.id, selectedProofFile),
         );
       } catch (uploadError) {
-        toast.error(t('payments:proofUploadFailed'));
+        toast.error(t('payments:proofUploadFailedCheckout'));
         captureUnexpectedException(uploadError, {
           tags: { flow: 'checkout.proofUpload', plan_id: plan.id, intent_id: intent.id },
         });
