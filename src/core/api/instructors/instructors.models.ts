@@ -102,6 +102,7 @@ export interface ClassRosterResponse {
   capacity: number;
   start_time?: string;
   can_register_retroactive_attendance?: boolean;
+  will_reopen_auto_cancelled_class?: boolean;
   instructor_payment_document_issued?: boolean;
 }
 
