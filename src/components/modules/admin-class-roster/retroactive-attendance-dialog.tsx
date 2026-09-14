@@ -24,6 +24,7 @@ interface RetroactiveAttendanceDialogProps {
   onOpenChange: (open: boolean) => void;
   instructorPaymentDocumentIssued: boolean;
   rosterIsEmpty: boolean;
+  willReopenAutoCancelledClass?: boolean;
   onRegistered: () => void;
 }
 
@@ -33,6 +34,7 @@ export function RetroactiveAttendanceDialog({
   onOpenChange,
   instructorPaymentDocumentIssued,
   rosterIsEmpty,
+  willReopenAutoCancelledClass = false,
   onRegistered,
 }: RetroactiveAttendanceDialogProps) {
   const { t } = useTranslation();
@@ -135,6 +137,8 @@ export function RetroactiveAttendanceDialog({
         toast.error(t('admin:bookings.instructorOwnClass'));
       } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_INSTRUCTOR_TEACHING_OVERLAP) {
         toast.error(t('admin:bookings.instructorTeachingOverlap'));
+      } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_CANCELLED) {
+        toast.error(t('admin:bookings.classCancelled'));
       } else if (
         error_code === DANSSHIP_ERROR_CODE.BOOKING_CLASS_FULL ||
         error_code === DANSSHIP_ERROR_CODE.CLASS_FULL
@@ -155,7 +159,11 @@ export function RetroactiveAttendanceDialog({
       <DialogContent className='sm:max-w-lg'>
         <DialogHeader>
           <DialogTitle>{t('admin:roster.dialogTitle')}</DialogTitle>
-          <DialogDescription>{t('admin:roster.dialogDescription')}</DialogDescription>
+          <DialogDescription>
+            {willReopenAutoCancelledClass
+              ? t('admin:roster.dialogDescriptionReopen')
+              : t('admin:roster.dialogDescription')}
+          </DialogDescription>
         </DialogHeader>
 
         {instructorPaymentDocumentIssued ? (

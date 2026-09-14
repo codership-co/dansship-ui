@@ -90,6 +90,7 @@ function AdminClassRosterPage() {
           onOpenChange={setIsDialogOpen}
           instructorPaymentDocumentIssued={Boolean(roster?.instructor_payment_document_issued)}
           rosterIsEmpty={enrolled.length === 0}
+          willReopenAutoCancelledClass={Boolean(roster?.will_reopen_auto_cancelled_class)}
           onRegistered={() => void reFetch()}
         />
       ) : null}
