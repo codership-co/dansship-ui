@@ -22,7 +22,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { AdminPermissions, PERMISSION } from '@core/permissions';
+import { AdminPermissions, PERMISSION, ROLE } from '@core/permissions';
 import { usePromise } from '@hooks';
 
 const PROFILE_TAB = 'profile';
@@ -53,10 +53,14 @@ function UserDetailsPage() {
   const canManageSchedule = useOrPermissions([PERMISSION.SCHEDULE_MANAGE]);
   const canReadPaymentDocuments = useOrPermissions([PERMISSION.INSTRUCTOR_PAYMENT_DOCUMENT_READ]);
   const canVoidPaymentDocuments = useOrPermissions([PERMISSION.INSTRUCTOR_PAYMENT_DOCUMENT_VOID]);
+  const canProcessPaymentDocuments = useOrPermissions([PERMISSION.INSTRUCTOR_PAYMENT_DOCUMENT_PROCESS]);
+  const canManagePayRate = useOrPermissions([PERMISSION.INSTRUCTOR_PAY_RATE_MANAGE]);
   const canReadClassFeedback = useOrPermissions(AdminPermissions.classFeedback);
   const showInstructorClasses = Boolean(user?.has_instructor_profile) && canManageSchedule;
   const showInstructorCsat = Boolean(user?.instructor_profile?.id) && canReadClassFeedback;
-  const showPaymentDocuments = Boolean(user?.has_instructor_profile) && canReadPaymentDocuments;
+  const showPaymentDocuments =
+    (Boolean(user?.has_instructor_profile) || Boolean(user?.roles?.includes(ROLE.AREA_LEADER))) &&
+    canReadPaymentDocuments;
 
   const requestedTabParam = searchParams.get('tab');
   const requestedTab = requestedTabParam === 'context' ? NOTES_TAB : (requestedTabParam ?? PROFILE_TAB);
@@ -197,7 +201,12 @@ function UserDetailsPage() {
             {showPaymentDocuments ? (
               <TabsContent value={PAYMENT_DOCUMENTS_TAB}>
                 {activeTab === PAYMENT_DOCUMENTS_TAB && userId ? (
-                  <UserPaymentDocumentsTab userId={userId} canVoid={canVoidPaymentDocuments} />
+                  <UserPaymentDocumentsTab
+                    userId={userId}
+                    canVoid={canVoidPaymentDocuments}
+                    canProcess={canProcessPaymentDocuments}
+                    canManagePayRate={canManagePayRate}
+                  />
                 ) : null}
               </TabsContent>
             ) : null}

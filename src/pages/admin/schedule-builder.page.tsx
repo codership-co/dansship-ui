@@ -50,6 +50,7 @@ function AdminScheduleBuilderPage() {
   const canCancelPublishedClass = useOrPermissions([PERMISSION.SCHEDULED_CLASS_CANCEL]);
   const canManageFullSchedule = useOrPermissions([PERMISSION.SCHEDULE_MANAGE]);
   const canEditDraftSchedule = useOrPermissions([PERMISSION.SCHEDULE_DRAFT_CREATE, PERMISSION.SCHEDULE_MANAGE]);
+  const canEditPublishedClass = useOrPermissions([PERMISSION.SCHEDULED_CLASS_UPDATE]);
   const canViewRoster = useOrPermissions(AdminPermissions.bookings);
   const [currentDate, setCurrentDate] = useState<Date>(() => startOfWeek(new Date(), { weekStartsOn: 1 }));
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -84,6 +85,7 @@ function AdminScheduleBuilderPage() {
     isCancellingPublishedClass,
     isRemovingClass,
     isCopyingWeek,
+    reFetchWeekDetails,
   } = useSchedules({ weekStartDate: selectedWeekDate });
   const weekObj = useMemo(() => weeks.find(w => w.week_start_date === selectedWeekDate), [weeks, selectedWeekDate]);
   const destinationWeekStart = useMemo(
@@ -97,8 +99,9 @@ function AdminScheduleBuilderPage() {
   const { response: instructors } = usePromise(() => DansshipAPI.instructorsAdmin.getInstructors());
 
   // Calculate the current active week
-  const isPublished = weekObj?.status === 'published';
-  const isArchived = weekObj?.status === 'archived';
+  const weekStatus = activeWeekDetail?.status ?? weekObj?.status;
+  const isPublished = weekStatus === 'published';
+  const isArchived = weekStatus === 'archived';
   const canMutateCurrentWeek = isPublished ? canManageFullSchedule : canEditDraftSchedule;
 
   const { response: agendaEvents } = usePromise(
@@ -153,10 +156,11 @@ function AdminScheduleBuilderPage() {
 
     if (isClassInPast(cls)) return;
 
-    if (isPublished && !(canManageFullSchedule || canCancelPublishedClass)) return;
+    if (isPublished && !(canEditPublishedClass || canCancelPublishedClass)) return;
 
     if (!isPublished && !canEditDraftSchedule) return;
 
+    void reFetchWeekDetails();
     setEditingClass(cls);
     setSubmitError(null);
     setDefaultSlot(null);
@@ -183,7 +187,7 @@ function AdminScheduleBuilderPage() {
       const startIso = new Date(`${data.date}T${data.start_time}:00`).toISOString();
       const endIso = new Date(`${data.date}T${data.end_time}:00`).toISOString();
 
-      if (editingClass && isPublished) {
+      if (editingClass) {
         const canFullyEdit = !editingClass.has_active_bookings;
         const publishedPayload = canFullyEdit
           ? {
@@ -199,24 +203,61 @@ function AdminScheduleBuilderPage() {
               instructor_id: resolveInstructorId(data.instructor_id),
               capacity: data.capacity || undefined,
             };
-        await editPublishedClass(selectedWeekId, editingClass.id, publishedPayload);
+
+        if (isPublished) {
+          const { ok } = await editPublishedClass(selectedWeekId, editingClass.id, publishedPayload);
+
+          if (!ok) {
+            setSubmitError(t('schedules:saveClassError'));
+
+            return;
+          }
+        } else {
+          const payload = {
+            class_definition_id: data.class_definition_id,
+            room_id: data.room_id,
+            instructor_id: resolveInstructorId(data.instructor_id),
+            start_time: startIso,
+            end_time: endIso,
+            capacity: data.capacity || undefined,
+          };
+          const draftResult = await updateClass(selectedWeekId, editingClass.id, payload);
+
+          if (!draftResult.ok) {
+            const shouldRetryAsPublished =
+              draftResult.error instanceof DansshipAPIError &&
+              draftResult.error.body.error_code === DANSSHIP_ERROR_CODE.INVALID_SCHEDULE_STATE;
+
+            if (!shouldRetryAsPublished) {
+              setSubmitError(getScheduleSubmitErrorMessage(draftResult.error as DansshipAPIError));
+
+              return;
+            }
+
+            const { ok } = await editPublishedClass(selectedWeekId, editingClass.id, publishedPayload);
+
+            if (!ok) {
+              setSubmitError(t('schedules:saveClassError'));
+
+              return;
+            }
+          }
+        }
       } else {
-        // Draft schedule: full create/update
-        const resolvedInstructorId = resolveInstructorId(data.instructor_id);
         const payload = {
           class_definition_id: data.class_definition_id,
           room_id: data.room_id,
-          instructor_id: resolvedInstructorId,
+          instructor_id: resolveInstructorId(data.instructor_id),
           start_time: startIso,
           end_time: endIso,
           capacity: data.capacity || undefined,
         };
+        const created = await addClass(payload);
 
-        if (editingClass) {
-          await updateClass(selectedWeekId, editingClass.id, payload);
-        } else {
-          // addClass works for both draft and published schedules
-          await addClass(payload);
+        if (!created) {
+          setSubmitError(t('schedules:saveClassError'));
+
+          return;
         }
       }
 
@@ -305,13 +346,13 @@ function AdminScheduleBuilderPage() {
               <span className='font-semibold text-gray-700 mr-4'>{t('schedules:statusLabel')}</span>
               <span
                 className={`px-3 py-1 rounded-full text-xs uppercase font-bold
-                ${weekObj?.status === 'draft' ? 'bg-yellow-100 text-yellow-800' : ''}
-                ${weekObj?.status === 'published' ? 'bg-green-100 text-green-800' : ''}
-                ${weekObj?.status === 'archived' ? 'bg-gray-200 text-gray-800' : ''}
-                ${!weekObj ? 'bg-blue-100 text-blue-800' : ''}
+                ${weekStatus === 'draft' ? 'bg-yellow-100 text-yellow-800' : ''}
+                ${weekStatus === 'published' ? 'bg-green-100 text-green-800' : ''}
+                ${weekStatus === 'archived' ? 'bg-gray-200 text-gray-800' : ''}
+                ${!weekStatus ? 'bg-blue-100 text-blue-800' : ''}
               `}
               >
-                {weekObj?.status || 'New'}
+                {weekStatus || 'New'}
               </span>
             </div>
 
@@ -343,7 +384,7 @@ function AdminScheduleBuilderPage() {
                 </Button>
               )}
 
-              {weekObj?.status === 'draft' && canManageFullSchedule && (
+              {weekStatus === 'draft' && canManageFullSchedule && (
                 <Button onClick={handlePublish} disabled={isPublishing}>
                   {t('schedules:publishSchedule')}
                 </Button>
@@ -372,7 +413,7 @@ function AdminScheduleBuilderPage() {
                 : undefined
             }
             dayColumnMinWidth={dayColumnMinWidth}
-            scheduleStatus={weekObj?.status}
+            scheduleStatus={weekStatus}
           />
         </div>
       )}
@@ -394,7 +435,7 @@ function AdminScheduleBuilderPage() {
         submitError={submitError}
         isPublishedEdit={isPublished && editingClass !== null}
         canCancelPublishedClass={canCancelPublishedClass}
-        canSave={!isPublished || canManageFullSchedule}
+        canSave={!isPublished || canEditPublishedClass}
       />
 
       <ConfirmDialog

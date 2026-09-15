@@ -45,6 +45,7 @@ export enum PERMISSION {
   OWN_PAYMENT_DOCUMENT_MANAGE = 'manage:own_payment_document',
   INSTRUCTOR_PAYMENT_DOCUMENT_READ = 'read:instructor_payment_document',
   INSTRUCTOR_PAYMENT_DOCUMENT_VOID = 'void:instructor_payment_document',
+  INSTRUCTOR_PAYMENT_DOCUMENT_PROCESS = 'process:instructor_payment_document',
   INSTRUCTOR_PAY_RATE_MANAGE = 'manage:instructor_pay_rate',
 
   // ORDER
@@ -100,6 +101,7 @@ export enum PERMISSION {
   // SCHEDULE
   SCHEDULE_MANAGE = 'manage:schedule',
   SCHEDULE_DRAFT_CREATE = 'create:schedule_draft',
+  SCHEDULED_CLASS_UPDATE = 'update:scheduled_class',
   SCHEDULED_CLASS_CANCEL = 'cancel:scheduled_class',
 
   // STUDIO RENTAL

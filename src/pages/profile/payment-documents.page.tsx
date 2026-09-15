@@ -7,7 +7,19 @@ import { toast } from 'sonner';
 import { Section, SectionHeading } from '@components/containers';
 import { OptionalFileUpload } from '@components/forms';
 import { SpinnerLoader } from '@components/loaders';
-import { Button, Input, Label, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
+import { ConfirmDialog } from '@components/modals';
+import {
+  Button,
+  Input,
+  Label,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  Textarea,
+} from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
 import {
   DansshipAPI,
@@ -56,7 +68,13 @@ function PaymentDocumentsPage() {
     async (kind: PaymentDocumentKind, file: File) => {
       const fileKey = await DansshipAPI.instructorPayments.uploadPaymentDocument(kind, file);
       const field =
-        kind === 'rut' ? 'rut_file_key' : kind === 'signature' ? 'signature_file_key' : 'bank_certificate_file_key';
+        kind === 'rut'
+          ? 'rut_file_key'
+          : kind === 'signature'
+            ? 'signature_file_key'
+            : kind === 'social-security'
+              ? 'social_security_file_key'
+              : 'bank_certificate_file_key';
 
       return DansshipAPI.instructorPayments.updatePaymentProfile({ [field]: fileKey });
     },
@@ -77,6 +95,17 @@ function PaymentDocumentsPage() {
   const { call: getDocumentViewUrl, isLoading: isOpeningDocument } = useCallablePromise((documentId: string) =>
     DansshipAPI.instructorPayments.getDocumentViewUrl(documentId),
   );
+  const { call: confirmDocument, isLoading: isConfirming } = useCallablePromise((documentId: string) =>
+    DansshipAPI.instructorPayments.confirmPaymentDocument(documentId),
+  );
+  const { call: disputeDocument, isLoading: isDisputing } = useCallablePromise((documentId: string, reason: string) =>
+    DansshipAPI.instructorPayments.disputePaymentDocument(documentId, reason),
+  );
+
+  const [confirmTargetId, setConfirmTargetId] = useState<string | null>(null);
+  const [disputeTargetId, setDisputeTargetId] = useState<string | null>(null);
+  const [disputeReason, setDisputeReason] = useState('');
+  const [disputeConfirmOpen, setDisputeConfirmOpen] = useState(false);
 
   const handleUpload = async (kind: PaymentDocumentKind, file: File | null) => {
     if (!file) return;
@@ -155,6 +184,48 @@ function PaymentDocumentsPage() {
     openUrl(data.view_url);
   };
 
+  const handleConfirm = async () => {
+    if (!confirmTargetId) return;
+
+    try {
+      const { ok } = await confirmDocument(confirmTargetId);
+
+      if (!ok) {
+        toast.error(t('profile:paymentDocuments.confirmFailed'));
+
+        return;
+      }
+
+      toast.success(t('profile:paymentDocuments.confirmSuccess'));
+      setConfirmTargetId(null);
+      void reFetch();
+    } catch {
+      toast.error(t('profile:paymentDocuments.confirmFailed'));
+    }
+  };
+
+  const handleDispute = async () => {
+    if (!disputeTargetId || !disputeReason.trim()) return;
+
+    try {
+      const { ok } = await disputeDocument(disputeTargetId, disputeReason.trim());
+
+      if (!ok) {
+        toast.error(t('profile:paymentDocuments.disputeFailed'));
+
+        return;
+      }
+
+      toast.success(t('profile:paymentDocuments.disputeSuccess'));
+      setDisputeConfirmOpen(false);
+      setDisputeTargetId(null);
+      setDisputeReason('');
+      void reFetch();
+    } catch {
+      toast.error(t('profile:paymentDocuments.disputeFailed'));
+    }
+  };
+
   if (user?.cuentaDeCobroEnabled === false || profile?.cuenta_de_cobro_enabled === false) {
     return <Navigate to={PageURLS.profile.root} replace />;
   }
@@ -174,7 +245,7 @@ function PaymentDocumentsPage() {
           <section className='grid gap-6 rounded-md border bg-white/50 p-4'>
             <h3 className='text-lg font-semibold'>{t('profile:paymentDocuments.documentsTitle')}</h3>
 
-            <div className='grid gap-6 lg:grid-cols-3'>
+            <div className='grid gap-6 lg:grid-cols-2 xl:grid-cols-4'>
               <div className='grid gap-2'>
                 <OptionalFileUpload
                   label={t('profile:paymentDocuments.rut')}
@@ -237,6 +308,29 @@ function PaymentDocumentsPage() {
                   </Button>
                 ) : null}
               </div>
+
+              {profile?.payment_type === 'fixed_amount' ? (
+                <div className='grid gap-2'>
+                  <OptionalFileUpload
+                    label={t('profile:paymentDocuments.socialSecurity')}
+                    helperText={t('profile:paymentDocuments.socialSecurityHint')}
+                    acceptedTypes={PaymentDocumentContentTypes}
+                    isUploading={isUploading}
+                    onChange={file => void handleUpload('social-security', file)}
+                  />
+                  {profile.has_social_security ? (
+                    <Button
+                      type='button'
+                      variant='outline'
+                      size='sm'
+                      disabled={isOpeningFile}
+                      onClick={() => void handleOpenFile('social-security')}
+                    >
+                      {t('profile:paymentDocuments.viewCurrent')}
+                    </Button>
+                  ) : null}
+                </div>
+              ) : null}
             </div>
 
             <form
@@ -304,6 +398,7 @@ function PaymentDocumentsPage() {
                   <TableBody>
                     {list.months.map(month => {
                       const issuedDocument = month.issued_document;
+                      const canConfirmOrDispute = month.status === 'issued' && Boolean(issuedDocument);
 
                       return (
                         <TableRow key={`${month.year}-${month.month}`}>
@@ -318,6 +413,9 @@ function PaymentDocumentsPage() {
                                   .map(code => t(`profile:paymentDocuments.missing.${code}`, { defaultValue: code }))
                                   .join(', ')}
                               </p>
+                            ) : null}
+                            {issuedDocument?.dispute_reason ? (
+                              <p className='mt-1 text-xs text-muted-foreground'>{issuedDocument.dispute_reason}</p>
                             ) : null}
                           </TableCell>
                           <TableCell>
@@ -335,6 +433,29 @@ function PaymentDocumentsPage() {
                                   {isGenerating ? <LuLoader className='animate-spin' /> : null}
                                   {t('profile:paymentDocuments.generate')}
                                 </Button>
+                              ) : null}
+                              {canConfirmOrDispute && issuedDocument ? (
+                                <>
+                                  <Button
+                                    type='button'
+                                    size='sm'
+                                    disabled={isConfirming}
+                                    onClick={() => setConfirmTargetId(issuedDocument.id)}
+                                  >
+                                    {t('profile:paymentDocuments.confirm')}
+                                  </Button>
+                                  <Button
+                                    type='button'
+                                    variant='outline'
+                                    size='sm'
+                                    onClick={() => {
+                                      setDisputeTargetId(issuedDocument.id);
+                                      setDisputeReason('');
+                                    }}
+                                  >
+                                    {t('profile:paymentDocuments.dispute')}
+                                  </Button>
+                                </>
                               ) : null}
                               {issuedDocument ? (
                                 <Button
@@ -359,6 +480,62 @@ function PaymentDocumentsPage() {
           </section>
         </>
       )}
+
+      {disputeTargetId ? (
+        <div className='grid gap-3 rounded-md border border-alert/30 bg-white/50 p-4'>
+          <h3 className='text-sm font-semibold'>{t('profile:paymentDocuments.disputeTitle')}</h3>
+          <p className='text-sm text-muted-foreground'>{t('profile:paymentDocuments.disputeHint')}</p>
+          <div className='grid gap-1.5'>
+            <Label htmlFor='dispute-reason'>{t('profile:paymentDocuments.disputeReason')}</Label>
+            <Textarea
+              id='dispute-reason'
+              value={disputeReason}
+              onChange={event => setDisputeReason(event.target.value)}
+              placeholder={t('profile:paymentDocuments.disputeReasonPlaceholder')}
+              rows={3}
+            />
+          </div>
+          <div className='flex justify-end gap-2'>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => {
+                setDisputeTargetId(null);
+                setDisputeReason('');
+              }}
+            >
+              {t('common:cancel')}
+            </Button>
+            <Button type='button' disabled={!disputeReason.trim()} onClick={() => setDisputeConfirmOpen(true)}>
+              {t('profile:paymentDocuments.disputeContinue')}
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
+      <ConfirmDialog
+        open={Boolean(confirmTargetId)}
+        onOpenChange={open => {
+          if (!open) setConfirmTargetId(null);
+        }}
+        onConfirm={() => void handleConfirm()}
+        title={t('profile:paymentDocuments.confirmTitle')}
+        description={t('profile:paymentDocuments.confirmDescription')}
+        confirmLabel={t('profile:paymentDocuments.confirm')}
+        cancelLabel={t('common:cancel')}
+        isLoading={isConfirming}
+      />
+      <ConfirmDialog
+        open={disputeConfirmOpen}
+        onOpenChange={setDisputeConfirmOpen}
+        onConfirm={() => void handleDispute()}
+        title={t('profile:paymentDocuments.disputeConfirmTitle')}
+        description={t('profile:paymentDocuments.disputeConfirmDescription')}
+        confirmLabel={t('profile:paymentDocuments.dispute')}
+        cancelLabel={t('common:cancel')}
+        confirmVariant='destructive'
+        isLoading={isDisputing}
+      />
     </Section>
   );
 }
