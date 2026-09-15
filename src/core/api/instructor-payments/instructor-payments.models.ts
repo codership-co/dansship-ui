@@ -1,10 +1,12 @@
 export type BankAccountType = 'savings' | 'checking';
 
-export type PaymentDocumentKind = 'rut' | 'bank-certificate' | 'signature';
+export type PaymentType = 'hourly_classes' | 'fixed_amount';
 
-export type PaymentDocumentStatus = 'issued' | 'voided';
+export type PaymentDocumentKind = 'rut' | 'bank-certificate' | 'signature' | 'social-security';
 
-export type PaymentMonthStatus = 'issued' | 'available' | 'blocked' | 'in_progress';
+export type PaymentDocumentStatus = 'issued' | 'confirmed' | 'disputed' | 'paid' | 'voided';
+
+export type PaymentMonthStatus = 'issued' | 'confirmed' | 'disputed' | 'paid' | 'available' | 'blocked' | 'in_progress';
 
 export type PaymentDocumentContentType = 'application/pdf' | 'image/jpeg' | 'image/png' | 'image/webp';
 
@@ -22,10 +24,12 @@ export const SignatureContentTypes: Array<Exclude<PaymentDocumentContentType, 'a
 ];
 
 export interface PaymentProfile {
-  instructor_profile_id: string;
+  user_id: string;
+  payment_type: PaymentType | null;
   has_rut: boolean;
   has_bank_certificate: boolean;
   has_signature: boolean;
+  has_social_security: boolean;
   bank_name: string | null;
   account_type: BankAccountType | string | null;
   account_number: string | null;
@@ -38,6 +42,7 @@ export interface PaymentProfileUpdatePayload {
   rut_file_key?: string | null;
   bank_certificate_file_key?: string | null;
   signature_file_key?: string | null;
+  social_security_file_key?: string | null;
   bank_name?: string | null;
   account_type?: BankAccountType | null;
   account_number?: string | null;
@@ -56,13 +61,14 @@ export interface PaymentDocumentLineItem {
 
 export interface PaymentDocument {
   id: string;
-  instructor_profile_id: string;
+  user_id: string;
   period_year: number;
   period_month: number;
+  payment_type: PaymentType | string;
   status: PaymentDocumentStatus | string;
   issued_at: string;
   issued_by_user_id: string | null;
-  hourly_rate_snapshot: number;
+  hourly_rate_snapshot: number | null;
   total_hours: number;
   total_amount: number;
   instructor_full_name_snapshot: string;
@@ -73,6 +79,14 @@ export interface PaymentDocument {
   account_number_snapshot: string;
   line_items: Array<PaymentDocumentLineItem>;
   amount_in_words_snapshot: string;
+  confirmed_at?: string | null;
+  confirmed_by_user_id?: string | null;
+  disputed_at?: string | null;
+  disputed_by_user_id?: string | null;
+  dispute_reason?: string | null;
+  paid_at?: string | null;
+  paid_by_user_id?: string | null;
+  payment_receipt_file_key?: string | null;
   voided_at: string | null;
   voided_by_user_id: string | null;
   void_reason: string | null;
@@ -97,10 +111,23 @@ export interface GeneratePaymentDocumentPayload {
   month: number;
 }
 
+export interface FixedPayRate {
+  user_id: string;
+  monthly_amount: number;
+  updated_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SetFixedPayRatePayload {
+  monthly_amount: number;
+}
+
 export interface AdminPaymentDocumentsResponse {
   profile: PaymentProfile;
   documents: Array<PaymentDocument>;
   payable_document_id: string | null;
+  fixed_pay_rate: FixedPayRate | null;
 }
 
 export interface InstructorPayRate {
@@ -129,10 +156,16 @@ function toNumber(value: string | number | null | undefined): number {
   return Number(value) || 0;
 }
 
+function toNullableNumber(value: string | number | null | undefined): number | null {
+  if (value === null || value === undefined || value === '') return null;
+
+  return toNumber(value);
+}
+
 function normalizeDocument(document: PaymentDocument): PaymentDocument {
   return {
     ...document,
-    hourly_rate_snapshot: toNumber(document.hourly_rate_snapshot as unknown as string),
+    hourly_rate_snapshot: toNullableNumber(document.hourly_rate_snapshot as unknown as string),
     total_hours: toNumber(document.total_hours as unknown as string),
     total_amount: toNumber(document.total_amount as unknown as string),
     line_items: (document.line_items ?? []).map(item => ({
@@ -153,10 +186,18 @@ export function normalizePaymentDocumentList(data: PaymentDocumentListResponse):
   };
 }
 
+export function normalizeFixedPayRate(data: FixedPayRate): FixedPayRate {
+  return {
+    ...data,
+    monthly_amount: toNumber(data.monthly_amount as unknown as string),
+  };
+}
+
 export function normalizeAdminPaymentDocuments(data: AdminPaymentDocumentsResponse): AdminPaymentDocumentsResponse {
   return {
     ...data,
     documents: (data.documents ?? []).map(normalizeDocument),
+    fixed_pay_rate: data.fixed_pay_rate ? normalizeFixedPayRate(data.fixed_pay_rate) : null,
   };
 }
 

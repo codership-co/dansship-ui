@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
@@ -8,6 +8,8 @@ import { usePromise } from '../use-promise';
 import {
   AddClassPayload,
   DansshipAPI,
+  DansshipAPIError,
+  DANSSHIP_ERROR_CODE,
   type CancelPublishedClassPayload,
   type EditPublishedClassPayload,
   type ScheduleWeek,
@@ -74,6 +76,18 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
     }
   }, [reFetchWeekDetails, reFetchWeeks, weekId]);
 
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible') return;
+
+      void refreshScheduleData();
+    };
+
+    document.addEventListener('visibilitychange', onVisible);
+
+    return () => document.removeEventListener('visibilitychange', onVisible);
+  }, [refreshScheduleData]);
+
   const publishWeek = useCallback(
     async (targetWeekId: string) => {
       const { ok, data } = await publishWeekPromise(targetWeekId);
@@ -106,16 +120,19 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
   );
   const updateClass = useCallback(
     async (targetWeekId: string, classId: string, payload: UpdateClassPayload) => {
-      const { ok, data } = await updateClassPromise(targetWeekId, classId, payload);
+      const result = await updateClassPromise(targetWeekId, classId, payload);
 
-      if (ok) {
+      if (result.ok) {
         toast.success(t('schedules:classUpdated'));
         await refreshScheduleData();
-      } else {
+      } else if (
+        !(result.error instanceof DansshipAPIError) ||
+        result.error.body.error_code !== DANSSHIP_ERROR_CODE.INVALID_SCHEDULE_STATE
+      ) {
         toast.error(t('schedules:classUpdateFailed'));
       }
 
-      return data;
+      return result;
     },
     [t, updateClassPromise, refreshScheduleData],
   );
@@ -136,16 +153,16 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
   );
   const editPublishedClass = useCallback(
     async (targetWeekId: string, classId: string, payload: EditPublishedClassPayload) => {
-      const { ok, data } = await editPublishedClassPromise(targetWeekId, classId, payload);
+      const result = await editPublishedClassPromise(targetWeekId, classId, payload);
 
-      if (ok) {
+      if (result.ok) {
         toast.success(t('schedules:classUpdated'));
         await refreshScheduleData();
       } else {
         toast.error(t('schedules:classUpdateFailed'));
       }
 
-      return data;
+      return result;
     },
     [t, editPublishedClassPromise, refreshScheduleData],
   );

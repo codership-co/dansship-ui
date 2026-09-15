@@ -40,7 +40,7 @@
   "paymentDocuments": {
     "nav": "Documentos de pago",
     "title": "Documentos de pago",
-    "subtitle": "Carga tu RUT, certificado bancario y firma, y genera las cuentas de cobro de cada mes cerrado.",
+    "subtitle": "Carga tus documentos de pago y genera las cuentas de cobro de cada mes cerrado.",
     "loading": "Cargando documentos de pago...",
     "documentsTitle": "Documentos",
     "cuentasTitle": "Cuentas de cobro",
@@ -50,6 +50,8 @@
     "bankCertificateHint": "PDF o imagen. Reemplaza el archivo actual.",
     "signature": "Firma",
     "signatureHint": "Imagen de tu firma. Reemplaza el archivo actual.",
+    "socialSecurity": "Planilla de seguridad social",
+    "socialSecurityHint": "PDF o imagen. Reemplaza el archivo actual.",
     "viewCurrent": "Ver archivo actual",
     "bankFieldsTitle": "Datos de la cuenta bancaria",
     "bankName": "Banco",
@@ -67,6 +69,21 @@
     "generateSuccess": "Cuenta de cobro generada.",
     "generateFailed": "No se pudo generar la cuenta de cobro. Verifica que exista una tarifa horaria y que el mes ya haya cerrado.",
     "download": "Descargar",
+    "confirm": "Confirmar",
+    "confirmTitle": "¿Confirmar esta cuenta de cobro?",
+    "confirmDescription": "Al confirmar, el documento queda listo para que administración lo pague.",
+    "confirmSuccess": "Cuenta de cobro confirmada.",
+    "confirmFailed": "No se pudo confirmar la cuenta de cobro.",
+    "dispute": "Reportar desacuerdo",
+    "disputeTitle": "Reportar desacuerdo",
+    "disputeHint": "Explica qué está mal en esta cuenta de cobro. Administración podrá anularla para que puedas generar una nueva.",
+    "disputeReason": "Motivo (obligatorio)",
+    "disputeReasonPlaceholder": "Explica el desacuerdo",
+    "disputeContinue": "Continuar",
+    "disputeConfirmTitle": "¿Reportar desacuerdo en esta cuenta de cobro?",
+    "disputeConfirmDescription": "Administración recibirá el motivo y podrá anular el documento.",
+    "disputeSuccess": "El desacuerdo quedó registrado.",
+    "disputeFailed": "No se pudo registrar el desacuerdo.",
     "viewFailed": "No se pudo abrir el documento.",
     "emptyMonths": "Aún no hay meses disponibles para generar cuentas de cobro.",
     "columns": {
@@ -76,6 +93,9 @@
     },
     "monthStatus": {
       "issued": "Emitida",
+      "confirmed": "Confirmada",
+      "disputed": "En desacuerdo",
+      "paid": "Pagada",
       "available": "Disponible",
       "blocked": "Faltan documentos",
       "in_progress": "Mes en curso"
@@ -87,7 +107,8 @@
       "account_type": "tipo de cuenta",
       "account_number": "número de cuenta",
       "signature": "firma",
-      "cedula": "cédula"
+      "cedula": "cédula",
+      "social_security": "planilla de seguridad social"
     },
     "months": {
       "1": "Enero",

@@ -13,10 +13,13 @@ import {
   type PaymentProfile,
   type PaymentProfileUpdatePayload,
   type PayRateListResponse,
+  type SetFixedPayRatePayload,
   type SetPayRatePayload,
+  type FixedPayRate,
   SignatureContentTypes,
   PaymentDocumentContentTypes,
   normalizeAdminPaymentDocuments,
+  normalizeFixedPayRate,
   normalizeGeneratedDocument,
   normalizePayRate,
   normalizePayRateList,
@@ -106,6 +109,27 @@ export class InstructorPaymentsAPI {
       method: 'GET',
     });
   }
+
+  async confirmPaymentDocument(documentId: string) {
+    return this.httpClient.callNoError<PaymentDocument>(
+      {
+        path: `/instructors/payment-documents/${documentId}/confirm`,
+        method: 'POST',
+      },
+      normalizeGeneratedDocument,
+    );
+  }
+
+  async disputePaymentDocument(documentId: string, reason: string) {
+    return this.httpClient.callNoError<PaymentDocument, { reason: string }>(
+      {
+        path: `/instructors/payment-documents/${documentId}/dispute`,
+        method: 'POST',
+        data: { reason },
+      },
+      normalizeGeneratedDocument,
+    );
+  }
 }
 
 export class InstructorPaymentsAdminAPI {
@@ -151,6 +175,59 @@ export class InstructorPaymentsAdminAPI {
         data: { reason },
       },
       normalizeGeneratedDocument,
+    );
+  }
+
+  private async getReceiptUploadUrl(userId: string, documentId: string, contentType: string) {
+    return this.httpClient.callNoError<PresignedUrlResponse, { content_type: string }>({
+      path: `/admin/users/${userId}/payment-documents/${documentId}/receipt/upload-url`,
+      method: 'POST',
+      data: { content_type: contentType },
+    });
+  }
+
+  async uploadReceipt(userId: string, documentId: string, file: File) {
+    if (!PaymentDocumentContentTypes.includes(file.type as PaymentDocumentContentType)) {
+      throw new Error('Invalid payment receipt content type');
+    }
+
+    return uploadFileWithPresignedRetry(
+      file,
+      async () => {
+        const { data } = await this.getReceiptUploadUrl(userId, documentId, file.type);
+
+        return data;
+      },
+      async fileKey => fileKey,
+    );
+  }
+
+  async getReceiptViewUrl(userId: string, documentId: string) {
+    return this.httpClient.callNoError<ProofViewUrlResponse>({
+      path: `/admin/users/${userId}/payment-documents/${documentId}/receipt/view-url`,
+      method: 'GET',
+    });
+  }
+
+  async payDocument(userId: string, documentId: string, fileKey: string) {
+    return this.httpClient.callNoError<PaymentDocument, { file_key: string }>(
+      {
+        path: `/admin/users/${userId}/payment-documents/${documentId}/pay`,
+        method: 'POST',
+        data: { file_key: fileKey },
+      },
+      normalizeGeneratedDocument,
+    );
+  }
+
+  async setFixedPayRate(userId: string, payload: SetFixedPayRatePayload) {
+    return this.httpClient.callNoError<FixedPayRate, SetFixedPayRatePayload>(
+      {
+        path: `/admin/users/${userId}/fixed-pay-rate`,
+        method: 'PUT',
+        data: payload,
+      },
+      normalizeFixedPayRate,
     );
   }
 

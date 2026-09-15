@@ -1,12 +1,14 @@
 import { format, parseISO } from 'date-fns';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
+import { OptionalFileUpload } from '@components/forms';
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
 import {
   Button,
+  Input,
   Label,
   Switch,
   Table,
@@ -17,7 +19,7 @@ import {
   TableRow,
   Textarea,
 } from '@components/ui';
-import { DansshipAPI, type PaymentDocument, type PaymentDocumentKind } from '@core/api';
+import { DansshipAPI, PaymentDocumentContentTypes, type PaymentDocument, type PaymentDocumentKind } from '@core/api';
 import { formatPrice } from '@helpers';
 import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
 
@@ -27,7 +29,19 @@ function openUrl(url: string | undefined) {
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 
-export function UserPaymentDocumentsTab({ userId, canVoid }: { userId: string; canVoid: boolean }) {
+const VOIDABLE_STATUSES = new Set(['issued', 'disputed']);
+
+export function UserPaymentDocumentsTab({
+  userId,
+  canVoid,
+  canProcess = false,
+  canManagePayRate = false,
+}: {
+  userId: string;
+  canVoid: boolean;
+  canProcess?: boolean;
+  canManagePayRate?: boolean;
+}) {
   const { t } = useTranslation();
   const locale = useDateLocale();
   const { response, isLoading, reFetch } = usePromise(
@@ -45,6 +59,9 @@ export function UserPaymentDocumentsTab({ userId, canVoid }: { userId: string; c
   const { call: getDocumentViewUrl, isLoading: isOpeningDocument } = useCallablePromise((documentId: string) =>
     DansshipAPI.instructorPaymentsAdmin.getDocumentViewUrl(userId, documentId),
   );
+  const { call: getReceiptViewUrl, isLoading: isOpeningReceipt } = useCallablePromise((documentId: string) =>
+    DansshipAPI.instructorPaymentsAdmin.getReceiptViewUrl(userId, documentId),
+  );
   const { call: voidDocument, isLoading: isVoiding } = useCallablePromise((documentId: string, reason: string) =>
     DansshipAPI.instructorPaymentsAdmin.voidDocument(userId, documentId, reason),
   );
@@ -53,10 +70,34 @@ export function UserPaymentDocumentsTab({ userId, canVoid }: { userId: string; c
       cuenta_de_cobro_enabled: enabled,
     }),
   );
+  const { call: saveFixedRate, isLoading: isSavingRate } = useCallablePromise((monthlyAmount: number) =>
+    DansshipAPI.instructorPaymentsAdmin.setFixedPayRate(userId, { monthly_amount: monthlyAmount }),
+  );
+  const { call: payDocument, isLoading: isPaying } = useCallablePromise(async (documentId: string, file: File) => {
+    const fileKey = await DansshipAPI.instructorPaymentsAdmin.uploadReceipt(userId, documentId, file);
+
+    return DansshipAPI.instructorPaymentsAdmin.payDocument(userId, documentId, fileKey);
+  });
 
   const [voidTarget, setVoidTarget] = useState<PaymentDocument | null>(null);
   const [voidReason, setVoidReason] = useState('');
   const [confirmOpen, setConfirmOpen] = useState(false);
+  const [payTarget, setPayTarget] = useState<PaymentDocument | null>(null);
+  const [receiptFile, setReceiptFile] = useState<File | null>(null);
+  const [monthlyAmount, setMonthlyAmount] = useState('');
+  const [rateInitialized, setRateInitialized] = useState(false);
+
+  useEffect(() => {
+    setRateInitialized(false);
+    setMonthlyAmount('');
+  }, [userId]);
+
+  useEffect(() => {
+    if (rateInitialized || !data) return;
+
+    setMonthlyAmount(data.fixed_pay_rate ? String(data.fixed_pay_rate.monthly_amount) : '');
+    setRateInitialized(true);
+  }, [data, rateInitialized]);
 
   const handleOpenFile = async (kind: PaymentDocumentKind) => {
     const { ok, data: view } = await getFileViewUrl(kind);
@@ -72,6 +113,18 @@ export function UserPaymentDocumentsTab({ userId, canVoid }: { userId: string; c
 
   const handleOpenDocument = async (documentId: string) => {
     const { ok, data: view } = await getDocumentViewUrl(documentId);
+
+    if (!ok || !view?.view_url) {
+      toast.error(t('admin:users.details.paymentDocuments.viewFailed'));
+
+      return;
+    }
+
+    openUrl(view.view_url);
+  };
+
+  const handleOpenReceipt = async (documentId: string) => {
+    const { ok, data: view } = await getReceiptViewUrl(documentId);
 
     if (!ok || !view?.view_url) {
       toast.error(t('admin:users.details.paymentDocuments.viewFailed'));
@@ -100,6 +153,27 @@ export function UserPaymentDocumentsTab({ userId, canVoid }: { userId: string; c
     void reFetch();
   };
 
+  const handlePay = async () => {
+    if (!payTarget || !receiptFile) return;
+
+    try {
+      const { ok } = await payDocument(payTarget.id, receiptFile);
+
+      if (!ok) {
+        toast.error(t('admin:users.details.paymentDocuments.payFailed'));
+
+        return;
+      }
+
+      toast.success(t('admin:users.details.paymentDocuments.paySuccess'));
+      setPayTarget(null);
+      setReceiptFile(null);
+      void reFetch();
+    } catch {
+      toast.error(t('admin:users.details.paymentDocuments.payFailed'));
+    }
+  };
+
   const handleToggleCuenta = async (checked: boolean) => {
     const { ok } = await updatePaymentProfile(checked);
 
@@ -110,6 +184,27 @@ export function UserPaymentDocumentsTab({ userId, canVoid }: { userId: string; c
     }
 
     toast.success(t('admin:users.details.paymentDocuments.toggleSuccess'));
+    void reFetch();
+  };
+
+  const handleSaveFixedRate = async () => {
+    const amount = Number(monthlyAmount);
+
+    if (!Number.isFinite(amount) || amount <= 0) {
+      toast.error(t('admin:users.details.paymentDocuments.fixedRateInvalid'));
+
+      return;
+    }
+
+    const { ok } = await saveFixedRate(amount);
+
+    if (!ok) {
+      toast.error(t('admin:users.details.paymentDocuments.fixedRateFailed'));
+
+      return;
+    }
+
+    toast.success(t('admin:users.details.paymentDocuments.fixedRateSuccess'));
     void reFetch();
   };
 
@@ -147,6 +242,36 @@ export function UserPaymentDocumentsTab({ userId, canVoid }: { userId: string; c
         />
       </div>
 
+      {canManagePayRate ? (
+        <form
+          className='grid gap-3 rounded-md border bg-white/50 p-4'
+          onSubmit={event => {
+            event.preventDefault();
+            void handleSaveFixedRate();
+          }}
+        >
+          <h3 className='text-sm font-semibold'>{t('admin:users.details.paymentDocuments.fixedRateTitle')}</h3>
+          <p className='text-sm text-muted-foreground'>{t('admin:users.details.paymentDocuments.fixedRateHint')}</p>
+          <div className='flex flex-wrap items-end gap-3'>
+            <div className='grid min-w-48 flex-1 gap-1.5'>
+              <Label htmlFor='fixed-monthly-amount'>{t('admin:users.details.paymentDocuments.fixedRateAmount')}</Label>
+              <Input
+                id='fixed-monthly-amount'
+                type='number'
+                min='1'
+                step='1'
+                value={monthlyAmount}
+                onChange={event => setMonthlyAmount(event.target.value)}
+                required
+              />
+            </div>
+            <Button type='submit' disabled={isSavingRate}>
+              {t('admin:users.details.paymentDocuments.fixedRateSave')}
+            </Button>
+          </div>
+        </form>
+      ) : null}
+
       <div className='grid gap-4 rounded-md border bg-white/50 p-4'>
         <h3 className='text-sm font-semibold'>{t('admin:users.details.paymentDocuments.filesTitle')}</h3>
         <div className='flex flex-wrap gap-2'>
@@ -174,6 +299,16 @@ export function UserPaymentDocumentsTab({ userId, canVoid }: { userId: string; c
           >
             {t('admin:users.details.paymentDocuments.viewSignature')}
           </Button>
+          {profile?.payment_type === 'fixed_amount' || profile?.has_social_security ? (
+            <Button
+              type='button'
+              variant='outline'
+              disabled={!profile?.has_social_security || isOpeningFile}
+              onClick={() => void handleOpenFile('social-security')}
+            >
+              {t('admin:users.details.paymentDocuments.viewSocialSecurity')}
+            </Button>
+          ) : null}
         </div>
         <dl className='grid gap-2 text-sm sm:grid-cols-3'>
           <div>
@@ -233,6 +368,40 @@ export function UserPaymentDocumentsTab({ userId, canVoid }: { userId: string; c
         </div>
       ) : null}
 
+      {payTarget ? (
+        <div className='grid gap-3 rounded-md border bg-white/50 p-4'>
+          <h3 className='text-sm font-semibold'>{t('admin:users.details.paymentDocuments.payTitle')}</h3>
+          <p className='text-sm text-muted-foreground'>
+            {t('admin:users.details.paymentDocuments.payHint', {
+              month: t(`admin:users.details.paymentDocuments.months.${payTarget.period_month}`),
+              year: payTarget.period_year,
+            })}
+          </p>
+          <OptionalFileUpload
+            label={t('admin:users.details.paymentDocuments.receipt')}
+            helperText={t('admin:users.details.paymentDocuments.receiptHint')}
+            acceptedTypes={PaymentDocumentContentTypes}
+            isUploading={isPaying}
+            onChange={file => setReceiptFile(file)}
+          />
+          <div className='flex justify-end gap-2'>
+            <Button
+              type='button'
+              variant='outline'
+              onClick={() => {
+                setPayTarget(null);
+                setReceiptFile(null);
+              }}
+            >
+              {t('common:cancel')}
+            </Button>
+            <Button type='button' disabled={!receiptFile || isPaying} onClick={() => void handlePay()}>
+              {t('admin:users.details.paymentDocuments.pay')}
+            </Button>
+          </div>
+        </div>
+      ) : null}
+
       {!documents.length ? (
         <p className='py-8 text-center text-sm text-muted-foreground'>
           {t('admin:users.details.paymentDocuments.empty')}
@@ -253,7 +422,8 @@ export function UserPaymentDocumentsTab({ userId, canVoid }: { userId: string; c
             <TableBody>
               {documents.map(document => {
                 const isPayable = document.id === data?.payable_document_id;
-                const isIssued = document.status === 'issued';
+                const canVoidThis = canVoid && VOIDABLE_STATUSES.has(document.status);
+                const canPayThis = canProcess && document.status === 'confirmed';
 
                 return (
                   <TableRow key={document.id} className={isPayable ? 'bg-primary/5' : undefined}>
@@ -266,9 +436,12 @@ export function UserPaymentDocumentsTab({ userId, canVoid }: { userId: string; c
                       ) : null}
                     </TableCell>
                     <TableCell>
-                      {document.status === 'voided'
-                        ? t('admin:users.details.paymentDocuments.statusVoided')
-                        : t('admin:users.details.paymentDocuments.statusIssued')}
+                      {t(`admin:users.details.paymentDocuments.status.${document.status}`, {
+                        defaultValue: document.status,
+                      })}
+                      {document.dispute_reason ? (
+                        <p className='mt-1 text-xs text-muted-foreground'>{document.dispute_reason}</p>
+                      ) : null}
                     </TableCell>
                     <TableCell>{formatPrice(document.total_amount, 'COP')}</TableCell>
                     <TableCell>{format(parseISO(document.issued_at), 'MMM d, yyyy HH:mm', { locale })}</TableCell>
@@ -294,7 +467,23 @@ export function UserPaymentDocumentsTab({ userId, canVoid }: { userId: string; c
                         >
                           {t('admin:users.details.paymentDocuments.download')}
                         </Button>
-                        {canVoid && isIssued ? (
+                        {document.payment_receipt_file_key ? (
+                          <Button
+                            type='button'
+                            variant='outline'
+                            size='sm'
+                            disabled={isOpeningReceipt}
+                            onClick={() => void handleOpenReceipt(document.id)}
+                          >
+                            {t('admin:users.details.paymentDocuments.viewReceipt')}
+                          </Button>
+                        ) : null}
+                        {canPayThis ? (
+                          <Button type='button' size='sm' onClick={() => setPayTarget(document)}>
+                            {t('admin:users.details.paymentDocuments.pay')}
+                          </Button>
+                        ) : null}
+                        {canVoidThis ? (
                           <Button type='button' variant='destructive' size='sm' onClick={() => setVoidTarget(document)}>
                             {t('admin:users.details.paymentDocuments.void')}
                           </Button>
