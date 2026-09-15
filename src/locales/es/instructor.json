@@ -31,6 +31,7 @@
     "title": "Lista de Alumnos",
     "enrolledStudents": "Estudiantes ({{count}}/{{capacity}})",
     "instructorAttendees": "Instructores asistentes",
+    "twoForOneTag": "2x1",
     "searchPlaceholder": "Buscar alumno por correo",
     "adding": "Agregando...",
     "manualAdd": "Agregar Manual",

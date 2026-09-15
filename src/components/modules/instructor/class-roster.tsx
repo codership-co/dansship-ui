@@ -5,7 +5,7 @@ import { LuCircleCheck, LuSearch, LuCircleX } from 'react-icons/lu';
 import { Link } from 'react-router';
 
 import { SpinnerLoader, Spinner } from '@components/loaders';
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Input } from '@components/ui';
+import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Input, Badge } from '@components/ui';
 import { useOrPermissions } from '@contexts';
 import { DansshipAPI, InstructorUserSearchResult, RosterStudent } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -31,14 +31,16 @@ function studentClassLevelLabel(student: RosterStudent, t: (key: string) => stri
 }
 
 function StudentName({ classId, student }: { classId: string; student: RosterStudent }) {
+  const { t } = useTranslation();
   const canViewProfile = useOrPermissions(InstructorPermissions.studentProfile);
   const name = studentDisplayName(student);
+  const tag = student.is_jueves_2x1 ? (
+    <Badge variant='outlineTertiary' size='small'>
+      {t('instructor:roster.twoForOneTag')}
+    </Badge>
+  ) : null;
 
-  if (!canViewProfile) {
-    return name;
-  }
-
-  return (
+  const nameNode = canViewProfile ? (
     <Link
       to={PageURLS.instructor.studentProfile(classId, student.user_id)}
       viewTransition
@@ -46,6 +48,15 @@ function StudentName({ classId, student }: { classId: string; student: RosterStu
     >
       {name}
     </Link>
+  ) : (
+    name
+  );
+
+  return (
+    <span className='inline-flex min-w-0 items-center gap-2'>
+      {nameNode}
+      {tag}
+    </span>
   );
 }
 

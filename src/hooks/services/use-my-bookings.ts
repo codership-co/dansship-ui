@@ -4,8 +4,24 @@ import { toast } from 'sonner';
 
 import { useCallablePromise } from '../use-callable-promise';
 
-import { BookClassPayload, DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError } from '@core/api';
+import { BookClassPayload, BookClassResponse, DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError } from '@core/api';
 import { captureUnexpectedException, withSentrySpan } from '@core/sentry';
+
+const companionErrorToastKey = (errorCode: string | undefined) => {
+  switch (errorCode) {
+    case DANSSHIP_ERROR_CODE.JUEVES_2X1_COMPANION_NOT_FOUND:
+      return 'bookings:companionNotFound';
+    case DANSSHIP_ERROR_CODE.JUEVES_2X1_SELF_REFERENCE:
+      return 'bookings:companionSelfReference';
+    case DANSSHIP_ERROR_CODE.JUEVES_2X1_NOT_ELIGIBLE:
+      return 'bookings:companionNotEligible';
+    case DANSSHIP_ERROR_CODE.BOOKING_CLASS_FULL:
+    case DANSSHIP_ERROR_CODE.CLASS_FULL:
+      return 'bookings:companionClassFull';
+    default:
+      return 'bookings:companionFailed';
+  }
+};
 
 export const useMyBookings = () => {
   const { t } = useTranslation();
@@ -19,7 +35,7 @@ export const useMyBookings = () => {
   const bookClass = useCallback(
     async (payload: BookClassPayload) => {
       return withSentrySpan('booking.create', 'ui.action', { class_id: payload.scheduled_class_id }, async () => {
-        const { error } = await bookClassPromise(payload);
+        const { error, data } = await bookClassPromise(payload);
 
         if (error) {
           if (error instanceof DansshipAPIError) {
@@ -65,6 +81,14 @@ export const useMyBookings = () => {
         }
 
         toast.success(t('bookings:bookSuccess'));
+
+        const bookingResult = data as BookClassResponse | undefined;
+
+        if (bookingResult?.companion_booking) {
+          toast.success(t('bookings:companionSuccess'));
+        } else if (bookingResult?.companion_error) {
+          toast.error(t(companionErrorToastKey(bookingResult.companion_error.error_code)));
+        }
 
         return true;
       });

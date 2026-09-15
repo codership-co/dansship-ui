@@ -17,6 +17,8 @@ export interface Booking {
   subscription_id?: string | null;
   plan_name?: string | null;
   is_cancellable?: boolean;
+  is_instructor_benefit?: boolean;
+  is_jueves_2x1?: boolean;
 
   scheduled_class?: ScheduledClass;
 }
@@ -40,6 +42,18 @@ export interface MyBookingsPage {
 
 export interface BookClassPayload {
   scheduled_class_id: string;
+  companion_email?: string | null;
+}
+
+export interface CompanionBookingError {
+  error_code: string;
+  message: string;
+}
+
+export interface BookClassResponse {
+  booking: Booking;
+  companion_booking?: Booking | null;
+  companion_error?: CompanionBookingError | null;
 }
 
 export interface BookingCancelPayload {
@@ -67,6 +81,7 @@ export interface PublishedClass extends ScheduledClass {
   user_booking_id?: string | null;
   user_booking_is_cancellable?: boolean | null;
   user_booking_would_restore_credit?: boolean | null;
+  jueves_2x1_eligible?: boolean;
 }
 
 export interface MarkAttendancePayload {

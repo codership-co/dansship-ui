@@ -94,6 +94,7 @@ export interface RosterStudent {
   status: 'active' | 'attended' | 'no_show' | 'cancelled';
   created_at: string;
   is_instructor_benefit?: boolean;
+  is_jueves_2x1?: boolean;
 }
 
 export interface ClassRosterResponse {

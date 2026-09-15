@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { LuCircleCheck, LuCircleX } from 'react-icons/lu';
 
 import { Spinner } from '@components/loaders';
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
+import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Badge } from '@components/ui';
 import { type RosterStudent } from '@core/api';
 import { classLevelLabelKey, rosterStudentName } from '@helpers';
 import { useAdminRoster } from '@hooks';
@@ -114,7 +114,16 @@ export function AdminRosterTable({
           ) : (
             attendees.map(student => (
               <TableRow key={student.id}>
-                <TableCell>{rosterStudentName(student)}</TableCell>
+                <TableCell>
+                  <span className='inline-flex items-center gap-2'>
+                    {rosterStudentName(student)}
+                    {student.is_jueves_2x1 ? (
+                      <Badge variant='outlineTertiary' size='small'>
+                        {t('admin:roster.twoForOneTag')}
+                      </Badge>
+                    ) : null}
+                  </span>
+                </TableCell>
                 <TableCell>{student.user_email || '-'}</TableCell>
                 <TableCell>{rosterClassLevel(student, t)}</TableCell>
                 <TableCell>{student.status}</TableCell>

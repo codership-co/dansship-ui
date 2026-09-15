@@ -346,6 +346,7 @@
     "notFound": "No se pudo cargar la lista de esta clase.",
     "enrolled": "Estudiantes ({{count}}/{{capacity}})",
     "instructorAttendees": "Instructores asistentes",
+    "twoForOneTag": "2x1",
     "studentName": "Estudiante",
     "noStudents": "No hay estudiantes inscritos.",
     "noLevel": "Sin nivel",
