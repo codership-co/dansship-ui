@@ -1,11 +1,13 @@
 import { format, parseISO } from 'date-fns';
 import { AsideModal, Button } from 'polpo/components';
 import { cn, toCapitalize } from 'polpo/helpers';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import { Container } from '@components/containers';
+import { EmailField } from '@components/form-fields';
 import { ConfirmDialog } from '@components/modals';
 import { ProfilePicture } from '@components/ui/profile-picture';
 import { useAuth, useStudentSession } from '@contexts';
@@ -45,6 +47,10 @@ export function BookingModal({
   const locale = useDateLocale();
   const { bookClass, cancelClass, isBookingClass, isCancelingClass } = useMyBookings();
   const [confirmAction, setConfirmAction] = useState<BookingConfirmAction | null>(null);
+  const [companionFieldError, setCompanionFieldError] = useState<string | null>(null);
+  const companionForm = useForm<{ companion_email: string }>({
+    defaultValues: { companion_email: '' },
+  });
   const {
     bookings: sessionBookings,
     subscriptions: sessionSubscriptions,
@@ -59,6 +65,11 @@ export function BookingModal({
     : subscriptions;
   const resolvedTrialEligible = isAuthenticated ? sessionTrialEligible : isTrialEligible;
   const subscriptionsReady = !isAuthenticated || !isLoadingSubscriptions || resolvedSubscriptions.length > 0;
+
+  useEffect(() => {
+    companionForm.reset({ companion_email: '' });
+    setCompanionFieldError(null);
+  }, [selectedClass?.id, companionForm]);
 
   if (!selectedClass) return null;
 
@@ -87,7 +98,19 @@ export function BookingModal({
   });
 
   const handleBook = async () => {
-    const ok = await bookClass({ scheduled_class_id: selectedClass.id });
+    const companionEmail = companionForm.getValues('companion_email').trim();
+
+    if (companionEmail && user?.email && companionEmail.toLowerCase() === user.email.trim().toLowerCase()) {
+      setCompanionFieldError(t('bookings:companionSelfReference'));
+
+      return;
+    }
+
+    setCompanionFieldError(null);
+    const ok = await bookClass({
+      scheduled_class_id: selectedClass.id,
+      companion_email: companionEmail || undefined,
+    });
 
     if (ok) {
       await onBookingChange?.();
@@ -150,6 +173,12 @@ export function BookingModal({
     !isOwnClass;
   const showTrialNote = Boolean(
     subscriptionsReady && eligibility.status === 'trial' && !isBooked && !isPast && !isCancelled && !isOwnClass,
+  );
+  const showThursday2x1Note = Boolean(
+    selectedClass.jueves_2x1_eligible && !isBooked && !isPast && !isCancelled && !isOwnClass,
+  );
+  const showCompanionField = Boolean(
+    showThursday2x1Note && subscriptionsReady && eligibility.status === 'ok' && !isFull && !hasTimeOverlap,
   );
 
   return (
@@ -285,6 +314,12 @@ export function BookingModal({
               </label>
             )}
 
+            {showThursday2x1Note && (
+              <label className='bg-primary/5 p-3 rounded text-primary border border-primary/20'>
+                {t('bookings:thursday2x1Note')}
+              </label>
+            )}
+
             {hasTimeOverlap && !isBooked && !isOwnClass && (
               <label className='bg-warning-50 p-3 rounded text-warning-800 border border-warning-200'>
                 {t('bookings:timeOverlapWarning')}
@@ -298,6 +333,16 @@ export function BookingModal({
             )}
 
             <section className='flex flex-col gap-2'>
+              {showCompanionField ? (
+                <EmailField
+                  control={companionForm.control}
+                  name='companion_email'
+                  label={t('bookings:companionEmail')}
+                  helperText={t('bookings:companionEmailHelper')}
+                  errorMessage={companionFieldError ?? undefined}
+                  disabled={isLoading}
+                />
+              ) : null}
               {isCancelled ? (
                 <label className='bg-gray-50 p-3 rounded text-gray-700 border border-gray-200 text-center'>
                   {t('bookings:classCancelledMessage')}

@@ -64,6 +64,11 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
             ? `${t('bookings:spotsFull')}`
             : `${bookingClass.enrolled_count} / ${bookingClass.capacity}`}
       </p>
+      {bookingClass.jueves_2x1_eligible ? (
+        <p className='absolute block font-bold top-0 left-0 m-4 py-1 px-4 bg-primary text-white rounded-2xl'>
+          {t('bookings:thursday2x1Badge')}
+        </p>
+      ) : null}
 
       <section className='bg-white/50 backdrop-blur-md py-4 px-8 grid gap-4 rounded-xl'>
         <h3 className='text-primary text-center sm:text-left'>

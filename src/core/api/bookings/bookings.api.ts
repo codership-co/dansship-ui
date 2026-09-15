@@ -4,6 +4,7 @@ import { DansshipAPIError } from '@core/api';
 
 import type {
   BookClassPayload,
+  BookClassResponse,
   Booking,
   BookingCancelPayload,
   GetMyBookingsParams,
@@ -23,7 +24,7 @@ export class BookingsAPI {
   }
 
   async bookClass(payload: BookClassPayload) {
-    return this.httpClient.callNoError<Booking, BookClassPayload>({
+    return this.httpClient.callNoError<BookClassResponse, BookClassPayload>({
       path: '/bookings',
       method: 'POST',
       data: payload,

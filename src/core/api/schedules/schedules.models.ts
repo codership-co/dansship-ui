@@ -11,6 +11,7 @@ export interface ScheduledClass {
   capacity: number;
   enrolled_count: number;
   is_cancelled?: boolean;
+  jueves_2x1_eligible?: boolean;
   cancellation_note?: string | null;
   cancelled_at?: string | null;
   cancelled_by_user_id?: string | null;
