@@ -11,7 +11,7 @@ import { EmailField } from '@components/form-fields';
 import { ConfirmDialog } from '@components/modals';
 import { ProfilePicture } from '@components/ui/profile-picture';
 import { useAuth, useStudentSession } from '@contexts';
-import { ActiveSubscription, PublishedClass } from '@core/api';
+import { ActiveSubscription, DANSSHIP_ERROR_CODE, PublishedClass } from '@core/api';
 import { DEFAULT_ROOM_IMAGE, PageURLS } from '@core/constants';
 import {
   formatTimeDifference,
@@ -107,15 +107,23 @@ export function BookingModal({
     }
 
     setCompanionFieldError(null);
-    const ok = await bookClass({
+    const result = await bookClass({
       scheduled_class_id: selectedClass.id,
       companion_email: companionEmail || undefined,
     });
 
-    if (ok) {
-      await onBookingChange?.();
-      onClose();
+    if (!result.ok) {
+      if (result.errorCode === DANSSHIP_ERROR_CODE.JUEVES_2X1_COMPANION_NOT_FOUND) {
+        setCompanionFieldError(t('bookings:companionNotFound'));
+      } else if (result.errorCode === DANSSHIP_ERROR_CODE.JUEVES_2X1_SELF_REFERENCE) {
+        setCompanionFieldError(t('bookings:companionSelfReference'));
+      }
+
+      return;
     }
+
+    await onBookingChange?.();
+    onClose();
   };
 
   const handleConfirmCancel = async () => {
