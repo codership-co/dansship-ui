@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { LiaFileContractSolid } from 'react-icons/lia';
-import { LuInstagram, LuMusic2 } from 'react-icons/lu';
+import { LuInstagram, LuMapPin, LuMusic2 } from 'react-icons/lu';
 import { RiWhatsappLine } from 'react-icons/ri';
 import { Link } from 'react-router';
 
@@ -32,6 +32,14 @@ export function Footer() {
               <Link to={PageURLS.legal} className='inline-flex items-center gap-2 transition hover:text-primary'>
                 <LiaFileContractSolid className='h-4 w-4' />
                 {t('home:sharedFooter.legal.title')}
+              </Link>
+              <Link
+                to={PageURLS.location}
+                viewTransition
+                className='inline-flex items-center gap-2 transition hover:text-primary'
+              >
+                <LuMapPin className='h-4 w-4' />
+                {t('home:sharedFooter.location.title')}
               </Link>
               <a
                 href={buildStudioWhatsAppLink()}

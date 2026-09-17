@@ -151,6 +151,9 @@
       "privacy": "Política de Privacidad",
       "terms": "Términos del Servicio"
     },
+    "location": {
+      "title": "Ubicación"
+    },
     "quick": {
       "events": "Eventos"
     },

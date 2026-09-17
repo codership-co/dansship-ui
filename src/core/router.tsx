@@ -10,6 +10,7 @@ import { PageURLS } from '@core/constants';
 import {
   Error404Page,
   HomePage,
+  LocationPage,
   PaymentsResultsLoader,
   SecureAdminAgendaConflictsPage,
   SecureAdminAgendaPage,
@@ -101,6 +102,7 @@ const routes: Array<RouteObject> = [
           { path: 'plans', Component: SecurePlansPage },
           { path: 'classes', Component: SecureClassesPage },
           { path: 'legal', Component: SecureLegalPage },
+          { path: 'location', Component: LocationPage },
           { path: 'ui', Component: UiPage },
 
           { path: 'auth/onboarding', Component: SecureOnboardingPage },

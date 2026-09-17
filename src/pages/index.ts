@@ -5,6 +5,7 @@ export * from './home.page';
 export * from './plans.page';
 export * from './ui.page';
 export * from './legal.page';
+export * from './location.page';
 export * from './classes.page';
 export * from './instructor.page';
 export * from './instructor-student-profile.page';

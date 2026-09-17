@@ -62,6 +62,12 @@ export const useMyBookings = () => {
               toast.error(t('bookings:subscriptionNotEligibleDesc'));
             } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_LATE_JOIN_CLOSED) {
               toast.error(t('bookings:lateJoinClosedDesc'));
+            } else if (
+              error_code === DANSSHIP_ERROR_CODE.JUEVES_2X1_COMPANION_NOT_FOUND ||
+              error_code === DANSSHIP_ERROR_CODE.JUEVES_2X1_SELF_REFERENCE ||
+              error_code === DANSSHIP_ERROR_CODE.JUEVES_2X1_NOT_ELIGIBLE
+            ) {
+              toast.error(t(companionErrorToastKey(error_code)));
             } else {
               toast.error(t('bookings:bookingFailedDesc'));
             }
@@ -77,20 +83,27 @@ export const useMyBookings = () => {
             });
           }
 
-          return false;
+          return {
+            ok: false,
+            errorCode: error instanceof DansshipAPIError ? error.body.error_code : undefined,
+          };
+        }
+
+        const bookingResult = data as BookClassResponse | undefined;
+
+        if (bookingResult?.companion_error) {
+          toast.error(t(companionErrorToastKey(bookingResult.companion_error.error_code)));
+
+          return { ok: false, errorCode: bookingResult.companion_error.error_code };
         }
 
         toast.success(t('bookings:bookSuccess'));
 
-        const bookingResult = data as BookClassResponse | undefined;
-
         if (bookingResult?.companion_booking) {
           toast.success(t('bookings:companionSuccess'));
-        } else if (bookingResult?.companion_error) {
-          toast.error(t(companionErrorToastKey(bookingResult.companion_error.error_code)));
         }
 
-        return true;
+        return { ok: true };
       });
     },
     [bookClassPromise, t],

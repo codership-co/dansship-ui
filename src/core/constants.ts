@@ -85,6 +85,7 @@ export const PageURLS = {
   home: '/',
   plans: '/plans',
   legal: '/legal',
+  location: '/location',
   auth: {
     login: '/auth/login',
     signup: '/auth/signup',
