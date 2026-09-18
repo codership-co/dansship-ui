@@ -86,7 +86,7 @@ export function NextClassHero({ booking, isCancelDisabled, onCancel }: NextClass
       <div className='relative flex min-w-0 flex-col gap-3.5'>
         <div className='flex min-w-0 items-start justify-between gap-3'>
           <div className='flex min-w-0 flex-1 flex-col gap-1.5'>
-            <p className='text-[10.5px] font-semibold tracking-[0.14em] text-secondary uppercase'>
+            <p className='m-0 text-[10.5px] font-semibold tracking-[0.14em] text-secondary uppercase'>
               {formatCountdownLabel(cls.start_time, t)}
             </p>
             <h3 className='m-0 break-words font-title text-[1.875rem] leading-[1.05] font-bold'>{className}</h3>

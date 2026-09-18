@@ -5,6 +5,7 @@ export * from './user-list';
 export * from './user-subscriptions-tab';
 export * from './user-bookings-tab';
 export * from './user-benefits-tab';
+export * from './user-workshops-tab';
 export * from './user-instructor-classes-tab';
 export * from './user-instructor-csat-tab';
 export * from './user-wallet-tab';

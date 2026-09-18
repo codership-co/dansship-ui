@@ -31,7 +31,7 @@ export function TransferPaymentInstructions() {
           <img
             src={BREB_QR_PLACEHOLDER}
             alt={t('payments:instructions.transfer.brebQrTitle')}
-            className='aspect-square h-auto w-full max-w-60 object-contain sm:max-w-80 md:max-w-120'
+            className='aspect-square h-auto w-full max-w-72 object-contain sm:max-w-80'
           />
 
           <p className='m-0 mt-4 font-semibold text-primary'>

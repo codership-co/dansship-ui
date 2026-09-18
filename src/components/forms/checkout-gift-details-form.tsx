@@ -150,7 +150,7 @@ export function CheckoutGiftDetailsForm({ defaultFormValues, onBack, onSubmit }:
           <LuArrowLeft />
           {t('common:back')}
         </Button>
-        <Button color='primary' className='flex items-center'>
+        <Button color='primary' variant='solid' className='flex items-center'>
           {t('common:next')}
           <LuArrowRight />
         </Button>

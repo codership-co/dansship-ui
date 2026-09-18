@@ -67,3 +67,72 @@ export const consumePendingPlanCheckoutIntent = (): string | null => {
 
   return planId;
 };
+
+const TALLER_CHECKOUT_INTENT_KEY = 'pending_taller_checkout_intent';
+
+interface TallerCheckoutIntent {
+  slug: string;
+  createdAt: number;
+}
+
+const isValidTallerIntent = (value: unknown): value is TallerCheckoutIntent => {
+  if (!value || typeof value !== 'object') {
+    return false;
+  }
+
+  const maybeIntent = value as Partial<TallerCheckoutIntent>;
+
+  return typeof maybeIntent.slug === 'string' && typeof maybeIntent.createdAt === 'number';
+};
+
+export const setPendingTallerCheckoutIntent = (slug: string) => {
+  const payload: TallerCheckoutIntent = {
+    slug,
+    createdAt: Date.now(),
+  };
+
+  localStorage.setItem(TALLER_CHECKOUT_INTENT_KEY, JSON.stringify(payload));
+};
+
+export const clearPendingTallerCheckoutIntent = () => {
+  localStorage.removeItem(TALLER_CHECKOUT_INTENT_KEY);
+};
+
+export const getPendingTallerCheckoutIntent = (): string | null => {
+  const rawValue = localStorage.getItem(TALLER_CHECKOUT_INTENT_KEY);
+
+  if (!rawValue) {
+    return null;
+  }
+
+  try {
+    const parsedValue = JSON.parse(rawValue);
+
+    if (!isValidTallerIntent(parsedValue)) {
+      clearPendingTallerCheckoutIntent();
+
+      return null;
+    }
+
+    const isExpired = Date.now() - parsedValue.createdAt > PLAN_CHECKOUT_INTENT_TTL_MS;
+
+    if (isExpired) {
+      clearPendingTallerCheckoutIntent();
+
+      return null;
+    }
+
+    return parsedValue.slug;
+  } catch {
+    clearPendingTallerCheckoutIntent();
+
+    return null;
+  }
+};
+
+export const consumePendingTallerCheckoutIntent = (): string | null => {
+  const slug = getPendingTallerCheckoutIntent();
+  clearPendingTallerCheckoutIntent();
+
+  return slug;
+};

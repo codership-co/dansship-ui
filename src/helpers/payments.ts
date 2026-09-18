@@ -33,7 +33,8 @@ export function paymentPurchaseLabel(intent: {
   const reference =
     intent.purchase_reference?.human_identifier ??
     intent.purchase_reference?.name ??
-    (typeof intent.metadata?.plan_name === 'string' ? intent.metadata.plan_name : null);
+    (typeof intent.metadata?.plan_name === 'string' ? intent.metadata.plan_name : null) ??
+    (typeof intent.metadata?.name === 'string' ? intent.metadata.name : null);
 
   if (reference) {
     return reference;

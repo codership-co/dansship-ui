@@ -8,7 +8,14 @@ import { ConfirmDialog } from '@components/modals';
 import { AdminClassRosterDialog, ClassSlotModal, CopyWeekDialog, ScheduleGrid } from '@components/modules';
 import { Button } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
-import { DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError, ScheduledClass, type ScheduleWeek } from '@core/api';
+import {
+  DANSSHIP_ERROR_CODE,
+  DansshipAPI,
+  DansshipAPIError,
+  ScheduledClass,
+  type AgendaEvent,
+  type ScheduleWeek,
+} from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions, PERMISSION } from '@core/permissions';
 import { useClasses, usePromise, useRooms, useSchedules } from '@hooks';
@@ -24,6 +31,16 @@ interface ClassSlotFormData {
 }
 
 const UNASSIGNED_INSTRUCTOR = '__tba__';
+
+type RosterView = { kind: 'class' | 'workshop'; id: string; title?: string };
+
+function isScheduleBuilderOverlayEvent(event: AgendaEvent) {
+  if (event.event_type === 'space_rental_external' || event.event_type === 'internal_reserved_use') {
+    return true;
+  }
+
+  return event.event_type === 'workshop' && event.status === 'published';
+}
 
 function resolveInstructorId(instructorId: string): string | null {
   if (!instructorId || instructorId === UNASSIGNED_INSTRUCTOR) {
@@ -57,7 +74,7 @@ function AdminScheduleBuilderPage() {
   const [isPublishConfirmOpen, setIsPublishConfirmOpen] = useState(false);
   const [isCopyWeekOpen, setIsCopyWeekOpen] = useState(false);
   const [editingClass, setEditingClass] = useState<ScheduledClass | null>(null);
-  const [rosterView, setRosterView] = useState<{ classId: string; classTitle?: string } | null>(null);
+  const [rosterView, setRosterView] = useState<RosterView | null>(null);
   const [defaultSlot, setDefaultSlot] = useState<{ date: string; time: string } | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [dayColumnMinWidth, setDayColumnMinWidth] = useState<number>(150);
@@ -395,19 +412,37 @@ function AdminScheduleBuilderPage() {
           <ScheduleGrid
             weekDate={selectedWeekDate}
             classes={activeWeekDetail?.classes || []}
-            events={(agendaEvents?.data ?? []).filter(
-              event => event.event_type === 'space_rental_external' || event.event_type === 'internal_reserved_use',
-            )}
+            events={(agendaEvents?.data ?? []).filter(isScheduleBuilderOverlayEvent)}
             onSlotClick={handleSlotClick}
-            onClassClick={selectedClass => handleClassClick(selectedClass as ScheduledClass)}
+            onClassClick={selectedClass => {
+              if ('event_type' in selectedClass) {
+                return;
+              }
+
+              handleClassClick(selectedClass);
+            }}
             onAddAtTime={!isArchived && canMutateCurrentWeek ? handleAddAtSameTime : undefined}
             onViewRoster={
               canViewRoster
-                ? classId => {
-                    const scheduledClass = (activeWeekDetail?.classes || []).find(cls => cls.id === classId);
+                ? target => {
+                    if (target.kind === 'class') {
+                      const scheduledClass = (activeWeekDetail?.classes || []).find(cls => cls.id === target.id);
+                      setRosterView({
+                        kind: 'class',
+                        id: target.id,
+                        title: scheduledClass?.class_definition?.name,
+                      });
+
+                      return;
+                    }
+
+                    const workshopEvent = (agendaEvents?.data ?? []).find(
+                      event => event.event_type === 'workshop' && event.source_id === target.id,
+                    );
                     setRosterView({
-                      classId,
-                      classTitle: scheduledClass?.class_definition?.name,
+                      kind: 'workshop',
+                      id: target.id,
+                      title: workshopEvent?.metadata?.title,
                     });
                   }
                 : undefined
@@ -460,8 +495,9 @@ function AdminScheduleBuilderPage() {
       />
 
       <AdminClassRosterDialog
-        classId={rosterView?.classId ?? ''}
-        classTitle={rosterView?.classTitle}
+        kind={rosterView?.kind ?? 'class'}
+        id={rosterView?.id ?? ''}
+        title={rosterView?.title}
         open={Boolean(rosterView)}
         onOpenChange={open => {
           if (!open) {

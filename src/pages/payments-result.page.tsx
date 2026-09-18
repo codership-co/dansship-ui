@@ -131,7 +131,7 @@ function PaymentsResultPage() {
                   <small className='m-0'>{t('payments:currentIntentStatus')}</small>
                 </section>
 
-                <section className='border py-4 border-gray-200 rounded-2xl overflow-hidden'>
+                <section className='border py-4 border-gray-200 rounded-2xl overflow-x-auto'>
                   {[
                     {
                       label: t('payments:createdAt'),
@@ -139,7 +139,7 @@ function PaymentsResultPage() {
                     },
                     {
                       label: t('payments:referenceId'),
-                      value: <span className='font-code break-all'>{intent.reference_id}</span>,
+                      value: <span className='font-code'>{intent.reference_id}</span>,
                     },
                     {
                       label: t('payments:methodLabel'),
@@ -161,20 +161,20 @@ function PaymentsResultPage() {
                       label: t('payments:ammount'),
                       value: formatPrice(intent.amount, intent.currency),
                     },
-                  ].map(({ label, value }) => (
+                  ].map(({ label, value }, index) => (
                     <section
-                      key={label}
+                      key={`${label}-${index}`}
                       className={cn(
-                        'grid grid-cols-[auto_1fr_auto] justify-between gap-2 items-center',
+                        'grid grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-x-3',
                         label && 'px-4 py-2 hover:bg-gray-100',
                         !label && 'border-b border-gray-200 my-4',
                       )}
                     >
                       {label && (
                         <>
-                          <small className='m-0 min-w-0'>{label}</small>
-                          <span className='border-b border-dashed border-gray-300' />
-                          <small className='m-0 min-w-0 max-w-[55%] text-right break-all'>{value}</small>
+                          <small className='m-0 whitespace-nowrap'>{label}</small>
+                          <span className='min-w-4 self-center border-b border-dashed border-gray-300' />
+                          <small className='m-0 text-right whitespace-nowrap'>{value}</small>
                         </>
                       )}
                     </section>

@@ -9,6 +9,7 @@ import {
   OperationalDashboard,
   StudentReports,
   StudioRentalReports,
+  WorkshopReports,
 } from '@components/modules';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
@@ -22,6 +23,7 @@ function AdminReportsPage() {
   const canStudents = useOrPermissions(AdminPermissions.studentReports);
   const canInstructors = useOrPermissions(AdminPermissions.instructorReports);
   const canRentals = useOrPermissions(AdminPermissions.studioRentalReports);
+  const canWorkshopReports = useOrPermissions(AdminPermissions.workshopReports);
   const canClassFeedback = useOrPermissions(AdminPermissions.classFeedback);
   const canNotifications = useOrPermissions(AdminPermissions.notifications);
 
@@ -32,11 +34,32 @@ function AdminReportsPage() {
         canFinance ? { value: 'finance', label: t('admin:reports.tabs.finance') } : null,
         canStudents ? { value: 'students', label: t('admin:reports.tabs.students') } : null,
         canInstructors ? { value: 'instructors', label: t('admin:reports.tabs.instructors') } : null,
-        canClassFeedback ? { value: 'class-feedback', label: t('admin:reports.tabs.classFeedback') } : null,
+        canClassFeedback
+          ? {
+              value: 'class-feedback',
+              label: t('admin:reports.tabs.classFeedback'),
+            }
+          : null,
         canRentals ? { value: 'rentals', label: t('admin:reports.tabs.rentals') } : null,
-        canNotifications ? { value: 'notifications', label: t('admin:reports.tabs.notifications') } : null,
+        canWorkshopReports ? { value: 'talleres', label: t('admin:reports.tabs.talleres') } : null,
+        canNotifications
+          ? {
+              value: 'notifications',
+              label: t('admin:reports.tabs.notifications'),
+            }
+          : null,
       ].filter((tab): tab is { value: string; label: string } => tab !== null),
-    [canClassFeedback, canFinance, canInstructors, canNotifications, canOperations, canRentals, canStudents, t],
+    [
+      canClassFeedback,
+      canFinance,
+      canInstructors,
+      canNotifications,
+      canOperations,
+      canRentals,
+      canStudents,
+      canWorkshopReports,
+      t,
+    ],
   );
   const defaultTab = tabs[0]?.value ?? 'operations';
   const [tab, setTab] = useState(defaultTab);
@@ -88,6 +111,11 @@ function AdminReportsPage() {
             <StudioRentalReports />
           </TabsContent>
         )}
+        {canWorkshopReports && (
+          <TabsContent value='talleres' className='outline-none'>
+            <WorkshopReports />
+          </TabsContent>
+        )}
         {canNotifications && (
           <TabsContent value='notifications' className='outline-none'>
             <NotificationSettings />
@@ -107,6 +135,7 @@ export const SecureAdminReportsPage = SecurityGuard(AdminReportsPage, {
     PERMISSION.INSTRUCTOR_REPORT_READ,
     PERMISSION.CLASS_FEEDBACK_READ,
     PERMISSION.STUDIO_RENTAL_REPORT_READ,
+    PERMISSION.WORKSHOP_REPORT_READ,
     PERMISSION.NOTIFICATION_MANAGE,
   ],
   requiresAuth: true,

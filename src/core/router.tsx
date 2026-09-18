@@ -25,6 +25,9 @@ import {
   SecureAdminReportsPage,
   SecureAdminScheduleBuilderPage,
   SecureAdminStudioRentalPage,
+  SecureAdminTalleresPage,
+  SecureAdminTallerComboEditPage,
+  SecureAdminTallerEditPage,
   SecureAdminUserDetailsPage,
   SecureAdminUserListPage,
   SecureBookingsPage,
@@ -52,6 +55,8 @@ import {
   SecureStudioRentalRequestsPage,
   SecureStudioRentalResultPage,
   SecureSubscriptionPage,
+  SecureTalleresPage,
+  SecureTallerLandingPage,
   SecureVerifyEmailPage,
   SecureWalletPage,
   StudioRentalResultLoader,
@@ -100,6 +105,17 @@ const routes: Array<RouteObject> = [
         children: [
           { index: true, Component: HomePage },
           { path: 'plans', Component: SecurePlansPage },
+          { path: 'workshops', Component: SecureTalleresPage },
+          { path: 'workshops/:slug', Component: SecureTallerLandingPage },
+          {
+            path: 'talleres',
+            loader: ({ request }) => redirect(`${PageURLS.talleres}${new URL(request.url).search}`),
+          },
+          {
+            path: 'talleres/:slug',
+            loader: ({ params, request }) =>
+              redirect(`${PageURLS.tallerLanding(params.slug ?? '')}${new URL(request.url).search}`),
+          },
           { path: 'classes', Component: SecureClassesPage },
           { path: 'legal', Component: SecureLegalPage },
           { path: 'location', Component: LocationPage },
@@ -184,6 +200,25 @@ const routes: Array<RouteObject> = [
                 loader: () => redirect(`${PageURLS.admin.inventory}?tab=doorCode`),
               },
               { path: 'campaigns', Component: SecureAdminCampaignsPage },
+              { path: 'workshops', Component: SecureAdminTalleresPage },
+              { path: 'workshops/new', Component: SecureAdminTallerEditPage },
+              { path: 'workshops/combos/new', Component: SecureAdminTallerComboEditPage },
+              { path: 'workshops/combos/:comboId', Component: SecureAdminTallerComboEditPage },
+              { path: 'workshops/:workshopId', Component: SecureAdminTallerEditPage },
+              { path: 'talleres', loader: () => redirect(PageURLS.admin.talleres) },
+              { path: 'talleres/new', loader: () => redirect(PageURLS.admin.tallerNew) },
+              {
+                path: 'talleres/combos/new',
+                loader: () => redirect(PageURLS.admin.tallerComboNew),
+              },
+              {
+                path: 'talleres/combos/:comboId',
+                loader: ({ params }) => redirect(PageURLS.admin.tallerComboEdit(params.comboId ?? '')),
+              },
+              {
+                path: 'talleres/:workshopId',
+                loader: ({ params }) => redirect(PageURLS.admin.tallerEdit(params.workshopId ?? '')),
+              },
             ],
           },
 

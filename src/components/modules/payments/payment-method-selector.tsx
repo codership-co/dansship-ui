@@ -7,9 +7,21 @@ import { cn } from '@helpers';
 interface PaymentMethodSelectorProps {
   value: PaymentMethod | null;
   onChange: (method: PaymentMethod) => void;
+  methods?: Array<PaymentMethod>;
 }
 
-const PaymentMethods = {
+const PaymentMethods: Partial<
+  Record<
+    PaymentMethod,
+    {
+      Icon: typeof LuLandmark;
+      title: string;
+      description: string;
+      helperText: string;
+      recommended: boolean;
+    }
+  >
+> = {
   [PaymentMethod.TRANSFER]: {
     Icon: LuLandmark,
     title: 'payments:method.breb',
@@ -26,12 +38,23 @@ const PaymentMethods = {
   },
 };
 
-export function PaymentMethodSelector({ value, onChange }: PaymentMethodSelectorProps) {
+export function PaymentMethodSelector({
+  value,
+  onChange,
+  methods = [PaymentMethod.TRANSFER, PaymentMethod.CARD],
+}: PaymentMethodSelectorProps) {
   const { t } = useTranslation();
 
   return (
     <div className='space-y-4 pt-3'>
-      {Object.entries(PaymentMethods).map(([method, { Icon, title, description, helperText, recommended }]) => {
+      {methods.map(method => {
+        const option = PaymentMethods[method];
+
+        if (!option) {
+          return null;
+        }
+
+        const { Icon, title, description, helperText, recommended } = option;
         const isSelected = value === method;
 
         return (
@@ -49,7 +72,7 @@ export function PaymentMethodSelector({ value, onChange }: PaymentMethodSelector
                   ? 'border border-primary bg-primary/5'
                   : 'border border-gray-200 hover:border-gray-300',
             )}
-            onClick={() => onChange(method as PaymentMethod)}
+            onClick={() => onChange(method)}
           >
             {recommended && (
               <div className='pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 -translate-y-1/2 rounded-full bg-highlight px-4 py-1 text-xs font-semibold uppercase text-highlight-100'>

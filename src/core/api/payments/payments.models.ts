@@ -160,12 +160,13 @@ export interface PaymentPreviewRequest {
   end_time?: string;
   duration_hours?: number | string;
   payment_option?: 'full' | 'fifty_fifty';
+  workshop_slug?: string;
 }
 
 export interface PaymentPreviewResponse {
   base_amount: string;
   discount_applied: boolean;
-  discount_type: 'percentage_discount' | 'fixed_discount' | 'percentage' | 'fixed_amount' | null;
+  discount_type: string | null;
   discount_value: string | null;
   final_price: string;
   is_valid: boolean;
@@ -189,7 +190,7 @@ export interface PaymentPreviewResponse {
 export interface PaymentPreviewMappedResponse {
   base_amount: number;
   discount_applied: boolean;
-  discount_type: 'percentage_discount' | 'fixed_discount' | 'percentage' | 'fixed_amount' | null;
+  discount_type: string | null;
   discount_value: number;
   final_price: number;
   is_valid: boolean;

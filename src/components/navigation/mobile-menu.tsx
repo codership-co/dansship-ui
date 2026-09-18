@@ -77,6 +77,13 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       icon: LuClipboardList,
     },
     {
+      to: PageURLS.admin.talleres,
+      label: t('nav:adminMenu.talleres'),
+      orPermissions: AdminPermissions.talleres,
+      featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
+      icon: LuClipboardList,
+    },
+    {
       to: PageURLS.admin.reports,
       label: t('nav:adminMenu.reportsConfig'),
       orPermissions: AdminPermissions.reports,

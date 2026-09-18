@@ -41,7 +41,12 @@ export interface ScheduleWeek {
   classes?: Array<ScheduledClass>;
 }
 
-export type AgendaEventType = 'studio_class' | 'space_rental_external' | 'internal_reserved_use' | 'blocked_space';
+export type AgendaEventType =
+  | 'studio_class'
+  | 'space_rental_external'
+  | 'internal_reserved_use'
+  | 'blocked_space'
+  | 'workshop';
 
 export interface AgendaEvent {
   event_type: AgendaEventType;

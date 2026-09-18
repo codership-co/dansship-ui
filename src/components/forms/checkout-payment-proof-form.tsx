@@ -32,6 +32,7 @@ interface CheckoutPaymentProofFormProps {
   checkoutData?: CheckoutFormValues;
   onSubmit: (intentId: string) => void;
   summaryTitle?: string;
+  hideSummary?: boolean;
   currency?: string;
   onCreateIntent?: () => Promise<string | null>;
 }
@@ -47,6 +48,7 @@ export function CheckoutPaymentProofForm({
   checkoutData,
   onSubmit,
   summaryTitle,
+  hideSummary = false,
   currency,
   onCreateIntent,
 }: CheckoutPaymentProofFormProps) {
@@ -291,76 +293,81 @@ export function CheckoutPaymentProofForm({
   return (
     <div className='grid grid-rows-[1fr_auto] h-full' data-sentry-mask>
       <section className='grid gap-8 content-start'>
-        <section className={cn('grid gap-8', isCardMethod && 'lg:grid-cols-2')}>
-          <div className='rounded-md border border-secondary bg-secondary-400/40 py-2 px-4'>
-            <label className='block'>{displayTitle}</label>
-            <label className='block'>
-              {t('payments:total')}: {formatPrice(finalPrice, displayCurrency)}
-            </label>
-            {walletAmountApplied > 0 || amountToCharge !== finalPrice ? (
-              <>
-                {walletAmountApplied > 0 ? (
-                  <label className='block text-primary'>
-                    {t('subscriptions:walletApplied')}: -{formatPrice(walletAmountApplied, displayCurrency)}
-                  </label>
-                ) : null}
-                <label className='block font-semibold'>
-                  {t('subscriptions:amountToCharge')}: {formatPrice(amountToCharge, displayCurrency)}
-                </label>
-              </>
-            ) : null}
-            {plan && checkoutData?.purchase_mode === 'duo' ? (
-              <div className='mt-2 grid gap-1 text-sm text-gray-700'>
-                <label className='block font-medium text-gray-900'>{t('payments:checkoutDuoSummaryTitle')}</label>
+        {!hideSummary || isWalletMethod || isCardMethod ? (
+          <section className={cn('grid gap-8', isCardMethod && 'lg:grid-cols-2')}>
+            {hideSummary ? null : (
+              <div className='rounded-md border border-secondary bg-secondary-400/40 py-2 px-4'>
+                <label className='block'>{displayTitle}</label>
                 <label className='block'>
-                  {t('payments:checkoutDuoPartner')}: {checkoutData.duo_partner_email}
+                  {t('payments:total')}: {formatPrice(finalPrice, displayCurrency)}
                 </label>
-                {checkoutData.start_date ? (
+                {walletAmountApplied > 0 || amountToCharge !== finalPrice ? (
+                  <>
+                    {walletAmountApplied > 0 ? (
+                      <label className='block text-primary'>
+                        {t('subscriptions:walletApplied')}: -{formatPrice(walletAmountApplied, displayCurrency)}
+                      </label>
+                    ) : null}
+                    <label className='block font-semibold'>
+                      {t('subscriptions:amountToCharge')}: {formatPrice(amountToCharge, displayCurrency)}
+                    </label>
+                  </>
+                ) : null}
+                {plan && checkoutData?.purchase_mode === 'duo' ? (
+                  <div className='mt-2 grid gap-1 text-sm text-gray-700'>
+                    <label className='block font-medium text-gray-900'>{t('payments:checkoutDuoSummaryTitle')}</label>
+                    <label className='block'>
+                      {t('payments:checkoutDuoPartner')}: {checkoutData.duo_partner_email}
+                    </label>
+                    {checkoutData.start_date ? (
+                      <label className='block'>
+                        {t('payments:checkoutDuoSharedStart', { date: format(checkoutData.start_date, 'yyyy-MM-dd') })}
+                      </label>
+                    ) : null}
+                  </div>
+                ) : plan && checkoutData?.is_gift ? (
+                  <div className='mt-2 grid gap-1 text-sm text-gray-700'>
+                    <label className='block font-medium text-gray-900'>{t('gifts:checkoutGiftSummaryTitle')}</label>
+                    <label className='block'>
+                      {t('gifts:recipientLabel')}: {checkoutData.gift_recipient_name} (
+                      {checkoutData.gift_recipient_email})
+                    </label>
+                    {checkoutData.gift_is_anonymous ? (
+                      <label className='block'>{t('gifts:anonymousSender')}</label>
+                    ) : checkoutData.gift_sender_display_name ? (
+                      <label className='block'>
+                        {t('gifts:fromSender', { name: checkoutData.gift_sender_display_name })}
+                      </label>
+                    ) : null}
+                    {checkoutData.gift_message ? (
+                      <label className='block'>
+                        {t('gifts:messageLabel')}: {checkoutData.gift_message}
+                      </label>
+                    ) : null}
+                    <label className='block text-gray-600'>{t('gifts:startDateGiftNote')}</label>
+                  </div>
+                ) : plan && checkoutData?.start_date ? (
                   <label className='block'>
-                    {t('payments:checkoutDuoSharedStart', { date: format(checkoutData.start_date, 'yyyy-MM-dd') })}
+                    {t('payments:startDate')}: {format(checkoutData.start_date, 'yyyy-MM-dd')}
                   </label>
                 ) : null}
               </div>
-            ) : plan && checkoutData?.is_gift ? (
-              <div className='mt-2 grid gap-1 text-sm text-gray-700'>
-                <label className='block font-medium text-gray-900'>{t('gifts:checkoutGiftSummaryTitle')}</label>
-                <label className='block'>
-                  {t('gifts:recipientLabel')}: {checkoutData.gift_recipient_name} ({checkoutData.gift_recipient_email})
-                </label>
-                {checkoutData.gift_is_anonymous ? (
-                  <label className='block'>{t('gifts:anonymousSender')}</label>
-                ) : checkoutData.gift_sender_display_name ? (
-                  <label className='block'>
-                    {t('gifts:fromSender', { name: checkoutData.gift_sender_display_name })}
-                  </label>
-                ) : null}
-                {checkoutData.gift_message ? (
-                  <label className='block'>
-                    {t('gifts:messageLabel')}: {checkoutData.gift_message}
-                  </label>
-                ) : null}
-                <label className='block text-gray-600'>{t('gifts:startDateGiftNote')}</label>
+            )}
+
+            {isWalletMethod ? (
+              <div className='rounded-md border border-primary/20 bg-primary/5 p-3 text-sm text-gray-700'>
+                <p className='font-semibold text-primary'>{t('subscriptions:walletFullyCoveredNote')}</p>
               </div>
-            ) : plan && checkoutData?.start_date ? (
-              <label className='block'>
-                {t('payments:startDate')}: {format(checkoutData.start_date, 'yyyy-MM-dd')}
-              </label>
             ) : null}
-          </div>
 
-          {isWalletMethod ? (
-            <div className='rounded-md border border-primary/20 bg-primary/5 p-3 text-sm text-gray-700'>
-              <p className='font-semibold text-primary'>{t('subscriptions:walletFullyCoveredNote')}</p>
-            </div>
-          ) : null}
-
-          {isCardMethod ? (
-            <div className='rounded-md border border-primary/20 bg-primary/5 p-3 text-sm text-gray-700'>
-              <p className='font-semibold text-primary'>{t(`payments:instructions.${paymentMethod}.title`)}</p>
-              <p className='mt-1'>{t(`payments:instructions.${paymentMethod}.description`)}</p>
-            </div>
-          ) : null}
-        </section>
+            {isCardMethod ? (
+              <div className='rounded-md border border-primary/20 bg-primary/5 p-3 text-sm text-gray-700'>
+                <p className='font-semibold text-primary'>{t(`payments:instructions.${paymentMethod}.title`)}</p>
+                <p className='mt-1'>{t(`payments:instructions.${paymentMethod}.description`)}</p>
+              </div>
+            ) : null}
+          </section>
+        ) : null}
 
         {requiresProof ? <TransferPaymentInstructions /> : null}
 
@@ -415,6 +422,7 @@ export function CheckoutPaymentProofForm({
         <Button
           type='submit'
           color='primary'
+          variant='solid'
           isLoading={isBusy}
           disabled={requiresProof && !selectedProofFile}
           onClick={() => onConfirm()}

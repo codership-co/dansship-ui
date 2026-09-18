@@ -29,6 +29,7 @@ import { addSentryBreadcrumb, clearSentryUser, setSentryUser } from '@core/sentr
 import {
   consumePendingGiftClaimToken,
   getPendingPlanCheckoutIntent,
+  getPendingTallerCheckoutIntent,
   isValidReturnPath,
   resolveBrowserPreferredLanguage,
   resolvePostLoginPath,
@@ -619,6 +620,12 @@ export function SecurityGuard(
         pathname !== PageURLS.auth.verifyInstructor
       ) {
         return <Navigate to={PageURLS.auth.onboarding} state={{ from: location }} />;
+      }
+
+      const pendingTallerSlug = getPendingTallerCheckoutIntent();
+
+      if (isAuthenticated && pendingTallerSlug && pathname !== PageURLS.tallerLanding(pendingTallerSlug)) {
+        return <Navigate to={PageURLS.tallerLanding(pendingTallerSlug)} state={{ from: location }} />;
       }
 
       if (isAuthenticated && getPendingPlanCheckoutIntent() && pathname !== PageURLS.plans) {

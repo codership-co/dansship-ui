@@ -119,6 +119,10 @@ function AdminAgendaPage() {
       value: 'blocked_space',
       label: t('admin:agenda.filters.blockedSpace', { defaultValue: 'Blocked Space' }),
     },
+    {
+      value: 'workshop',
+      label: t('admin:agenda.filters.workshop', { defaultValue: 'Taller' }),
+    },
   ];
 
   return (
