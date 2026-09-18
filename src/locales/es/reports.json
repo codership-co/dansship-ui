@@ -80,7 +80,8 @@
     "purchaseTypes": {
       "plan": "Plan",
       "merch": "Merch",
-      "studioRental": "Alquiler de estudio"
+      "studioRental": "Alquiler de estudio",
+      "workshop": "Taller"
     }
   },
   "tax": {
@@ -227,5 +228,17 @@
     "comment": "Comentario",
     "empty": "No hay calificaciones en este período.",
     "anonymousName": "Estudiante sin nombre"
+  },
+  "workshops": {
+    "revenueTitle": "Ingresos de talleres y combos",
+    "byOfferingTitle": "Ingresos por taller o combo",
+    "fillTitle": "Ocupación de talleres",
+    "offering": "Oferta",
+    "kind": "Tipo",
+    "workshop": "Taller",
+    "combo": "Combo",
+    "when": "Fecha",
+    "emptyRevenue": "No hay pagos de talleres en este período.",
+    "emptyFill": "No hay talleres en este período."
   }
 }

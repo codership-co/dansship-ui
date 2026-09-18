@@ -118,6 +118,7 @@
         "subscriptions": "Suscripciones",
         "payments": "Pagos",
         "bookings": "Reservas",
+        "talleres": "Talleres",
         "benefits": "Beneficios",
         "wallet": "Billetera",
         "paymentDocuments": "Documentos de pago",
@@ -136,7 +137,10 @@
         "reimbursed": "Reembolsada",
         "actions": "Acciones",
         "benefit": "Beneficio",
-        "grantedAt": "Otorgado"
+        "grantedAt": "Otorgado",
+        "taller": "Taller",
+        "origin": "Origen",
+        "ticketPrice": "Precio del ticket"
       },
       "reimburse": "Reembolsar",
       "reimburseConfirmTitle": "¿Reembolsar esta clase?",
@@ -157,6 +161,8 @@
         "failed": "No se pudo extender la suscripción."
       },
       "emptyBookings": "Este usuario no tiene reservas.",
+      "emptyTalleres": "Este usuario no tiene inscripciones a talleres.",
+      "comboAlsoIncludes": "también incluye {{names}}",
       "emptyBenefits": "Este usuario no tiene beneficios aplicados.",
       "wallet": {
         "balanceLabel": "Saldo disponible",
@@ -378,6 +384,7 @@
       "instructors": "Instructores",
       "classFeedback": "CSAT de clases",
       "rentals": "Alquiler de estudio",
+      "talleres": "Talleres",
       "dashboard": "Operaciones",
       "instructorPerformance": "Instructores",
       "classCancellations": "Cancelaciones de Clases",

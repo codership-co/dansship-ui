@@ -2,20 +2,30 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
-import { Section } from '@components/containers';
+import { Section, SectionHeading } from '@components/containers';
 import { ConfirmDialog } from '@components/modals';
 import { ClassCsatFields, formatClassCsatHeadline } from '@components/modules/campaigns/class-csat-form';
 import {
-  HistoryBookingCard,
   HistoryListSkeleton,
-  NextClassHero,
-  UpcomingBookingCard,
+  HistoryReservationCard,
+  NextReservationHero,
   UpcomingListSkeleton,
+  UpcomingReservationCard,
 } from '@components/modules/my-bookings';
 import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useStudentSession } from '@contexts';
-import { DansshipAPI, MyBooking } from '@core/api';
+import { DansshipAPI, MyBooking, type RentalRequest, type RentalSeries } from '@core/api';
 import { PageURLS } from '@core/constants';
+import {
+  classReservation,
+  isUpcomingRental,
+  isUpcomingRentalSeries,
+  rentalReservation,
+  rentalSeriesReservation,
+  sortReservationsAscending,
+  sortReservationsDescending,
+  workshopReservation,
+} from '@helpers';
 import { useMyBookings, useMyBookingsHistory, usePromise } from '@hooks';
 
 function BookingsPage() {
@@ -23,7 +33,7 @@ function BookingsPage() {
   const {
     bookings: upcomingBookings,
     bookingsResponse: upcomingResponse,
-    isLoadingBookings: isLoadingUpcoming,
+    isLoadingBookings: isLoadingUpcomingClasses,
     bookingsError: upcomingError,
     reFetchBookings: reFetchUpcoming,
   } = useStudentSession();
@@ -32,8 +42,8 @@ function BookingsPage() {
   );
   const {
     items: historyItems,
-    total: historyTotal,
-    isLoading: isLoadingHistory,
+    total: historyClassTotal,
+    isLoading: isLoadingHistoryClasses,
     isLoadingMore,
     error: historyError,
     hasMore,
@@ -41,6 +51,19 @@ function BookingsPage() {
     reFetch: reFetchHistory,
   } = useMyBookingsHistory();
   const { cancelClass, isCancelingClass } = useMyBookings();
+  const { response: workshopUpcomingResponse, isLoading: isLoadingWorkshopUpcoming } = usePromise(() =>
+    DansshipAPI.talleres.listMyRegistrations({ scope: 'upcoming' }),
+  );
+  const { response: workshopHistoryResponse, isLoading: isLoadingWorkshopHistory } = usePromise(() =>
+    DansshipAPI.talleres.listMyRegistrations({ scope: 'history' }),
+  );
+  const { response: rentalRequestsResponse, isLoading: isLoadingRentalRequests } = usePromise(() =>
+    DansshipAPI.studioRental.getMyRequests(),
+  );
+  const { response: rentalSeriesResponse, isLoading: isLoadingRentalSeries } = usePromise(() =>
+    DansshipAPI.studioRental.getMySeries(),
+  );
+  const { response: roomsResponse } = usePromise(() => DansshipAPI.studioRental.getRooms());
   const [bookingToCancel, setBookingToCancel] = useState<MyBooking | null>(null);
   const [bookingToRate, setBookingToRate] = useState<MyBooking | null>(null);
   const [isRefreshingBookings, setIsRefreshingBookings] = useState(false);
@@ -52,8 +75,59 @@ function BookingsPage() {
     [myFeedbackResponse?.data?.items],
   );
 
-  const nextClass = upcomingBookings[0] ?? null;
-  const furtherUpcoming = upcomingBookings.slice(1);
+  const roomNameById = useMemo(() => {
+    const dictionary: Record<string, string> = {};
+
+    (roomsResponse?.data ?? []).forEach(room => {
+      dictionary[room.id] = room.name;
+    });
+
+    return dictionary;
+  }, [roomsResponse?.data]);
+
+  const rentalRequests = useMemo(
+    () => (rentalRequestsResponse?.data ?? []) as Array<RentalRequest>,
+    [rentalRequestsResponse?.data],
+  );
+  const rentalSeries = useMemo(
+    () => (rentalSeriesResponse?.data ?? []) as Array<RentalSeries>,
+    [rentalSeriesResponse?.data],
+  );
+
+  const upcomingItems = useMemo(() => {
+    const classes = upcomingBookings.map(classReservation);
+    const workshops = (workshopUpcomingResponse?.data ?? []).map(workshopReservation);
+    const rentals = rentalRequests
+      .filter(request => isUpcomingRental(request))
+      .map(request => rentalReservation(request, roomNameById[request.slots[0]?.room_id] ?? ''));
+    const series = rentalSeries
+      .filter(item => isUpcomingRentalSeries(item))
+      .map(item => rentalSeriesReservation(item, roomNameById[item.room_id] ?? ''));
+
+    return sortReservationsAscending([...classes, ...workshops, ...rentals, ...series]);
+  }, [upcomingBookings, workshopUpcomingResponse?.data, rentalRequests, rentalSeries, roomNameById]);
+
+  const extraHistory = useMemo(() => {
+    const workshops = (workshopHistoryResponse?.data ?? []).map(workshopReservation);
+    const rentals = rentalRequests
+      .filter(request => !isUpcomingRental(request))
+      .map(request => rentalReservation(request, roomNameById[request.slots[0]?.room_id] ?? ''));
+    const series = rentalSeries
+      .filter(item => !isUpcomingRentalSeries(item))
+      .map(item => rentalSeriesReservation(item, roomNameById[item.room_id] ?? ''));
+
+    return [...workshops, ...rentals, ...series];
+  }, [workshopHistoryResponse?.data, rentalRequests, rentalSeries, roomNameById]);
+
+  const historyReservations = useMemo(
+    () => sortReservationsDescending([...historyItems.map(classReservation), ...extraHistory]),
+    [historyItems, extraHistory],
+  );
+
+  const nextReservation = upcomingItems[0] ?? null;
+  const furtherUpcoming = upcomingItems.slice(1);
+  const historyLoaded = historyReservations.length;
+  const historyTotal = historyClassTotal + extraHistory.length;
 
   useEffect(() => {
     if (!hasMore) {
@@ -78,7 +152,7 @@ function BookingsPage() {
     observer.observe(node);
 
     return () => observer.disconnect();
-  }, [hasMore, loadNextPage, historyItems.length]);
+  }, [hasMore, loadNextPage, historyReservations.length]);
 
   const handleConfirmCancel = async () => {
     if (!bookingToCancel) return;
@@ -96,25 +170,38 @@ function BookingsPage() {
     }
   };
 
-  const upcomingFailed = Boolean(upcomingError || upcomingResponse?.error);
-  const historyFailed = Boolean(historyError);
+  const isLoadingUpcoming =
+    (isLoadingUpcomingClasses && !upcomingResponse) ||
+    (isLoadingWorkshopUpcoming && !workshopUpcomingResponse) ||
+    (isLoadingRentalRequests && !rentalRequestsResponse) ||
+    (isLoadingRentalSeries && !rentalSeriesResponse);
+  const isLoadingHistory =
+    (isLoadingHistoryClasses && historyItems.length === 0) ||
+    (isLoadingWorkshopHistory && !workshopHistoryResponse) ||
+    (isLoadingRentalRequests && !rentalRequestsResponse) ||
+    (isLoadingRentalSeries && !rentalSeriesResponse);
+  const upcomingFailed =
+    upcomingItems.length === 0 &&
+    Boolean(upcomingError || upcomingResponse?.error) &&
+    Boolean(workshopUpcomingResponse && !workshopUpcomingResponse.ok) &&
+    Boolean(rentalRequestsResponse && !rentalRequestsResponse.ok);
+  const historyFailed =
+    historyReservations.length === 0 &&
+    Boolean(historyError) &&
+    Boolean(workshopHistoryResponse && !workshopHistoryResponse.ok) &&
+    Boolean(rentalRequestsResponse && !rentalRequestsResponse.ok);
 
   const upcomingHeading =
-    upcomingBookings.length === 1
+    upcomingItems.length === 1
       ? t('bookings:nextClassSection')
-      : upcomingBookings.length > 1
-        ? `${t('bookings:upcomingSection')} · ${upcomingBookings.length}`
+      : upcomingItems.length > 1
+        ? `${t('bookings:upcomingSection')} · ${upcomingItems.length}`
         : t('bookings:upcomingSection');
 
   return (
     <>
       <Section navbarPadding className='overflow-x-hidden pb-10'>
-        <header className='mb-6 flex flex-col gap-1'>
-          <h1 className='m-0 font-title text-[1.625rem] leading-[1.1] font-bold text-foreground'>
-            {t('bookings:myBookingsTitle')}
-          </h1>
-          <p className='m-0 text-[13px] leading-[1.4] text-muted-foreground'>{t('bookings:myBookingsSubtitle')}</p>
-        </header>
+        <SectionHeading title={t('bookings:myBookingsTitle')} subtitle={t('bookings:myBookingsSubtitle')} />
 
         <section className='mb-8 flex flex-col gap-2.5'>
           <div className='flex items-center gap-2'>
@@ -124,29 +211,29 @@ function BookingsPage() {
             </h2>
           </div>
 
-          {isLoadingUpcoming && !upcomingResponse ? (
+          {isLoadingUpcoming && upcomingItems.length === 0 ? (
             <UpcomingListSkeleton />
           ) : upcomingFailed ? (
             <p className='text-alert-600'>{t('bookings:loadError')}</p>
-          ) : upcomingBookings.length === 0 ? (
+          ) : upcomingItems.length === 0 ? (
             <p className='rounded-2xl border border-dashed border-primary/20 bg-white/60 px-6 py-10 text-center text-muted-foreground'>
               {t('bookings:emptyUpcoming')}
             </p>
           ) : (
             <div className='space-y-3'>
-              {nextClass ? (
-                <NextClassHero
-                  booking={nextClass}
+              {nextReservation ? (
+                <NextReservationHero
+                  item={nextReservation}
                   isCancelDisabled={isCancelingClass || isRefreshingBookings}
-                  onCancel={setBookingToCancel}
+                  onCancelClass={setBookingToCancel}
                 />
               ) : null}
-              {furtherUpcoming.map(booking => (
-                <UpcomingBookingCard
-                  key={booking.id}
-                  booking={booking}
+              {furtherUpcoming.map(item => (
+                <UpcomingReservationCard
+                  key={item.id}
+                  item={item}
                   isCancelDisabled={isCancelingClass || isRefreshingBookings}
-                  onCancel={setBookingToCancel}
+                  onCancelClass={setBookingToCancel}
                 />
               ))}
             </div>
@@ -160,27 +247,27 @@ function BookingsPage() {
             </h2>
             {!isLoadingHistory && historyTotal > 0 ? (
               <p className='shrink-0 text-[11px] text-muted-foreground'>
-                {t('bookings:historyCount', { loaded: historyItems.length, total: historyTotal })}
+                {t('bookings:historyCount', { loaded: historyLoaded, total: historyTotal })}
               </p>
             ) : null}
           </div>
 
-          {isLoadingHistory && historyItems.length === 0 ? (
+          {isLoadingHistory && historyReservations.length === 0 ? (
             <HistoryListSkeleton />
-          ) : historyFailed && historyItems.length === 0 ? (
+          ) : historyFailed ? (
             <p className='text-alert-600'>{t('bookings:loadError')}</p>
-          ) : historyItems.length === 0 ? (
+          ) : historyReservations.length === 0 ? (
             <p className='rounded-2xl border border-dashed border-primary/20 bg-white/60 px-6 py-10 text-center text-muted-foreground'>
               {t('bookings:emptyHistory')}
             </p>
           ) : (
             <div className='space-y-3'>
-              {historyItems.map(booking => (
-                <HistoryBookingCard
-                  key={booking.id}
-                  booking={booking}
-                  alreadyRated={ratedClassIds.has(booking.scheduled_class.id)}
-                  onRate={setBookingToRate}
+              {historyReservations.map(item => (
+                <HistoryReservationCard
+                  key={item.id}
+                  item={item}
+                  alreadyRated={item.kind === 'class' ? ratedClassIds.has(item.booking.scheduled_class.id) : false}
+                  onRateClass={setBookingToRate}
                 />
               ))}
               {hasMore ? (

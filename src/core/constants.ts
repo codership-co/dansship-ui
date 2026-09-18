@@ -126,6 +126,11 @@ export const PageURLS = {
     studioRental: '/admin/studio-rental',
     doorCode: '/admin/door-code',
     campaigns: '/admin/campaigns',
+    talleres: '/admin/workshops',
+    tallerNew: '/admin/workshops/new',
+    tallerEdit: (id: string) => `/admin/workshops/${id}`,
+    tallerComboNew: '/admin/workshops/combos/new',
+    tallerComboEdit: (id: string) => `/admin/workshops/combos/${id}`,
   },
   figures: '/figures',
   figuresById: (id: string | number) => `/figures/${id}`,
@@ -141,4 +146,6 @@ export const PageURLS = {
   studioRentalBrowse: '/studio-rental/browse',
   studioRentalRequests: '/studio-rental/requests',
   studioRentalResult: '/studio-rental/result',
+  talleres: '/workshops',
+  tallerLanding: (slug: string) => `/workshops/${slug}`,
 } as const;

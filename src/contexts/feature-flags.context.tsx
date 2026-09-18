@@ -21,6 +21,7 @@ export enum FEATURE_FLAG {
   isProfileEditPageEnabled = 'isProfileEditPageEnabled',
   isStudioRentalBrowsePageEnabled = 'isStudioRentalBrowsePageEnabled',
   isStudioRentalRequestsPageEnabled = 'isStudioRentalRequestsPageEnabled',
+  isTalleresPageEnabled = 'isTalleresPageEnabled',
 }
 
 interface UserPages {
@@ -36,6 +37,7 @@ interface UserPages {
   isProfileEditPageEnabled: boolean | string;
   isStudioRentalBrowsePageEnabled: boolean | string;
   isStudioRentalRequestsPageEnabled: boolean | string;
+  isTalleresPageEnabled?: boolean | string;
 }
 
 interface FeatureFlagsContextState extends UserPages {
@@ -81,6 +83,7 @@ export const FeatureFlagsProvider = ({ children }: FeatureFlagsProviderProps) =>
         isProfileEditPageEnabled: isUserOn && userPages.isProfileEditPageEnabled === true,
         isStudioRentalBrowsePageEnabled: isUserOn && userPages.isStudioRentalBrowsePageEnabled === true,
         isStudioRentalRequestsPageEnabled: isUserOn && userPages.isStudioRentalRequestsPageEnabled === true,
+        isTalleresPageEnabled: isUserOn && userPages.isTalleresPageEnabled !== false,
       }}
     >
       {children}

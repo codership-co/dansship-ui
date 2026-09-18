@@ -13,3 +13,6 @@ export * from './studio-rental.page';
 export * from './agenda-conflicts.page';
 export * from './schedule-builder.page';
 export * from './campaigns.page';
+export * from './talleres.page';
+export * from './taller-edit.page';
+export * from './taller-combo-edit.page';

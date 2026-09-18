@@ -26,6 +26,8 @@ const purchaseTypeLabel = (value: string, t: (key: string) => string) => {
 
   if (value === 'studio_rental') return t('reports:cash.purchaseTypes.studioRental');
 
+  if (value === 'workshop') return t('reports:cash.purchaseTypes.workshop');
+
   return value;
 };
 

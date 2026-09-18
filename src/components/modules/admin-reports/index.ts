@@ -4,6 +4,7 @@ export * from './operational-dashboard';
 export * from './financial-reports';
 export * from './student-reports';
 export * from './studio-rental-reports';
+export * from './workshop-reports';
 export * from './notification-settings';
 export * from './class-cancellations-table';
 export * from './class-feedback-table';

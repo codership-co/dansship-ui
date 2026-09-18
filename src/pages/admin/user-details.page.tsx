@@ -17,6 +17,7 @@ import {
   UserRolesManager,
   UserSubscriptionsTab,
   UserWalletTab,
+  UserWorkshopsTab,
 } from '@components/modules';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
@@ -29,6 +30,7 @@ const PROFILE_TAB = 'profile';
 const SUBSCRIPTIONS_TAB = 'subscriptions';
 const PAYMENTS_TAB = 'payments';
 const BOOKINGS_TAB = 'bookings';
+const TALLERES_TAB = 'talleres';
 const BENEFITS_TAB = 'benefits';
 const WALLET_TAB = 'wallet';
 const NOTES_TAB = 'notes';
@@ -47,6 +49,7 @@ function UserDetailsPage() {
   const canManageSubscriptions = useOrPermissions(AdminPermissions.subscriptions);
   const canManagePayments = useOrPermissions(AdminPermissions.payments);
   const canManageBookings = useOrPermissions(AdminPermissions.bookings);
+  const canManageTalleres = useOrPermissions(AdminPermissions.talleres);
   const canReadBenefits = useOrPermissions(AdminPermissions.benefits);
   const canManageWallet = useOrPermissions(AdminPermissions.wallet);
   const canManageUserContext = useOrPermissions(AdminPermissions.userContext);
@@ -70,6 +73,7 @@ function UserDetailsPage() {
     ...(canManageSubscriptions ? [SUBSCRIPTIONS_TAB] : []),
     ...(canManagePayments ? [PAYMENTS_TAB] : []),
     ...(canManageBookings ? [BOOKINGS_TAB] : []),
+    ...(canManageTalleres ? [TALLERES_TAB] : []),
     ...(canReadBenefits ? [BENEFITS_TAB] : []),
     ...(canManageWallet ? [WALLET_TAB] : []),
     ...(showPaymentDocuments ? [PAYMENT_DOCUMENTS_TAB] : []),
@@ -114,7 +118,9 @@ function UserDetailsPage() {
           <Tabs
             value={activeTab}
             onValueChange={value => {
-              setSearchParams(value === PROFILE_TAB ? {} : { tab: value }, { replace: true });
+              setSearchParams(value === PROFILE_TAB ? {} : { tab: value }, {
+                replace: true,
+              });
             }}
           >
             <TabsList className='mb-4 h-auto max-w-full flex-nowrap justify-start gap-1 overflow-x-auto border border-gray-200 bg-white p-1 shadow-sm [&_[data-slot=tabs-trigger]]:flex-none'>
@@ -130,6 +136,9 @@ function UserDetailsPage() {
               ) : null}
               {canManageBookings ? (
                 <TabsTrigger value={BOOKINGS_TAB}>{t('admin:users.details.tabs.bookings')}</TabsTrigger>
+              ) : null}
+              {canManageTalleres ? (
+                <TabsTrigger value={TALLERES_TAB}>{t('admin:users.details.tabs.talleres')}</TabsTrigger>
               ) : null}
               {canReadBenefits ? (
                 <TabsTrigger value={BENEFITS_TAB}>{t('admin:users.details.tabs.benefits')}</TabsTrigger>
@@ -183,6 +192,12 @@ function UserDetailsPage() {
             {canManageBookings ? (
               <TabsContent value={BOOKINGS_TAB}>
                 {activeTab === BOOKINGS_TAB && userId ? <UserBookingsTab userId={userId} /> : null}
+              </TabsContent>
+            ) : null}
+
+            {canManageTalleres ? (
+              <TabsContent value={TALLERES_TAB}>
+                {activeTab === TALLERES_TAB && userId ? <UserWorkshopsTab userId={userId} /> : null}
               </TabsContent>
             ) : null}
 

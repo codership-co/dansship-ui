@@ -9,6 +9,8 @@ import type { ScheduledClass, AgendaEvent, ScheduleStatus } from '@core/api';
 
 export type GridEvent = ScheduledClass | AgendaEvent;
 
+export type RosterTarget = { kind: 'class' | 'workshop'; id: string };
+
 export type HourRangeSelection = {
   date: string;
   /** Inclusive start hour (0–23). */
@@ -27,8 +29,8 @@ interface ScheduleGridProps {
   onSlotClick?: (date: string, timeHour: number) => void;
   onClassClick?: (event: GridEvent) => void;
   onAddAtTime?: (date: string, time: string) => void;
-  /** Admin-only: open the class roster without leaving the calendar. */
-  onViewRoster?: (classId: string) => void;
+  /** Admin-only: open the class or workshop roster without leaving the calendar. */
+  onViewRoster?: (target: RosterTarget) => void;
   dayColumnMinWidth?: number;
   scheduleStatus?: ScheduleStatus;
   /** Emphasizes a specific scheduled class in the grid (e.g. next upcoming). */
@@ -519,8 +521,13 @@ export function ScheduleGrid({
                 const isMuted = isClassPast || isClassCancelled;
                 const isHighlighted = Boolean(highlightedClassId && id === highlightedClassId);
                 const occupancyKind = 'event_type' in cls ? cls.metadata?.kind : undefined;
-                const scheduledClassId = 'event_type' in cls ? null : cls.id;
-                const showRosterIcon = Boolean(onViewRoster && scheduledClassId);
+                const rosterTarget: RosterTarget | null =
+                  'event_type' in cls
+                    ? cls.event_type === 'workshop'
+                      ? { kind: 'workshop', id: cls.source_id }
+                      : null
+                    : { kind: 'class', id: cls.id };
+                const showRosterIcon = Boolean(onViewRoster && rosterTarget);
 
                 let bgClass =
                   'bg-secondary/40 border-secondary hover:bg-secondary/60 hover:border-primary/40 text-primary';
@@ -538,12 +545,30 @@ export function ScheduleGrid({
                 } else if (eventType === 'internal_reserved_use') {
                   bgClass =
                     'bg-purple-100 border-purple-300 hover:bg-purple-200 hover:border-purple-400 text-purple-900';
+                } else if (eventType === 'workshop') {
+                  bgClass = 'bg-amber-100 border-amber-300 hover:bg-amber-200 hover:border-amber-400 text-amber-950';
                 }
 
                 return (
                   <div
                     key={id}
-                    onClick={() => (isClassCancelled || !isClassPast) && onClassClick?.(cls)}
+                    onClick={() => {
+                      if (eventType === 'workshop') {
+                        if (rosterTarget) {
+                          onViewRoster?.(rosterTarget);
+                        }
+
+                        return;
+                      }
+
+                      if ('event_type' in cls) {
+                        return;
+                      }
+
+                      if (isClassCancelled || !isClassPast) {
+                        onClassClick?.(cls);
+                      }
+                    }}
                     className={`group absolute rounded shadow-sm p-1 z-20 flex flex-col ${
                       enableRangeSelect ? 'pointer-events-none' : ''
                     } ${
@@ -559,13 +584,13 @@ export function ScheduleGrid({
                     }}
                     title={classInstructor ? `${className} with ${classInstructor}` : className}
                   >
-                    {showRosterIcon && scheduledClassId ? (
+                    {showRosterIcon && rosterTarget ? (
                       <button
                         type='button'
                         className='absolute left-1 top-1 z-30 flex h-5 w-5 pointer-events-auto items-center justify-center rounded bg-primary text-primary-foreground hover:bg-primary/90'
                         onClick={event => {
                           event.stopPropagation();
-                          onViewRoster?.(scheduledClassId);
+                          onViewRoster?.(rosterTarget);
                         }}
                         title={t('admin:users.details.viewRoster')}
                         aria-label={t('admin:users.details.viewRoster')}

@@ -258,6 +258,7 @@ export function CheckoutPayForm({
           <Button
             disabled={!termsAndConditions || (!isWalletCovered && !paymentMethod)}
             color='primary'
+            variant='solid'
             className='flex items-center'
           >
             {t('common:next')}

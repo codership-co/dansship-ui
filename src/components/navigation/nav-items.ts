@@ -1,5 +1,13 @@
 import { GrSchedules } from 'react-icons/gr';
-import { LuBellElectric, LuBookImage, LuCalendarHeart, LuDoorOpen, LuFootprints, LuUser } from 'react-icons/lu';
+import {
+  LuBellElectric,
+  LuBookImage,
+  LuCalendarClock,
+  LuCalendarHeart,
+  LuDoorOpen,
+  LuFootprints,
+  LuUser,
+} from 'react-icons/lu';
 
 import { FEATURE_FLAG } from '@contexts';
 import { PageURLS } from '@core/constants';
@@ -38,6 +46,7 @@ export function getAdminMenuPermissions(): Array<PERMISSION> {
     ...AdminPermissions.users,
     ...AdminPermissions.studioRental,
     ...AdminPermissions.campaigns,
+    ...AdminPermissions.talleres,
   ];
 }
 
@@ -71,6 +80,12 @@ export function getPrimaryNavItems(t: Translate, { isAuthenticated }: PrimaryNav
           label: t('nav:navPlans'),
           featureFlags: [FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
           icon: LuBellElectric,
+        },
+        {
+          to: PageURLS.talleres,
+          label: t('nav:talleres'),
+          featureFlags: [FEATURE_FLAG.isTalleresPageEnabled],
+          icon: LuCalendarClock,
         },
         {
           to: PageURLS.figures,
@@ -114,6 +129,12 @@ export function getPrimaryNavItems(t: Translate, { isAuthenticated }: PrimaryNav
           requireAuthentication: true,
           featureFlags: [FEATURE_FLAG.isMyAccountSubscriptionPageEnabled],
           icon: LuBellElectric,
+        },
+        {
+          to: PageURLS.talleres,
+          label: t('nav:talleres'),
+          featureFlags: [FEATURE_FLAG.isTalleresPageEnabled],
+          icon: LuCalendarClock,
         },
       ];
 }

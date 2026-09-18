@@ -59,6 +59,7 @@
   "deleteClassConfirm": "Esto eliminará permanentemente la clase programada de esta semana.",
   "saveClass": "Guardar Clase",
   "classRoster": "Lista de {{name}}",
+  "workshopRoster": "Inscritos de {{name}}",
   "rosterDescription": "Consulta alumnos inscritos y registra asistencia después del inicio de clase.",
   "publishedSuccess": "Horario publicado exitosamente",
   "publishFailed": "Error al publicar el horario",
@@ -106,7 +107,8 @@
       "studioClass": "Clase de estudio",
       "externalRental": "Renta externa",
       "internalReservedUse": "Uso interno reservado",
-      "blockedSpace": "Espacio bloqueado"
+      "blockedSpace": "Espacio bloqueado",
+      "workshop": "Taller"
     }
   }
 }

@@ -277,6 +277,30 @@ export interface StudioRentalMixReport {
   items: Array<StudioRentalMixItem>;
 }
 
+export interface WorkshopRevenueByOfferingItem extends MoneyTotals {
+  offering_type: 'workshop' | 'combo' | string;
+  offering_id: string;
+  offering_name: string;
+}
+
+export interface WorkshopRevenueReport {
+  totals: MoneyTotals;
+  by_offering: Array<WorkshopRevenueByOfferingItem>;
+}
+
+export interface WorkshopFillItem {
+  workshop_id: string;
+  workshop_name: string;
+  starts_at: string;
+  capacity: number;
+  holding_registrations: number;
+  fill_rate: number;
+}
+
+export interface WorkshopFillReport {
+  items: Array<WorkshopFillItem>;
+}
+
 export interface InstructorPerformanceRow {
   instructor_id: string;
   instructor_name: string;

@@ -31,6 +31,8 @@ import { StudioRentalAdminAPI } from './studio-rental/studio-rental.admin.api';
 import { StudioRentalAPI } from './studio-rental/studio-rental.api';
 import { SubscriptionsAdminAPI } from './subscriptions/subscriptions.admin.api';
 import { SubscriptionsAPI } from './subscriptions/subscriptions.api';
+import { TalleresAdminAPI } from './talleres/talleres.admin.api';
+import { TalleresAPI } from './talleres/talleres.api';
 import { UserContextAdminAPI } from './user-context/user-context.admin.api';
 import { UsersAdminAPI } from './users/users.admin.api';
 import { WalletsAdminAPI, WalletsAPI } from './wallets/wallets.api';
@@ -84,6 +86,8 @@ export class DansshipAPI {
   static studioRentalAdmin = new StudioRentalAdminAPI(this.httpClient);
   static subscriptions = new SubscriptionsAPI(this.httpClient);
   static subscriptionsAdmin = new SubscriptionsAdminAPI(this.httpClient);
+  static talleres = new TalleresAPI(this.httpClient);
+  static talleresAdmin = new TalleresAdminAPI(this.httpClient);
   static usersAdmin = new UsersAdminAPI(this.httpClient);
   static userContextAdmin = new UserContextAdminAPI(this.httpClient);
   static rbacAdmin = new RbacAdminAPI(this.httpClient);

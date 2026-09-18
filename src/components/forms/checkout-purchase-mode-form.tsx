@@ -479,7 +479,7 @@ export function CheckoutPurchaseModeForm({
           {t('common:cancel')}
         </Button>
 
-        <Button isLoading={isLoading} color='primary' className='flex items-center'>
+        <Button isLoading={isLoading} color='primary' variant='solid' className='flex items-center'>
           {t('common:next')}
           <LuArrowRight />
         </Button>

@@ -17,4 +17,5 @@ export * from './class-level';
 export * from './roster';
 export * from './class-feedback';
 export * from './my-bookings';
+export * from './reservations';
 export * from './chunk-load';
