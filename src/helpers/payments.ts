@@ -1,5 +1,5 @@
 export function formatPrice(amount: number, currency: string): string {
-  return new Intl.NumberFormat(undefined, {
+  return new Intl.NumberFormat('es-CO', {
     style: 'currency',
     currency,
     maximumFractionDigits: 2,

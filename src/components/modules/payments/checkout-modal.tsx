@@ -60,6 +60,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
   const navigate = useNavigate();
   const [step, setStep] = useState<CheckoutStep>(CheckoutStep.MODE);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
+  const [isQuarterly, setIsQuarterly] = useState(false);
   const [checkoutData, setCheckoutData] = useState<CheckoutFormValues>({
     ...defaultCheckoutFormValues,
     start_date: new Date(),
@@ -74,8 +75,12 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
   const isGiftCheckout = checkoutData.is_gift;
   const planSubtitle = t('subscriptions:checkoutPlanSubtitle', {
     name: plan.name,
-    validity: t('subscriptions:validForDays', { count: plan.validity_days }),
+    validity: t('subscriptions:validForDays', { count: isQuarterly ? 90 : plan.validity_days }),
   });
+
+  const handleQuarterlyChange = useCallback((nextIsQuarterly: boolean) => {
+    setIsQuarterly(nextIsQuarterly);
+  }, []);
 
   const applyPaymentPreview = useCallback((nextPaymentData: PaymentData) => {
     setPaymentData(nextPaymentData);
@@ -94,6 +99,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
   const handleModeSubmit = useCallback(
     async (data: CheckoutFormValues, nextPaymentData: PaymentData) => {
       setCheckoutData(data);
+      setIsQuarterly(Boolean(data.is_quarterly) && data.purchase_mode !== 'duo');
       applyPaymentPreview(nextPaymentData);
 
       if (data.is_gift) {
@@ -141,6 +147,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
             onCancel={onClose}
             onSubmit={handleModeSubmit}
             defaultFormValues={checkoutData}
+            onQuarterlyChange={handleQuarterlyChange}
           />
         </section>
       ),
@@ -193,6 +200,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
           finalPrice={paymentData.finalPrice}
           amountToCharge={paymentData.amountToCharge}
           walletAmountApplied={paymentData.walletAmountApplied}
+          originalPrice={paymentData.originalPrice}
           onClose={onClose}
           onBack={() => setStep(CheckoutStep.PAY)}
           onSubmit={(intentId: string) => {

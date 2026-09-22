@@ -6,7 +6,7 @@ import { LuArrowLeft, LuArrowRight } from 'react-icons/lu';
 import { z } from 'zod';
 
 import { PaymentMethodSelector } from '@components/modules/payments/payment-method-selector';
-import { PaymentMethod, PublicPlan } from '@core/api';
+import { PaymentMethod, PublicPlan, type AppliedDiscountMapped } from '@core/api';
 import { formatPrice } from '@helpers';
 
 export const createCheckoutReviewSchema = (t: TFunction) =>
@@ -23,6 +23,7 @@ export const createCheckoutReviewSchema = (t: TFunction) =>
       gift_is_anonymous: z.boolean(),
       gift_sender_display_name: z.string(),
       duo_partner_email: z.string(),
+      is_quarterly: z.boolean(),
     })
     .superRefine((data, ctx) => {
       if (data.purchase_mode === 'gift') {
@@ -84,6 +85,7 @@ export type CheckoutFormValues = z.infer<ReturnType<typeof createCheckoutReviewS
 export interface PaymentData {
   discountCode: string;
   discountBenefitCode: string | null;
+  appliedDiscounts: Array<AppliedDiscountMapped>;
   taxContext: string;
   discountContext: string;
   error: string;
@@ -106,6 +108,7 @@ export const DefaultPaymentData: PaymentData = {
   discountContext: '',
   discountCode: '',
   discountBenefitCode: null,
+  appliedDiscounts: [],
   error: '',
   isValid: false,
   discountValue: 0,
@@ -133,7 +136,48 @@ export const defaultCheckoutFormValues: CheckoutFormValues = {
   gift_is_anonymous: false,
   gift_sender_display_name: '',
   duo_partner_email: '',
+  is_quarterly: false,
 };
+
+function discountLineLabel(t: TFunction, discount: AppliedDiscountMapped): string {
+  if (discount.code === 'QUARTERLY_PCT_10') {
+    return t('subscriptions:discountQuarterly');
+  }
+
+  if (discount.code === 'REFERRAL_FIXED_20000') {
+    return t('subscriptions:discountReferral');
+  }
+
+  if (discount.code === 'FIRST_PLAN_PCT_10') {
+    return t('subscriptions:discountFirstPlan');
+  }
+
+  if (discount.type === 'percentage_discount' || discount.type === 'percentage') {
+    return t('subscriptions:discountCode');
+  }
+
+  return t('subscriptions:discount');
+}
+
+function isPercentageDiscount(discount: AppliedDiscountMapped): boolean {
+  return discount.type === 'percentage_discount' || discount.type === 'percentage';
+}
+
+function discountLineAmount(discount: AppliedDiscountMapped, currency: string): string {
+  if (discount.calculatedAmount > 0) {
+    return `-${formatPrice(discount.calculatedAmount, currency)}`;
+  }
+
+  if (discount.type === 'fixed_discount' || discount.type === 'fixed_amount') {
+    return `-${formatPrice(discount.value, currency)}`;
+  }
+
+  if (isPercentageDiscount(discount)) {
+    return `-${discount.value}%`;
+  }
+
+  return `-${formatPrice(discount.value, currency)}`;
+}
 
 interface CheckoutPayFormProps {
   plan: PublicPlan;
@@ -159,6 +203,22 @@ export function CheckoutPayForm({
   const { t } = useTranslation();
   const [termsAndConditions, setTermsAndConditions] = useState(false);
   const isDuo = checkoutData.purchase_mode === 'duo';
+  const discountLines =
+    paymentData.appliedDiscounts.length > 0
+      ? paymentData.appliedDiscounts
+      : paymentData.applied && paymentData.discountBenefitCode
+        ? [
+            {
+              code: paymentData.discountBenefitCode,
+              name: '',
+              type: '',
+              value: paymentData.discountValue,
+              calculatedAmount: Math.max(paymentData.originalPrice - paymentData.finalPrice, 0),
+            } satisfies AppliedDiscountMapped,
+          ]
+        : [];
+  const showOriginalPrice =
+    !isDuo && paymentData.originalPrice > paymentData.finalPrice && (discountLines.length > 0 || paymentData.applied);
 
   return (
     <form
@@ -178,20 +238,14 @@ export function CheckoutPayForm({
             <span className='min-w-0 break-words text-gray-500'>{t('subscriptions:iva')}</span>
             <span className='shrink-0'>{formatPrice(paymentData.taxAmount, plan.currency)}</span>
           </div>
-          {!isDuo && paymentData.applied && (
-            <div className='mb-2 flex items-center justify-between gap-2'>
-              <span className='min-w-0 break-words text-gray-500'>
-                {paymentData.discountBenefitCode === 'REFERRAL_FIXED_20000'
-                  ? t('subscriptions:discountReferral')
-                  : paymentData.discountBenefitCode === 'FIRST_PLAN_PCT_10'
-                    ? t('subscriptions:discountFirstPlan')
-                    : paymentData.discountCode
-                      ? t('subscriptions:discountCode')
-                      : t('subscriptions:discount')}
-              </span>
-              <span className='shrink-0'>{paymentData.discountContext}</span>
-            </div>
-          )}
+
+          {!isDuo &&
+            discountLines.map(discount => (
+              <div key={discount.code} className='mb-2 flex items-center justify-between gap-2 text-primary'>
+                <span className='min-w-0 break-words'>{discountLineLabel(t, discount)}</span>
+                <span className='shrink-0 font-medium'>{discountLineAmount(discount, plan.currency)}</span>
+              </div>
+            ))}
 
           {!isDuo && paymentData.bonusClassesGranted !== null && paymentData.bonusClassesGranted > 0 && (
             <div className='mb-2 rounded-md border border-primary/20 bg-primary/5 px-3 py-2 text-sm text-primary'>
@@ -211,9 +265,16 @@ export function CheckoutPayForm({
             </div>
           )}
 
-          <div className='mt-4 flex items-center justify-between gap-2 border-t pt-4 text-lg font-bold'>
-            <span className='min-w-0 break-words'>{t('subscriptions:totalDue')}</span>
-            <span className='shrink-0'>{formatPrice(paymentData.amountToCharge, plan.currency)}</span>
+          <div className='mt-4 flex items-start justify-between gap-2 border-t pt-4'>
+            <span className='min-w-0 break-words text-lg font-bold'>{t('subscriptions:totalDue')}</span>
+            <span className='flex shrink-0 flex-col items-end gap-0.5'>
+              <span className='text-lg font-bold'>{formatPrice(paymentData.amountToCharge, plan.currency)}</span>
+              {showOriginalPrice ? (
+                <span className='text-sm font-medium text-destructive line-through decoration-destructive'>
+                  {t('subscriptions:priceBefore', { amount: formatPrice(paymentData.originalPrice, plan.currency) })}
+                </span>
+              ) : null}
+            </span>
           </div>
         </div>
 
