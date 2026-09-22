@@ -27,6 +27,7 @@ interface CheckoutPaymentProofFormProps {
   finalPrice: number;
   amountToCharge: number;
   walletAmountApplied: number;
+  originalPrice?: number;
   onClose: () => void;
   onBack: () => void;
   checkoutData?: CheckoutFormValues;
@@ -43,6 +44,7 @@ export function CheckoutPaymentProofForm({
   finalPrice,
   amountToCharge,
   walletAmountApplied,
+  originalPrice,
   onClose,
   onBack,
   checkoutData,
@@ -75,6 +77,9 @@ export function CheckoutPaymentProofForm({
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const displayTitle = summaryTitle ?? plan?.name ?? '';
   const displayCurrency = currency ?? plan?.currency ?? 'COP';
+  const isQuarterlyCheckout = Boolean(checkoutData?.is_quarterly) && checkoutData?.purchase_mode !== 'duo';
+  const quarterlyClassCount = (plan?.classes_included ?? 0) * 3;
+  const showOriginalPrice = originalPrice !== undefined && originalPrice > finalPrice;
 
   const onConfirm = async () => {
     if (requiresProof && !selectedProofFile) {
@@ -167,6 +172,7 @@ export function CheckoutPaymentProofForm({
       gift_sender_display_name,
       purchase_mode,
       duo_partner_email,
+      is_quarterly,
     } = checkoutData;
 
     const isDuoCheckout = purchase_mode === 'duo';
@@ -185,6 +191,7 @@ export function CheckoutPaymentProofForm({
     } else {
       payload.discount_code = discount_code.trim() ? discount_code.trim() : undefined;
       payload.referral_code = !is_gift && referral_code?.trim() ? referral_code.trim() : undefined;
+      payload.is_quarterly = Boolean(is_quarterly);
 
       if (is_gift) {
         payload.is_gift = true;
@@ -299,8 +306,14 @@ export function CheckoutPaymentProofForm({
               <div className='rounded-md border border-secondary bg-secondary-400/40 py-2 px-4'>
                 <label className='block'>{displayTitle}</label>
                 <label className='block'>
-                  {t('payments:total')}: {formatPrice(finalPrice, displayCurrency)}
+                  <span>{t('payments:total')}: </span>
+                  <span className='font-semibold'>{formatPrice(finalPrice, displayCurrency)}</span>
                 </label>
+                {showOriginalPrice ? (
+                  <label className='block text-sm font-medium text-destructive line-through decoration-destructive'>
+                    {t('subscriptions:priceBefore', { amount: formatPrice(originalPrice, displayCurrency) })}
+                  </label>
+                ) : null}
                 {walletAmountApplied > 0 || amountToCharge !== finalPrice ? (
                   <>
                     {walletAmountApplied > 0 ? (
@@ -350,6 +363,17 @@ export function CheckoutPaymentProofForm({
                   <label className='block'>
                     {t('payments:startDate')}: {format(checkoutData.start_date, 'yyyy-MM-dd')}
                   </label>
+                ) : null}
+                {plan && isQuarterlyCheckout ? (
+                  <div className='mt-2 grid gap-1 text-sm text-gray-700'>
+                    <label className='block font-medium text-gray-900'>
+                      {t('subscriptions:quarterlySummaryTitle')}
+                    </label>
+                    <label className='block'>
+                      {t('subscriptions:quarterlyClassesIncluded', { count: quarterlyClassCount })}
+                    </label>
+                    <label className='block'>{t('subscriptions:quarterlyValidity', { count: 90 })}</label>
+                  </div>
                 ) : null}
               </div>
             )}

@@ -12,6 +12,27 @@ export function toNumber(value: unknown, fallback = 0): number {
   return fallback;
 }
 
+export function mapAppliedDiscounts(
+  discounts:
+    | Array<{
+        code: string;
+        name: string;
+        type: string;
+        value: string | number;
+        calculated_amount: string | number;
+      }>
+    | null
+    | undefined,
+) {
+  return (discounts ?? []).map(item => ({
+    code: item.code,
+    name: item.name,
+    type: item.type,
+    value: toNumber(item.value),
+    calculatedAmount: toNumber(item.calculated_amount),
+  }));
+}
+
 function toOptionalNumber(value: unknown): number | null {
   if (value === null || value === undefined) {
     return null;

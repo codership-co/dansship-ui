@@ -19,7 +19,7 @@ import {
   CheckoutPurchaseMode,
   CheckoutPurchaseModeSelector,
 } from '@components/modules/payments/checkout-purchase-mode-selector';
-import { Tabs, TabsList, TabsTrigger } from '@components/ui';
+import { Badge, Label, Switch, Tabs, TabsList, TabsTrigger } from '@components/ui';
 import { DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError, PaymentPreviewRequest, PublicPlan } from '@core/api';
 import { captureUnexpectedException, withSentrySpan } from '@core/sentry';
 import { formatPrice, isColombiaSeptember } from '@helpers';
@@ -73,6 +73,7 @@ interface CheckoutPurchaseModeFormProps {
   onCancel: () => void;
   onSubmit: (data: CheckoutFormValues, paymentData: PaymentData) => Promise<void>;
   defaultFormValues: CheckoutFormValues;
+  onQuarterlyChange?: (isQuarterly: boolean) => void;
 }
 
 export function CheckoutPurchaseModeForm({
@@ -80,6 +81,7 @@ export function CheckoutPurchaseModeForm({
   onCancel,
   onSubmit,
   defaultFormValues,
+  onQuarterlyChange,
 }: CheckoutPurchaseModeFormProps) {
   const { t } = useTranslation();
   const classesIncluded = plan.classes_included ?? 0;
@@ -118,6 +120,7 @@ export function CheckoutPurchaseModeForm({
   const duoPartnerEmail = watch('duo_partner_email');
   const isGift = purchaseMode === 'gift';
   const isDuo = purchaseMode === 'duo';
+  const isQuarterly = watch('is_quarterly');
   const duoHalfClasses = Math.floor(classesIncluded / 2);
 
   const handlePurchaseModeChange = useCallback(
@@ -146,6 +149,7 @@ export function CheckoutPurchaseModeForm({
       if (nextMode === 'duo') {
         setValue('discount_code', '');
         setValue('referral_code', '');
+        setValue('is_quarterly', false);
         setCodeKind('discount');
 
         return;
@@ -179,6 +183,10 @@ export function CheckoutPurchaseModeForm({
   }, [handlePurchaseModeChange, purchaseMode, showDuo]);
 
   useEffect(() => {
+    onQuarterlyChange?.(isQuarterly && !isDuo);
+  }, [isDuo, isQuarterly, onQuarterlyChange]);
+
+  useEffect(() => {
     setGiftEligibilityError(null);
   }, [giftRecipientEmail]);
 
@@ -210,6 +218,7 @@ export function CheckoutPurchaseModeForm({
             ? {
                 ...formData,
                 is_gift: false,
+                is_quarterly: false,
                 discount_code: '',
                 referral_code: '',
                 gift_recipient_name: '',
@@ -242,6 +251,7 @@ export function CheckoutPurchaseModeForm({
           previewPayload.discount_code = nextDiscountCode ? nextDiscountCode.toUpperCase() : undefined;
           previewPayload.referral_code =
             mode !== 'gift' && nextReferralCode ? nextReferralCode.toUpperCase() : undefined;
+          previewPayload.is_quarterly = Boolean(nextData.is_quarterly);
 
           if (mode === 'gift') {
             previewPayload.is_gift = true;
@@ -294,6 +304,7 @@ export function CheckoutPurchaseModeForm({
           bonus_expires_days,
           bonus_benefit_name,
           discount_benefit_code,
+          applied_discounts,
           wallet_amount_applied,
           amount_to_charge,
         } = data;
@@ -305,6 +316,7 @@ export function CheckoutPurchaseModeForm({
           isValid: is_valid,
           discountCode: nextDiscountCode.toUpperCase(),
           discountBenefitCode: discount_benefit_code,
+          appliedDiscounts: applied_discounts ?? [],
           error: rejection_reason || '',
           applied: discount_applied,
           discountValue: discount_value,
@@ -361,6 +373,27 @@ export function CheckoutPurchaseModeForm({
     <form onSubmit={handleSubmit(handleInternalSubmit)} className='grid h-full grid-rows-[1fr_auto]'>
       <div className='grid content-start gap-8'>
         <CheckoutPurchaseModeSelector value={purchaseMode} onChange={handlePurchaseModeChange} showDuo={showDuo} />
+
+        <div className='grid gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3'>
+          <div className='flex items-center justify-between gap-3'>
+            <div className='flex min-w-0 items-center gap-2'>
+              <Label htmlFor='checkout-quarterly-toggle' className='text-sm font-medium text-gray-900'>
+                {t('subscriptions:quarterlyToggleLabel')}
+              </Label>
+              <Badge variant='secondary' size='small'>
+                {t('subscriptions:quarterlyDiscountBadge')}
+              </Badge>
+            </div>
+            <Switch
+              id='checkout-quarterly-toggle'
+              checked={Boolean(isQuarterly) && !isDuo}
+              disabled={isDuo}
+              onCheckedChange={checked => setValue('is_quarterly', checked)}
+              className='data-[state=unchecked]:border-border data-[state=unchecked]:bg-gray-300'
+            />
+          </div>
+          {isDuo ? <p className='m-0 text-xs text-gray-500'>{t('subscriptions:quarterlyDuoDisabledNote')}</p> : null}
+        </div>
 
         {isGift ? (
           <EmailField

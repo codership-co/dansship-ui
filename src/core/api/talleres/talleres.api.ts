@@ -1,6 +1,6 @@
 import { HttpClient } from 'polpo-http-client';
 
-import { toNumber } from '../payments/payments.helpers';
+import { mapAppliedDiscounts, toNumber } from '../payments/payments.helpers';
 
 import { DansshipAPIError, type PaymentPreviewMappedResponse, type PaymentPreviewResponse } from '@core/api';
 
@@ -49,6 +49,7 @@ export class TalleresAPI {
         bonus_expires_days: data.bonus_expires_days ?? null,
         bonus_benefit_name: data.bonus_benefit_name ?? null,
         discount_benefit_code: data.discount_benefit_code ?? null,
+        applied_discounts: mapAppliedDiscounts(data.applied_discounts),
         is_first_plan_purchase: data.is_first_plan_purchase ?? false,
         wallet_amount_applied: toNumber(data.wallet_amount_applied),
         amount_to_charge: toNumber(data.amount_to_charge, toNumber(data.final_price)),

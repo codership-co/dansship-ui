@@ -36,6 +36,7 @@ export interface CreatePaymentIntentPayload {
   gift_sender_display_name?: string;
   is_duo?: boolean;
   duo_partner_email?: string;
+  is_quarterly?: boolean;
 }
 
 export interface BoldCheckoutConfig {
@@ -106,6 +107,7 @@ export interface PaymentIntent {
   gift_recipient_email?: string | null;
   is_duo?: boolean;
   duo_partner_email?: string | null;
+  is_quarterly?: boolean;
   admin_notes: string | null;
   reviewed_by: string | null;
   reviewed_at: string | null;
@@ -154,6 +156,7 @@ export interface PaymentPreviewRequest {
   gift_recipient_email?: string;
   is_duo?: boolean;
   duo_partner_email?: string;
+  is_quarterly?: boolean;
   room_id?: string;
   resource_id?: string | null;
   start_time?: string;
@@ -161,6 +164,22 @@ export interface PaymentPreviewRequest {
   duration_hours?: number | string;
   payment_option?: 'full' | 'fifty_fifty';
   workshop_slug?: string;
+}
+
+export interface AppliedDiscountPreview {
+  code: string;
+  name: string;
+  type: string;
+  value: string | number;
+  calculated_amount: string | number;
+}
+
+export interface AppliedDiscountMapped {
+  code: string;
+  name: string;
+  type: string;
+  value: number;
+  calculatedAmount: number;
 }
 
 export interface PaymentPreviewResponse {
@@ -179,6 +198,7 @@ export interface PaymentPreviewResponse {
   bonus_expires_days?: number | null;
   bonus_benefit_name?: string | null;
   discount_benefit_code?: string | null;
+  applied_discounts?: Array<AppliedDiscountPreview>;
   is_first_plan_purchase?: boolean;
   wallet_amount_applied?: string;
   amount_to_charge?: string;
@@ -203,6 +223,7 @@ export interface PaymentPreviewMappedResponse {
   bonus_expires_days: number | null;
   bonus_benefit_name: string | null;
   discount_benefit_code: string | null;
+  applied_discounts: Array<AppliedDiscountMapped>;
   is_first_plan_purchase: boolean;
   wallet_amount_applied: number;
   amount_to_charge: number;
