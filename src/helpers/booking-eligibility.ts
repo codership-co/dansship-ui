@@ -114,6 +114,14 @@ export function getClassBookingEligibility(
   return { status: 'no_subscription' };
 }
 
+/**
+ * True when a paid plan in the subscription list covers this class.
+ * Trial is a separate flag, not a row in that list, so this ignores it.
+ */
+export function hasPaidPlanCoveringClass(subscriptions: Array<ActiveSubscription>, classStart: Date | string): boolean {
+  return getClassBookingEligibility(subscriptions, classStart, false).status === 'ok';
+}
+
 export function canBookClassAt(
   subscriptions: Array<ActiveSubscription>,
   classStart: Date | string,
