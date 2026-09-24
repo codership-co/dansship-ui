@@ -16,6 +16,7 @@ import { DEFAULT_ROOM_IMAGE, PageURLS } from '@core/constants';
 import {
   formatTimeDifference,
   getClassBookingEligibility,
+  hasPaidPlanCoveringClass,
   isOwnInstructedClass,
   isPastBookingDeadline,
   toColombiaDateKey,
@@ -182,12 +183,17 @@ export function BookingModal({
   const showTrialNote = Boolean(
     subscriptionsReady && eligibility.status === 'trial' && !isBooked && !isPast && !isCancelled && !isOwnClass,
   );
+  const paidPlanCoversClass = hasPaidPlanCoveringClass(resolvedSubscriptions, selectedClass.start_time);
   const showThursday2x1Note = Boolean(
-    selectedClass.jueves_2x1_eligible && !isBooked && !isPast && !isCancelled && !isOwnClass,
+    subscriptionsReady &&
+    selectedClass.jueves_2x1_eligible &&
+    paidPlanCoversClass &&
+    !isBooked &&
+    !isPast &&
+    !isCancelled &&
+    !isOwnClass,
   );
-  const showCompanionField = Boolean(
-    showThursday2x1Note && subscriptionsReady && eligibility.status === 'ok' && !isFull && !hasTimeOverlap,
-  );
+  const showCompanionField = Boolean(showThursday2x1Note && !isFull && !hasTimeOverlap);
 
   return (
     <>
