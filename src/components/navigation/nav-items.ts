@@ -29,6 +29,7 @@ type Translate = (key: string) => string;
 
 interface PrimaryNavOptions {
   isAuthenticated: boolean;
+  showManagedWorkshops?: boolean;
 }
 
 /** Permissions that reveal the hamburger Admin section. */
@@ -66,7 +67,10 @@ export function getScheduleBuilderNavItem(t: Translate): NavItem {
  * Signed-in: Mi Horario (instructor) → Classes → Bookings → Studio rental → Plans→subscription
  * Figuras/Progreso omitted when authenticated (not prod-ready).
  */
-export function getPrimaryNavItems(t: Translate, { isAuthenticated }: PrimaryNavOptions): Array<NavItem> {
+export function getPrimaryNavItems(
+  t: Translate,
+  { isAuthenticated, showManagedWorkshops = false }: PrimaryNavOptions,
+): Array<NavItem> {
   return !isAuthenticated
     ? [
         {
@@ -136,6 +140,17 @@ export function getPrimaryNavItems(t: Translate, { isAuthenticated }: PrimaryNav
           featureFlags: [FEATURE_FLAG.isTalleresPageEnabled],
           icon: LuCalendarClock,
         },
+        ...(showManagedWorkshops
+          ? [
+              {
+                to: PageURLS.managedWorkshops,
+                label: t('talleres:managed.nav'),
+                requireAuthentication: true,
+                featureFlags: [FEATURE_FLAG.isTalleresPageEnabled],
+                icon: LuCalendarClock,
+              },
+            ]
+          : []),
       ];
 }
 

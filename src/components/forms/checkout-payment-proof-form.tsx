@@ -36,6 +36,7 @@ interface CheckoutPaymentProofFormProps {
   hideSummary?: boolean;
   currency?: string;
   onCreateIntent?: () => Promise<string | null>;
+  paymentQrUrl?: string | null;
 }
 
 export function CheckoutPaymentProofForm({
@@ -53,6 +54,7 @@ export function CheckoutPaymentProofForm({
   hideSummary = false,
   currency,
   onCreateIntent,
+  paymentQrUrl,
 }: CheckoutPaymentProofFormProps) {
   const { t } = useTranslation();
   const { call: createIntent, isLoading: isCreating } = useCallablePromise((payload: CreatePaymentIntentPayload) =>
@@ -393,7 +395,7 @@ export function CheckoutPaymentProofForm({
           </section>
         ) : null}
 
-        {requiresProof ? <TransferPaymentInstructions /> : null}
+        {requiresProof ? <TransferPaymentInstructions qrUrl={paymentQrUrl} /> : null}
 
         {requiresProof ? (
           <div

@@ -1,7 +1,7 @@
 import { ActionModal, Button } from 'polpo/components';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LuCreditCard, LuList } from 'react-icons/lu';
+import { LuCreditCard, LuInfo, LuList } from 'react-icons/lu';
 import { useLocation, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
@@ -185,18 +185,35 @@ function TallerCheckoutContent({ landing, onClose }: { landing: WorkshopLanding;
     }
   }, [isWalletCovered, paymentMethod]);
 
+  const hasPlanPrice =
+    preview?.discount_type === 'has_active_plan' || preview?.discount_type === 'has_active_plan_min_classes';
+  const isPair = landing.kind === 'combo' || landing.requires_partner;
+  const priceLabel = hasPlanPrice
+    ? t(isPair ? 'talleres:checkout.yourPricePlanPair' : 'talleres:checkout.yourPricePlan')
+    : t('talleres:checkout.yourPrice');
+
   const reviewForm = (
-    <div className='grid gap-6 p-4 sm:p-6'>
+    <div className='grid content-start gap-4'>
       {workshops.map(workshop => (
-        <div key={workshop.name} className='rounded-xl border p-4'>
-          <p className='m-0 text-xs uppercase text-muted-foreground'>{t('talleres:checkout.workshop')}</p>
-          <p className='m-0 font-semibold'>{workshop.name}</p>
-          <p className='m-0 mt-2 text-sm'>
-            {t('talleres:checkout.dateAndRoom')}: {workshop.date}
-          </p>
-          <p className='m-0 text-sm'>
-            {t('talleres:checkout.instructor')}: {workshop.instructor}
-          </p>
+        <div key={workshop.name} className='grid gap-5 rounded-2xl bg-secondary/45 px-5 py-5'>
+          <div className='grid gap-1'>
+            <p className='m-0 text-[10px] font-semibold tracking-[0.08em] uppercase text-muted-foreground'>
+              {t('talleres:checkout.workshop')}
+            </p>
+            <p className='m-0 text-[15px] font-semibold'>{workshop.name}</p>
+          </div>
+          <div className='grid gap-1'>
+            <p className='m-0 text-[10px] font-semibold tracking-[0.08em] uppercase text-muted-foreground'>
+              {t('talleres:checkout.dateAndRoom')}
+            </p>
+            <p className='m-0 text-[15px] font-semibold'>{workshop.date}</p>
+          </div>
+          <div className='grid gap-1'>
+            <p className='m-0 text-[10px] font-semibold tracking-[0.08em] uppercase text-muted-foreground'>
+              {t('talleres:checkout.instructor')}
+            </p>
+            <p className='m-0 text-[15px] font-semibold'>{workshop.instructor}</p>
+          </div>
         </div>
       ))}
       {landing.requires_partner ? (
@@ -227,14 +244,17 @@ function TallerCheckoutContent({ landing, onClose }: { landing: WorkshopLanding;
         </div>
       ) : null}
       {preview ? (
-        <p className='m-0 rounded-full bg-secondary px-4 py-2 font-semibold'>
-          {t('talleres:checkout.yourPrice')}: {formatPrice(preview.final_price, 'COP')}
-        </p>
+        <div className='flex items-center justify-between gap-4 rounded-xl bg-secondary px-4 py-3.5'>
+          <span className='text-sm font-semibold'>{priceLabel}</span>
+          <span className='font-title text-2xl leading-none font-bold text-primary'>
+            {formatPrice(preview.final_price, 'COP')}
+          </span>
+        </div>
       ) : null}
-      <label className='flex items-start gap-3 text-sm'>
-        <Checkbox checked={accepted} onCheckedChange={value => setAccepted(value === true)} />
-        <span>{t('talleres:checkout.nonRefundableCheckbox')}</span>
-      </label>
+      <div className='flex items-start gap-2.5 text-muted-foreground'>
+        <LuInfo className='mt-0.5 size-4 shrink-0' aria-hidden />
+        <p className='m-0 text-[12.5px] leading-relaxed font-medium'>{t('talleres:checkout.nonRefundableNote')}</p>
+      </div>
       <div className='flex flex-wrap justify-end gap-2'>
         <Button type='button' color='primary' variant='outlined' onClick={onClose}>
           {t('talleres:checkout.cancel')}
@@ -248,7 +268,7 @@ function TallerCheckoutContent({ landing, onClose }: { landing: WorkshopLanding;
             type='button'
             color='primary'
             variant='solid'
-            disabled={!partnerValid || !preview || !accepted}
+            disabled={!partnerValid || !preview}
             onClick={() => setStep(CheckoutStep.PAY)}
           >
             {t('talleres:checkout.next')}
@@ -259,7 +279,7 @@ function TallerCheckoutContent({ landing, onClose }: { landing: WorkshopLanding;
   );
 
   const payForm = preview ? (
-    <div className='grid gap-6 p-4 sm:p-6'>
+    <div className='grid content-start gap-4'>
       <div>
         <div className='mb-2 flex items-center justify-between gap-2'>
           <span className='min-w-0 break-words text-gray-500'>{t('subscriptions:subtotal')}</span>
@@ -287,6 +307,10 @@ function TallerCheckoutContent({ landing, onClose }: { landing: WorkshopLanding;
           methods={[PaymentMethod.TRANSFER]}
         />
       ) : null}
+      <label className='flex items-start gap-3 text-sm'>
+        <Checkbox checked={accepted} onCheckedChange={value => setAccepted(value === true)} />
+        <span>{t('talleres:checkout.nonRefundableCheckbox')}</span>
+      </label>
       <CheckoutPaymentProofForm
         hideSummary
         paymentMethod={paymentMethod ?? (isWalletCovered ? PaymentMethod.WALLET : PaymentMethod.TRANSFER)}
@@ -296,7 +320,13 @@ function TallerCheckoutContent({ landing, onClose }: { landing: WorkshopLanding;
         onClose={onClose}
         onBack={() => setStep(CheckoutStep.REVIEW)}
         onCreateIntent={async () => {
-          if (!accepted || (!isWalletCovered && !paymentMethod)) {
+          if (!accepted) {
+            toast.error(t('talleres:checkout.acceptRequired'));
+
+            return null;
+          }
+
+          if (!isWalletCovered && !paymentMethod) {
             return null;
           }
 
@@ -306,6 +336,7 @@ function TallerCheckoutContent({ landing, onClose }: { landing: WorkshopLanding;
           onClose();
           navigate(`${PageURLS.paymentsResult}?intentId=${intentId}`);
         }}
+        paymentQrUrl={landing.payment_qr_url}
       />
     </div>
   ) : null;
