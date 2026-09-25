@@ -8,8 +8,9 @@ const BREB_QR_PLACEHOLDER = '/assets/images/payments/breb-qr.png';
 const BREB_KEY = '@boldds3507';
 // const BANK_ACCOUNT_NUMBER = '1700-1510-7618';
 
-export function TransferPaymentInstructions() {
+export function TransferPaymentInstructions({ qrUrl }: { qrUrl?: string | null }) {
   const { t } = useTranslation();
+  const imageSrc = qrUrl || BREB_QR_PLACEHOLDER;
 
   return (
     <section className='rounded-md border border-primary/20 bg-primary/5 p-4 text-sm text-gray-700'>
@@ -29,15 +30,17 @@ export function TransferPaymentInstructions() {
           {/* <p className='m-0 font-semibold text-primary'>{t('payments:instructions.transfer.brebQrTitle')}</p> */}
 
           <img
-            src={BREB_QR_PLACEHOLDER}
+            src={imageSrc}
             alt={t('payments:instructions.transfer.brebQrTitle')}
             className='aspect-square h-auto w-full max-w-72 object-contain sm:max-w-80'
           />
 
-          <p className='m-0 mt-4 font-semibold text-primary'>
-            {t('payments:instructions.transfer.brebKeyLabel')}{' '}
-            <span className='m-0 mt-1 font-large text-gray-900 text-xl'>{BREB_KEY}</span>
-          </p>
+          {!qrUrl ? (
+            <p className='m-0 mt-4 font-semibold text-primary'>
+              {t('payments:instructions.transfer.brebKeyLabel')}{' '}
+              <span className='m-0 mt-1 font-large text-gray-900 text-xl'>{BREB_KEY}</span>
+            </p>
+          ) : null}
         </article>
 
         {/* }

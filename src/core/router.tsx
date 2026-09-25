@@ -57,6 +57,8 @@ import {
   SecureSubscriptionPage,
   SecureTalleresPage,
   SecureTallerLandingPage,
+  SecureManagedWorkshopsPage,
+  SecureManagedWorkshopDetailPage,
   SecureVerifyEmailPage,
   SecureWalletPage,
   StudioRentalResultLoader,
@@ -106,6 +108,8 @@ const routes: Array<RouteObject> = [
           { index: true, Component: HomePage },
           { path: 'plans', Component: SecurePlansPage },
           { path: 'workshops', Component: SecureTalleresPage },
+          { path: 'workshops/managed', Component: SecureManagedWorkshopsPage },
+          { path: 'workshops/managed/:workshopId', Component: SecureManagedWorkshopDetailPage },
           { path: 'workshops/:slug', Component: SecureTallerLandingPage },
           {
             path: 'talleres',

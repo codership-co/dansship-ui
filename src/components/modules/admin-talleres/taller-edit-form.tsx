@@ -1,12 +1,14 @@
-import { FormEvent, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
 import { PriceTiersEditor } from './price-tiers-editor';
+import { TallerRoster } from './taller-roster';
 
 import { OptionalFileUpload } from '@components/forms/optional-file-upload';
 import { SpinnerLoader } from '@components/loaders';
+import { DirectRegistrationForm } from '@components/modules/talleres/direct-registration-form';
 import {
   Button,
   Card,
@@ -28,7 +30,7 @@ import {
   type WorkshopStatus,
 } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { usePromise } from '@hooks';
+import { useCallablePromise, usePromise } from '@hooks';
 
 function colombiaParts(iso: string) {
   const date = new Date(iso);
@@ -75,6 +77,11 @@ export function TallerEditForm({ workshop }: TallerEditFormProps) {
   const [roomId, setRoomId] = useState(workshop?.room_id ?? '');
   const [instructorId, setInstructorId] = useState(workshop?.instructor_id ?? '');
   const [requiresPartner, setRequiresPartner] = useState(workshop?.requires_partner ?? false);
+  const [isCollaboration, setIsCollaboration] = useState(workshop?.is_collaboration ?? false);
+  const [collaboratorEmail, setCollaboratorEmail] = useState(workshop?.collaborator_email ?? '');
+  const [collaboratorName, setCollaboratorName] = useState<string | null>(workshop?.collaborator_display_name ?? null);
+  const [collaboratorError, setCollaboratorError] = useState<string | null>(null);
+  const [participation, setParticipation] = useState(String(workshop?.collaborator_participation_percentage ?? 0));
   const [status, setStatus] = useState<WorkshopStatus>(workshop?.status ?? 'draft');
   const [basePrice, setBasePrice] = useState(String(workshop?.base_price ?? ''));
   const [tiers, setTiers] = useState<Array<WorkshopPriceTierInput>>(
@@ -86,11 +93,21 @@ export function TallerEditForm({ workshop }: TallerEditFormProps) {
   );
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(workshop?.image_url ?? null);
+  const [qrFile, setQrFile] = useState<File | null>(null);
+  const [qrPreviewUrl, setQrPreviewUrl] = useState<string | null>(workshop?.payment_qr_url ?? null);
   const [saving, setSaving] = useState(false);
 
   const { response: roomsResponse } = usePromise(() => DansshipAPI.inventoryAdmin.getRooms({ is_active: true }));
   const { response: instructorsResponse } = usePromise(() => DansshipAPI.instructorsAdmin.getInstructors());
   const { response: conditionsResponse } = usePromise(() => DansshipAPI.talleresAdmin.listPriceConditions());
+  const { response: rosterResponse, reFetch: reFetchRoster } = usePromise(
+    () => DansshipAPI.talleresAdmin.listRoster(workshop?.id ?? ''),
+    Boolean(workshop?.id && (workshop.is_collaboration || isCollaboration)),
+    [workshop?.id, isCollaboration],
+  );
+  const { call: lookupCollaborator } = useCallablePromise((email: string) =>
+    DansshipAPI.talleresAdmin.lookupCollaborator(email),
+  );
 
   const rooms = roomsResponse?.data ?? [];
   const instructors = useMemo(
@@ -99,8 +116,47 @@ export function TallerEditForm({ workshop }: TallerEditFormProps) {
   );
   const conditions = Array.isArray(conditionsResponse?.data) ? conditionsResponse.data : [];
 
+  useEffect(() => {
+    const email = collaboratorEmail.trim();
+
+    if (!isCollaboration || !email || !email.includes('@')) {
+      setCollaboratorName(null);
+      setCollaboratorError(null);
+
+      return;
+    }
+
+    const handle = window.setTimeout(() => {
+      void lookupCollaborator(email)
+        .then(result => {
+          const data = result.data;
+
+          if (data?.found) {
+            setCollaboratorName(data.display_name);
+            setCollaboratorError(null);
+          } else {
+            setCollaboratorName(null);
+            setCollaboratorError(data?.error_code ?? 'COLLABORATOR_NOT_FOUND');
+          }
+        })
+        .catch(() => {
+          setCollaboratorName(null);
+          setCollaboratorError('COLLABORATOR_NOT_FOUND');
+        });
+    }, 400);
+
+    return () => window.clearTimeout(handle);
+  }, [collaboratorEmail, isCollaboration, lookupCollaborator]);
+
   const save = async (event: FormEvent) => {
     event.preventDefault();
+
+    if (isCollaboration && collaboratorEmail.trim() && !collaboratorName) {
+      toast.error(t('talleres:admin.collaboratorNotFound'));
+
+      return;
+    }
+
     setSaving(true);
     const payload = {
       name: name.trim(),
@@ -111,6 +167,10 @@ export function TallerEditForm({ workshop }: TallerEditFormProps) {
       instructor_id: instructorId,
       capacity: Number(capacity),
       requires_partner: requiresPartner,
+      is_collaboration: isCollaboration,
+      collaborator_email: isCollaboration && collaboratorEmail.trim() ? collaboratorEmail.trim() : null,
+      clear_collaborator: isCollaboration && !collaboratorEmail.trim(),
+      collaborator_participation_percentage: Number(participation || 0),
       base_price: Number(basePrice),
       price_tiers: tiers,
     };
@@ -139,6 +199,17 @@ export function TallerEditForm({ workshop }: TallerEditFormProps) {
           }
         }
 
+        if (qrFile) {
+          const upload = await DansshipAPI.talleresAdmin.uploadPaymentQr(workshop.id, qrFile);
+
+          if (!upload.data) {
+            toast.error(t('talleres:admin.qrUploadFailed'));
+          } else {
+            setQrPreviewUrl(upload.data.payment_qr_url);
+            setQrFile(null);
+          }
+        }
+
         toast.success(t('talleres:admin.updateSuccess'));
       } else {
         const { data, ok } = await DansshipAPI.talleresAdmin.createWorkshop(payload);
@@ -154,6 +225,14 @@ export function TallerEditForm({ workshop }: TallerEditFormProps) {
 
           if (!upload.data) {
             toast.error(t('talleres:admin.imageUploadFailed'));
+          }
+        }
+
+        if (qrFile) {
+          const upload = await DansshipAPI.talleresAdmin.uploadPaymentQr(data.id, qrFile);
+
+          if (!upload.data) {
+            toast.error(t('talleres:admin.qrUploadFailed'));
           }
         }
 
@@ -340,6 +419,59 @@ export function TallerEditForm({ workshop }: TallerEditFormProps) {
       </Card>
 
       <Card>
+        <CardHeader>
+          <CardTitle>{t('talleres:admin.collaboration')}</CardTitle>
+        </CardHeader>
+        <CardContent className='grid gap-4'>
+          <div className='flex items-center justify-between gap-4'>
+            <span>{t('talleres:admin.isCollaboration')}</span>
+            <Switch checked={isCollaboration} onCheckedChange={checked => setIsCollaboration(checked)} />
+          </div>
+          {isCollaboration ? (
+            <>
+              <div className='grid gap-2'>
+                <Label htmlFor='collaborator-email'>{t('talleres:admin.collaboratorEmail')}</Label>
+                <Input
+                  id='collaborator-email'
+                  type='email'
+                  value={collaboratorEmail}
+                  onChange={event => setCollaboratorEmail(event.target.value)}
+                />
+                {collaboratorName ? (
+                  <p className='m-0 text-sm text-primary'>{collaboratorName}</p>
+                ) : collaboratorError ? (
+                  <p className='m-0 text-sm text-destructive'>{t('talleres:admin.collaboratorNotFound')}</p>
+                ) : null}
+              </div>
+              <div className='grid gap-2'>
+                <Label htmlFor='participation'>{t('talleres:admin.participation')}</Label>
+                <Input
+                  id='participation'
+                  type='number'
+                  min={0}
+                  max={100}
+                  value={participation}
+                  onChange={event => setParticipation(event.target.value)}
+                />
+                <p className='m-0 text-xs text-muted-foreground'>{t('talleres:admin.participationHint')}</p>
+              </div>
+              <OptionalFileUpload
+                value={qrFile}
+                previewUrl={qrPreviewUrl}
+                acceptedTypes={Object.values(PaymentProofContentType)}
+                isUploading={saving}
+                helperText={t('talleres:admin.qrHint')}
+                onChange={(file, nextPreviewUrl) => {
+                  setQrFile(file);
+                  setQrPreviewUrl(nextPreviewUrl ?? workshop?.payment_qr_url ?? null);
+                }}
+              />
+            </>
+          ) : null}
+        </CardContent>
+      </Card>
+
+      <Card>
         <CardContent className='flex items-center justify-between gap-4 pt-6'>
           <span>{t('talleres:admin.requiresPartner')}</span>
           <Switch
@@ -366,6 +498,27 @@ export function TallerEditForm({ workshop }: TallerEditFormProps) {
           />
         </CardContent>
       </Card>
+      {workshop && isCollaboration ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('talleres:admin.roster')}</CardTitle>
+          </CardHeader>
+          <CardContent className='grid gap-4'>
+            <DirectRegistrationForm
+              onSubmit={async payload => {
+                const { ok } = await DansshipAPI.talleresAdmin.registerDirectly(workshop.id, payload);
+
+                if (ok) {
+                  await reFetchRoster();
+                }
+
+                return ok;
+              }}
+            />
+            <TallerRoster rows={rosterResponse?.data ?? []} />
+          </CardContent>
+        </Card>
+      ) : null}
     </form>
   );
 }

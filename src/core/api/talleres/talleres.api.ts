@@ -5,13 +5,21 @@ import { mapAppliedDiscounts, toNumber } from '../payments/payments.helpers';
 import { DansshipAPIError, type PaymentPreviewMappedResponse, type PaymentPreviewResponse } from '@core/api';
 
 import type {
+  CollaboratorPaymentItem,
+  CollaboratorWorkshopSummary,
+  DirectRegistrationPayload,
   PartnerLookupResponse,
   WorkshopCatalogCard,
+  WorkshopImageConfirmRequest,
+  WorkshopImageUploadRequest,
+  WorkshopImageUploadResponse,
   WorkshopLanding,
   WorkshopPurchaseCreatePayload,
   WorkshopPurchaseResponse,
+  WorkshopRosterEntry,
   MyWorkshopRegistration,
   MyWorkshopRegistrationScope,
+  WorkshopAdmin,
 } from './talleres.models';
 
 export class TalleresAPI {
@@ -83,6 +91,75 @@ export class TalleresAPI {
       path: '/workshops/registrations/me',
       method: 'GET',
       params: { scope },
+    });
+  }
+
+  async listCollaborations() {
+    return this.httpClient.callNoError<Array<CollaboratorWorkshopSummary>>({
+      path: '/workshops/collaborations',
+      method: 'GET',
+    });
+  }
+
+  async collaboratorRoster(workshopId: string) {
+    return this.httpClient.callNoError<Array<WorkshopRosterEntry>>({
+      path: `/workshops/collaborations/${workshopId}/roster`,
+      method: 'GET',
+    });
+  }
+
+  async collaboratorPayments(workshopId: string) {
+    return this.httpClient.callNoError<Array<CollaboratorPaymentItem>>({
+      path: `/workshops/collaborations/${workshopId}/payments`,
+      method: 'GET',
+    });
+  }
+
+  async reviewCollaboratorPayment(
+    workshopId: string,
+    paymentIntentId: string,
+    payload: { action: 'approve' | 'reject'; admin_notes?: string | null },
+  ) {
+    return this.httpClient.callNoError<CollaboratorPaymentItem>({
+      path: `/workshops/collaborations/${workshopId}/payments/${paymentIntentId}/review`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async collaboratorRegister(workshopId: string, payload: DirectRegistrationPayload) {
+    return this.httpClient.callNoError<WorkshopRosterEntry, DirectRegistrationPayload>({
+      path: `/workshops/collaborations/${workshopId}/registrations`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async uploadCollaboratorPaymentQr(workshopId: string, file: File) {
+    const response = await this.httpClient.callNoError<WorkshopImageUploadResponse, WorkshopImageUploadRequest>({
+      path: `/workshops/collaborations/${workshopId}/payment-qr/upload-url`,
+      method: 'POST',
+      data: { content_type: file.type as WorkshopImageUploadRequest['content_type'] },
+    });
+
+    if (!response.data) {
+      return response;
+    }
+
+    const uploadResponse = await fetch(response.data.upload_url, {
+      method: 'PUT',
+      headers: { 'Content-Type': file.type },
+      body: file,
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('WORKSHOP_IMAGE_UPLOAD_FAILED');
+    }
+
+    return this.httpClient.callNoError<WorkshopAdmin, WorkshopImageConfirmRequest>({
+      path: `/workshops/collaborations/${workshopId}/payment-qr/confirm`,
+      method: 'POST',
+      data: { file_key: response.data.file_key },
     });
   }
 }

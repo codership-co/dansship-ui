@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { SpinnerLoader } from '@components/loaders';
 import { formatMoney, ReportDateRange } from '@components/modules/admin-reports/report-date-range';
 import {
+  Badge,
   Card,
   CardContent,
   CardHeader,
@@ -65,6 +66,7 @@ export function WorkshopReports() {
           <Card className='border-input shadow-sm'>
             <CardHeader className='border-b border-gray-100 bg-gray-50/50 pb-4'>
               <CardTitle className='text-lg text-gray-800'>{t('reports:workshops.revenueTitle')}</CardTitle>
+              <p className='m-0 text-sm text-muted-foreground'>{t('reports:workshops.revenueExcludesCollaboration')}</p>
             </CardHeader>
             <CardContent className='grid grid-cols-2 md:grid-cols-4 gap-2 p-4'>
               <Metric label={t('reports:cash.intents')} value={String(revenue?.totals.intent_count ?? 0)} />
@@ -136,7 +138,14 @@ export function WorkshopReports() {
                   ) : (
                     (fill?.items ?? []).map(row => (
                       <TableRow key={row.workshop_id}>
-                        <TableCell>{row.workshop_name}</TableCell>
+                        <TableCell>
+                          <span className='inline-flex items-center gap-2'>
+                            {row.workshop_name}
+                            {row.is_collaboration ? (
+                              <Badge variant='outline'>{t('reports:workshops.collaborationBadge')}</Badge>
+                            ) : null}
+                          </span>
+                        </TableCell>
                         <TableCell>{format(parseISO(row.starts_at), 'MMM d, yyyy HH:mm', { locale })}</TableCell>
                         <TableCell className='text-right'>
                           {row.holding_registrations} / {row.capacity}

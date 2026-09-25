@@ -148,4 +148,6 @@ export const PageURLS = {
   studioRentalResult: '/studio-rental/result',
   talleres: '/workshops',
   tallerLanding: (slug: string) => `/workshops/${slug}`,
+  managedWorkshops: '/workshops/managed',
+  managedWorkshop: (id: string) => `/workshops/managed/${id}`,
 } as const;

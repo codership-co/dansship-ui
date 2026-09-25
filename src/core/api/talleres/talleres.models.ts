@@ -74,6 +74,7 @@ export interface WorkshopLanding {
   schedule_label?: string | null;
   price_rows: Array<LandingPriceRow>;
   components: Array<LandingComponentCard>;
+  payment_qr_url?: string | null;
 }
 
 export interface AdminWorkshopListItem {
@@ -101,6 +102,13 @@ export interface WorkshopAdmin {
   image_url: string | null;
   slug: string;
   requires_partner: boolean;
+  is_collaboration: boolean;
+  collaborator_user_id: string | null;
+  collaborator_email: string | null;
+  collaborator_display_name: string | null;
+  collaborator_participation_percentage: string | number;
+  payment_qr_key: string | null;
+  payment_qr_url: string | null;
   base_price: string | number;
   tax_type_id: string;
   status: WorkshopStatus;
@@ -151,6 +159,9 @@ export interface WorkshopCreatePayload {
   instructor_id: string;
   capacity: number;
   requires_partner: boolean;
+  is_collaboration?: boolean;
+  collaborator_email?: string | null;
+  collaborator_participation_percentage?: number | string;
   base_price: number | string;
   price_tiers: Array<WorkshopPriceTierInput>;
 }
@@ -164,6 +175,10 @@ export interface WorkshopUpdatePayload {
   instructor_id?: string;
   capacity?: number;
   requires_partner?: boolean;
+  is_collaboration?: boolean;
+  collaborator_email?: string | null;
+  clear_collaborator?: boolean;
+  collaborator_participation_percentage?: number | string;
   base_price?: number | string;
   status?: WorkshopStatus;
   price_tiers?: Array<WorkshopPriceTierInput>;
@@ -208,6 +223,7 @@ export interface WorkshopPurchaseResponse {
   matched_condition_type: string | null;
   partner_user_id: string | null;
   workshop_ids: Array<string>;
+  payment_qr_url?: string | null;
 }
 
 export interface WorkshopRosterEntry {
@@ -276,4 +292,38 @@ export interface WorkshopImageUploadResponse {
 
 export interface WorkshopImageConfirmRequest {
   file_key: string;
+}
+
+export interface CollaboratorWorkshopSummary {
+  id: string;
+  name: string;
+  slug: string;
+  starts_at: string;
+  ends_at: string;
+  status: WorkshopStatus;
+  payment_qr_url: string | null;
+  enrolled_count: number;
+  pending_review_count: number;
+}
+
+export interface DirectRegistrationPayload {
+  email: string;
+  full_name?: string | null;
+  phone_number?: string | null;
+  phone_country_code?: string | null;
+}
+
+export interface CollaboratorPaymentItem {
+  id: string;
+  purchase_id: string;
+  payer_user_id: string;
+  payer_email: string;
+  payer_display_name: string;
+  amount: string | number;
+  status: string;
+  payment_method_type: string;
+  created_at: string;
+  proof_uploaded_at: string | null;
+  has_proof: boolean;
+  proof_view_url: string | null;
 }

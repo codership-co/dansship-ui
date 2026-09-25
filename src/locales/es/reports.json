@@ -239,6 +239,8 @@
     "combo": "Combo",
     "when": "Fecha",
     "emptyRevenue": "No hay pagos de talleres en este período.",
-    "emptyFill": "No hay talleres en este período."
+    "emptyFill": "No hay talleres en este período.",
+    "revenueExcludesCollaboration": "Los talleres en colaboración no entran en estos ingresos. Siguen contando en ocupación.",
+    "collaborationBadge": "Colaboración"
   }
 }

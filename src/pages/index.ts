@@ -19,6 +19,7 @@ export * from './studio-rental-requests.page';
 export * from './studio-rental-result.page';
 export * from './talleres.page';
 export * from './taller-landing.page';
+export * from './workshops-managed.page';
 export * from './profile';
 export * from './payments-result.page';
 export * from './gifts-claim.page';

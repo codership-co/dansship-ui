@@ -294,6 +294,7 @@ export interface WorkshopFillItem {
   starts_at: string;
   capacity: number;
   holding_registrations: number;
+  is_collaboration?: boolean;
   fill_rate: number;
 }
 

@@ -25,8 +25,10 @@ import { MenuItem } from './navbar';
 import { LanguageSelector } from '@components/navigation/language-selector';
 import { Isotype, Logotype } from '@components/svg';
 import { FEATURE_FLAG, useAuth, useOrPermissions } from '@contexts';
+import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminInventoryPagePermissions, AdminPermissions } from '@core/permissions';
+import { usePromise } from '@hooks';
 
 interface MobileMenuProps {
   isOpen: boolean;
@@ -38,12 +40,16 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, isAuthenticated } = useAuth();
+  const { response: collaborations } = usePromise(() => DansshipAPI.talleres.listCollaborations(), isAuthenticated);
   const scheduleBuilderNavItem = getScheduleBuilderNavItem(t);
   const canAccessAdminMenu = useOrPermissions(getAdminMenuPermissions());
 
   const primaryMenuItems: Array<NavItem> = [
     ...(isAuthenticated ? [getMobileProfileNavItem(t)] : []),
-    ...getPrimaryNavItems(t, { isAuthenticated }),
+    ...getPrimaryNavItems(t, {
+      isAuthenticated,
+      showManagedWorkshops: (collaborations?.data?.length ?? 0) > 0,
+    }),
   ];
 
   const adminMenuItems: Array<NavItem> = [

@@ -8,6 +8,8 @@ import type {
   ComboAdmin,
   ComboCreatePayload,
   ComboUpdatePayload,
+  DirectRegistrationPayload,
+  PartnerLookupResponse,
   PriceConditionCatalogItem,
   WorkshopAdmin,
   WorkshopCreatePayload,
@@ -184,5 +186,60 @@ export class TalleresAdminAPI {
     }
 
     return this.confirmImageUpload(id, { file_key });
+  }
+
+  async lookupCollaborator(email: string) {
+    return this.httpClient.callNoError<PartnerLookupResponse>({
+      path: '/admin/workshops/collaborators/lookup',
+      method: 'GET',
+      params: { email },
+    });
+  }
+
+  async registerDirectly(id: string, payload: DirectRegistrationPayload) {
+    return this.httpClient.callNoError<WorkshopRosterEntry, DirectRegistrationPayload>({
+      path: `/admin/workshops/${id}/registrations`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async getPaymentQrUploadUrl(id: string, payload: WorkshopImageUploadRequest) {
+    return this.httpClient.callNoError<WorkshopImageUploadResponse, WorkshopImageUploadRequest>({
+      path: `/admin/workshops/${id}/payment-qr/upload-url`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async confirmPaymentQr(id: string, payload: WorkshopImageConfirmRequest) {
+    return this.httpClient.callNoError<WorkshopAdmin, WorkshopImageConfirmRequest>({
+      path: `/admin/workshops/${id}/payment-qr/confirm`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async uploadPaymentQr(id: string, file: File) {
+    const response = await this.getPaymentQrUploadUrl(id, {
+      content_type: file.type as WorkshopImageUploadRequest['content_type'],
+    });
+
+    if (!response.data) {
+      return response;
+    }
+
+    const { upload_url, file_key } = response.data;
+    const uploadResponse = await fetch(upload_url, {
+      method: 'PUT',
+      headers: { 'Content-Type': file.type },
+      body: file,
+    });
+
+    if (!uploadResponse.ok) {
+      throw new Error('WORKSHOP_IMAGE_UPLOAD_FAILED');
+    }
+
+    return this.confirmPaymentQr(id, { file_key });
   }
 }
