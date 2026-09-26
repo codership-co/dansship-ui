@@ -16,6 +16,9 @@ import type {
   WorkshopLanding,
   WorkshopPurchaseCreatePayload,
   WorkshopPurchaseResponse,
+  InstructorTeachingRosterEntry,
+  InstructorTeachingUpcomingWeek,
+  InstructorTeachingWorkshop,
   WorkshopRosterEntry,
   MyWorkshopRegistration,
   MyWorkshopRegistrationScope,
@@ -91,6 +94,30 @@ export class TalleresAPI {
       path: '/workshops/registrations/me',
       method: 'GET',
       params: { scope },
+    });
+  }
+
+  async listTeachingWeek(weekStartDate: string) {
+    return this.httpClient.callNoError<Array<InstructorTeachingWorkshop>>({
+      path: `/workshops/teaching/weeks/${weekStartDate}`,
+      method: 'GET',
+    });
+  }
+
+  async getTeachingUpcomingWeek(fromWeek?: string) {
+    return this.httpClient.callNoError<InstructorTeachingUpcomingWeek>({
+      path: '/workshops/teaching/upcoming-week',
+      method: 'GET',
+      params: {
+        ...(fromWeek ? { from: fromWeek } : {}),
+      },
+    });
+  }
+
+  async getTeachingRoster(workshopId: string) {
+    return this.httpClient.callNoError<Array<InstructorTeachingRosterEntry>>({
+      path: `/workshops/teaching/${workshopId}/roster`,
+      method: 'GET',
     });
   }
 

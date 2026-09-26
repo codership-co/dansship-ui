@@ -3,6 +3,7 @@ export * from './booking-eligibility';
 export * from './checkout-intent';
 export * from './gift-claim-intent';
 export * from './classes';
+export * from './instructor-teaching';
 export * from './date';
 export * from './merch';
 export * from './delay-promise';

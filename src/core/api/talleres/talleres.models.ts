@@ -226,6 +226,35 @@ export interface WorkshopPurchaseResponse {
   payment_qr_url?: string | null;
 }
 
+export interface InstructorTeachingRoom {
+  id: string;
+  name: string;
+  image_url: string | null;
+}
+
+export interface InstructorTeachingWorkshop {
+  id: string;
+  name: string;
+  starts_at: string;
+  ends_at: string;
+  room: InstructorTeachingRoom;
+  capacity: number;
+  registered_count: number;
+}
+
+export interface InstructorTeachingUpcomingWeek {
+  requested_week_start: string;
+  resolved_week_start: string;
+  jumped: boolean;
+  workshops: Array<InstructorTeachingWorkshop>;
+  focus_day: string | null;
+}
+
+export interface InstructorTeachingRosterEntry {
+  display_name: string;
+  email: string;
+}
+
 export interface WorkshopRosterEntry {
   id: string;
   user_id: string;
