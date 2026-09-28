@@ -24,3 +24,18 @@ export interface BenefitGrant {
 export interface ListBenefitGrantsParams {
   user_id: string;
 }
+
+export interface BenefitWindow {
+  id: string;
+  code: string;
+  name: string;
+  is_active: boolean;
+  starts_on: string | null;
+  ends_on: string | null;
+}
+
+export interface UpdateBenefitWindowPayload {
+  is_active?: boolean;
+  starts_on?: string | null;
+  ends_on?: string | null;
+}

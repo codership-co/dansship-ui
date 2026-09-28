@@ -10,6 +10,7 @@ export * from './auth';
 export * from './admin-studio-rentals';
 export * from './admin-door-code';
 export * from './admin-campaigns';
+export * from './admin-benefit-windows';
 export * from './admin-talleres';
 export * from './instructor';
 export * from './classes';
