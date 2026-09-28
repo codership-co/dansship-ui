@@ -19,3 +19,4 @@ export * from './use-student-onboarding';
 export * from './use-products';
 export * from './use-payment-intents';
 export * from './use-campaigns';
+export * from './use-benefit-windows';

@@ -1,12 +1,25 @@
 {
   "inventory": {
     "title": "Gestión de Inventario y Facturación",
-    "subtitle": "Administra salas, catálogo de clases, planes y el código de la puerta.",
+    "subtitle": "Administra salas, catálogo de clases, planes, promociones y el código de la puerta.",
     "tabs": {
       "rooms": "Salas",
       "classCatalog": "Catálogo de Clases",
       "plans": "Planes",
+      "promotions": "Promociones",
       "doorCode": "Código de Puerta"
+    },
+    "promotionsPanel": {
+      "empty": "No hay promociones para administrar.",
+      "name": "Nombre",
+      "active": "Activa",
+      "from": "Desde",
+      "until": "Hasta",
+      "save": "Guardar",
+      "optionalHint": "Vacío = sin límite",
+      "invalidRange": "La fecha de fin debe ser igual o posterior al inicio.",
+      "saveSuccess": "Promoción actualizada.",
+      "saveFailed": "No se pudo actualizar la promoción."
     }
   },
   "paymentAssignments": {

@@ -2,13 +2,13 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
-import { ClassesTab, DoorCodePanel, PlansTab, RoomsTab } from '@components/modules';
+import { BenefitWindowsPanel, ClassesTab, DoorCodePanel, PlansTab, RoomsTab } from '@components/modules';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
 import { PageURLS } from '@core/constants';
 import { AdminInventoryPagePermissions, AdminPermissions } from '@core/permissions';
 
-const INVENTORY_TABS = ['rooms', 'classes', 'plans', 'doorCode'] as const;
+const INVENTORY_TABS = ['rooms', 'classes', 'plans', 'promotions', 'doorCode'] as const;
 type InventoryTab = (typeof INVENTORY_TABS)[number];
 
 function isInventoryTab(value: string | null): value is InventoryTab {
@@ -20,6 +20,7 @@ function AdminInventoryPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const canManageInventory = useOrPermissions(AdminPermissions.inventory);
   const canManageDoorCode = useOrPermissions(AdminPermissions.doorCode);
+  const canManageBenefitWindows = useOrPermissions(AdminPermissions.benefitWindows);
 
   const visibleTabs = useMemo(() => {
     const tabs: Array<InventoryTab> = [];
@@ -28,12 +29,16 @@ function AdminInventoryPage() {
       tabs.push('rooms', 'classes', 'plans');
     }
 
+    if (canManageBenefitWindows) {
+      tabs.push('promotions');
+    }
+
     if (canManageDoorCode) {
       tabs.push('doorCode');
     }
 
     return tabs;
-  }, [canManageDoorCode, canManageInventory]);
+  }, [canManageBenefitWindows, canManageDoorCode, canManageInventory]);
 
   const requestedTab = searchParams.get('tab');
   const defaultTab = visibleTabs[0] ?? 'rooms';
@@ -77,6 +82,9 @@ function AdminInventoryPage() {
               <TabsTrigger value='plans'>{t('admin:inventory.tabs.plans')}</TabsTrigger>
             </>
           ) : null}
+          {canManageBenefitWindows ? (
+            <TabsTrigger value='promotions'>{t('admin:inventory.tabs.promotions')}</TabsTrigger>
+          ) : null}
           {canManageDoorCode ? <TabsTrigger value='doorCode'>{t('admin:inventory.tabs.doorCode')}</TabsTrigger> : null}
         </TabsList>
 
@@ -92,6 +100,12 @@ function AdminInventoryPage() {
               <PlansTab />
             </TabsContent>
           </>
+        ) : null}
+
+        {canManageBenefitWindows ? (
+          <TabsContent value='promotions' className='bg-white p-6 rounded-lg shadow-sm border border-gray-100'>
+            <BenefitWindowsPanel />
+          </TabsContent>
         ) : null}
 
         {canManageDoorCode ? (

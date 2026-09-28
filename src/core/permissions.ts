@@ -119,6 +119,7 @@ export enum PERMISSION {
 
   // BENEFIT
   BENEFIT_READ = 'read:benefit',
+  BENEFIT_MANAGE = 'manage:benefit',
 
   // CAMPAIGN
   CAMPAIGN_MANAGE = 'manage:campaign',
@@ -171,6 +172,7 @@ export const AdminPermissions = {
   doorCode: [PERMISSION.DOOR_CODE_MANAGE],
   subscriptions: [PERMISSION.SUBSCRIPTION_MANAGE],
   benefits: [PERMISSION.BENEFIT_READ],
+  benefitWindows: [PERMISSION.BENEFIT_MANAGE],
   merch: [PERMISSION.PRODUCT_MANAGE],
   merchPos: [PERMISSION.ORDER_CREATE],
   figures: [PERMISSION.FIGURE_MANAGE],
@@ -188,4 +190,8 @@ export const AdminPermissions = {
 };
 
 /** Page + menu access for Inventario y Facturación (tabs are gated individually). */
-export const AdminInventoryPagePermissions = [...AdminPermissions.inventory, ...AdminPermissions.doorCode];
+export const AdminInventoryPagePermissions = [
+  ...AdminPermissions.inventory,
+  ...AdminPermissions.doorCode,
+  ...AdminPermissions.benefitWindows,
+];
