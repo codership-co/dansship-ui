@@ -107,19 +107,10 @@ export interface GeneratePaymentDocumentPayload {
   month: number;
 }
 
-export interface FixedPayRate {
-  user_id: string;
-  monthly_amount: number;
-  updated_by: string | null;
-  created_at: string;
-  updated_at: string;
-}
-
 export interface AdminPaymentDocumentsResponse {
   profile: PaymentProfile;
   documents: Array<PaymentDocument>;
   payable_document_id: string | null;
-  fixed_pay_rate: FixedPayRate | null;
 }
 
 function toNumber(value: string | number | null | undefined): number {
@@ -160,18 +151,10 @@ export function normalizePaymentDocumentList(data: PaymentDocumentListResponse):
   };
 }
 
-export function normalizeFixedPayRate(data: FixedPayRate): FixedPayRate {
-  return {
-    ...data,
-    monthly_amount: toNumber(data.monthly_amount as unknown as string),
-  };
-}
-
 export function normalizeAdminPaymentDocuments(data: AdminPaymentDocumentsResponse): AdminPaymentDocumentsResponse {
   return {
     ...data,
     documents: (data.documents ?? []).map(normalizeDocument),
-    fixed_pay_rate: data.fixed_pay_rate ? normalizeFixedPayRate(data.fixed_pay_rate) : null,
   };
 }
 
