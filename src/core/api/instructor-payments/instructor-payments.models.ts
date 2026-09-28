@@ -48,10 +48,6 @@ export interface PaymentProfileUpdatePayload {
   account_number?: string | null;
 }
 
-export interface AdminPaymentProfileUpdatePayload {
-  cuenta_de_cobro_enabled: boolean;
-}
-
 export interface PaymentDocumentLineItem {
   scheduled_class_id: string;
   class_date: string;
@@ -119,33 +115,11 @@ export interface FixedPayRate {
   updated_at: string;
 }
 
-export interface SetFixedPayRatePayload {
-  monthly_amount: number;
-}
-
 export interface AdminPaymentDocumentsResponse {
   profile: PaymentProfile;
   documents: Array<PaymentDocument>;
   payable_document_id: string | null;
   fixed_pay_rate: FixedPayRate | null;
-}
-
-export interface InstructorPayRate {
-  id: string;
-  hourly_amount: number;
-  effective_from: string;
-  effective_to: string | null;
-  created_by: string | null;
-  created_at: string;
-}
-
-export interface PayRateListResponse {
-  current: InstructorPayRate | null;
-  history: Array<InstructorPayRate>;
-}
-
-export interface SetPayRatePayload {
-  hourly_amount: number;
 }
 
 function toNumber(value: string | number | null | undefined): number {
@@ -201,20 +175,54 @@ export function normalizeAdminPaymentDocuments(data: AdminPaymentDocumentsRespon
   };
 }
 
-export function normalizePayRate(data: InstructorPayRate): InstructorPayRate {
-  return {
-    ...data,
-    hourly_amount: toNumber(data.hourly_amount as unknown as string),
-  };
-}
-
-export function normalizePayRateList(data: PayRateListResponse): PayRateListResponse {
-  return {
-    current: data.current ? normalizePayRate(data.current) : null,
-    history: (data.history ?? []).map(normalizePayRate),
-  };
-}
-
 export function normalizeGeneratedDocument(data: PaymentDocument): PaymentDocument {
   return normalizeDocument(data);
+}
+
+export type PaymentAssignmentState = 'active' | 'scheduled' | 'ended';
+
+export interface PaymentAssignment {
+  id: string;
+  user_id: string;
+  full_name: string;
+  email: string;
+  payment_type: PaymentType;
+  amount: number;
+  start_date: string;
+  end_date: string | null;
+  state: PaymentAssignmentState;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PaymentAssignmentListResponse {
+  items: Array<PaymentAssignment>;
+}
+
+export interface CreatePaymentAssignmentPayload {
+  user_id: string;
+  payment_type: PaymentType;
+  amount: number;
+  start_date: string;
+  end_date: string | null;
+}
+
+export interface UpdatePaymentAssignmentPayload {
+  payment_type: PaymentType;
+  amount: number;
+  start_date: string;
+  end_date: string | null;
+}
+
+export function normalizePaymentAssignment(data: PaymentAssignment): PaymentAssignment {
+  return {
+    ...data,
+    amount: toNumber(data.amount as unknown as string),
+  };
+}
+
+export function normalizePaymentAssignmentList(data: PaymentAssignmentListResponse): PaymentAssignmentListResponse {
+  return {
+    items: (data.items ?? []).map(normalizePaymentAssignment),
+  };
 }

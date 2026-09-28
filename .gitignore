@@ -39,3 +39,5 @@ ds-bundle/
 .design-sync/node_modules
 /types/
 /index.d.ts
+
+claude_design/

@@ -8,6 +8,7 @@ export * from './reports.page';
 export * from './bookings.page';
 export * from './payments.page';
 export * from './inventory.page';
+export * from './payment-assignments.page';
 export * from './merch-pos.page';
 export * from './studio-rental.page';
 export * from './agenda-conflicts.page';

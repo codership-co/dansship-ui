@@ -5,7 +5,7 @@ import { FaCartArrowDown, FaSignOutAlt } from 'react-icons/fa';
 import { GiAvoidance } from 'react-icons/gi';
 import { HiOutlineDocument } from 'react-icons/hi';
 import { HiMiniShoppingCart } from 'react-icons/hi2';
-import { LuClipboardList, LuX } from 'react-icons/lu';
+import { LuClipboardList, LuLink, LuX } from 'react-icons/lu';
 import { MdOutlineInventory, MdOutlinePayments } from 'react-icons/md';
 import { RiAdminFill } from 'react-icons/ri';
 import { SiReasonstudios } from 'react-icons/si';
@@ -27,7 +27,7 @@ import { Isotype, Logotype } from '@components/svg';
 import { FEATURE_FLAG, useAuth, useOrPermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { AdminInventoryPagePermissions, AdminPermissions } from '@core/permissions';
+import { AdminInventoryPagePermissions, AdminPermissions, PERMISSION } from '@core/permissions';
 import { usePromise } from '@hooks';
 
 interface MobileMenuProps {
@@ -102,6 +102,13 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       orPermissions: AdminInventoryPagePermissions,
       featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
       icon: MdOutlineInventory,
+    },
+    {
+      to: PageURLS.admin.paymentAssignments,
+      label: t('nav:adminMenu.paymentAssignments'),
+      orPermissions: [PERMISSION.INSTRUCTOR_PAY_RATE_MANAGE],
+      featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
+      icon: LuLink,
     },
     {
       to: PageURLS.admin.bookings,

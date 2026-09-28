@@ -2,6 +2,7 @@ export * from './admin-users';
 export * from './admin-class-roster';
 export * from './schedules';
 export * from './admin-inventory';
+export * from './admin-payment-assignments';
 export * from './admin-merch';
 export * from './admin-payments';
 export * from './admin-reports';

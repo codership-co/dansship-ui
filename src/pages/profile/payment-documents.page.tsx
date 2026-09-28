@@ -30,7 +30,6 @@ import {
   type PaymentMonthSummary,
 } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { PERMISSION } from '@core/permissions';
 import { formatPrice } from '@helpers';
 import { useCallablePromise, usePromise } from '@hooks';
 
@@ -43,8 +42,10 @@ function openUrl(url: string | undefined) {
 function PaymentDocumentsPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { response, isLoading, error, reFetch } = usePromise(() =>
-    DansshipAPI.instructorPayments.listPaymentDocuments(),
+  const canOpenPaymentDocuments = user?.cuentaDeCobroEnabled === true;
+  const { response, isLoading, error, reFetch } = usePromise(
+    () => DansshipAPI.instructorPayments.listPaymentDocuments(),
+    canOpenPaymentDocuments,
   );
   const list = response?.data;
   const profile = list?.profile;
@@ -226,7 +227,17 @@ function PaymentDocumentsPage() {
     }
   };
 
-  if (user?.cuentaDeCobroEnabled === false || profile?.cuenta_de_cobro_enabled === false) {
+  if (!user) {
+    return (
+      <Section navbarPadding>
+        <div className='grid place-content-center py-12'>
+          <SpinnerLoader message={t('profile:paymentDocuments.loading')} />
+        </div>
+      </Section>
+    );
+  }
+
+  if (!canOpenPaymentDocuments) {
     return <Navigate to={PageURLS.profile.root} replace />;
   }
 
@@ -542,7 +553,6 @@ function PaymentDocumentsPage() {
 
 export const SecurePaymentDocumentsPage = SecurityGuard(PaymentDocumentsPage, {
   featureFlags: [FEATURE_FLAG.areUserPagesEnabled],
-  orPermissions: [PERMISSION.OWN_PAYMENT_DOCUMENT_MANAGE],
   requiresAuth: true,
   redirect: PageURLS.auth.login,
 });
