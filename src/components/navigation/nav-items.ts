@@ -38,6 +38,7 @@ export function getAdminMenuPermissions(): Array<PERMISSION> {
     ...AdminPermissions.scheduleBuilder,
     ...AdminPermissions.scheduleManage,
     ...AdminInventoryPagePermissions,
+    PERMISSION.INSTRUCTOR_PAY_RATE_MANAGE,
     ...AdminPermissions.bookings,
     ...AdminPermissions.payments,
     ...AdminPermissions.merch,

@@ -116,6 +116,7 @@ export const PageURLS = {
     classRoster: (classId: string | number) => `/admin/classes/${classId}/roster`,
     agendaConflicts: '/admin/agenda/conflicts',
     inventory: '/admin/inventory',
+    paymentAssignments: '/admin/payment-assignments',
     scheduleBuilder: '/admin/schedule-builder',
     reports: '/admin/reports',
     bookings: '/admin/bookings',

@@ -1,25 +1,15 @@
 import { format, parseISO } from 'date-fns';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
 import { toast } from 'sonner';
 
 import { OptionalFileUpload } from '@components/forms';
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
-import {
-  Button,
-  Input,
-  Label,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  Textarea,
-} from '@components/ui';
+import { Button, Label, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Textarea } from '@components/ui';
 import { DansshipAPI, PaymentDocumentContentTypes, type PaymentDocument, type PaymentDocumentKind } from '@core/api';
+import { PageURLS } from '@core/constants';
 import { formatPrice } from '@helpers';
 import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
 
@@ -65,14 +55,6 @@ export function UserPaymentDocumentsTab({
   const { call: voidDocument, isLoading: isVoiding } = useCallablePromise((documentId: string, reason: string) =>
     DansshipAPI.instructorPaymentsAdmin.voidDocument(userId, documentId, reason),
   );
-  const { call: updatePaymentProfile, isLoading: isToggling } = useCallablePromise((enabled: boolean) =>
-    DansshipAPI.instructorPaymentsAdmin.updateUserPaymentProfile(userId, {
-      cuenta_de_cobro_enabled: enabled,
-    }),
-  );
-  const { call: saveFixedRate, isLoading: isSavingRate } = useCallablePromise((monthlyAmount: number) =>
-    DansshipAPI.instructorPaymentsAdmin.setFixedPayRate(userId, { monthly_amount: monthlyAmount }),
-  );
   const { call: payDocument, isLoading: isPaying } = useCallablePromise(async (documentId: string, file: File) => {
     const fileKey = await DansshipAPI.instructorPaymentsAdmin.uploadReceipt(userId, documentId, file);
 
@@ -84,20 +66,6 @@ export function UserPaymentDocumentsTab({
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [payTarget, setPayTarget] = useState<PaymentDocument | null>(null);
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
-  const [monthlyAmount, setMonthlyAmount] = useState('');
-  const [rateInitialized, setRateInitialized] = useState(false);
-
-  useEffect(() => {
-    setRateInitialized(false);
-    setMonthlyAmount('');
-  }, [userId]);
-
-  useEffect(() => {
-    if (rateInitialized || !data) return;
-
-    setMonthlyAmount(data.fixed_pay_rate ? String(data.fixed_pay_rate.monthly_amount) : '');
-    setRateInitialized(true);
-  }, [data, rateInitialized]);
 
   const handleOpenFile = async (kind: PaymentDocumentKind) => {
     const { ok, data: view } = await getFileViewUrl(kind);
@@ -174,40 +142,6 @@ export function UserPaymentDocumentsTab({
     }
   };
 
-  const handleToggleCuenta = async (checked: boolean) => {
-    const { ok } = await updatePaymentProfile(checked);
-
-    if (!ok) {
-      toast.error(t('admin:users.details.paymentDocuments.toggleFailed'));
-
-      return;
-    }
-
-    toast.success(t('admin:users.details.paymentDocuments.toggleSuccess'));
-    void reFetch();
-  };
-
-  const handleSaveFixedRate = async () => {
-    const amount = Number(monthlyAmount);
-
-    if (!Number.isFinite(amount) || amount <= 0) {
-      toast.error(t('admin:users.details.paymentDocuments.fixedRateInvalid'));
-
-      return;
-    }
-
-    const { ok } = await saveFixedRate(amount);
-
-    if (!ok) {
-      toast.error(t('admin:users.details.paymentDocuments.fixedRateFailed'));
-
-      return;
-    }
-
-    toast.success(t('admin:users.details.paymentDocuments.fixedRateSuccess'));
-    void reFetch();
-  };
-
   if (isLoading && !data) {
     return (
       <div className='grid place-content-center py-12'>
@@ -225,51 +159,13 @@ export function UserPaymentDocumentsTab({
 
   return (
     <section className='grid gap-6'>
-      <div className='flex items-start justify-between gap-4 rounded-md border bg-white/50 p-4'>
-        <div className='space-y-1'>
-          <Label htmlFor='cuenta-de-cobro-enabled' className='text-sm font-semibold'>
-            {t('admin:users.details.paymentDocuments.requiresCuenta')}
-          </Label>
-          <p className='text-sm text-muted-foreground'>
-            {t('admin:users.details.paymentDocuments.requiresCuentaHint')}
-          </p>
-        </div>
-        <Switch
-          id='cuenta-de-cobro-enabled'
-          checked={profile?.cuenta_de_cobro_enabled ?? true}
-          disabled={isToggling}
-          onCheckedChange={checked => void handleToggleCuenta(checked)}
-        />
-      </div>
-
       {canManagePayRate ? (
-        <form
-          className='grid gap-3 rounded-md border bg-white/50 p-4'
-          onSubmit={event => {
-            event.preventDefault();
-            void handleSaveFixedRate();
-          }}
-        >
-          <h3 className='text-sm font-semibold'>{t('admin:users.details.paymentDocuments.fixedRateTitle')}</h3>
-          <p className='text-sm text-muted-foreground'>{t('admin:users.details.paymentDocuments.fixedRateHint')}</p>
-          <div className='flex flex-wrap items-end gap-3'>
-            <div className='grid min-w-48 flex-1 gap-1.5'>
-              <Label htmlFor='fixed-monthly-amount'>{t('admin:users.details.paymentDocuments.fixedRateAmount')}</Label>
-              <Input
-                id='fixed-monthly-amount'
-                type='number'
-                min='1'
-                step='1'
-                value={monthlyAmount}
-                onChange={event => setMonthlyAmount(event.target.value)}
-                required
-              />
-            </div>
-            <Button type='submit' disabled={isSavingRate}>
-              {t('admin:users.details.paymentDocuments.fixedRateSave')}
-            </Button>
-          </div>
-        </form>
+        <div className='grid gap-2 rounded-md border bg-white/50 p-4 text-sm'>
+          <p>{t('admin:users.details.paymentDocuments.fixedRatePointer')}</p>
+          <Link className='font-semibold text-primary' to={PageURLS.admin.paymentAssignments}>
+            {t('admin:users.details.paymentDocuments.fixedRateLink')}
+          </Link>
+        </div>
       ) : null}
 
       <div className='grid gap-4 rounded-md border bg-white/50 p-4'>

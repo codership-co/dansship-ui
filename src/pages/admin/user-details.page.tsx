@@ -59,11 +59,17 @@ function UserDetailsPage() {
   const canProcessPaymentDocuments = useOrPermissions([PERMISSION.INSTRUCTOR_PAYMENT_DOCUMENT_PROCESS]);
   const canManagePayRate = useOrPermissions([PERMISSION.INSTRUCTOR_PAY_RATE_MANAGE]);
   const canReadClassFeedback = useOrPermissions(AdminPermissions.classFeedback);
+  const { response: assignmentsResponse } = usePromise(
+    () => DansshipAPI.instructorPaymentsAdmin.listUserPaymentAssignments(userId),
+    Boolean(userId) && canReadPaymentDocuments,
+    [userId, canReadPaymentDocuments],
+  );
+  const hasPaymentAssignment = (assignmentsResponse?.data?.items.length ?? 0) > 0;
   const showInstructorClasses = Boolean(user?.has_instructor_profile) && canManageSchedule;
   const showInstructorCsat = Boolean(user?.instructor_profile?.id) && canReadClassFeedback;
   const showPaymentDocuments =
-    (Boolean(user?.has_instructor_profile) || Boolean(user?.roles?.includes(ROLE.AREA_LEADER))) &&
-    canReadPaymentDocuments;
+    canReadPaymentDocuments &&
+    (Boolean(user?.has_instructor_profile) || Boolean(user?.roles?.includes(ROLE.AREA_LEADER)) || hasPaymentAssignment);
 
   const requestedTabParam = searchParams.get('tab');
   const requestedTab = requestedTabParam === 'context' ? NOTES_TAB : (requestedTabParam ?? PROFILE_TAB);

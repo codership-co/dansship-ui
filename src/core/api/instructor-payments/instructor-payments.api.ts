@@ -4,7 +4,6 @@ import { uploadFileWithPresignedRetry } from '../common/put-file-to-presigned-ur
 
 import {
   type AdminPaymentDocumentsResponse,
-  type AdminPaymentProfileUpdatePayload,
   type GeneratePaymentDocumentPayload,
   type PaymentDocument,
   type PaymentDocumentContentType,
@@ -12,19 +11,17 @@ import {
   type PaymentDocumentListResponse,
   type PaymentProfile,
   type PaymentProfileUpdatePayload,
-  type PayRateListResponse,
-  type SetFixedPayRatePayload,
-  type SetPayRatePayload,
-  type FixedPayRate,
+  type CreatePaymentAssignmentPayload,
+  type PaymentAssignment,
+  type PaymentAssignmentListResponse,
+  type UpdatePaymentAssignmentPayload,
   SignatureContentTypes,
   PaymentDocumentContentTypes,
   normalizeAdminPaymentDocuments,
-  normalizeFixedPayRate,
   normalizeGeneratedDocument,
-  normalizePayRate,
-  normalizePayRateList,
+  normalizePaymentAssignment,
+  normalizePaymentAssignmentList,
   normalizePaymentDocumentList,
-  type InstructorPayRate,
 } from './instructor-payments.models';
 
 import { DansshipAPIError } from '@core/api';
@@ -145,14 +142,6 @@ export class InstructorPaymentsAdminAPI {
     );
   }
 
-  async updateUserPaymentProfile(userId: string, payload: AdminPaymentProfileUpdatePayload) {
-    return this.httpClient.callNoError<PaymentProfile, AdminPaymentProfileUpdatePayload>({
-      path: `/admin/users/${userId}/payment-profile`,
-      method: 'PATCH',
-      data: payload,
-    });
-  }
-
   async getFileViewUrl(userId: string, kind: PaymentDocumentKind) {
     return this.httpClient.callNoError<ProofViewUrlResponse>({
       path: `/admin/users/${userId}/payment-profile/${kind}/view-url`,
@@ -220,35 +209,45 @@ export class InstructorPaymentsAdminAPI {
     );
   }
 
-  async setFixedPayRate(userId: string, payload: SetFixedPayRatePayload) {
-    return this.httpClient.callNoError<FixedPayRate, SetFixedPayRatePayload>(
+  async listPaymentAssignments() {
+    return this.httpClient.callNoError<PaymentAssignmentListResponse>(
       {
-        path: `/admin/users/${userId}/fixed-pay-rate`,
-        method: 'PUT',
-        data: payload,
-      },
-      normalizeFixedPayRate,
-    );
-  }
-
-  async listPayRates() {
-    return this.httpClient.callNoError<PayRateListResponse>(
-      {
-        path: '/admin/instructor-pay-rates',
+        path: '/admin/payment-assignments',
         method: 'GET',
       },
-      normalizePayRateList,
+      normalizePaymentAssignmentList,
     );
   }
 
-  async setPayRate(payload: SetPayRatePayload) {
-    return this.httpClient.callNoError<InstructorPayRate, SetPayRatePayload>(
+  async listUserPaymentAssignments(userId: string) {
+    return this.httpClient.callNoError<PaymentAssignmentListResponse>(
       {
-        path: '/admin/instructor-pay-rates',
+        path: `/admin/users/${userId}/payment-assignments`,
+        method: 'GET',
+      },
+      normalizePaymentAssignmentList,
+    );
+  }
+
+  async createPaymentAssignment(payload: CreatePaymentAssignmentPayload) {
+    return this.httpClient.callNoError<PaymentAssignment, CreatePaymentAssignmentPayload>(
+      {
+        path: '/admin/payment-assignments',
         method: 'POST',
         data: payload,
       },
-      normalizePayRate,
+      normalizePaymentAssignment,
+    );
+  }
+
+  async updatePaymentAssignment(assignmentId: string, payload: UpdatePaymentAssignmentPayload) {
+    return this.httpClient.callNoError<PaymentAssignment, UpdatePaymentAssignmentPayload>(
+      {
+        path: `/admin/payment-assignments/${assignmentId}`,
+        method: 'PATCH',
+        data: payload,
+      },
+      normalizePaymentAssignment,
     );
   }
 }

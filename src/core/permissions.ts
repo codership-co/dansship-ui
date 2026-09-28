@@ -188,8 +188,4 @@ export const AdminPermissions = {
 };
 
 /** Page + menu access for Inventario y Facturación (tabs are gated individually). */
-export const AdminInventoryPagePermissions = [
-  ...AdminPermissions.inventory,
-  ...AdminPermissions.doorCode,
-  PERMISSION.INSTRUCTOR_PAY_RATE_MANAGE,
-];
+export const AdminInventoryPagePermissions = [...AdminPermissions.inventory, ...AdminPermissions.doorCode];

@@ -9,10 +9,9 @@ import { toast } from 'sonner';
 
 import { Section } from '@components/containers';
 import { ProfilePicture } from '@components/ui';
-import { FEATURE_FLAG, useAuth, useEnabledFeatureFlag, useOrPermissions, useStudentSession } from '@contexts';
+import { FEATURE_FLAG, useAuth, useEnabledFeatureFlag, useStudentSession } from '@contexts';
 import { DansshipAPI, PaymentProofContentType, PaymentProofContentTypesList } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { PERMISSION } from '@core/permissions';
 import { usePromise } from '@hooks';
 
 interface ProfileHeaderProps {
@@ -25,7 +24,6 @@ export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
   const { user, uploadProfilePhoto } = useAuth();
   const [imageURL, setImageURL] = useState<string>('');
   const [isUploading, setIsUploading] = useState(false);
-  const canManageOwnPaymentDocuments = useOrPermissions([PERMISSION.OWN_PAYMENT_DOCUMENT_MANAGE]);
   const isStudioRentalRequestsEnabled = useEnabledFeatureFlag([
     FEATURE_FLAG.areUserPagesEnabled,
     FEATURE_FLAG.isStudioRentalRequestsPageEnabled,
@@ -182,7 +180,7 @@ export function ProfileHeader({ editMode, onEdit }: ProfileHeaderProps) {
               </Button>
             </Link>
 
-            {canManageOwnPaymentDocuments && user.cuentaDeCobroEnabled !== false ? (
+            {user.cuentaDeCobroEnabled === true ? (
               <Link to={PageURLS.profile.paymentDocuments}>
                 <Button variant='solid' color='primary' size='small' fullWidth>
                   <LuFileText className='h-4 w-4' />

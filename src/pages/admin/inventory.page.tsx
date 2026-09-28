@@ -2,13 +2,13 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
-import { ClassesTab, DoorCodePanel, InstructorPayRatesTab, PlansTab, RoomsTab } from '@components/modules';
+import { ClassesTab, DoorCodePanel, PlansTab, RoomsTab } from '@components/modules';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
 import { PageURLS } from '@core/constants';
-import { AdminInventoryPagePermissions, AdminPermissions, PERMISSION } from '@core/permissions';
+import { AdminInventoryPagePermissions, AdminPermissions } from '@core/permissions';
 
-const INVENTORY_TABS = ['rooms', 'classes', 'plans', 'payRates', 'doorCode'] as const;
+const INVENTORY_TABS = ['rooms', 'classes', 'plans', 'doorCode'] as const;
 type InventoryTab = (typeof INVENTORY_TABS)[number];
 
 function isInventoryTab(value: string | null): value is InventoryTab {
@@ -19,7 +19,6 @@ function AdminInventoryPage() {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const canManageInventory = useOrPermissions(AdminPermissions.inventory);
-  const canManagePayRate = useOrPermissions([PERMISSION.INSTRUCTOR_PAY_RATE_MANAGE]);
   const canManageDoorCode = useOrPermissions(AdminPermissions.doorCode);
 
   const visibleTabs = useMemo(() => {
@@ -29,16 +28,12 @@ function AdminInventoryPage() {
       tabs.push('rooms', 'classes', 'plans');
     }
 
-    if (canManagePayRate) {
-      tabs.push('payRates');
-    }
-
     if (canManageDoorCode) {
       tabs.push('doorCode');
     }
 
     return tabs;
-  }, [canManageDoorCode, canManageInventory, canManagePayRate]);
+  }, [canManageDoorCode, canManageInventory]);
 
   const requestedTab = searchParams.get('tab');
   const defaultTab = visibleTabs[0] ?? 'rooms';
@@ -82,7 +77,6 @@ function AdminInventoryPage() {
               <TabsTrigger value='plans'>{t('admin:inventory.tabs.plans')}</TabsTrigger>
             </>
           ) : null}
-          {canManagePayRate ? <TabsTrigger value='payRates'>{t('admin:inventory.tabs.payRates')}</TabsTrigger> : null}
           {canManageDoorCode ? <TabsTrigger value='doorCode'>{t('admin:inventory.tabs.doorCode')}</TabsTrigger> : null}
         </TabsList>
 
@@ -98,12 +92,6 @@ function AdminInventoryPage() {
               <PlansTab />
             </TabsContent>
           </>
-        ) : null}
-
-        {canManagePayRate ? (
-          <TabsContent value='payRates' className='bg-white p-6 rounded-lg shadow-sm border border-gray-100'>
-            <InstructorPayRatesTab />
-          </TabsContent>
         ) : null}
 
         {canManageDoorCode ? (
