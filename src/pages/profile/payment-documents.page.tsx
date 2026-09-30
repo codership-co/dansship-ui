@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LuLoader } from 'react-icons/lu';
 import { Navigate } from 'react-router';
 import { toast } from 'sonner';
 
@@ -8,18 +7,8 @@ import { Section, SectionHeading } from '@components/containers';
 import { OptionalFileUpload } from '@components/forms';
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
-import {
-  Button,
-  Input,
-  Label,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  Textarea,
-} from '@components/ui';
+import { PaymentMonthsList } from '@components/modules/profile';
+import { Button, Input, Label, Textarea } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
 import {
   DansshipAPI,
@@ -30,7 +19,6 @@ import {
   type PaymentMonthSummary,
 } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { formatPrice } from '@helpers';
 import { useCallablePromise, usePromise } from '@hooks';
 
 function openUrl(url: string | undefined) {
@@ -77,7 +65,9 @@ function PaymentDocumentsPage() {
               ? 'social_security_file_key'
               : 'bank_certificate_file_key';
 
-      return DansshipAPI.instructorPayments.updatePaymentProfile({ [field]: fileKey });
+      return DansshipAPI.instructorPayments.updatePaymentProfile({
+        [field]: fileKey,
+      });
     },
   );
   const { call: saveBankFields, isLoading: isSavingBank } = useCallablePromise(() =>
@@ -389,104 +379,26 @@ function PaymentDocumentsPage() {
             </form>
           </section>
 
-          <section className='grid gap-4'>
+          <section className='grid min-w-0 gap-4'>
             <h3 className='text-lg font-semibold'>{t('profile:paymentDocuments.cuentasTitle')}</h3>
             {!list?.months.length ? (
               <p className='py-8 text-center text-sm text-muted-foreground'>
                 {t('profile:paymentDocuments.emptyMonths')}
               </p>
             ) : (
-              <div className='rounded-md border bg-white/50 overflow-x-auto'>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>{t('profile:paymentDocuments.columns.period')}</TableHead>
-                      <TableHead>{t('profile:paymentDocuments.columns.status')}</TableHead>
-                      <TableHead>{t('profile:paymentDocuments.columns.total')}</TableHead>
-                      <TableHead />
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {list.months.map(month => {
-                      const issuedDocument = month.issued_document;
-                      const canConfirmOrDispute = month.status === 'issued' && Boolean(issuedDocument);
-
-                      return (
-                        <TableRow key={`${month.year}-${month.month}`}>
-                          <TableCell>
-                            {t(`profile:paymentDocuments.months.${month.month}`)} {month.year}
-                          </TableCell>
-                          <TableCell>
-                            {t(`profile:paymentDocuments.monthStatus.${month.status}`)}
-                            {month.status === 'blocked' && month.missing_requirements.length ? (
-                              <p className='mt-1 text-xs text-muted-foreground'>
-                                {month.missing_requirements
-                                  .map(code => t(`profile:paymentDocuments.missing.${code}`, { defaultValue: code }))
-                                  .join(', ')}
-                              </p>
-                            ) : null}
-                            {issuedDocument?.dispute_reason ? (
-                              <p className='mt-1 text-xs text-muted-foreground'>{issuedDocument.dispute_reason}</p>
-                            ) : null}
-                          </TableCell>
-                          <TableCell>
-                            {issuedDocument ? formatPrice(issuedDocument.total_amount, 'COP') : '—'}
-                          </TableCell>
-                          <TableCell>
-                            <div className='flex justify-end gap-2'>
-                              {month.status === 'available' ? (
-                                <Button
-                                  type='button'
-                                  size='sm'
-                                  disabled={isGenerating}
-                                  onClick={() => void handleGenerate(month)}
-                                >
-                                  {isGenerating ? <LuLoader className='animate-spin' /> : null}
-                                  {t('profile:paymentDocuments.generate')}
-                                </Button>
-                              ) : null}
-                              {canConfirmOrDispute && issuedDocument ? (
-                                <>
-                                  <Button
-                                    type='button'
-                                    size='sm'
-                                    disabled={isConfirming}
-                                    onClick={() => setConfirmTargetId(issuedDocument.id)}
-                                  >
-                                    {t('profile:paymentDocuments.confirm')}
-                                  </Button>
-                                  <Button
-                                    type='button'
-                                    variant='outline'
-                                    size='sm'
-                                    onClick={() => {
-                                      setDisputeTargetId(issuedDocument.id);
-                                      setDisputeReason('');
-                                    }}
-                                  >
-                                    {t('profile:paymentDocuments.dispute')}
-                                  </Button>
-                                </>
-                              ) : null}
-                              {issuedDocument ? (
-                                <Button
-                                  type='button'
-                                  variant='outline'
-                                  size='sm'
-                                  disabled={isOpeningDocument}
-                                  onClick={() => void handleOpenDocument(issuedDocument.id)}
-                                >
-                                  {t('profile:paymentDocuments.download')}
-                                </Button>
-                              ) : null}
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
+              <PaymentMonthsList
+                months={list.months}
+                isGenerating={isGenerating}
+                isConfirming={isConfirming}
+                isOpeningDocument={isOpeningDocument}
+                onGenerate={month => void handleGenerate(month)}
+                onConfirm={setConfirmTargetId}
+                onDispute={documentId => {
+                  setDisputeTargetId(documentId);
+                  setDisputeReason('');
+                }}
+                onDownload={documentId => void handleOpenDocument(documentId)}
+              />
             )}
           </section>
         </>
