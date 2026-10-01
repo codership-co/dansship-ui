@@ -4,7 +4,18 @@ import { LuEllipsisVertical } from 'react-icons/lu';
 import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@components/modals';
-import { Button, Popover, PopoverContent, PopoverTrigger } from '@components/ui';
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@components/ui';
 import { useOrPermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { AdminPermissions } from '@core/permissions';
@@ -36,6 +47,7 @@ export function UserDetailsActions({
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<'deactivateUser' | 'deactivateInstructor' | null>(null);
+  const [issuedActivationLink, setIssuedActivationLink] = useState<string | null>(null);
   const canManageUsers = useOrPermissions(AdminPermissions.users);
 
   const { call: inviteInstructor, isLoading: isInviting } = useCallablePromise((id: string) =>
@@ -90,9 +102,27 @@ export function UserDetailsActions({
           email: userEmail,
         }),
       );
+
+      if (response.data?.activation_link) {
+        setIssuedActivationLink(response.data.activation_link);
+      }
+
       onChanged();
     } catch {
       toast.error(t('admin:users.details.inviteInstructorFailed'));
+    }
+  };
+
+  const handleCopyActivationLink = async () => {
+    if (!issuedActivationLink) {
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(issuedActivationLink);
+      toast.success(t('admin:users.details.copyInstructorInviteLinkSuccess'));
+    } catch {
+      toast.error(t('admin:users.details.copyInstructorInviteLinkFailed'));
     }
   };
 
@@ -310,6 +340,31 @@ export function UserDetailsActions({
           isLoading={confirmDialog.isLoading}
         />
       ) : null}
+
+      <Dialog
+        open={issuedActivationLink !== null}
+        onOpenChange={open => {
+          if (!open) {
+            setIssuedActivationLink(null);
+          }
+        }}
+      >
+        <DialogContent className='sm:max-w-106.25'>
+          <DialogHeader>
+            <DialogTitle>{t('admin:users.details.instructorInviteLinkTitle')}</DialogTitle>
+            <DialogDescription>{t('admin:users.details.instructorInviteLinkDescription')}</DialogDescription>
+          </DialogHeader>
+          {issuedActivationLink ? <p className='break-all text-sm text-foreground'>{issuedActivationLink}</p> : null}
+          <DialogFooter>
+            <Button type='button' variant='outline' onClick={() => setIssuedActivationLink(null)}>
+              {t('common:close')}
+            </Button>
+            <Button type='button' onClick={() => void handleCopyActivationLink()}>
+              {t('admin:users.details.copyInstructorInviteLink')}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
