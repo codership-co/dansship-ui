@@ -8,7 +8,14 @@ import { OptionalFileUpload } from '@components/forms';
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
 import { Button, Label, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Textarea } from '@components/ui';
-import { DansshipAPI, PaymentDocumentContentTypes, type PaymentDocument, type PaymentDocumentKind } from '@core/api';
+import {
+  DANSSHIP_ERROR_CODE,
+  DansshipAPI,
+  DansshipAPIError,
+  PaymentDocumentContentTypes,
+  type PaymentDocument,
+  type PaymentDocumentKind,
+} from '@core/api';
 import { PageURLS } from '@core/constants';
 import { formatPrice } from '@helpers';
 import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
@@ -20,6 +27,13 @@ function openUrl(url: string | undefined) {
 }
 
 const VOIDABLE_STATUSES = new Set(['issued', 'disputed']);
+
+function isDocumentNotConfirmed(error: unknown) {
+  return (
+    error instanceof DansshipAPIError &&
+    error.body.error_code === DANSSHIP_ERROR_CODE.INSTRUCTOR_PAYMENT_DOCUMENT_NOT_CONFIRMED
+  );
+}
 
 export function UserPaymentDocumentsTab({
   userId,
@@ -121,14 +135,27 @@ export function UserPaymentDocumentsTab({
     void reFetch();
   };
 
+  const handlePayFailure = (error: unknown) => {
+    if (isDocumentNotConfirmed(error)) {
+      toast.error(t('admin:users.details.paymentDocuments.payNotConfirmed'));
+      setPayTarget(null);
+      setReceiptFile(null);
+      void reFetch();
+
+      return;
+    }
+
+    toast.error(t('admin:users.details.paymentDocuments.payFailed'));
+  };
+
   const handlePay = async () => {
     if (!payTarget || !receiptFile) return;
 
     try {
-      const { ok } = await payDocument(payTarget.id, receiptFile);
+      const { ok, error } = await payDocument(payTarget.id, receiptFile);
 
       if (!ok) {
-        toast.error(t('admin:users.details.paymentDocuments.payFailed'));
+        handlePayFailure(error);
 
         return;
       }
@@ -137,8 +164,8 @@ export function UserPaymentDocumentsTab({
       setPayTarget(null);
       setReceiptFile(null);
       void reFetch();
-    } catch {
-      toast.error(t('admin:users.details.paymentDocuments.payFailed'));
+    } catch (error) {
+      handlePayFailure(error);
     }
   };
 

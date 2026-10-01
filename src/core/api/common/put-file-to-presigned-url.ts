@@ -1,3 +1,5 @@
+import { DansshipAPIError } from '../dansship.error';
+
 const DEFAULT_PUT_ATTEMPTS = 2;
 const DEFAULT_FLOW_ATTEMPTS = 2;
 
@@ -5,6 +7,14 @@ function wait(ms: number) {
   return new Promise<void>(resolve => {
     setTimeout(resolve, ms);
   });
+}
+
+function isRetryableFlowError(error: unknown) {
+  if (error instanceof DansshipAPIError) {
+    return error.status >= 500;
+  }
+
+  return true;
 }
 
 function isRetryablePutFailure(error: unknown, status?: number) {
@@ -88,7 +98,7 @@ export async function uploadFileWithPresignedRetry<T>(
     } catch (error) {
       lastError = error;
 
-      if (attempt >= DEFAULT_FLOW_ATTEMPTS) {
+      if (attempt >= DEFAULT_FLOW_ATTEMPTS || !isRetryableFlowError(error)) {
         break;
       }
 
