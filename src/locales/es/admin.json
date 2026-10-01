@@ -294,6 +294,7 @@
         "receiptHint": "PDF o imagen del comprobante.",
         "paySuccess": "La cuenta de cobro quedó marcada como pagada.",
         "payFailed": "No se pudo registrar el pago.",
+        "payNotConfirmed": "Esta cuenta ya no está confirmada. Si ya fue pagada, no hace falta registrarla de nuevo.",
         "fixedRatePointer": "El tipo y el monto de pago se administran en Vinculación de Pago.",
         "fixedRateLink": "Abrir Vinculación de Pago",
         "void": "Anular",

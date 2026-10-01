@@ -183,7 +183,11 @@ export class InstructorPaymentsAdminAPI {
     return uploadFileWithPresignedRetry(
       file,
       async () => {
-        const { data } = await this.getReceiptUploadUrl(userId, documentId, file.type);
+        const { ok, data, error } = await this.getReceiptUploadUrl(userId, documentId, file.type);
+
+        if (!ok || !data?.upload_url || !data.file_key) {
+          throw error instanceof DansshipAPIError ? error : new Error('Failed to get upload url');
+        }
 
         return data;
       },
