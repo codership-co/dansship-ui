@@ -134,8 +134,8 @@ export interface AdminInstructorListItem {
 }
 
 export interface InstructorInviteResponse {
-  user_id: string;
-  email: string;
+  invited: boolean;
+  activation_link: string;
 }
 
 export interface InstructorDeactivateResponse {
