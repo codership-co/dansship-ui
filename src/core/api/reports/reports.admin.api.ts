@@ -196,6 +196,28 @@ export class ReportsAdminAPI {
     });
   }
 
+  async exportActiveStudentsCsv() {
+    const response = await fetch(`${import.meta.env.VITE_DANSSHIP_API_URL}/admin/reports/active-students-list.csv`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: { accept: 'text/csv' },
+    });
+
+    if (!response.ok) {
+      throw new Error('Active students export failed');
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = 'estudiantes-activos.csv';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }
+
   async getNetRevenueByClassType(startDate?: string, endDate?: string) {
     return this.httpClient.callNoError<NetRevenueByClassTypeReport>({
       path: '/admin/reports/net-revenue-by-class-type',

@@ -149,8 +149,11 @@
     "email": "Correo",
     "viewStudent": "Ver estudiante",
     "activeListTitle": "Estudiantes activos y sus planes",
-    "activeListDescription": "Estudiantes con al menos una suscripción activa (no sistema). Los filtros de fecha no aplican.",
-    "plans": "Planes"
+    "activeListDescription": "Estudiantes con al menos una suscripción activa de un plan no sistema, vigente hoy (hora de Colombia). Los filtros de fecha no aplican.",
+    "plans": "Planes",
+    "phone": "Teléfono",
+    "exportCsv": "Exportar CSV",
+    "exportCsvFailed": "No se pudo exportar el CSV de estudiantes activos."
   },
   "classTypeNetRevenue": {
     "title": "Ingreso neto por tipo de clase",
