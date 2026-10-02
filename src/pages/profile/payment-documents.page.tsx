@@ -11,7 +11,9 @@ import { PaymentMonthsList } from '@components/modules/profile';
 import { Button, Input, Label, Textarea } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
 import {
+  DANSSHIP_ERROR_CODE,
   DansshipAPI,
+  DansshipAPIError,
   PaymentDocumentContentTypes,
   SignatureContentTypes,
   type BankAccountType,
@@ -136,18 +138,30 @@ function PaymentDocumentsPage() {
 
   const handleGenerate = async (month: PaymentMonthSummary) => {
     try {
-      const { ok } = await generateDocument(month.year, month.month);
+      const result = await generateDocument(month.year, month.month);
 
-      if (!ok) {
-        toast.error(t('profile:paymentDocuments.generateFailed'));
+      if (!result.ok) {
+        const code = result.error instanceof DansshipAPIError ? result.error.body.error_code : undefined;
+
+        toast.error(
+          code === DANSSHIP_ERROR_CODE.INSTRUCTOR_PAYMENT_NO_NEW_CLASSES
+            ? t('profile:paymentDocuments.noNewClasses')
+            : t('profile:paymentDocuments.generateFailed'),
+        );
 
         return;
       }
 
       toast.success(t('profile:paymentDocuments.generateSuccess'));
       void reFetch();
-    } catch {
-      toast.error(t('profile:paymentDocuments.generateFailed'));
+    } catch (error) {
+      const code = error instanceof DansshipAPIError ? error.body.error_code : undefined;
+
+      toast.error(
+        code === DANSSHIP_ERROR_CODE.INSTRUCTOR_PAYMENT_NO_NEW_CLASSES
+          ? t('profile:paymentDocuments.noNewClasses')
+          : t('profile:paymentDocuments.generateFailed'),
+      );
     }
   };
 

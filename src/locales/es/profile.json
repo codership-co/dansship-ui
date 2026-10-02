@@ -68,6 +68,8 @@
     "generate": "Generar",
     "generateSuccess": "Cuenta de cobro generada.",
     "generateFailed": "No se pudo generar la cuenta de cobro. Verifica que exista una tarifa horaria y que el mes ya haya cerrado.",
+    "substituteOpenMonth": "Puedes generar una cuenta durante el mes en curso por las clases que ya empezaron. Cada cuenta incluye solo las clases que todavía no están en otra cuenta.",
+    "noNewClasses": "No hay clases nuevas para incluir. Solo entran las clases que ya empezaron y que no están en otra cuenta de cobro.",
     "download": "Descargar",
     "confirm": "Confirmar",
     "confirmTitle": "¿Confirmar esta cuenta de cobro?",

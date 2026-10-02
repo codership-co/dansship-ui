@@ -5,7 +5,9 @@ import {
   type AvailabilityApiItem,
   type InstructorAvailability,
   DAY_TO_INDEX,
+  type InstructorConvertToRegularResponse,
   type InstructorDeactivateResponse,
+  type InstructorInvitePayload,
   type InstructorInviteResponse,
   type InstructorReactivateResponse,
 } from './instructors.models';
@@ -22,10 +24,11 @@ export class InstructorsAdminAPI {
     });
   }
 
-  async inviteInstructor(userId: string) {
-    return this.httpClient.callNoError<InstructorInviteResponse>({
+  async inviteInstructor(userId: string, payload: InstructorInvitePayload) {
+    return this.httpClient.callNoError<InstructorInviteResponse, InstructorInvitePayload>({
       path: `/admin/instructors/${userId}/invite`,
       method: 'POST',
+      data: payload,
     });
   }
 
@@ -39,6 +42,13 @@ export class InstructorsAdminAPI {
   async reactivateInstructor(userId: string) {
     return this.httpClient.callNoError<InstructorReactivateResponse>({
       path: `/admin/instructors/${userId}/reactivate`,
+      method: 'POST',
+    });
+  }
+
+  async convertSubstituteToRegular(userId: string) {
+    return this.httpClient.callNoError<InstructorConvertToRegularResponse>({
+      path: `/admin/instructors/${userId}/convert-to-regular`,
       method: 'POST',
     });
   }

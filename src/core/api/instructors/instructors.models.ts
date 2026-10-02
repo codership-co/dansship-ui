@@ -133,6 +133,10 @@ export interface AdminInstructorListItem {
   full_name?: string;
 }
 
+export interface InstructorInvitePayload {
+  is_substitute: boolean;
+}
+
 export interface InstructorInviteResponse {
   invited: boolean;
   activation_link: string;
@@ -144,6 +148,10 @@ export interface InstructorDeactivateResponse {
 
 export interface InstructorReactivateResponse {
   reactivated: boolean;
+}
+
+export interface InstructorConvertToRegularResponse {
+  converted: boolean;
 }
 
 export interface AcceptInstructorInvitePayload {

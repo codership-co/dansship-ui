@@ -12,6 +12,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  Label,
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -29,6 +30,7 @@ interface UserDetailsActionsProps {
   hasInstructorProfile: boolean;
   instructorOnboardingCompleted: boolean;
   instructorBusinessStatus: string | null;
+  isSubstitute: boolean;
   onChanged: () => void;
 }
 
@@ -42,16 +44,23 @@ export function UserDetailsActions({
   hasInstructorProfile,
   instructorOnboardingCompleted,
   instructorBusinessStatus,
+  isSubstitute,
   onChanged,
 }: UserDetailsActionsProps) {
   const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [pendingAction, setPendingAction] = useState<'deactivateUser' | 'deactivateInstructor' | null>(null);
+  const [pendingAction, setPendingAction] = useState<
+    'deactivateUser' | 'deactivateInstructor' | 'convertSubstitute' | null
+  >(null);
+  const [inviteDialogOpen, setInviteDialogOpen] = useState(false);
+  const [inviteAsSubstitute, setInviteAsSubstitute] = useState(false);
   const [issuedActivationLink, setIssuedActivationLink] = useState<string | null>(null);
   const canManageUsers = useOrPermissions(AdminPermissions.users);
 
-  const { call: inviteInstructor, isLoading: isInviting } = useCallablePromise((id: string) =>
-    DansshipAPI.instructorsAdmin.inviteInstructor(id),
+  const { call: inviteInstructor, isLoading: isInviting } = useCallablePromise((id: string, asSubstitute: boolean) =>
+    DansshipAPI.instructorsAdmin.inviteInstructor(id, {
+      is_substitute: asSubstitute,
+    }),
   );
   const { call: deactivateUser, isLoading: isDeactivatingUser } = useCallablePromise((id: string) =>
     DansshipAPI.usersAdmin.deactivateUser(id),
@@ -64,6 +73,9 @@ export function UserDetailsActions({
   );
   const { call: reactivateInstructor, isLoading: isReactivatingInstructor } = useCallablePromise((id: string) =>
     DansshipAPI.instructorsAdmin.reactivateInstructor(id),
+  );
+  const { call: convertSubstituteToRegular, isLoading: isConvertingSubstitute } = useCallablePromise((id: string) =>
+    DansshipAPI.instructorsAdmin.convertSubstituteToRegular(id),
   );
 
   const isInstructor = useMemo(() => roleNames.some(role => normalizeRoleName(role) === 'instructor'), [roleNames]);
@@ -79,16 +91,34 @@ export function UserDetailsActions({
   const canReactivateUser = !isActive;
   const canDeactivateInstructor = instructorOnboardingCompleted && isInstructor;
   const canReactivateInstructor = hasInstructorProfile && instructorOnboardingCompleted && !isInstructor;
+  const canConvertSubstitute = isSubstitute && instructorBusinessStatus === 'active' && isInstructor;
   const isLoading =
-    isInviting || isDeactivatingUser || isReactivatingUser || isDeactivatingInstructor || isReactivatingInstructor;
+    isInviting ||
+    isDeactivatingUser ||
+    isReactivatingUser ||
+    isDeactivatingInstructor ||
+    isReactivatingInstructor ||
+    isConvertingSubstitute;
 
   if (!canManageUsers) {
     return null;
   }
 
+  const openInviteDialog = () => {
+    setIsMenuOpen(false);
+    setInviteAsSubstitute(isSubstitute);
+    setIssuedActivationLink(null);
+    setInviteDialogOpen(true);
+  };
+
+  const closeInviteDialog = () => {
+    setInviteDialogOpen(false);
+    setIssuedActivationLink(null);
+  };
+
   const handleInviteInstructor = async () => {
     try {
-      const response = await inviteInstructor(userId);
+      const response = await inviteInstructor(userId, inviteAsSubstitute);
 
       if (!response.ok) {
         toast.error(t('admin:users.details.inviteInstructorFailed'));
@@ -96,7 +126,6 @@ export function UserDetailsActions({
         return;
       }
 
-      setIsMenuOpen(false);
       toast.success(
         t('admin:users.details.inviteInstructorSuccess', {
           email: userEmail,
@@ -182,6 +211,25 @@ export function UserDetailsActions({
     }
   };
 
+  const handleConvertSubstitute = async () => {
+    try {
+      const response = await convertSubstituteToRegular(userId);
+
+      if (!response.ok) {
+        toast.error(t('admin:users.details.convertSubstituteToRegularFailed'));
+
+        return;
+      }
+
+      setPendingAction(null);
+      setIsMenuOpen(false);
+      toast.success(t('admin:users.details.convertSubstituteToRegularSuccess'));
+      onChanged();
+    } catch {
+      toast.error(t('admin:users.details.convertSubstituteToRegularFailed'));
+    }
+  };
+
   const handleReactivateInstructor = async () => {
     try {
       const response = await reactivateInstructor(userId);
@@ -206,7 +254,8 @@ export function UserDetailsActions({
     canDeactivateUser ||
     canReactivateUser ||
     canDeactivateInstructor ||
-    canReactivateInstructor;
+    canReactivateInstructor ||
+    canConvertSubstitute;
 
   if (!hasActions) {
     return null;
@@ -218,6 +267,7 @@ export function UserDetailsActions({
           title: t('admin:users.details.deactivateUserConfirmTitle'),
           description: t('admin:users.details.deactivateUserConfirmDescription', { email: userEmail }),
           confirmLabel: t('admin:users.details.deactivateUser'),
+          confirmVariant: 'destructive' as const,
           onConfirm: handleDeactivateUser,
           isLoading: isDeactivatingUser,
         }
@@ -226,10 +276,20 @@ export function UserDetailsActions({
             title: t('admin:users.details.deactivateInstructorConfirmTitle'),
             description: t('admin:users.details.deactivateInstructorConfirmDescription', { email: userEmail }),
             confirmLabel: t('admin:users.details.deactivateInstructor'),
+            confirmVariant: 'destructive' as const,
             onConfirm: handleDeactivateInstructor,
             isLoading: isDeactivatingInstructor,
           }
-        : null;
+        : pendingAction === 'convertSubstitute'
+          ? {
+              title: t('admin:users.details.convertSubstituteToRegularConfirmTitle'),
+              description: t('admin:users.details.convertSubstituteToRegularConfirmDescription', { email: userEmail }),
+              confirmLabel: t('admin:users.details.convertSubstituteToRegular'),
+              confirmVariant: 'default' as const,
+              onConfirm: handleConvertSubstitute,
+              isLoading: isConvertingSubstitute,
+            }
+          : null;
 
   return (
     <>
@@ -273,6 +333,20 @@ export function UserDetailsActions({
               </button>
             ) : null}
 
+            {canConvertSubstitute ? (
+              <button
+                type='button'
+                className='rounded-md px-3 py-2 text-left text-sm hover:bg-accent disabled:opacity-50'
+                disabled={isLoading}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setPendingAction('convertSubstitute');
+                }}
+              >
+                {t('admin:users.details.convertSubstituteToRegular')}
+              </button>
+            ) : null}
+
             {canDeactivateInstructor ? (
               <button
                 type='button'
@@ -303,7 +377,7 @@ export function UserDetailsActions({
                 type='button'
                 className='rounded-md px-3 py-2 text-left text-sm hover:bg-accent disabled:opacity-50'
                 disabled={isLoading}
-                onClick={() => void handleInviteInstructor()}
+                onClick={openInviteDialog}
               >
                 {t('admin:users.details.convertToInstructor')}
               </button>
@@ -314,7 +388,7 @@ export function UserDetailsActions({
                 type='button'
                 className='rounded-md px-3 py-2 text-left text-sm hover:bg-accent disabled:opacity-50'
                 disabled={isLoading}
-                onClick={() => void handleInviteInstructor()}
+                onClick={openInviteDialog}
               >
                 {t('admin:users.details.resendInstructorInvite')}
               </button>
@@ -336,33 +410,75 @@ export function UserDetailsActions({
           description={confirmDialog.description}
           confirmLabel={confirmDialog.confirmLabel}
           cancelLabel={t('common:cancel')}
-          confirmVariant='destructive'
+          confirmVariant={confirmDialog.confirmVariant ?? 'destructive'}
           isLoading={confirmDialog.isLoading}
         />
       ) : null}
 
       <Dialog
-        open={issuedActivationLink !== null}
+        open={inviteDialogOpen}
         onOpenChange={open => {
           if (!open) {
-            setIssuedActivationLink(null);
+            closeInviteDialog();
           }
         }}
       >
         <DialogContent className='sm:max-w-106.25'>
-          <DialogHeader>
-            <DialogTitle>{t('admin:users.details.instructorInviteLinkTitle')}</DialogTitle>
-            <DialogDescription>{t('admin:users.details.instructorInviteLinkDescription')}</DialogDescription>
-          </DialogHeader>
-          {issuedActivationLink ? <p className='break-all text-sm text-foreground'>{issuedActivationLink}</p> : null}
-          <DialogFooter>
-            <Button type='button' variant='outline' onClick={() => setIssuedActivationLink(null)}>
-              {t('common:close')}
-            </Button>
-            <Button type='button' onClick={() => void handleCopyActivationLink()}>
-              {t('admin:users.details.copyInstructorInviteLink')}
-            </Button>
-          </DialogFooter>
+          {issuedActivationLink ? (
+            <>
+              <DialogHeader>
+                <DialogTitle>{t('admin:users.details.instructorInviteLinkTitle')}</DialogTitle>
+                <DialogDescription>{t('admin:users.details.instructorInviteLinkDescription')}</DialogDescription>
+              </DialogHeader>
+              <p className='break-all text-sm text-foreground'>{issuedActivationLink}</p>
+              <DialogFooter>
+                <Button type='button' variant='outline' onClick={closeInviteDialog}>
+                  {t('common:close')}
+                </Button>
+                <Button type='button' onClick={() => void handleCopyActivationLink()}>
+                  {t('admin:users.details.copyInstructorInviteLink')}
+                </Button>
+              </DialogFooter>
+            </>
+          ) : (
+            <>
+              <DialogHeader>
+                <DialogTitle>{t('admin:users.details.instructorInviteChoiceTitle')}</DialogTitle>
+                <DialogDescription>{t('admin:users.details.instructorInviteChoiceDescription')}</DialogDescription>
+              </DialogHeader>
+              <fieldset className='grid gap-2'>
+                <legend className='text-sm font-medium text-foreground'>
+                  {t('admin:users.details.instructorInviteKindLabel')}
+                </legend>
+                <Label className='font-normal'>
+                  <input
+                    type='radio'
+                    name='instructor-invite-kind'
+                    checked={!inviteAsSubstitute}
+                    onChange={() => setInviteAsSubstitute(false)}
+                  />
+                  {t('admin:users.details.instructorInviteKindInstructor')}
+                </Label>
+                <Label className='font-normal'>
+                  <input
+                    type='radio'
+                    name='instructor-invite-kind'
+                    checked={inviteAsSubstitute}
+                    onChange={() => setInviteAsSubstitute(true)}
+                  />
+                  {t('admin:users.details.instructorInviteKindSubstitute')}
+                </Label>
+              </fieldset>
+              <DialogFooter>
+                <Button type='button' variant='outline' onClick={closeInviteDialog} disabled={isInviting}>
+                  {t('common:cancel')}
+                </Button>
+                <Button type='button' onClick={() => void handleInviteInstructor()} disabled={isInviting}>
+                  {t('admin:users.details.sendInstructorInvite')}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </>

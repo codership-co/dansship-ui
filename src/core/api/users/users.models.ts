@@ -76,6 +76,7 @@ export interface AdminUserInstructorProfile {
   photo_url: string | null;
   contact_info: string | null;
   business_status: string | null;
+  is_substitute?: boolean;
   created_at: string;
   updated_at: string;
   completion_percent?: number;
