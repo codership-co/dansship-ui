@@ -197,9 +197,10 @@ export interface PendingDuoAssignmentsReport {
 
 export interface ActiveStudentListItem {
   user_id: string;
-  student_name: string;
+  full_name: string;
   email: string;
-  plans: Array<string>;
+  phone: string;
+  plan: string;
 }
 
 export interface ActiveStudentsListReport {

@@ -3,6 +3,7 @@ import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
+import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ReportDateRange } from '@components/modules/admin-reports/report-date-range';
@@ -31,6 +32,7 @@ export function StudentReports() {
   };
   const [dateRange, setDateRange] = useState(initialDateRange);
   const [appliedDateRange, setAppliedDateRange] = useState(initialDateRange);
+  const [isExportingActiveStudents, setIsExportingActiveStudents] = useState(false);
   const deps = [appliedDateRange.start, appliedDateRange.end];
 
   const { response: activeData, isLoading: activeLoading } = usePromise(
@@ -88,6 +90,17 @@ export function StudentReports() {
   const trialWithoutPlan = trialWithoutPlanData?.data?.items ?? [];
   const pendingDuo = pendingDuoData?.data?.items ?? [];
   const activeList = activeListData?.data?.items ?? [];
+
+  async function exportActiveStudents() {
+    setIsExportingActiveStudents(true);
+    try {
+      await DansshipAPI.reportsAdmin.exportActiveStudentsCsv();
+    } catch {
+      toast.error(t('reports:students.exportCsvFailed'));
+    } finally {
+      setIsExportingActiveStudents(false);
+    }
+  }
 
   return (
     <div className='space-y-8'>
@@ -191,8 +204,18 @@ export function StudentReports() {
           </Card>
 
           <Card className='border-input shadow-sm'>
-            <CardHeader className='border-b border-gray-100 bg-gray-50/50 pb-4'>
+            <CardHeader className='flex flex-row items-center justify-between gap-3 border-b border-gray-100 bg-gray-50/50 pb-4'>
               <CardTitle className='text-lg text-gray-800'>{t('reports:students.activeListTitle')}</CardTitle>
+              <Button
+                color='primary'
+                size='small'
+                variant='flat'
+                className='whitespace-nowrap'
+                disabled={isExportingActiveStudents}
+                onClick={() => void exportActiveStudents()}
+              >
+                {t('reports:students.exportCsv')}
+              </Button>
             </CardHeader>
             <CardContent className='space-y-3 p-0'>
               <p className='px-4 pt-4 text-sm text-gray-600'>{t('reports:students.activeListDescription')}</p>
@@ -201,19 +224,21 @@ export function StudentReports() {
                   <TableRow>
                     <TableHead>{t('reports:students.student')}</TableHead>
                     <TableHead>{t('reports:students.email')}</TableHead>
+                    <TableHead>{t('reports:students.phone')}</TableHead>
                     <TableHead>{t('reports:students.plans')}</TableHead>
                     <TableHead />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {activeList.length === 0 ? (
-                    <EmptyRow cols={4} />
+                    <EmptyRow cols={5} />
                   ) : (
                     activeList.map(row => (
                       <TableRow key={row.user_id}>
-                        <TableCell className='font-medium'>{row.student_name}</TableCell>
+                        <TableCell className='font-medium'>{row.full_name}</TableCell>
                         <TableCell>{row.email}</TableCell>
-                        <TableCell>{row.plans.join(', ')}</TableCell>
+                        <TableCell>{row.phone}</TableCell>
+                        <TableCell>{row.plan}</TableCell>
                         <TableCell className='text-right'>
                           <Link to={PageURLS.admin.userDetails(row.user_id)} viewTransition>
                             <Button color='primary' size='small' variant='flat' className='whitespace-nowrap'>
