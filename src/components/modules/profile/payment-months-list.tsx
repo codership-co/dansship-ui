@@ -1,10 +1,7 @@
-import type { ReactNode } from 'react';
-
 import { useTranslation } from 'react-i18next';
-import { LuLoader } from 'react-icons/lu';
 
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
-import { formatPrice } from '@helpers';
+import { Button } from '@components/ui';
+import { cn, formatPrice } from '@helpers';
 
 import type { PaymentDocument, PaymentMonthSummary } from '@core/api';
 
@@ -19,161 +16,40 @@ type PaymentMonthsListProps = {
   onDownload: (documentId: string) => void;
 };
 
-type MonthActionsProps = {
-  month: PaymentMonthSummary;
-  className?: string;
-} & Pick<
-  PaymentMonthsListProps,
-  'isGenerating' | 'isConfirming' | 'isOpeningDocument' | 'onGenerate' | 'onConfirm' | 'onDispute' | 'onDownload'
->;
-
 function monthKey(month: PaymentMonthSummary) {
   return `${month.year}-${month.month}`;
 }
 
+function isCurrentColombiaMonth(year: number, month: number) {
+  const [currentYear, currentMonth] = new Date()
+    .toLocaleDateString('en-CA', { timeZone: 'America/Bogota' })
+    .split('-')
+    .map(Number);
+
+  return year === currentYear && month === currentMonth;
+}
+
 function monthDocuments(month: PaymentMonthSummary) {
-  return month.documents ?? [];
+  if (month.documents?.length) return month.documents;
+
+  return month.issued_document ? [month.issued_document] : [];
 }
 
-function isIncrementalMonth(month: PaymentMonthSummary) {
-  return Boolean(month.can_generate) || monthDocuments(month).length > 0;
+function monthTotal(documents: Array<PaymentDocument>) {
+  if (!documents.length) return null;
+
+  return documents.reduce((sum, document) => sum + document.total_amount, 0);
 }
 
-function monthTotal(month: PaymentMonthSummary) {
-  const documents = monthDocuments(month);
+function documentNote(document: PaymentDocument, voidedNote: (reason: string) => string) {
+  if (document.status === 'voided' && document.void_reason) return voidedNote(document.void_reason);
 
-  if (isIncrementalMonth(month)) {
-    if (!documents.length) return null;
-
-    return documents.reduce((sum, document) => sum + document.total_amount, 0);
-  }
-
-  return month.issued_document?.total_amount ?? null;
-}
-
-function MonthStatus({ month }: { month: PaymentMonthSummary }) {
-  const { t } = useTranslation();
-  const issuedDocument = month.issued_document;
-  const incremental = isIncrementalMonth(month);
-
-  return (
-    <div className='min-w-0 text-sm'>
-      <p>{t(`profile:paymentDocuments.monthStatus.${month.status}`)}</p>
-      {month.status === 'blocked' && month.missing_requirements.length ? (
-        <p className='mt-1 text-xs break-words text-muted-foreground'>
-          {month.missing_requirements
-            .map(code =>
-              t(`profile:paymentDocuments.missing.${code}`, {
-                defaultValue: code,
-              }),
-            )
-            .join(', ')}
-        </p>
-      ) : null}
-      {!incremental && issuedDocument?.dispute_reason ? (
-        <p className='mt-1 text-xs break-words text-muted-foreground'>{issuedDocument.dispute_reason}</p>
-      ) : null}
-      {month.can_generate ? (
-        <p className='mt-1 text-xs break-words text-muted-foreground'>
-          {t('profile:paymentDocuments.substituteOpenMonth')}
-        </p>
-      ) : null}
-    </div>
-  );
-}
-
-function MonthActions({
-  month,
-  className,
-  isGenerating,
-  isConfirming,
-  isOpeningDocument,
-  onGenerate,
-  onConfirm,
-  onDispute,
-  onDownload,
-}: MonthActionsProps) {
-  const { t } = useTranslation();
-  const issuedDocument = month.issued_document;
-  const documents = monthDocuments(month);
-
-  if (isIncrementalMonth(month)) {
-    const stacked = className?.includes('justify-end') ? 'grid justify-items-end gap-2' : 'grid gap-2';
-
-    return (
-      <div className={stacked}>
-        {documents.map(document => (
-          <DocumentActions
-            key={document.id}
-            document={document}
-            isConfirming={isConfirming}
-            isOpeningDocument={isOpeningDocument}
-            onConfirm={onConfirm}
-            onDispute={onDispute}
-            onDownload={onDownload}
-          />
-        ))}
-        {month.can_generate ? (
-          <Button key='generate' type='button' size='sm' disabled={isGenerating} onClick={() => onGenerate(month)}>
-            {isGenerating ? <LuLoader className='animate-spin' /> : null}
-            {t('profile:paymentDocuments.generate')}
-          </Button>
-        ) : null}
-      </div>
-    );
-  }
-
-  const canConfirmOrDispute = month.status === 'issued' && Boolean(issuedDocument);
-  const actions: Array<ReactNode> = [];
-
-  if (month.status === 'available') {
-    actions.push(
-      <Button key='generate' type='button' size='sm' disabled={isGenerating} onClick={() => onGenerate(month)}>
-        {isGenerating ? <LuLoader className='animate-spin' /> : null}
-        {t('profile:paymentDocuments.generate')}
-      </Button>,
-    );
-  }
-
-  if (canConfirmOrDispute && issuedDocument) {
-    actions.push(
-      <Button
-        key='confirm'
-        type='button'
-        size='sm'
-        disabled={isConfirming}
-        onClick={() => onConfirm(issuedDocument.id)}
-      >
-        {t('profile:paymentDocuments.confirm')}
-      </Button>,
-      <Button key='dispute' type='button' variant='outline' size='sm' onClick={() => onDispute(issuedDocument.id)}>
-        {t('profile:paymentDocuments.dispute')}
-      </Button>,
-    );
-  }
-
-  if (issuedDocument) {
-    actions.push(
-      <Button
-        key='download'
-        type='button'
-        variant='outline'
-        size='sm'
-        disabled={isOpeningDocument}
-        onClick={() => onDownload(issuedDocument.id)}
-      >
-        {t('profile:paymentDocuments.download')}
-      </Button>,
-    );
-  }
-
-  if (!actions.length) return null;
-
-  return <div className={className}>{actions}</div>;
+  return document.dispute_reason || null;
 }
 
 function DocumentActions({
   document,
+  alignEnd,
   isConfirming,
   isOpeningDocument,
   onConfirm,
@@ -181,6 +57,7 @@ function DocumentActions({
   onDownload,
 }: {
   document: PaymentDocument;
+  alignEnd?: boolean;
   isConfirming: boolean;
   isOpeningDocument: boolean;
   onConfirm: (documentId: string) => void;
@@ -188,17 +65,10 @@ function DocumentActions({
   onDownload: (documentId: string) => void;
 }) {
   const { t } = useTranslation();
-  const canConfirmOrDispute = document.status === 'issued';
 
   return (
-    <div className='flex min-w-0 flex-wrap items-center gap-2'>
-      <span className='text-xs text-muted-foreground'>
-        {t(`profile:paymentDocuments.monthStatus.${document.status}`)} · {formatPrice(document.total_amount, 'COP')}
-      </span>
-      {document.dispute_reason ? (
-        <span className='text-xs break-words text-muted-foreground'>{document.dispute_reason}</span>
-      ) : null}
-      {canConfirmOrDispute ? (
+    <div className={cn('flex flex-wrap items-center gap-1.5', alignEnd && 'justify-end')}>
+      {document.status === 'issued' ? (
         <>
           <Button type='button' size='sm' disabled={isConfirming} onClick={() => onConfirm(document.id)}>
             {t('profile:paymentDocuments.confirm')}
@@ -221,24 +91,167 @@ function DocumentActions({
   );
 }
 
-function PaymentMonthCard({
+function MonthBlock({
   month,
-  ...actions
-}: { month: PaymentMonthSummary } & Omit<MonthActionsProps, 'month' | 'className'>) {
+  isGenerating,
+  isConfirming,
+  isOpeningDocument,
+  onGenerate,
+  onConfirm,
+  onDispute,
+  onDownload,
+}: { month: PaymentMonthSummary } & Omit<PaymentMonthsListProps, 'months'>) {
   const { t } = useTranslation();
-  const total = monthTotal(month);
+  const documents = monthDocuments(month);
+  const total = monthTotal(documents);
+  const canGenerate = month.can_generate || month.status === 'available';
+  const generateNote =
+    month.can_generate && isCurrentColombiaMonth(month.year, month.month)
+      ? t('profile:paymentDocuments.substituteOpenMonth')
+      : t('profile:paymentDocuments.closedMonthGenerate');
+  const missingNote =
+    month.status === 'blocked' && month.missing_requirements.length
+      ? month.missing_requirements
+          .map(code => t(`profile:paymentDocuments.missing.${code}`, { defaultValue: code }))
+          .join(', ')
+      : null;
+  const emptyStatus =
+    documents.length === 0 && (month.status === 'in_progress' || month.status === 'blocked')
+      ? t(`profile:paymentDocuments.monthStatus.${month.status}`)
+      : null;
+
+  const periodLabel = `${t(`profile:paymentDocuments.months.${month.month}`)} ${month.year}`;
+  const totalLabel = total === null ? '—' : formatPrice(total, 'COP');
+  const accountLine = (document: PaymentDocument, index: number) =>
+    t('profile:paymentDocuments.accountLine', {
+      index: index + 1,
+      status: t(`profile:paymentDocuments.monthStatus.${document.status}`, {
+        defaultValue: document.status,
+      }),
+      amount: formatPrice(document.total_amount, 'COP'),
+    });
 
   return (
-    <article className='grid min-w-0 gap-3 rounded-md border bg-white/50 p-4'>
-      <div className='flex min-w-0 items-start justify-between gap-3'>
-        <p className='font-medium'>
-          {t(`profile:paymentDocuments.months.${month.month}`)} {month.year}
-        </p>
-        <p className='shrink-0 text-sm'>{total === null ? '—' : formatPrice(total, 'COP')}</p>
+    <div className='border-b border-border last:border-b-0 md:border-b-2'>
+      <div className='px-4 py-4 md:hidden'>
+        <p className='font-semibold'>{periodLabel}</p>
+
+        <div className='mt-4'>
+          <p className='text-[10px] font-semibold tracking-wide text-muted-foreground uppercase'>
+            {t('profile:paymentDocuments.columns.total')}
+          </p>
+          <p className='mt-0.5 text-[13px] font-semibold'>{totalLabel}</p>
+        </div>
+
+        <div className='mt-4'>
+          {documents.length > 0 || emptyStatus ? (
+            <p className='mb-1 text-[10px] font-semibold tracking-wide text-muted-foreground uppercase'>
+              {t('profile:paymentDocuments.columns.documents')}
+            </p>
+          ) : null}
+          {emptyStatus ? (
+            <div className='flex flex-col gap-1 py-1'>
+              <span className='text-[13px] font-semibold'>{emptyStatus}</span>
+              {missingNote ? <p className='text-xs text-muted-foreground'>{missingNote}</p> : null}
+            </div>
+          ) : null}
+          {documents.map((document, index) => {
+            const note = documentNote(document, reason => t('profile:paymentDocuments.voidedNote', { reason }));
+
+            return (
+              <div key={document.id} className={cn('py-2', index > 0 && 'mt-1 border-t border-border pt-3')}>
+                <p className='text-[13px] font-semibold break-words'>{accountLine(document, index)}</p>
+                {note ? <p className='mt-0.5 text-xs text-muted-foreground'>{note}</p> : null}
+                <div className='mt-2'>
+                  <DocumentActions
+                    document={document}
+                    isConfirming={isConfirming}
+                    isOpeningDocument={isOpeningDocument}
+                    onConfirm={onConfirm}
+                    onDispute={onDispute}
+                    onDownload={onDownload}
+                  />
+                </div>
+              </div>
+            );
+          })}
+          {canGenerate ? (
+            <div className={cn(documents.length > 0 && 'mt-2 border-t border-dashed border-border pt-3')}>
+              <p className='text-[10px] font-semibold tracking-wide text-primary uppercase'>
+                {t('profile:paymentDocuments.newAccount')}
+              </p>
+              <p className='mt-1.5 text-xs text-muted-foreground'>{generateNote}</p>
+              <div className='mt-3'>
+                <Button type='button' size='sm' disabled={isGenerating} onClick={() => onGenerate(month)}>
+                  {t('profile:paymentDocuments.generate')}
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </div>
       </div>
-      <MonthStatus month={month} />
-      <MonthActions month={month} className='flex flex-wrap gap-2' {...actions} />
-    </article>
+
+      <div className='hidden md:grid md:grid-cols-[140px_110px_minmax(0,1fr)_230px]'>
+        <div className='px-4 py-4 font-semibold'>{periodLabel}</div>
+        <div className='px-4 py-4 text-[13px] font-semibold'>{totalLabel}</div>
+        <div className='min-w-0 px-4 py-4'>
+          {emptyStatus ? (
+            <div className='flex flex-col gap-1 py-1'>
+              <span className='text-[13px] font-semibold'>{emptyStatus}</span>
+              {missingNote ? <p className='text-xs text-muted-foreground'>{missingNote}</p> : null}
+            </div>
+          ) : null}
+          {documents.map((document, index) => {
+            const note = documentNote(document, reason => t('profile:paymentDocuments.voidedNote', { reason }));
+
+            return (
+              <div
+                key={document.id}
+                className={cn(
+                  'flex min-h-[38px] flex-col justify-center gap-0.5 py-2',
+                  index < documents.length - 1 && 'border-b border-border',
+                )}
+              >
+                <span className='text-[13px] font-semibold break-words'>{accountLine(document, index)}</span>
+                {note ? <p className='text-xs text-muted-foreground'>{note}</p> : null}
+              </div>
+            );
+          })}
+          {canGenerate ? <p className='pt-2.5 text-xs text-muted-foreground'>{generateNote}</p> : null}
+        </div>
+        <div className='min-w-0 px-4 py-4'>
+          <div className='flex flex-col items-end'>
+            {emptyStatus ? <div className='py-1' /> : null}
+            {documents.map((document, index) => (
+              <div
+                key={document.id}
+                className={cn(
+                  'flex min-h-[38px] w-full items-center justify-end py-2',
+                  index < documents.length - 1 && 'border-b border-border',
+                )}
+              >
+                <DocumentActions
+                  document={document}
+                  alignEnd
+                  isConfirming={isConfirming}
+                  isOpeningDocument={isOpeningDocument}
+                  onConfirm={onConfirm}
+                  onDispute={onDispute}
+                  onDownload={onDownload}
+                />
+              </div>
+            ))}
+            {canGenerate ? (
+              <div className='flex w-full justify-end pt-2.5'>
+                <Button type='button' size='sm' disabled={isGenerating} onClick={() => onGenerate(month)}>
+                  {t('profile:paymentDocuments.generate')}
+                </Button>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -246,47 +259,16 @@ export function PaymentMonthsList({ months, ...actions }: PaymentMonthsListProps
   const { t } = useTranslation();
 
   return (
-    <>
-      <div className='grid min-w-0 gap-3 md:hidden'>
-        {months.map(month => (
-          <PaymentMonthCard key={monthKey(month)} month={month} {...actions} />
-        ))}
+    <div className='overflow-hidden rounded-md border bg-white/50'>
+      <div className='hidden border-b border-border md:grid md:grid-cols-[140px_110px_minmax(0,1fr)_230px]'>
+        <div className='px-4 py-3 text-[13px] font-semibold'>{t('profile:paymentDocuments.columns.period')}</div>
+        <div className='px-4 py-3 text-[13px] font-semibold'>{t('profile:paymentDocuments.columns.total')}</div>
+        <div className='px-4 py-3 text-[13px] font-semibold'>{t('profile:paymentDocuments.columns.documents')}</div>
+        <div className='px-4 py-3' />
       </div>
-
-      <div className='hidden min-w-0 overflow-hidden rounded-md border bg-white/50 md:block'>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>{t('profile:paymentDocuments.columns.period')}</TableHead>
-              <TableHead>{t('profile:paymentDocuments.columns.status')}</TableHead>
-              <TableHead>{t('profile:paymentDocuments.columns.total')}</TableHead>
-              <TableHead />
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {months.map(month => {
-              const total = monthTotal(month);
-
-              return (
-                <TableRow key={monthKey(month)}>
-                  <TableCell className='whitespace-normal'>
-                    {t(`profile:paymentDocuments.months.${month.month}`)} {month.year}
-                  </TableCell>
-                  <TableCell className='whitespace-normal'>
-                    <MonthStatus month={month} />
-                  </TableCell>
-                  <TableCell className='whitespace-normal'>
-                    {total === null ? '—' : formatPrice(total, 'COP')}
-                  </TableCell>
-                  <TableCell className='whitespace-normal'>
-                    <MonthActions month={month} className='flex flex-wrap justify-end gap-2' {...actions} />
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </div>
-    </>
+      {months.map(month => (
+        <MonthBlock key={monthKey(month)} month={month} {...actions} />
+      ))}
+    </div>
   );
 }

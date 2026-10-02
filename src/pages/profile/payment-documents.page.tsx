@@ -4,18 +4,15 @@ import { Navigate } from 'react-router';
 import { toast } from 'sonner';
 
 import { Section, SectionHeading } from '@components/containers';
-import { OptionalFileUpload } from '@components/forms';
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
-import { PaymentMonthsList } from '@components/modules/profile';
+import { PaymentDocumentFiles, PaymentMonthsList } from '@components/modules/profile';
 import { Button, Input, Label, Textarea } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
 import {
   DANSSHIP_ERROR_CODE,
   DansshipAPI,
   DansshipAPIError,
-  PaymentDocumentContentTypes,
-  SignatureContentTypes,
   type BankAccountType,
   type PaymentDocumentKind,
   type PaymentMonthSummary,
@@ -257,99 +254,21 @@ function PaymentDocumentsPage() {
         <p className='py-8 text-center text-sm text-muted-foreground'>{t('profile:paymentDocuments.loadFailed')}</p>
       ) : (
         <>
-          <section className='grid gap-6 rounded-md border bg-white/50 p-4'>
-            <h3 className='text-lg font-semibold'>{t('profile:paymentDocuments.documentsTitle')}</h3>
+          <section className='grid gap-4 rounded-md border bg-white/50 p-5'>
+            <h3 className='text-base font-bold'>{t('profile:paymentDocuments.documentsTitle')}</h3>
 
-            <div className='grid gap-6 lg:grid-cols-2 xl:grid-cols-4'>
-              <div className='grid gap-2'>
-                <OptionalFileUpload
-                  label={t('profile:paymentDocuments.rut')}
-                  helperText={t('profile:paymentDocuments.rutHint')}
-                  acceptedTypes={PaymentDocumentContentTypes}
-                  isUploading={isUploading}
-                  onChange={file => void handleUpload('rut', file)}
-                />
-                {profile?.has_rut ? (
-                  <Button
-                    type='button'
-                    variant='outline'
-                    size='sm'
-                    disabled={isOpeningFile}
-                    onClick={() => void handleOpenFile('rut')}
-                  >
-                    {t('profile:paymentDocuments.viewCurrent')}
-                  </Button>
-                ) : null}
-              </div>
-
-              <div className='grid gap-2'>
-                <OptionalFileUpload
-                  label={t('profile:paymentDocuments.bankCertificate')}
-                  helperText={t('profile:paymentDocuments.bankCertificateHint')}
-                  acceptedTypes={PaymentDocumentContentTypes}
-                  isUploading={isUploading}
-                  onChange={file => void handleUpload('bank-certificate', file)}
-                />
-                {profile?.has_bank_certificate ? (
-                  <Button
-                    type='button'
-                    variant='outline'
-                    size='sm'
-                    disabled={isOpeningFile}
-                    onClick={() => void handleOpenFile('bank-certificate')}
-                  >
-                    {t('profile:paymentDocuments.viewCurrent')}
-                  </Button>
-                ) : null}
-              </div>
-
-              <div className='grid gap-2'>
-                <OptionalFileUpload
-                  label={t('profile:paymentDocuments.signature')}
-                  helperText={t('profile:paymentDocuments.signatureHint')}
-                  acceptedTypes={SignatureContentTypes}
-                  isUploading={isUploading}
-                  onChange={file => void handleUpload('signature', file)}
-                />
-                {profile?.has_signature ? (
-                  <Button
-                    type='button'
-                    variant='outline'
-                    size='sm'
-                    disabled={isOpeningFile}
-                    onClick={() => void handleOpenFile('signature')}
-                  >
-                    {t('profile:paymentDocuments.viewCurrent')}
-                  </Button>
-                ) : null}
-              </div>
-
-              {profile?.payment_type === 'fixed_amount' ? (
-                <div className='grid gap-2'>
-                  <OptionalFileUpload
-                    label={t('profile:paymentDocuments.socialSecurity')}
-                    helperText={t('profile:paymentDocuments.socialSecurityHint')}
-                    acceptedTypes={PaymentDocumentContentTypes}
-                    isUploading={isUploading}
-                    onChange={file => void handleUpload('social-security', file)}
-                  />
-                  {profile.has_social_security ? (
-                    <Button
-                      type='button'
-                      variant='outline'
-                      size='sm'
-                      disabled={isOpeningFile}
-                      onClick={() => void handleOpenFile('social-security')}
-                    >
-                      {t('profile:paymentDocuments.viewCurrent')}
-                    </Button>
-                  ) : null}
-                </div>
-              ) : null}
-            </div>
+            {profile ? (
+              <PaymentDocumentFiles
+                profile={profile}
+                isUploading={isUploading}
+                isOpeningFile={isOpeningFile}
+                onUpload={(kind, file) => void handleUpload(kind, file)}
+                onView={kind => void handleOpenFile(kind)}
+              />
+            ) : null}
 
             <form
-              className='grid gap-4'
+              className='grid gap-3.5 border-t border-border pt-4'
               onSubmit={event => {
                 event.preventDefault();
                 void handleSaveBank();
@@ -468,7 +387,7 @@ function PaymentDocumentsPage() {
         onConfirm={() => void handleDispute()}
         title={t('profile:paymentDocuments.disputeConfirmTitle')}
         description={t('profile:paymentDocuments.disputeConfirmDescription')}
-        confirmLabel={t('profile:paymentDocuments.dispute')}
+        confirmLabel={t('profile:paymentDocuments.disputeConfirmLabel')}
         cancelLabel={t('common:cancel')}
         confirmVariant='destructive'
         isLoading={isDisputing}
