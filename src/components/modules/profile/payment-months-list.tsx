@@ -6,7 +6,7 @@ import { LuLoader } from 'react-icons/lu';
 import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { formatPrice } from '@helpers';
 
-import type { PaymentMonthSummary } from '@core/api';
+import type { PaymentDocument, PaymentMonthSummary } from '@core/api';
 
 type PaymentMonthsListProps = {
   months: Array<PaymentMonthSummary>;
@@ -31,9 +31,30 @@ function monthKey(month: PaymentMonthSummary) {
   return `${month.year}-${month.month}`;
 }
 
+function monthDocuments(month: PaymentMonthSummary) {
+  return month.documents ?? [];
+}
+
+function isIncrementalMonth(month: PaymentMonthSummary) {
+  return Boolean(month.can_generate) || monthDocuments(month).length > 0;
+}
+
+function monthTotal(month: PaymentMonthSummary) {
+  const documents = monthDocuments(month);
+
+  if (isIncrementalMonth(month)) {
+    if (!documents.length) return null;
+
+    return documents.reduce((sum, document) => sum + document.total_amount, 0);
+  }
+
+  return month.issued_document?.total_amount ?? null;
+}
+
 function MonthStatus({ month }: { month: PaymentMonthSummary }) {
   const { t } = useTranslation();
   const issuedDocument = month.issued_document;
+  const incremental = isIncrementalMonth(month);
 
   return (
     <div className='min-w-0 text-sm'>
@@ -49,8 +70,13 @@ function MonthStatus({ month }: { month: PaymentMonthSummary }) {
             .join(', ')}
         </p>
       ) : null}
-      {issuedDocument?.dispute_reason ? (
+      {!incremental && issuedDocument?.dispute_reason ? (
         <p className='mt-1 text-xs break-words text-muted-foreground'>{issuedDocument.dispute_reason}</p>
+      ) : null}
+      {month.can_generate ? (
+        <p className='mt-1 text-xs break-words text-muted-foreground'>
+          {t('profile:paymentDocuments.substituteOpenMonth')}
+        </p>
       ) : null}
     </div>
   );
@@ -69,6 +95,34 @@ function MonthActions({
 }: MonthActionsProps) {
   const { t } = useTranslation();
   const issuedDocument = month.issued_document;
+  const documents = monthDocuments(month);
+
+  if (isIncrementalMonth(month)) {
+    const stacked = className?.includes('justify-end') ? 'grid justify-items-end gap-2' : 'grid gap-2';
+
+    return (
+      <div className={stacked}>
+        {documents.map(document => (
+          <DocumentActions
+            key={document.id}
+            document={document}
+            isConfirming={isConfirming}
+            isOpeningDocument={isOpeningDocument}
+            onConfirm={onConfirm}
+            onDispute={onDispute}
+            onDownload={onDownload}
+          />
+        ))}
+        {month.can_generate ? (
+          <Button key='generate' type='button' size='sm' disabled={isGenerating} onClick={() => onGenerate(month)}>
+            {isGenerating ? <LuLoader className='animate-spin' /> : null}
+            {t('profile:paymentDocuments.generate')}
+          </Button>
+        ) : null}
+      </div>
+    );
+  }
+
   const canConfirmOrDispute = month.status === 'issued' && Boolean(issuedDocument);
   const actions: Array<ReactNode> = [];
 
@@ -118,12 +172,61 @@ function MonthActions({
   return <div className={className}>{actions}</div>;
 }
 
+function DocumentActions({
+  document,
+  isConfirming,
+  isOpeningDocument,
+  onConfirm,
+  onDispute,
+  onDownload,
+}: {
+  document: PaymentDocument;
+  isConfirming: boolean;
+  isOpeningDocument: boolean;
+  onConfirm: (documentId: string) => void;
+  onDispute: (documentId: string) => void;
+  onDownload: (documentId: string) => void;
+}) {
+  const { t } = useTranslation();
+  const canConfirmOrDispute = document.status === 'issued';
+
+  return (
+    <div className='flex min-w-0 flex-wrap items-center gap-2'>
+      <span className='text-xs text-muted-foreground'>
+        {t(`profile:paymentDocuments.monthStatus.${document.status}`)} · {formatPrice(document.total_amount, 'COP')}
+      </span>
+      {document.dispute_reason ? (
+        <span className='text-xs break-words text-muted-foreground'>{document.dispute_reason}</span>
+      ) : null}
+      {canConfirmOrDispute ? (
+        <>
+          <Button type='button' size='sm' disabled={isConfirming} onClick={() => onConfirm(document.id)}>
+            {t('profile:paymentDocuments.confirm')}
+          </Button>
+          <Button type='button' variant='outline' size='sm' onClick={() => onDispute(document.id)}>
+            {t('profile:paymentDocuments.dispute')}
+          </Button>
+        </>
+      ) : null}
+      <Button
+        type='button'
+        variant='outline'
+        size='sm'
+        disabled={isOpeningDocument}
+        onClick={() => onDownload(document.id)}
+      >
+        {t('profile:paymentDocuments.download')}
+      </Button>
+    </div>
+  );
+}
+
 function PaymentMonthCard({
   month,
   ...actions
 }: { month: PaymentMonthSummary } & Omit<MonthActionsProps, 'month' | 'className'>) {
   const { t } = useTranslation();
-  const issuedDocument = month.issued_document;
+  const total = monthTotal(month);
 
   return (
     <article className='grid min-w-0 gap-3 rounded-md border bg-white/50 p-4'>
@@ -131,7 +234,7 @@ function PaymentMonthCard({
         <p className='font-medium'>
           {t(`profile:paymentDocuments.months.${month.month}`)} {month.year}
         </p>
-        <p className='shrink-0 text-sm'>{issuedDocument ? formatPrice(issuedDocument.total_amount, 'COP') : '—'}</p>
+        <p className='shrink-0 text-sm'>{total === null ? '—' : formatPrice(total, 'COP')}</p>
       </div>
       <MonthStatus month={month} />
       <MonthActions month={month} className='flex flex-wrap gap-2' {...actions} />
@@ -162,7 +265,7 @@ export function PaymentMonthsList({ months, ...actions }: PaymentMonthsListProps
           </TableHeader>
           <TableBody>
             {months.map(month => {
-              const issuedDocument = month.issued_document;
+              const total = monthTotal(month);
 
               return (
                 <TableRow key={monthKey(month)}>
@@ -173,7 +276,7 @@ export function PaymentMonthsList({ months, ...actions }: PaymentMonthsListProps
                     <MonthStatus month={month} />
                   </TableCell>
                   <TableCell className='whitespace-normal'>
-                    {issuedDocument ? formatPrice(issuedDocument.total_amount, 'COP') : '—'}
+                    {total === null ? '—' : formatPrice(total, 'COP')}
                   </TableCell>
                   <TableCell className='whitespace-normal'>
                     <MonthActions month={month} className='flex flex-wrap justify-end gap-2' {...actions} />

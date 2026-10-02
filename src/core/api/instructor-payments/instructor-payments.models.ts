@@ -95,6 +95,8 @@ export interface PaymentMonthSummary {
   status: PaymentMonthStatus;
   missing_requirements: Array<string>;
   issued_document: PaymentDocument | null;
+  documents: Array<PaymentDocument>;
+  can_generate: boolean;
 }
 
 export interface PaymentDocumentListResponse {
@@ -147,6 +149,8 @@ export function normalizePaymentDocumentList(data: PaymentDocumentListResponse):
       ...month,
       missing_requirements: month.missing_requirements ?? [],
       issued_document: month.issued_document ? normalizeDocument(month.issued_document) : null,
+      documents: (month.documents ?? []).map(normalizeDocument),
+      can_generate: month.can_generate ?? false,
     })),
   };
 }

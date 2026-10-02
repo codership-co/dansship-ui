@@ -104,6 +104,7 @@ function UserDetailsPage() {
             instructorBusinessStatus={
               user.instructor_business_status ?? user.instructor_profile?.business_status ?? null
             }
+            isSubstitute={user.instructor_profile?.is_substitute ?? false}
             onChanged={() => void reFetch()}
           />
         ) : null
