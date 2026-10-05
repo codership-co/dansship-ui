@@ -2,7 +2,7 @@ import { Outlet } from 'react-router';
 
 import { Toaster } from '@components/ui/sonner';
 import { AuthProvider, FeatureFlagsProvider, SecurityGuard } from '@contexts';
-import { useScrollToTop } from '@hooks';
+import { useMetaPixelPageView, useScrollToTop } from '@hooks';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -10,6 +10,7 @@ interface LayoutProps {
 
 const Layout = ({ children }: LayoutProps) => {
   useScrollToTop();
+  useMetaPixelPageView();
 
   return (
     <>

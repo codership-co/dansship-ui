@@ -5,5 +5,6 @@ export * from './use-language';
 export * from './use-callable-promise';
 export * from './use-promise';
 export * from './use-countdown';
+export * from './use-meta-pixel-page-view';
 export * from './use-scroll-to-top';
 export * from './use-router-loading';
