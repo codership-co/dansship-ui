@@ -26,6 +26,18 @@ function openUrl(url: string | undefined) {
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 
+function generationErrorMessage(code: string | undefined, t: (key: string) => string) {
+  if (code === DANSSHIP_ERROR_CODE.INSTRUCTOR_PAYMENT_NO_NEW_CLASSES) {
+    return t('profile:paymentDocuments.noNewClasses');
+  }
+
+  if (code === DANSSHIP_ERROR_CODE.INSTRUCTOR_PAYMENT_MONTH_NOT_CLOSED) {
+    return t('profile:paymentDocuments.generateMonthNotClosed');
+  }
+
+  return t('profile:paymentDocuments.generateFailed');
+}
+
 function PaymentDocumentsPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -140,11 +152,7 @@ function PaymentDocumentsPage() {
       if (!result.ok) {
         const code = result.error instanceof DansshipAPIError ? result.error.body.error_code : undefined;
 
-        toast.error(
-          code === DANSSHIP_ERROR_CODE.INSTRUCTOR_PAYMENT_NO_NEW_CLASSES
-            ? t('profile:paymentDocuments.noNewClasses')
-            : t('profile:paymentDocuments.generateFailed'),
-        );
+        toast.error(generationErrorMessage(code, t));
 
         return;
       }
@@ -154,11 +162,7 @@ function PaymentDocumentsPage() {
     } catch (error) {
       const code = error instanceof DansshipAPIError ? error.body.error_code : undefined;
 
-      toast.error(
-        code === DANSSHIP_ERROR_CODE.INSTRUCTOR_PAYMENT_NO_NEW_CLASSES
-          ? t('profile:paymentDocuments.noNewClasses')
-          : t('profile:paymentDocuments.generateFailed'),
-      );
+      toast.error(generationErrorMessage(code, t));
     }
   };
 
