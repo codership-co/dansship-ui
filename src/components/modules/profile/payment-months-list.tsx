@@ -36,9 +36,11 @@ function monthDocuments(month: PaymentMonthSummary) {
 }
 
 function monthTotal(documents: Array<PaymentDocument>) {
-  if (!documents.length) return null;
+  const counted = documents.filter(document => document.status !== 'voided');
 
-  return documents.reduce((sum, document) => sum + document.total_amount, 0);
+  if (!counted.length) return null;
+
+  return counted.reduce((sum, document) => sum + document.total_amount, 0);
 }
 
 function documentNote(document: PaymentDocument, voidedNote: (reason: string) => string) {
