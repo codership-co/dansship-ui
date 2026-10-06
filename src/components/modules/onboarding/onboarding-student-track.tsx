@@ -45,7 +45,7 @@ export const OnboardingStudentTrack = () => {
                 onSubmit={data =>
                   submitProfileStep({
                     ...data,
-                    birth_date: data.birth_date.toISOString().slice(0, 10),
+                    birth_date: `${data.birth_date.getFullYear()}-${String(data.birth_date.getMonth() + 1).padStart(2, '0')}-${String(data.birth_date.getDate()).padStart(2, '0')}`,
                     terms_accepted: true,
                   })
                 }

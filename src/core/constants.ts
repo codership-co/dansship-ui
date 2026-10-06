@@ -19,6 +19,7 @@ export const DOCUMENT_TYPE_OPTIONS = [
 
 export const COUNTRY_CODE_OPTIONS = [
   { value: '+57', label: '🇨🇴 +57' },
+  { value: '+58', label: '🇻🇪 +58' },
   { value: '+1', label: '🇺🇸 +1' },
   { value: '+34', label: '🇪🇸 +34' },
   { value: '+52', label: '🇲🇽 +52' },

@@ -70,6 +70,10 @@ export interface BasicProfilePayload {
   document_value: string;
   city?: string;
   address?: string;
+  guardian_first_name?: string;
+  guardian_last_name?: string;
+  guardian_phone_country_code?: string;
+  guardian_phone_number?: string;
   terms_accepted?: true;
 }
 

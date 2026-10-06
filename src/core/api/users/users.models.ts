@@ -92,6 +92,10 @@ export interface AdminUserDetailsResponse {
   full_name: string;
   photo_url: string | null;
   birth_date: string | null;
+  guardian_first_name: string | null;
+  guardian_last_name: string | null;
+  guardian_phone_country_code: string | null;
+  guardian_phone_number: string | null;
   display_name: string | null;
   phone_country_code: string | null;
   phone_number: string | null;

@@ -50,7 +50,10 @@ function toDateInputValue(value: string | null | undefined) {
 
 function toIsoDate(value: Date | string) {
   if (value instanceof Date) {
-    return value.toISOString().slice(0, 10);
+    const month = String(value.getMonth() + 1).padStart(2, '0');
+    const day = String(value.getDate()).padStart(2, '0');
+
+    return `${value.getFullYear()}-${month}-${day}`;
   }
 
   return value;
@@ -70,6 +73,10 @@ function getDefaultProfileDataFromUser(user: User, selfProfile?: AuthUser | null
       document_value: selfProfile?.document_value ?? user.documentValue ?? '',
       city: selfProfile?.city ?? user.city ?? '',
       address: selfProfile?.address ?? user.address ?? '',
+      guardian_first_name: selfProfile?.guardian_first_name ?? '',
+      guardian_last_name: selfProfile?.guardian_last_name ?? '',
+      guardian_phone_country_code: selfProfile?.guardian_phone_country_code || '+57',
+      guardian_phone_number: selfProfile?.guardian_phone_number ?? '',
     },
     [ProfileDataKey.HEALTH]: {
       emergency_contact_name: asFormString(health?.emergency_contact_name),
@@ -149,6 +156,10 @@ export function ProfileEdit({ showInstructor }: ProfileEditProps) {
         document_value: data.document_value,
         city: data.city,
         address: data.address,
+        guardian_first_name: data.guardian_first_name,
+        guardian_last_name: data.guardian_last_name,
+        guardian_phone_country_code: data.guardian_phone_country_code,
+        guardian_phone_number: data.guardian_phone_number,
       });
       await Promise.all([getProfile(), refetchSelfProfile()]);
       toast.success(t('profile:saveSuccess'));
@@ -281,6 +292,10 @@ export function ProfileEdit({ showInstructor }: ProfileEditProps) {
                     document_value: data.document_value,
                     city: data.city,
                     address: data.address,
+                    guardian_first_name: data.guardian_first_name,
+                    guardian_last_name: data.guardian_last_name,
+                    guardian_phone_country_code: data.guardian_phone_country_code,
+                    guardian_phone_number: data.guardian_phone_number,
                   });
                 }}
                 defaultValues={{

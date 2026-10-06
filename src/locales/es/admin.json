@@ -94,6 +94,8 @@
       "backToList": "Volver a usuarios",
       "alias": "Prefiere ser llamado(a) como...",
       "birthDate": "Fecha de nacimiento",
+      "guardian": "Acudiente",
+      "guardianPhone": "Teléfono del acudiente",
       "phoneNumber": "Número de teléfono",
       "documentNumber": "Número de documento",
       "city": "Ciudad",
