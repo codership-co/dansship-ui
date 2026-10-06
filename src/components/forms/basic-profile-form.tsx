@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TFunction } from 'i18next';
 import { Button, Checkbox } from 'polpo/components';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { Trans, useTranslation } from 'react-i18next';
 import { LuBuilding, LuCalendar, LuHouse, LuIdCard, LuPhone, LuUser } from 'react-icons/lu';
@@ -12,32 +12,91 @@ import { DateField, PhoneField, SelectField, TextField } from '@components/form-
 import { DansshipAPI, PaymentProofContentType, PaymentProofContentTypesList } from '@core/api';
 import { DOCUMENT_TYPE_OPTIONS } from '@core/constants';
 
-export const createBasicProfileSchema = (t: TFunction, requireTermsAcceptance = false) => {
-  const tenYearsAgo = new Date();
-  tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10);
+function ageInYears(birthDate: Date, today = new Date()) {
+  let years = today.getFullYear() - birthDate.getFullYear();
+  const beforeBirthday =
+    today.getMonth() < birthDate.getMonth() ||
+    (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate());
 
-  const baseSchema = z.object({
+  if (beforeBirthday) {
+    years -= 1;
+  }
+
+  return years;
+}
+
+function requiresGuardian(birthDate: Date) {
+  const age = ageInYears(birthDate);
+
+  return age >= 4 && age < 14;
+}
+
+export const createBasicProfileSchema = (t: TFunction, requireTermsAcceptance = false) => {
+  const fourYearsAgo = new Date();
+  fourYearsAgo.setFullYear(fourYearsAgo.getFullYear() - 4);
+
+  const fields = z.object({
     full_name: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
     birth_date: z
       .date(t('auth:onboarding.validationRequired'))
-      .max(tenYearsAgo, { message: t('auth:onboarding.validationMinAge10') }),
+      .max(fourYearsAgo, { message: t('auth:onboarding.validationMinAge4') }),
     phone_country_code: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
     phone_number: z.string().regex(/^\d{10}$/, { message: t('auth:onboarding.validationPhoneLength') }),
     document_type: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
     document_value: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
     city: z.string().optional(),
     address: z.string().optional(),
+    guardian_first_name: z.string().optional(),
+    guardian_last_name: z.string().optional(),
+    guardian_phone_country_code: z.string().optional(),
+    guardian_phone_number: z.string().optional(),
     terms_accepted: z.boolean().optional(),
   });
 
-  if (!requireTermsAcceptance) {
-    return baseSchema;
-  }
+  const baseSchema = requireTermsAcceptance
+    ? fields.extend({
+        terms_accepted: z.literal(true, {
+          message: t('auth:onboarding.termsRequired'),
+        }),
+      })
+    : fields;
 
-  return baseSchema.extend({
-    terms_accepted: z.literal(true, {
-      message: t('auth:onboarding.termsRequired'),
-    }),
+  return baseSchema.superRefine((values, context) => {
+    if (!(values.birth_date instanceof Date) || !requiresGuardian(values.birth_date)) {
+      return;
+    }
+
+    if (!values.guardian_first_name?.trim()) {
+      context.addIssue({
+        code: 'custom',
+        path: ['guardian_first_name'],
+        message: t('auth:onboarding.validationRequired'),
+      });
+    }
+
+    if (!values.guardian_last_name?.trim()) {
+      context.addIssue({
+        code: 'custom',
+        path: ['guardian_last_name'],
+        message: t('auth:onboarding.validationRequired'),
+      });
+    }
+
+    if (!values.guardian_phone_country_code?.trim()) {
+      context.addIssue({
+        code: 'custom',
+        path: ['guardian_phone_country_code'],
+        message: t('auth:onboarding.validationRequired'),
+      });
+    }
+
+    if (!/^\d{10}$/.test(values.guardian_phone_number ?? '')) {
+      context.addIssue({
+        code: 'custom',
+        path: ['guardian_phone_number'],
+        message: t('auth:onboarding.validationPhoneLength'),
+      });
+    }
   });
 };
 
@@ -65,7 +124,7 @@ export function BasicProfileForm({
   const [profilePhoto, setProfilePhoto] = useState<File>();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  const { handleSubmit, control } = useForm<BasicProfileFormValues>({
+  const { handleSubmit, control, watch } = useForm<BasicProfileFormValues>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     resolver: zodResolver(schema),
@@ -78,10 +137,27 @@ export function BasicProfileForm({
       document_value: '',
       city: '',
       address: '',
+      guardian_first_name: '',
+      guardian_last_name: '',
+      guardian_phone_country_code: '+57',
+      guardian_phone_number: '',
       terms_accepted: false,
       ...defaultValues,
     },
   });
+  const [birthDate, setBirthDate] = useState(defaultValues?.birth_date);
+
+  useEffect(() => {
+    const subscription = watch((values, { name }) => {
+      if (name === 'birth_date') {
+        setBirthDate(values.birth_date);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
+  const showGuardian = birthDate instanceof Date && requiresGuardian(birthDate);
 
   const handleInputFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;
@@ -233,6 +309,38 @@ export function BasicProfileForm({
             />
           </div>
         </div>
+
+        {showGuardian ? (
+          <section className='space-y-4'>
+            <h3 className='text-primary'>{t('auth:onboarding.guardian.title')}</h3>
+            <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-end'>
+              <TextField
+                control={control}
+                label={t('auth:onboarding.guardian.firstName')}
+                name='guardian_first_name'
+                placeholder={t('auth:onboarding.guardian.firstName')}
+                icon={<LuUser className='mr-2 h-4 w-4' />}
+              />
+              <TextField
+                control={control}
+                label={t('auth:onboarding.guardian.lastName')}
+                name='guardian_last_name'
+                placeholder={t('auth:onboarding.guardian.lastName')}
+                icon={<LuUser className='mr-2 h-4 w-4' />}
+              />
+            </div>
+            <PhoneField
+              control={control}
+              codeName='guardian_phone_country_code'
+              codePlaceholder={t('auth:onboarding.fields.phoneCode.placeholder')}
+              name='guardian_phone_number'
+              icon={<LuPhone className='mr-2 h-4 w-4' />}
+              type='tel'
+              label={t('auth:onboarding.guardian.phone')}
+              placeholder={t('auth:onboarding.guardian.phone')}
+            />
+          </section>
+        ) : null}
 
         {requireTermsAcceptance ? (
           <Controller

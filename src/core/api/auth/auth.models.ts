@@ -3,6 +3,10 @@ export interface AuthUser {
   email: string;
   full_name: string;
   birth_date?: string | null;
+  guardian_first_name?: string | null;
+  guardian_last_name?: string | null;
+  guardian_phone_country_code?: string | null;
+  guardian_phone_number?: string | null;
   display_name: string | null;
   phone_country_code?: string | null;
   phone_number?: string | null;
@@ -172,6 +176,10 @@ export interface UpdateProfilePayload {
   full_name?: string;
   display_name?: string;
   birth_date?: string;
+  guardian_first_name?: string;
+  guardian_last_name?: string;
+  guardian_phone_country_code?: string;
+  guardian_phone_number?: string;
   phone_country_code?: string;
   phone_number?: string;
   document_type?: string;

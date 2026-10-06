@@ -205,6 +205,18 @@ export function UserDetails({ user, isLoading, hasError }: UserDetailsProps) {
           label={t('admin:users.details.birthDate')}
           value={user.birth_date ? formatDate(user.birth_date, i18n.language) : '-'}
         />
+        {user.guardian_first_name || user.guardian_last_name || user.guardian_phone_number ? (
+          <>
+            <DetailField
+              label={t('admin:users.details.guardian')}
+              value={[user.guardian_first_name, user.guardian_last_name].filter(Boolean).join(' ') || '-'}
+            />
+            <DetailField
+              label={t('admin:users.details.guardianPhone')}
+              value={[user.guardian_phone_country_code, user.guardian_phone_number].filter(Boolean).join(' ') || '-'}
+            />
+          </>
+        ) : null}
         <DetailField
           label={t('admin:users.details.phoneNumber')}
           value={
