@@ -613,9 +613,12 @@ export function SecurityGuard(
         return <UnauthorizedPage />;
       }
 
+      const isHalloweenKiosk = pathname === PageURLS.halloween;
+
       if (
         isAuthenticated &&
         requireOnboarding &&
+        !isHalloweenKiosk &&
         pathname !== PageURLS.auth.onboarding &&
         pathname !== PageURLS.auth.verifyInstructor
       ) {
@@ -624,11 +627,16 @@ export function SecurityGuard(
 
       const pendingTallerSlug = getPendingTallerCheckoutIntent();
 
-      if (isAuthenticated && pendingTallerSlug && pathname !== PageURLS.tallerLanding(pendingTallerSlug)) {
+      if (
+        isAuthenticated &&
+        pendingTallerSlug &&
+        !isHalloweenKiosk &&
+        pathname !== PageURLS.tallerLanding(pendingTallerSlug)
+      ) {
         return <Navigate to={PageURLS.tallerLanding(pendingTallerSlug)} state={{ from: location }} />;
       }
 
-      if (isAuthenticated && getPendingPlanCheckoutIntent() && pathname !== PageURLS.plans) {
+      if (isAuthenticated && getPendingPlanCheckoutIntent() && !isHalloweenKiosk && pathname !== PageURLS.plans) {
         return <Navigate to={PageURLS.plans} state={{ from: location }} />;
       }
 

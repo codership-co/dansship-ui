@@ -1,0 +1,18 @@
+{
+  "kicker": "Truco o clase",
+  "title": "Noche de disfraces",
+  "subtitle": "Gira la ruleta si vienes disfrazado",
+  "spin": "Girar",
+  "next": "Siguiente persona",
+  "resultKicker": "¡Boo!",
+  "resultTitle": "1 clase adicional gratis",
+  "resultBody": "Premio de esta noche de disfraces",
+  "wheelLabel": "Ruleta de Halloween",
+  "slices": {
+    "class": "Clase boo",
+    "candy": "Dulce",
+    "trick": "Truco",
+    "sticker": "Sticker",
+    "hug": "Abrazo"
+  }
+}
