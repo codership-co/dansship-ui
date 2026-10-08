@@ -1,6 +1,7 @@
 export * from './auth';
 export * from './admin';
 export * from './error';
+export * from './halloween.page';
 export * from './home.page';
 export * from './plans.page';
 export * from './ui.page';
