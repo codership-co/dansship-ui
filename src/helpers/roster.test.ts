@@ -1,12 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { groupWorkshopRosterByPurchase } from './roster';
+import { groupEventRosterByPurchase } from './roster';
 
-import type { WorkshopRosterEntry } from '@core/api';
+import type { EventRosterEntry } from '@core/api';
 
-function entry(
-  overrides: Partial<WorkshopRosterEntry> & Pick<WorkshopRosterEntry, 'id' | 'purchase_id'>,
-): WorkshopRosterEntry {
+function entry(overrides: Partial<EventRosterEntry> & Pick<EventRosterEntry, 'id' | 'purchase_id'>): EventRosterEntry {
   return {
     user_id: `user-${overrides.id}`,
     display_name: 'Student',
@@ -20,11 +18,11 @@ function entry(
   };
 }
 
-describe('groupWorkshopRosterByPurchase', () => {
+describe('groupEventRosterByPurchase', () => {
   it('keeps a single registrant as its own group', () => {
     const rows = [entry({ id: 'a', purchase_id: 'p1', display_name: 'Ana' })];
 
-    expect(groupWorkshopRosterByPurchase(rows)).toEqual([{ purchaseId: 'p1', members: [rows[0]] }]);
+    expect(groupEventRosterByPurchase(rows)).toEqual([{ purchaseId: 'p1', members: [rows[0]] }]);
   });
 
   it('groups pair members that share a purchase, preserving direct vs combo source', () => {
@@ -48,7 +46,7 @@ describe('groupWorkshopRosterByPurchase', () => {
       }),
     ];
 
-    const groups = groupWorkshopRosterByPurchase(rows);
+    const groups = groupEventRosterByPurchase(rows);
 
     expect(groups).toHaveLength(2);
     expect(groups[0]?.purchaseId).toBe('combo-purchase');

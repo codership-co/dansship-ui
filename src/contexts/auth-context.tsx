@@ -29,7 +29,7 @@ import { addSentryBreadcrumb, clearSentryUser, setSentryUser } from '@core/sentr
 import {
   consumePendingGiftClaimToken,
   getPendingPlanCheckoutIntent,
-  getPendingTallerCheckoutIntent,
+  getPendingEventoCheckoutIntent,
   isValidReturnPath,
   resolveBrowserPreferredLanguage,
   resolvePostLoginPath,
@@ -45,7 +45,7 @@ interface CommonAuthContextState {
   login: (data: LoginPayload) => Promise<void>;
   googleLogin: (credential: string) => Promise<void>;
   linkGoogle: (credential: string) => Promise<void>;
-  setPassword: (data: SetPasswordPayload) => Promise<void>;
+  setPassword: (data: SetPasswordPayload) => Promise<boolean>;
   signUp: (data: RegisterPayload) => Promise<void>;
   updateProfile: (data: UpdateProfilePayload) => Promise<void>;
   uploadProfilePhoto: (file: File) => Promise<User | undefined>;
@@ -56,6 +56,7 @@ interface CommonAuthContextState {
   getProfile: () => Promise<User | undefined>;
   logout: () => Promise<void>;
   requireOnboarding: boolean;
+  mustChangePassword: boolean;
 }
 
 interface AuthenticatedAuthContextState extends CommonAuthContextState {
@@ -212,6 +213,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           toast.error(t('auth:unauthorized'));
         }
 
+        if (error.body.error_code === DANSSHIP_ERROR_CODE.TEMP_PASSWORD_EXPIRED) {
+          toast.error(t('auth:tempPasswordExpired'));
+        }
+
         return;
       }
 
@@ -285,8 +290,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const data = await DansshipAPI.auth.setPassword(payload);
       setUser(data);
       toast.success(t('auth:setPassword.success'));
-    } catch {
+
+      return true;
+    } catch (error) {
+      if (error instanceof DansshipAPIError && error.body.error_code === DANSSHIP_ERROR_CODE.TEMP_PASSWORD_REUSE) {
+        toast.error(t('auth:changePassword.reuse'));
+
+        return false;
+      }
+
       toast.error(t('auth:setPassword.failed'));
+
+      return false;
     }
   }
 
@@ -480,6 +495,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         verifyEmail,
         resendVerification,
         requireOnboarding: (user?.requiresOnboarding && !user?.onboardingCompleted) ?? false,
+        mustChangePassword: user?.mustChangePassword ?? false,
       }}
     >
       {children}
@@ -585,7 +601,7 @@ export function SecurityGuard(
   }: SecurityGuardOptions = {},
 ): React.ComponentType {
   function Guard() {
-    const { isAuthenticated, requireOnboarding, ready } = useAuth();
+    const { isAuthenticated, requireOnboarding, mustChangePassword, ready } = useAuth();
     const location = useLocation();
     const validPermissions = usePermissions({ orPermissions, andPermissions });
     const validFeatureFlags = useEnabledFeatureFlag(featureFlags);
@@ -614,26 +630,36 @@ export function SecurityGuard(
       }
 
       const isHalloweenKiosk = pathname === PageURLS.halloween;
+      const isChangePassword = pathname === PageURLS.auth.changePassword;
+
+      if (isAuthenticated && mustChangePassword && !isHalloweenKiosk) {
+        if (!isChangePassword) {
+          return <Navigate to={PageURLS.auth.changePassword} state={{ from: location }} />;
+        }
+
+        return <Component />;
+      }
 
       if (
         isAuthenticated &&
         requireOnboarding &&
         !isHalloweenKiosk &&
+        !isChangePassword &&
         pathname !== PageURLS.auth.onboarding &&
         pathname !== PageURLS.auth.verifyInstructor
       ) {
         return <Navigate to={PageURLS.auth.onboarding} state={{ from: location }} />;
       }
 
-      const pendingTallerSlug = getPendingTallerCheckoutIntent();
+      const pendingEventoSlug = getPendingEventoCheckoutIntent();
 
       if (
         isAuthenticated &&
-        pendingTallerSlug &&
+        pendingEventoSlug &&
         !isHalloweenKiosk &&
-        pathname !== PageURLS.tallerLanding(pendingTallerSlug)
+        pathname !== PageURLS.eventoLanding(pendingEventoSlug)
       ) {
-        return <Navigate to={PageURLS.tallerLanding(pendingTallerSlug)} state={{ from: location }} />;
+        return <Navigate to={PageURLS.eventoLanding(pendingEventoSlug)} state={{ from: location }} />;
       }
 
       if (isAuthenticated && getPendingPlanCheckoutIntent() && !isHalloweenKiosk && pathname !== PageURLS.plans) {
@@ -643,7 +669,15 @@ export function SecurityGuard(
       return <Component />;
       // Depend on pathname only so ?tab= / search updates do not remount page trees.
       // eslint-disable-next-line react-hooks/exhaustive-deps -- location used for Navigate state; pathname drives remounts
-    }, [isAuthenticated, location.pathname, ready, requireOnboarding, validFeatureFlags, validPermissions]);
+    }, [
+      isAuthenticated,
+      location.pathname,
+      mustChangePassword,
+      ready,
+      requireOnboarding,
+      validFeatureFlags,
+      validPermissions,
+    ]);
   }
 
   return Guard as React.ComponentType;

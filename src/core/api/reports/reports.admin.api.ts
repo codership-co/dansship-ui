@@ -28,8 +28,8 @@ import type {
   TrialStudentsWithoutPlanReport,
   UnderutilizedScheduleReport,
   WalletLiabilityReport,
-  WorkshopFillReport,
-  WorkshopRevenueReport,
+  EventFillReport,
+  EventRevenueReport,
 } from './reports.models';
 
 type DateRangeParams = {
@@ -266,19 +266,25 @@ export class ReportsAdminAPI {
     });
   }
 
-  async getWorkshopRevenue(startDate?: string, endDate?: string) {
-    return this.httpClient.callNoError<WorkshopRevenueReport>({
-      path: '/admin/reports/workshops/revenue',
+  async getEventRevenue(startDate?: string, endDate?: string, eventType?: string) {
+    return this.httpClient.callNoError<EventRevenueReport>({
+      path: '/admin/reports/events/revenue',
       method: 'GET',
-      params: this.dateParams(startDate, endDate),
+      params: {
+        ...this.dateParams(startDate, endDate),
+        ...(eventType ? { type: eventType } : {}),
+      },
     });
   }
 
-  async getWorkshopFill(startDate?: string, endDate?: string) {
-    return this.httpClient.callNoError<WorkshopFillReport>({
-      path: '/admin/reports/workshops/fill',
+  async getEventFill(startDate?: string, endDate?: string, eventType?: string) {
+    return this.httpClient.callNoError<EventFillReport>({
+      path: '/admin/reports/events/fill',
       method: 'GET',
-      params: this.dateParams(startDate, endDate),
+      params: {
+        ...this.dateParams(startDate, endDate),
+        ...(eventType ? { type: eventType } : {}),
+      },
     });
   }
 

@@ -48,21 +48,21 @@ export function HistoryReservationCard({ item, alreadyRated, onRateClass }: Hist
       : null;
   const title = reservationDisplayTitle(item, t);
   const schedule =
-    item.kind === 'workshop'
+    item.kind === 'event'
       ? `${format(start, 'HH:mm')} – ${format(new Date(item.registration.ends_at), 'HH:mm')} · ${item.registration.room_name ?? t('bookings:unknown')}`
       : item.kind === 'rental'
         ? `${format(start, 'HH:mm')}${lastRentalSlot ? ` – ${format(new Date(lastRentalSlot.end_time), 'HH:mm')}` : ''} · ${item.roomName || t('bookings:unknown')}`
         : `${item.series.start_time.slice(0, 5)} – ${item.series.end_time.slice(0, 5)} · ${item.roomName || t('bookings:unknown')}`;
   const status =
-    item.kind === 'workshop'
+    item.kind === 'event'
       ? item.registration.source === 'combo' && item.registration.combo_name
-        ? `${t(`bookings:workshopStatus.${item.registration.status}`)} · ${item.registration.combo_name}`
-        : t(`bookings:workshopStatus.${item.registration.status}`)
+        ? `${t(`bookings:eventStatus.${item.registration.status}`)} · ${item.registration.combo_name}`
+        : t(`bookings:eventStatus.${item.registration.status}`)
       : t(
           `studioRental:status.${rentalStatusI18nKey(item.kind === 'rental' ? item.request.status : item.series.status)}`,
         );
   const intentId =
-    item.kind === 'workshop'
+    item.kind === 'event'
       ? item.registration.payment_intent_id
       : item.kind === 'rental'
         ? item.request.payment_intent_id
@@ -82,15 +82,15 @@ export function HistoryReservationCard({ item, alreadyRated, onRateClass }: Hist
         </div>
         <p className='mt-1 text-[12.5px] leading-[1.4] text-muted-foreground'>{schedule}</p>
         <div className='mt-3 flex min-w-0 flex-wrap items-center justify-end gap-2'>
-          {item.kind === 'workshop' ? (
+          {item.kind === 'event' ? (
             <>
               <Button
                 type='button'
                 variant='outlinePrimary'
                 size='sm'
-                onClick={() => navigate(PageURLS.tallerLanding(item.registration.workshop_slug))}
+                onClick={() => navigate(PageURLS.eventoLanding(item.registration.event_slug))}
               >
-                {t('bookings:viewWorkshop')}
+                {t('bookings:viewEvent')}
               </Button>
               {intentId && item.registration.status !== 'confirmed' ? (
                 <Button

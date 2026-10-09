@@ -9,7 +9,7 @@ import type { ScheduledClass, AgendaEvent, ScheduleStatus } from '@core/api';
 
 export type GridEvent = ScheduledClass | AgendaEvent;
 
-export type RosterTarget = { kind: 'class' | 'workshop'; id: string };
+export type RosterTarget = { kind: 'class' | 'event'; id: string };
 
 export type HourRangeSelection = {
   date: string;
@@ -29,7 +29,7 @@ interface ScheduleGridProps {
   onSlotClick?: (date: string, timeHour: number) => void;
   onClassClick?: (event: GridEvent) => void;
   onAddAtTime?: (date: string, time: string) => void;
-  /** Admin-only: open the class or workshop roster without leaving the calendar. */
+  /** Admin-only: open the class or event roster without leaving the calendar. */
   onViewRoster?: (target: RosterTarget) => void;
   dayColumnMinWidth?: number;
   scheduleStatus?: ScheduleStatus;
@@ -524,7 +524,7 @@ export function ScheduleGrid({
                 const rosterTarget: RosterTarget | null =
                   'event_type' in cls
                     ? cls.event_type === 'workshop'
-                      ? { kind: 'workshop', id: cls.source_id }
+                      ? { kind: 'event', id: cls.source_id }
                       : null
                     : { kind: 'class', id: cls.id };
                 const showRosterIcon = Boolean(onViewRoster && rosterTarget);

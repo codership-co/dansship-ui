@@ -25,7 +25,7 @@ export * from './schedules/schedules.models';
 export * from './schedules/schedules.helpers';
 export * from './studio-rental/studio-rental.models';
 export * from './subscriptions/subscriptions.models';
-export * from './talleres/talleres.models';
+export * from './eventos/eventos.models';
 export * from './users/users.models';
 export * from './user-context/user-context.models';
 export * from './wallets/wallets.models';

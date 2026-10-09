@@ -105,6 +105,7 @@ export interface ClassRosterResponse {
   can_register_retroactive_attendance?: boolean;
   will_reopen_auto_cancelled_class?: boolean;
   instructor_payment_document_issued?: boolean;
+  refundable_count?: number;
 }
 
 export interface InstructorStudentProfile {

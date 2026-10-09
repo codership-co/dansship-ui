@@ -29,7 +29,7 @@ type Translate = (key: string) => string;
 
 interface PrimaryNavOptions {
   isAuthenticated: boolean;
-  showManagedWorkshops?: boolean;
+  showManagedEvents?: boolean;
 }
 
 /** Permissions that reveal the hamburger Admin section. */
@@ -48,7 +48,7 @@ export function getAdminMenuPermissions(): Array<PERMISSION> {
     ...AdminPermissions.users,
     ...AdminPermissions.studioRental,
     ...AdminPermissions.campaigns,
-    ...AdminPermissions.talleres,
+    ...AdminPermissions.eventos,
   ];
 }
 
@@ -70,7 +70,7 @@ export function getScheduleBuilderNavItem(t: Translate): NavItem {
  */
 export function getPrimaryNavItems(
   t: Translate,
-  { isAuthenticated, showManagedWorkshops = false }: PrimaryNavOptions,
+  { isAuthenticated, showManagedEvents = false }: PrimaryNavOptions,
 ): Array<NavItem> {
   return !isAuthenticated
     ? [
@@ -87,8 +87,8 @@ export function getPrimaryNavItems(
           icon: LuBellElectric,
         },
         {
-          to: PageURLS.talleres,
-          label: t('nav:talleres'),
+          to: PageURLS.eventos,
+          label: t('nav:eventos'),
           featureFlags: [FEATURE_FLAG.isTalleresPageEnabled],
           icon: LuCalendarClock,
         },
@@ -136,16 +136,16 @@ export function getPrimaryNavItems(
           icon: LuBellElectric,
         },
         {
-          to: PageURLS.talleres,
-          label: t('nav:talleres'),
+          to: PageURLS.eventos,
+          label: t('nav:eventos'),
           featureFlags: [FEATURE_FLAG.isTalleresPageEnabled],
           icon: LuCalendarClock,
         },
-        ...(showManagedWorkshops
+        ...(showManagedEvents
           ? [
               {
-                to: PageURLS.managedWorkshops,
-                label: t('talleres:managed.nav'),
+                to: PageURLS.managedEvents,
+                label: t('eventos:managed.nav'),
                 requireAuthentication: true,
                 featureFlags: [FEATURE_FLAG.isTalleresPageEnabled],
                 icon: LuCalendarClock,

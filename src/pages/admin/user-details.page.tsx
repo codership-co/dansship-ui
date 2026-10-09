@@ -17,7 +17,8 @@ import {
   UserRolesManager,
   UserSubscriptionsTab,
   UserWalletTab,
-  UserWorkshopsTab,
+  UserEventsTab,
+  UserRegistrationActions,
 } from '@components/modules';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
@@ -30,7 +31,7 @@ const PROFILE_TAB = 'profile';
 const SUBSCRIPTIONS_TAB = 'subscriptions';
 const PAYMENTS_TAB = 'payments';
 const BOOKINGS_TAB = 'bookings';
-const TALLERES_TAB = 'talleres';
+const TALLERES_TAB = 'eventos';
 const BENEFITS_TAB = 'benefits';
 const WALLET_TAB = 'wallet';
 const NOTES_TAB = 'notes';
@@ -49,7 +50,7 @@ function UserDetailsPage() {
   const canManageSubscriptions = useOrPermissions(AdminPermissions.subscriptions);
   const canManagePayments = useOrPermissions(AdminPermissions.payments);
   const canManageBookings = useOrPermissions(AdminPermissions.bookings);
-  const canManageTalleres = useOrPermissions(AdminPermissions.talleres);
+  const canManageEventos = useOrPermissions(AdminPermissions.eventos);
   const canReadBenefits = useOrPermissions(AdminPermissions.benefits);
   const canManageWallet = useOrPermissions(AdminPermissions.wallet);
   const canManageUserContext = useOrPermissions(AdminPermissions.userContext);
@@ -79,7 +80,7 @@ function UserDetailsPage() {
     ...(canManageSubscriptions ? [SUBSCRIPTIONS_TAB] : []),
     ...(canManagePayments ? [PAYMENTS_TAB] : []),
     ...(canManageBookings ? [BOOKINGS_TAB] : []),
-    ...(canManageTalleres ? [TALLERES_TAB] : []),
+    ...(canManageEventos ? [TALLERES_TAB] : []),
     ...(canReadBenefits ? [BENEFITS_TAB] : []),
     ...(canManageWallet ? [WALLET_TAB] : []),
     ...(showPaymentDocuments ? [PAYMENT_DOCUMENTS_TAB] : []),
@@ -94,19 +95,27 @@ function UserDetailsPage() {
       dataComponent='UserDetailsPage'
       actions={
         user ? (
-          <UserDetailsActions
-            userId={userId}
-            userEmail={user.email}
-            roleNames={user.roles}
-            isActive={user.is_active}
-            hasInstructorProfile={user.has_instructor_profile}
-            instructorOnboardingCompleted={user.instructor_onboarding_completed ?? false}
-            instructorBusinessStatus={
-              user.instructor_business_status ?? user.instructor_profile?.business_status ?? null
-            }
-            isSubstitute={user.instructor_profile?.is_substitute ?? false}
-            onChanged={() => void reFetch()}
-          />
+          <div className='flex flex-wrap items-center justify-end gap-2'>
+            <UserRegistrationActions
+              userId={userId}
+              email={user.email}
+              isEmailVerified={user.is_email_verified}
+              mustChangePassword={Boolean(user.must_change_password)}
+            />
+            <UserDetailsActions
+              userId={userId}
+              userEmail={user.email}
+              roleNames={user.roles}
+              isActive={user.is_active}
+              hasInstructorProfile={user.has_instructor_profile}
+              instructorOnboardingCompleted={user.instructor_onboarding_completed ?? false}
+              instructorBusinessStatus={
+                user.instructor_business_status ?? user.instructor_profile?.business_status ?? null
+              }
+              isSubstitute={user.instructor_profile?.is_substitute ?? false}
+              onChanged={() => void reFetch()}
+            />
+          </div>
         ) : null
       }
     >
@@ -144,8 +153,8 @@ function UserDetailsPage() {
               {canManageBookings ? (
                 <TabsTrigger value={BOOKINGS_TAB}>{t('admin:users.details.tabs.bookings')}</TabsTrigger>
               ) : null}
-              {canManageTalleres ? (
-                <TabsTrigger value={TALLERES_TAB}>{t('admin:users.details.tabs.talleres')}</TabsTrigger>
+              {canManageEventos ? (
+                <TabsTrigger value={TALLERES_TAB}>{t('admin:users.details.tabs.eventos')}</TabsTrigger>
               ) : null}
               {canReadBenefits ? (
                 <TabsTrigger value={BENEFITS_TAB}>{t('admin:users.details.tabs.benefits')}</TabsTrigger>
@@ -202,9 +211,9 @@ function UserDetailsPage() {
               </TabsContent>
             ) : null}
 
-            {canManageTalleres ? (
+            {canManageEventos ? (
               <TabsContent value={TALLERES_TAB}>
-                {activeTab === TALLERES_TAB && userId ? <UserWorkshopsTab userId={userId} /> : null}
+                {activeTab === TALLERES_TAB && userId ? <UserEventsTab userId={userId} /> : null}
               </TabsContent>
             ) : null}
 

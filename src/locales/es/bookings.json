@@ -1,6 +1,6 @@
 {
   "myBookingsTitle": "Mis reservas",
-  "myBookingsSubtitle": "Tus clases, talleres y rentas de estudio.",
+  "myBookingsSubtitle": "Tus clases, eventos y rentas de estudio.",
   "loading": "Cargando tus reservas...",
   "loadingMore": "Cargando más reservas...",
   "loadMore": "Cargar más",
@@ -12,14 +12,14 @@
   "nextClassSection": "Tu próxima reserva",
   "historySection": "Historial",
   "historyCount": "{{loaded}} de {{total}}",
-  "viewWorkshop": "Ver taller",
+  "viewEvent": "Ver evento",
   "viewPayment": "Ver pago",
   "viewRental": "Ver solicitud",
-  "workshopNamedTitle": "Taller: {{name}}",
+  "eventNamedTitle": "Evento: {{name}}",
   "rentalNamedTitle": "Renta: {{name}}",
   "rentalTitle": "Renta de estudio",
   "rentalSeriesTitle": "Serie de renta",
-  "workshopStatus": {
+  "eventStatus": {
     "pending_payment": "Pendiente de pago",
     "confirmed": "Confirmado",
     "expired": "Expirado",

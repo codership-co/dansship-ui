@@ -24,7 +24,7 @@ import {
   rentalSeriesReservation,
   sortReservationsAscending,
   sortReservationsDescending,
-  workshopReservation,
+  eventReservation,
 } from '@helpers';
 import { useMyBookings, useMyBookingsHistory, usePromise } from '@hooks';
 
@@ -51,11 +51,11 @@ function BookingsPage() {
     reFetch: reFetchHistory,
   } = useMyBookingsHistory();
   const { cancelClass, isCancelingClass } = useMyBookings();
-  const { response: workshopUpcomingResponse, isLoading: isLoadingWorkshopUpcoming } = usePromise(() =>
-    DansshipAPI.talleres.listMyRegistrations({ scope: 'upcoming' }),
+  const { response: eventUpcomingResponse, isLoading: isLoadingEventUpcoming } = usePromise(() =>
+    DansshipAPI.eventos.listMyRegistrations({ scope: 'upcoming' }),
   );
-  const { response: workshopHistoryResponse, isLoading: isLoadingWorkshopHistory } = usePromise(() =>
-    DansshipAPI.talleres.listMyRegistrations({ scope: 'history' }),
+  const { response: eventHistoryResponse, isLoading: isLoadingEventHistory } = usePromise(() =>
+    DansshipAPI.eventos.listMyRegistrations({ scope: 'history' }),
   );
   const { response: rentalRequestsResponse, isLoading: isLoadingRentalRequests } = usePromise(() =>
     DansshipAPI.studioRental.getMyRequests(),
@@ -96,7 +96,7 @@ function BookingsPage() {
 
   const upcomingItems = useMemo(() => {
     const classes = upcomingBookings.map(classReservation);
-    const workshops = (workshopUpcomingResponse?.data ?? []).map(workshopReservation);
+    const events = (eventUpcomingResponse?.data ?? []).map(eventReservation);
     const rentals = rentalRequests
       .filter(request => isUpcomingRental(request))
       .map(request => rentalReservation(request, roomNameById[request.slots[0]?.room_id] ?? ''));
@@ -104,11 +104,11 @@ function BookingsPage() {
       .filter(item => isUpcomingRentalSeries(item))
       .map(item => rentalSeriesReservation(item, roomNameById[item.room_id] ?? ''));
 
-    return sortReservationsAscending([...classes, ...workshops, ...rentals, ...series]);
-  }, [upcomingBookings, workshopUpcomingResponse?.data, rentalRequests, rentalSeries, roomNameById]);
+    return sortReservationsAscending([...classes, ...events, ...rentals, ...series]);
+  }, [upcomingBookings, eventUpcomingResponse?.data, rentalRequests, rentalSeries, roomNameById]);
 
   const extraHistory = useMemo(() => {
-    const workshops = (workshopHistoryResponse?.data ?? []).map(workshopReservation);
+    const events = (eventHistoryResponse?.data ?? []).map(eventReservation);
     const rentals = rentalRequests
       .filter(request => !isUpcomingRental(request))
       .map(request => rentalReservation(request, roomNameById[request.slots[0]?.room_id] ?? ''));
@@ -116,8 +116,8 @@ function BookingsPage() {
       .filter(item => !isUpcomingRentalSeries(item))
       .map(item => rentalSeriesReservation(item, roomNameById[item.room_id] ?? ''));
 
-    return [...workshops, ...rentals, ...series];
-  }, [workshopHistoryResponse?.data, rentalRequests, rentalSeries, roomNameById]);
+    return [...events, ...rentals, ...series];
+  }, [eventHistoryResponse?.data, rentalRequests, rentalSeries, roomNameById]);
 
   const historyReservations = useMemo(
     () => sortReservationsDescending([...historyItems.map(classReservation), ...extraHistory]),
@@ -172,23 +172,23 @@ function BookingsPage() {
 
   const isLoadingUpcoming =
     (isLoadingUpcomingClasses && !upcomingResponse) ||
-    (isLoadingWorkshopUpcoming && !workshopUpcomingResponse) ||
+    (isLoadingEventUpcoming && !eventUpcomingResponse) ||
     (isLoadingRentalRequests && !rentalRequestsResponse) ||
     (isLoadingRentalSeries && !rentalSeriesResponse);
   const isLoadingHistory =
     (isLoadingHistoryClasses && historyItems.length === 0) ||
-    (isLoadingWorkshopHistory && !workshopHistoryResponse) ||
+    (isLoadingEventHistory && !eventHistoryResponse) ||
     (isLoadingRentalRequests && !rentalRequestsResponse) ||
     (isLoadingRentalSeries && !rentalSeriesResponse);
   const upcomingFailed =
     upcomingItems.length === 0 &&
     Boolean(upcomingError || upcomingResponse?.error) &&
-    Boolean(workshopUpcomingResponse && !workshopUpcomingResponse.ok) &&
+    Boolean(eventUpcomingResponse && !eventUpcomingResponse.ok) &&
     Boolean(rentalRequestsResponse && !rentalRequestsResponse.ok);
   const historyFailed =
     historyReservations.length === 0 &&
     Boolean(historyError) &&
-    Boolean(workshopHistoryResponse && !workshopHistoryResponse.ok) &&
+    Boolean(eventHistoryResponse && !eventHistoryResponse.ok) &&
     Boolean(rentalRequestsResponse && !rentalRequestsResponse.ok);
 
   const upcomingHeading =

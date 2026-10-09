@@ -1,10 +1,10 @@
-import type { MyBooking, MyWorkshopRegistration, RentalRequest, RentalSeries } from '@core/api';
+import type { MyBooking, MyEventRegistration, RentalRequest, RentalSeries } from '@core/api';
 
-export type ReservationKind = 'class' | 'workshop' | 'rental' | 'rental_series';
+export type ReservationKind = 'class' | 'event' | 'rental' | 'rental_series';
 
 export type ReservationItem =
   | { kind: 'class'; id: string; startsAt: string; booking: MyBooking }
-  | { kind: 'workshop'; id: string; startsAt: string; registration: MyWorkshopRegistration }
+  | { kind: 'event'; id: string; startsAt: string; registration: MyEventRegistration }
   | { kind: 'rental'; id: string; startsAt: string; request: RentalRequest; roomName: string }
   | { kind: 'rental_series'; id: string; startsAt: string; series: RentalSeries; roomName: string };
 
@@ -17,10 +17,10 @@ export function classReservation(booking: MyBooking): ReservationItem {
   };
 }
 
-export function workshopReservation(registration: MyWorkshopRegistration): ReservationItem {
+export function eventReservation(registration: MyEventRegistration): ReservationItem {
   return {
-    kind: 'workshop',
-    id: `workshop-${registration.id}`,
+    kind: 'event',
+    id: `event-${registration.id}`,
     startsAt: registration.starts_at,
     registration,
   };
@@ -60,8 +60,8 @@ export function reservationDisplayTitle(
     return item.booking.scheduled_class.class_definition?.name ?? t('bookings:classFallback');
   }
 
-  if (item.kind === 'workshop') {
-    return t('bookings:workshopNamedTitle', { name: item.registration.workshop_name });
+  if (item.kind === 'event') {
+    return t('bookings:eventNamedTitle', { name: item.registration.event_name });
   }
 
   if (item.roomName) {

@@ -6,9 +6,11 @@ import { LuChevronLeft, LuChevronRight, LuSearch } from 'react-icons/lu';
 import { Link } from 'react-router';
 
 import { SpinnerLoader } from '@components/loaders';
-import { Checkbox, Input, Label } from '@components/ui';
+import { Button as ActionButton, Checkbox, Input, Label } from '@components/ui';
+import { useOrPermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
+import { AdminPermissions } from '@core/permissions';
 import { useCallablePromise } from '@hooks';
 
 const PAGE_SIZE = 20;
@@ -22,6 +24,7 @@ export function UserList() {
   const [isInstructorOnly, setIsInstructorOnly] = useState(false);
   const [offset, setOffset] = useState(0);
   const { t } = useTranslation();
+  const canRegister = useOrPermissions(AdminPermissions.userRegistration);
   const { register, watch } = useForm<UserSearchForm>({
     defaultValues: { search: '' },
   });
@@ -86,7 +89,14 @@ export function UserList() {
           </label>
         </div>
 
-        <p className='text-sm text-muted-foreground'>{t('admin:users.total', { count: total })}</p>
+        <div className='flex flex-wrap items-center gap-3'>
+          {canRegister ? (
+            <ActionButton asChild>
+              <Link to={PageURLS.admin.userCreate}>{t('admin:users.create')}</Link>
+            </ActionButton>
+          ) : null}
+          <p className='text-sm text-muted-foreground'>{t('admin:users.total', { count: total })}</p>
+        </div>
       </div>
 
       {isLoading ? (

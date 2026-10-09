@@ -25,5 +25,25 @@
       "source": "/((?!assets/).*)",
       "destination": "/index.html"
     }
+  ],
+  "redirects": [
+    { "source": "/talleres/managed/:id", "destination": "/eventos/managed/:id", "permanent": true },
+    { "source": "/talleres/managed", "destination": "/eventos/managed", "permanent": true },
+    { "source": "/talleres/:slug", "destination": "/eventos/:slug", "permanent": true },
+    { "source": "/talleres", "destination": "/eventos", "permanent": true },
+    { "source": "/workshops/managed/:id", "destination": "/eventos/managed/:id", "permanent": true },
+    { "source": "/workshops/managed", "destination": "/eventos/managed", "permanent": true },
+    { "source": "/workshops/:slug", "destination": "/eventos/:slug", "permanent": true },
+    { "source": "/workshops", "destination": "/eventos", "permanent": true },
+    { "source": "/admin/talleres/combos/new", "destination": "/admin/eventos/combos/new", "permanent": true },
+    { "source": "/admin/talleres/combos/:comboId", "destination": "/admin/eventos/combos/:comboId", "permanent": true },
+    { "source": "/admin/talleres/new", "destination": "/admin/eventos/new", "permanent": true },
+    { "source": "/admin/talleres/:id", "destination": "/admin/eventos/:id", "permanent": true },
+    { "source": "/admin/talleres", "destination": "/admin/eventos", "permanent": true },
+    { "source": "/admin/workshops/combos/new", "destination": "/admin/eventos/combos/new", "permanent": true },
+    { "source": "/admin/workshops/combos/:comboId", "destination": "/admin/eventos/combos/:comboId", "permanent": true },
+    { "source": "/admin/workshops/new", "destination": "/admin/eventos/new", "permanent": true },
+    { "source": "/admin/workshops/:id", "destination": "/admin/eventos/:id", "permanent": true },
+    { "source": "/admin/workshops", "destination": "/admin/eventos", "permanent": true }
   ]
 }

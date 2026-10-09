@@ -68,25 +68,25 @@ export const consumePendingPlanCheckoutIntent = (): string | null => {
   return planId;
 };
 
-const TALLER_CHECKOUT_INTENT_KEY = 'pending_taller_checkout_intent';
+const TALLER_CHECKOUT_INTENT_KEY = 'pending_evento_checkout_intent';
 
-interface TallerCheckoutIntent {
+interface EventoCheckoutIntent {
   slug: string;
   createdAt: number;
 }
 
-const isValidTallerIntent = (value: unknown): value is TallerCheckoutIntent => {
+const isValidEventoIntent = (value: unknown): value is EventoCheckoutIntent => {
   if (!value || typeof value !== 'object') {
     return false;
   }
 
-  const maybeIntent = value as Partial<TallerCheckoutIntent>;
+  const maybeIntent = value as Partial<EventoCheckoutIntent>;
 
   return typeof maybeIntent.slug === 'string' && typeof maybeIntent.createdAt === 'number';
 };
 
-export const setPendingTallerCheckoutIntent = (slug: string) => {
-  const payload: TallerCheckoutIntent = {
+export const setPendingEventoCheckoutIntent = (slug: string) => {
+  const payload: EventoCheckoutIntent = {
     slug,
     createdAt: Date.now(),
   };
@@ -94,11 +94,11 @@ export const setPendingTallerCheckoutIntent = (slug: string) => {
   localStorage.setItem(TALLER_CHECKOUT_INTENT_KEY, JSON.stringify(payload));
 };
 
-export const clearPendingTallerCheckoutIntent = () => {
+export const clearPendingEventoCheckoutIntent = () => {
   localStorage.removeItem(TALLER_CHECKOUT_INTENT_KEY);
 };
 
-export const getPendingTallerCheckoutIntent = (): string | null => {
+export const getPendingEventoCheckoutIntent = (): string | null => {
   const rawValue = localStorage.getItem(TALLER_CHECKOUT_INTENT_KEY);
 
   if (!rawValue) {
@@ -108,8 +108,8 @@ export const getPendingTallerCheckoutIntent = (): string | null => {
   try {
     const parsedValue = JSON.parse(rawValue);
 
-    if (!isValidTallerIntent(parsedValue)) {
-      clearPendingTallerCheckoutIntent();
+    if (!isValidEventoIntent(parsedValue)) {
+      clearPendingEventoCheckoutIntent();
 
       return null;
     }
@@ -117,22 +117,22 @@ export const getPendingTallerCheckoutIntent = (): string | null => {
     const isExpired = Date.now() - parsedValue.createdAt > PLAN_CHECKOUT_INTENT_TTL_MS;
 
     if (isExpired) {
-      clearPendingTallerCheckoutIntent();
+      clearPendingEventoCheckoutIntent();
 
       return null;
     }
 
     return parsedValue.slug;
   } catch {
-    clearPendingTallerCheckoutIntent();
+    clearPendingEventoCheckoutIntent();
 
     return null;
   }
 };
 
-export const consumePendingTallerCheckoutIntent = (): string | null => {
-  const slug = getPendingTallerCheckoutIntent();
-  clearPendingTallerCheckoutIntent();
+export const consumePendingEventoCheckoutIntent = (): string | null => {
+  const slug = getPendingEventoCheckoutIntent();
+  clearPendingEventoCheckoutIntent();
 
   return slug;
 };

@@ -81,7 +81,7 @@
       "plan": "Plan",
       "merch": "Merch",
       "studioRental": "Alquiler de estudio",
-      "workshop": "Taller"
+      "event": "Evento"
     }
   },
   "tax": {
@@ -232,18 +232,20 @@
     "empty": "No hay calificaciones en este período.",
     "anonymousName": "Estudiante sin nombre"
   },
-  "workshops": {
-    "revenueTitle": "Ingresos de talleres y combos",
-    "byOfferingTitle": "Ingresos por taller o combo",
-    "fillTitle": "Ocupación de talleres",
+  "events": {
+    "revenueTitle": "Ingresos de eventos y combos",
+    "byOfferingTitle": "Ingresos por evento o combo",
+    "fillTitle": "Ocupación de eventos",
     "offering": "Oferta",
-    "kind": "Tipo",
-    "workshop": "Taller",
+    "kind": "Tipo de oferta",
+    "eventType": "Tipo",
+    "allTypes": "Todos los tipos",
+    "event": "Evento",
     "combo": "Combo",
     "when": "Fecha",
-    "emptyRevenue": "No hay pagos de talleres en este período.",
-    "emptyFill": "No hay talleres en este período.",
-    "revenueExcludesCollaboration": "Los talleres en colaboración no entran en estos ingresos. Siguen contando en ocupación.",
+    "emptyRevenue": "No hay pagos de eventos en este período.",
+    "emptyFill": "No hay eventos en este período.",
+    "revenueExcludesCollaboration": "Los eventos en colaboración no entran en estos ingresos. Siguen contando en ocupación.",
     "collaborationBadge": "Colaboración"
   }
 }
