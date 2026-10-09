@@ -100,7 +100,7 @@ export const createBasicProfileSchema = (t: TFunction, requireTermsAcceptance = 
   });
 };
 
-type BasicProfileFormValues = z.infer<ReturnType<typeof createBasicProfileSchema>>;
+export type BasicProfileFormValues = z.infer<ReturnType<typeof createBasicProfileSchema>>;
 
 interface OnboardingBasicProfileFormProps {
   isLoading: boolean;
@@ -108,6 +108,8 @@ interface OnboardingBasicProfileFormProps {
   onSubmit: (values: BasicProfileFormValues) => void;
   defaultValues?: Partial<BasicProfileFormValues>;
   requireTermsAcceptance?: boolean;
+  termsI18nKey?: string;
+  showPhotoUpload?: boolean;
   submitLabel?: string;
 }
 
@@ -117,6 +119,8 @@ export function BasicProfileForm({
   onSubmit,
   defaultValues,
   requireTermsAcceptance = false,
+  termsI18nKey = 'auth:onboarding.terms',
+  showPhotoUpload = true,
   submitLabel,
 }: OnboardingBasicProfileFormProps) {
   const { t } = useTranslation();
@@ -202,34 +206,40 @@ export function BasicProfileForm({
   return (
     <div className='space-y-6' data-sentry-mask>
       <form className='space-y-4' onSubmit={handleSubmit(internalSubmit)}>
-        <section className='grid lg:grid-cols-[auto_1fr] gap-4'>
-          <div
-            className='relative grid justify-items-center gap-8 rounded-md border border-dashed border-gray-300 py-4 px-8'
-            data-sentry-block
-          >
-            <section>
-              <section className='w-50 aspect-square bg-gray-300/50 border border-dashed border-gray-300 rounded-full grid place-content-center overflow-hidden'>
-                {imageUrl ? (
-                  <img src={imageUrl} alt='proof preview' className='w-full aspect-square inline-block object-cover' />
-                ) : (
-                  <label className='p-8 text-center'>{t('auth:onboarding.fields.profilePhoto.button')}</label>
-                )}
+        <section className={showPhotoUpload ? 'grid lg:grid-cols-[auto_1fr] gap-4' : 'grid gap-4'}>
+          {showPhotoUpload ? (
+            <div
+              className='relative grid justify-items-center gap-8 rounded-md border border-dashed border-gray-300 py-4 px-8'
+              data-sentry-block
+            >
+              <section>
+                <section className='w-50 aspect-square bg-gray-300/50 border border-dashed border-gray-300 rounded-full grid place-content-center overflow-hidden'>
+                  {imageUrl ? (
+                    <img
+                      src={imageUrl}
+                      alt='proof preview'
+                      className='w-full aspect-square inline-block object-cover'
+                    />
+                  ) : (
+                    <label className='p-8 text-center'>{t('auth:onboarding.fields.profilePhoto.button')}</label>
+                  )}
+                </section>
               </section>
-            </section>
-            <section className='grid justify-items-center'>
-              <Button color='secondary' variant='flat'>
-                {profilePhoto
-                  ? t('auth:onboarding.fields.profilePhoto.buttonReplace')
-                  : t('auth:onboarding.fields.profilePhoto.button')}
-              </Button>
-            </section>
-            <input
-              type='file'
-              className='absolute w-full h-full top-0 left-0 cursor-pointer opacity-0'
-              accept={PaymentProofContentTypesList.join(',')}
-              onChange={handleInputFileUpload}
-            />
-          </div>
+              <section className='grid justify-items-center'>
+                <Button color='secondary' variant='flat'>
+                  {profilePhoto
+                    ? t('auth:onboarding.fields.profilePhoto.buttonReplace')
+                    : t('auth:onboarding.fields.profilePhoto.button')}
+                </Button>
+              </section>
+              <input
+                type='file'
+                className='absolute w-full h-full top-0 left-0 cursor-pointer opacity-0'
+                accept={PaymentProofContentTypesList.join(',')}
+                onChange={handleInputFileUpload}
+              />
+            </div>
+          ) : null}
 
           <section className='space-y-4'>
             <div className='space-y-2'>
@@ -352,7 +362,7 @@ export function BasicProfileForm({
                   label={
                     <Trans
                       className='text-small'
-                      i18nKey='auth:onboarding.terms'
+                      i18nKey={termsI18nKey}
                       components={{
                         LinkTerms: (
                           <a

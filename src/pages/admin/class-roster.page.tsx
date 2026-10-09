@@ -5,8 +5,8 @@ import { Link, useParams } from 'react-router';
 
 import { AdminPageLayout } from '@components/layouts';
 import { SpinnerLoader } from '@components/loaders';
-import { AdminRosterTable, RetroactiveAttendanceDialog } from '@components/modules';
-import { FEATURE_FLAG, SecurityGuard } from '@contexts';
+import { AdminRosterTable, RefundClassCreditsDialog, RetroactiveAttendanceDialog } from '@components/modules';
+import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions } from '@core/permissions';
@@ -17,6 +17,8 @@ function AdminClassRosterPage() {
   const { t } = useTranslation();
   const { classId = '' } = useParams<{ classId: string }>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isRefundOpen, setIsRefundOpen] = useState(false);
+  const canRefundCredits = useOrPermissions(AdminPermissions.classCreditRefund);
   const { response, isLoading, error, reFetch } = usePromise(
     () => DansshipAPI.bookingsAdmin.getAdminClassRoster(classId),
     !!classId,
@@ -27,6 +29,8 @@ function AdminClassRosterPage() {
   const capacity = roster?.capacity ?? 0;
   const hasError = Boolean(error) || Boolean(response && !response.ok);
   const canRegisterRetroactive = Boolean(roster?.can_register_retroactive_attendance);
+  const refundableCount = roster?.refundable_count ?? 0;
+  const canRefundClass = canRefundCredits && refundableCount > 0;
   const isPastStartTime = Boolean(roster?.start_time && new Date(roster.start_time) < new Date());
 
   return (
@@ -35,6 +39,11 @@ function AdminClassRosterPage() {
       dataComponent='AdminClassRosterPage'
       actions={
         <div className='flex flex-wrap items-center gap-2'>
+          {canRefundClass ? (
+            <Button color='primary' size='small' variant='flat' onClick={() => setIsRefundOpen(true)}>
+              {t('admin:roster.refundCredits')}
+            </Button>
+          ) : null}
           {canRegisterRetroactive ? (
             <Button color='primary' size='small' onClick={() => setIsDialogOpen(true)}>
               {t('admin:roster.registerRetroactive')}
@@ -92,6 +101,15 @@ function AdminClassRosterPage() {
           rosterIsEmpty={enrolled.length === 0}
           willReopenAutoCancelledClass={Boolean(roster?.will_reopen_auto_cancelled_class)}
           onRegistered={() => void reFetch()}
+        />
+      ) : null}
+      {classId && canRefundClass ? (
+        <RefundClassCreditsDialog
+          classId={classId}
+          open={isRefundOpen}
+          onOpenChange={setIsRefundOpen}
+          refundableCount={refundableCount}
+          onRefunded={() => void reFetch()}
         />
       ) : null}
     </AdminPageLayout>

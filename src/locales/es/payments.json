@@ -93,7 +93,6 @@
   "purchaseType": {
     "plan": "Plan",
     "merch": "Mercancía",
-    "workshop": "Taller",
     "event": "Evento",
     "private_class": "Clase privada",
     "studio_rental": "Alquiler de estudio"

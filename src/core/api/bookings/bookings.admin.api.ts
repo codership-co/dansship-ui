@@ -7,6 +7,8 @@ import type {
   AdminBookingUser,
   AdminReimburseCreditPayload,
   Booking,
+  ClassCreditRefundPayload,
+  ClassCreditRefundResult,
   MarkAttendancePayload,
   MyBooking,
 } from './bookings.models';
@@ -50,6 +52,14 @@ export class BookingsAdminAPI {
   async reimburseCredit(bookingId: string, payload: AdminReimburseCreditPayload = {}) {
     return this.httpClient.callNoError<Booking, AdminReimburseCreditPayload>({
       path: `/admin/bookings/${bookingId}/reimburse-credit`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async refundClassCredits(classId: string, payload: ClassCreditRefundPayload) {
+    return this.httpClient.callNoError<ClassCreditRefundResult, ClassCreditRefundPayload>({
+      path: `/admin/classes/${classId}/refund-credits`,
       method: 'POST',
       data: payload,
     });

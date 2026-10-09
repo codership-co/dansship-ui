@@ -163,7 +163,7 @@ export interface PaymentPreviewRequest {
   end_time?: string;
   duration_hours?: number | string;
   payment_option?: 'full' | 'fifty_fifty';
-  workshop_slug?: string;
+  event_slug?: string;
 }
 
 export interface AppliedDiscountPreview {

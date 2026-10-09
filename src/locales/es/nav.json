@@ -21,7 +21,7 @@
   "myRentalRequests": "Mis Solicitudes de Renta",
   "menuScheduleClass": "Agendar Clase",
   "navPlans": "Planes",
-  "talleres": "Talleres",
+  "eventos": "Eventos",
   "menuPlans": "Mis Suscripciones",
   "menuBookings": "Mis Reservas",
   "menuFigures": "Figuras",
@@ -40,6 +40,6 @@
     "users": "Usuarios",
     "studioRental": "Renta de Estudio",
     "campaigns": "Campañas",
-    "talleres": "Talleres"
+    "eventos": "Eventos"
   }
 }

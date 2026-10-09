@@ -9,7 +9,7 @@ import {
   OperationalDashboard,
   StudentReports,
   StudioRentalReports,
-  WorkshopReports,
+  EventReports,
 } from '@components/modules';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
@@ -23,7 +23,7 @@ function AdminReportsPage() {
   const canStudents = useOrPermissions(AdminPermissions.studentReports);
   const canInstructors = useOrPermissions(AdminPermissions.instructorReports);
   const canRentals = useOrPermissions(AdminPermissions.studioRentalReports);
-  const canWorkshopReports = useOrPermissions(AdminPermissions.workshopReports);
+  const canEventReports = useOrPermissions(AdminPermissions.eventReports);
   const canClassFeedback = useOrPermissions(AdminPermissions.classFeedback);
   const canNotifications = useOrPermissions(AdminPermissions.notifications);
 
@@ -41,7 +41,7 @@ function AdminReportsPage() {
             }
           : null,
         canRentals ? { value: 'rentals', label: t('admin:reports.tabs.rentals') } : null,
-        canWorkshopReports ? { value: 'talleres', label: t('admin:reports.tabs.talleres') } : null,
+        canEventReports ? { value: 'eventos', label: t('admin:reports.tabs.eventos') } : null,
         canNotifications
           ? {
               value: 'notifications',
@@ -57,7 +57,7 @@ function AdminReportsPage() {
       canOperations,
       canRentals,
       canStudents,
-      canWorkshopReports,
+      canEventReports,
       t,
     ],
   );
@@ -111,9 +111,9 @@ function AdminReportsPage() {
             <StudioRentalReports />
           </TabsContent>
         )}
-        {canWorkshopReports && (
-          <TabsContent value='talleres' className='outline-none'>
-            <WorkshopReports />
+        {canEventReports && (
+          <TabsContent value='eventos' className='outline-none'>
+            <EventReports />
           </TabsContent>
         )}
         {canNotifications && (
@@ -135,7 +135,7 @@ export const SecureAdminReportsPage = SecurityGuard(AdminReportsPage, {
     PERMISSION.INSTRUCTOR_REPORT_READ,
     PERMISSION.CLASS_FEEDBACK_READ,
     PERMISSION.STUDIO_RENTAL_REPORT_READ,
-    PERMISSION.WORKSHOP_REPORT_READ,
+    PERMISSION.EVENT_REPORT_READ,
     PERMISSION.NOTIFICATION_MANAGE,
   ],
   requiresAuth: true,

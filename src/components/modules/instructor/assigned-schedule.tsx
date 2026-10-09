@@ -9,8 +9,8 @@ import { WeekSelector } from '../schedules';
 
 import { ClassRoster } from './class-roster';
 import { InstructorClassCard } from './instructor-class-card';
-import { InstructorWorkshopCard } from './instructor-workshop-card';
-import { InstructorWorkshopRoster } from './instructor-workshop-roster';
+import { InstructorEventCard } from './instructor-event-card';
+import { InstructorEventRoster } from './instructor-event-roster';
 
 import { Container } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
@@ -22,7 +22,7 @@ import {
   DansshipAPIError,
   DANSSHIP_ERROR_CODE,
   InstructorTeachingUpcomingWeek,
-  InstructorTeachingWorkshop,
+  InstructorTeachingEvent,
   ScheduledClass,
   UpcomingWeekResponse,
 } from '@core/api';
@@ -40,7 +40,7 @@ import { useDateLocale, usePromise } from '@hooks';
 
 type SelectedTeaching =
   | { kind: 'class'; scheduledClass: ScheduledClass }
-  | { kind: 'workshop'; workshop: InstructorTeachingWorkshop };
+  | { kind: 'event'; event: InstructorTeachingEvent };
 
 function isMissingTeachingProfile(error: unknown): boolean {
   return (
@@ -85,7 +85,7 @@ export function AssignedSchedule() {
   const [week, setWeek] = useState(currentWeek);
   const [selected, setSelected] = useState<SelectedTeaching | null>(null);
   const [initialClasses, setInitialClasses] = useState<Array<ScheduledClass> | null>(null);
-  const [initialWorkshops, setInitialWorkshops] = useState<Array<InstructorTeachingWorkshop> | null>(null);
+  const [initialEvents, setInitialEvents] = useState<Array<InstructorTeachingEvent> | null>(null);
   const [initialFocusDay, setInitialFocusDay] = useState<string | null>(null);
   const [nearestWeek, setNearestWeek] = useState<string | null>(null);
   const [showJumpedBanner, setShowJumpedBanner] = useState(false);
@@ -99,7 +99,7 @@ export function AssignedSchedule() {
     hasInstructorProfile,
   );
   const { response: teachingUpcomingResponse, isLoading: isResolvingTeaching } = usePromise(
-    () => DansshipAPI.talleres.getTeachingUpcomingWeek(currentWeek),
+    () => DansshipAPI.eventos.getTeachingUpcomingWeek(currentWeek),
     hasInstructorProfile,
   );
 
@@ -117,7 +117,7 @@ export function AssignedSchedule() {
 
       setWeek(resolution.week);
       setInitialClasses(resolution.classes);
-      setInitialWorkshops(resolution.workshops);
+      setInitialEvents(resolution.events);
       setInitialFocusDay(resolution.focusDay);
       setNearestWeek(resolution.week);
       setShowJumpedBanner(resolution.jumped);
@@ -130,7 +130,7 @@ export function AssignedSchedule() {
   useEffect(() => {
     if (!hasInstructorProfile) {
       setInitialClasses([]);
-      setInitialWorkshops([]);
+      setInitialEvents([]);
       setInitialFocusDay(null);
       setWeekReady(true);
 
@@ -170,7 +170,7 @@ export function AssignedSchedule() {
   }, [applyResolution, hasInstructorProfile, upcomingResponse, teachingUpcomingResponse]);
 
   const shouldFetchClasses = hasInstructorProfile && weekReady && initialClasses === null;
-  const shouldFetchWorkshops = hasInstructorProfile && weekReady && initialWorkshops === null;
+  const shouldFetchEvents = hasInstructorProfile && weekReady && initialEvents === null;
 
   const { response: instructorSchedule, isLoading: isLoadingInstructorSchedule } = usePromise(
     () => DansshipAPI.instructors.getInstructorWeeklySchedule(week),
@@ -178,9 +178,9 @@ export function AssignedSchedule() {
     [week, shouldFetchClasses],
   );
   const { response: teachingWeek, isLoading: isLoadingTeachingWeek } = usePromise(
-    () => DansshipAPI.talleres.listTeachingWeek(week),
-    shouldFetchWorkshops,
-    [week, shouldFetchWorkshops],
+    () => DansshipAPI.eventos.listTeachingWeek(week),
+    shouldFetchEvents,
+    [week, shouldFetchEvents],
   );
 
   const classes = useMemo(() => {
@@ -191,15 +191,15 @@ export function AssignedSchedule() {
     return instructorSchedule?.data ?? [];
   }, [initialClasses, instructorSchedule?.data]);
 
-  const workshops = useMemo(() => {
-    if (initialWorkshops !== null) {
-      return initialWorkshops;
+  const events = useMemo(() => {
+    if (initialEvents !== null) {
+      return initialEvents;
     }
 
     return teachingWeek?.data ?? [];
-  }, [initialWorkshops, teachingWeek?.data]);
+  }, [initialEvents, teachingWeek?.data]);
 
-  const teachingDays = useMemo(() => mergeTeachingWeek(classes, workshops, week), [classes, workshops, week]);
+  const teachingDays = useMemo(() => mergeTeachingWeek(classes, events, week), [classes, events, week]);
 
   useEffect(() => {
     if (lockFocus) {
@@ -211,21 +211,20 @@ export function AssignedSchedule() {
     setActiveDay(previousDay => resolveActiveTeachingDay(teachingDays, previousDay));
   }, [teachingDays, lockFocus, initialFocusDay]);
 
-  const nextTeaching = useMemo(() => findNextTeaching(classes, workshops), [classes, workshops]);
+  const nextTeaching = useMemo(() => findNextTeaching(classes, events), [classes, events]);
   const nextStart =
-    nextTeaching?.kind === 'class' ? nextTeaching.scheduledClass.start_time : nextTeaching?.workshop.starts_at;
-  const nextEnd =
-    nextTeaching?.kind === 'class' ? nextTeaching.scheduledClass.end_time : nextTeaching?.workshop.ends_at;
+    nextTeaching?.kind === 'class' ? nextTeaching.scheduledClass.start_time : nextTeaching?.event.starts_at;
+  const nextEnd = nextTeaching?.kind === 'class' ? nextTeaching.scheduledClass.end_time : nextTeaching?.event.ends_at;
   const nextStatus = useMemo(
     () => (nextStart && nextEnd ? getUpcomingStatusKey(nextStart, nextEnd) : null),
     [nextStart, nextEnd],
   );
   const nextRoomName =
-    nextTeaching?.kind === 'class' ? nextTeaching.scheduledClass.room?.name : nextTeaching?.workshop.room?.name;
+    nextTeaching?.kind === 'class' ? nextTeaching.scheduledClass.room?.name : nextTeaching?.event.room?.name;
   const nextName =
     nextTeaching?.kind === 'class'
       ? nextTeaching.scheduledClass.class_definition?.name || t('bookings:classDefault')
-      : nextTeaching?.workshop.name;
+      : nextTeaching?.event.name;
 
   const isLoading =
     hasInstructorProfile &&
@@ -233,13 +232,13 @@ export function AssignedSchedule() {
       isResolvingTeaching ||
       !weekReady ||
       (shouldFetchClasses && isLoadingInstructorSchedule) ||
-      (shouldFetchWorkshops && isLoadingTeachingWeek));
+      (shouldFetchEvents && isLoadingTeachingWeek));
 
-  const hasTeachingItems = classes.length > 0 || workshops.length > 0;
+  const hasTeachingItems = classes.length > 0 || events.length > 0;
 
   const clearWeekCache = () => {
     setInitialClasses(null);
-    setInitialWorkshops(null);
+    setInitialEvents(null);
     setInitialFocusDay(null);
     setLockFocus(false);
     setShowJumpedBanner(false);
@@ -264,7 +263,7 @@ export function AssignedSchedule() {
 
     const [classResult, teachingResult] = await Promise.all([
       DansshipAPI.instructors.getUpcomingWeek(currentWeek),
-      DansshipAPI.talleres.getTeachingUpcomingWeek(currentWeek),
+      DansshipAPI.eventos.getTeachingUpcomingWeek(currentWeek),
     ]);
 
     if (!classResult.ok && !isMissingTeachingProfile(classResult.error)) {
@@ -293,7 +292,7 @@ export function AssignedSchedule() {
   };
 
   const openClassRoster = (scheduledClass: ScheduledClass) => setSelected({ kind: 'class', scheduledClass });
-  const openWorkshopRoster = (workshop: InstructorTeachingWorkshop) => setSelected({ kind: 'workshop', workshop });
+  const openEventRoster = (event: InstructorTeachingEvent) => setSelected({ kind: 'event', event });
 
   return (
     <section className='grid gap-8'>
@@ -322,10 +321,10 @@ export function AssignedSchedule() {
           <article className='grid gap-4 rounded-xl border border-primary/30 bg-primary/5 p-5 sm:p-6 sm:grid-cols-[1fr_auto] sm:items-center'>
             <div className='grid gap-2'>
               <p className='text-sm font-semibold uppercase tracking-wide text-primary/80 m-0 inline-flex items-center gap-2'>
-                {nextTeaching.kind === 'workshop' ? t('instructor:home.nextWorkshop') : t('instructor:home.nextClass')}
-                {nextTeaching.kind === 'workshop' && (
+                {nextTeaching.kind === 'event' ? t('instructor:home.nextEvent') : t('instructor:home.nextClass')}
+                {nextTeaching.kind === 'event' && (
                   <Badge variant='default' size='small'>
-                    {t('instructor:home.workshopBadge')}
+                    {nextTeaching.event.type_label ?? t('eventos:types.taller')}
                   </Badge>
                 )}
               </p>
@@ -361,7 +360,7 @@ export function AssignedSchedule() {
               onClick={() =>
                 nextTeaching.kind === 'class'
                   ? openClassRoster(nextTeaching.scheduledClass)
-                  : openWorkshopRoster(nextTeaching.workshop)
+                  : openEventRoster(nextTeaching.event)
               }
             >
               <LuClipboardList className='size-4' />
@@ -464,10 +463,10 @@ export function AssignedSchedule() {
                       onClick={() => openClassRoster(item.scheduledClass)}
                     />
                   ) : (
-                    <InstructorWorkshopCard
-                      workshop={item.workshop}
-                      highlighted={nextTeaching?.kind === 'workshop' && item.id === nextTeaching.workshop.id}
-                      onClick={() => openWorkshopRoster(item.workshop)}
+                    <InstructorEventCard
+                      event={item.event}
+                      highlighted={nextTeaching?.kind === 'event' && item.id === nextTeaching.event.id}
+                      onClick={() => openEventRoster(item.event)}
                     />
                   )}
                 </section>
@@ -479,8 +478,8 @@ export function AssignedSchedule() {
         <Dialog open={!!selected} onOpenChange={() => setSelected(null)}>
           <DialogContent className='max-w-[calc(100%-1rem)] sm:max-w-4xl max-h-[92vh] overflow-y-auto p-4 sm:p-6'>
             <DialogTitle>
-              {selected?.kind === 'workshop'
-                ? t('instructor:home.workshopRosterTitle', { name: selected.workshop.name })
+              {selected?.kind === 'event'
+                ? t('instructor:home.eventRosterTitle', { name: selected.event.name })
                 : t('schedules:classRoster', {
                     name:
                       selected?.kind === 'class'
@@ -489,8 +488,8 @@ export function AssignedSchedule() {
                   })}
             </DialogTitle>
             <DialogDescription>
-              {selected?.kind === 'workshop'
-                ? t('instructor:home.workshopRosterDescription')
+              {selected?.kind === 'event'
+                ? t('instructor:home.eventRosterDescription')
                 : t('schedules:rosterDescription')}
             </DialogDescription>
             {selected?.kind === 'class' && (
@@ -500,7 +499,7 @@ export function AssignedSchedule() {
                 startTime={selected.scheduledClass.start_time}
               />
             )}
-            {selected?.kind === 'workshop' && <InstructorWorkshopRoster workshopId={selected.workshop.id} />}
+            {selected?.kind === 'event' && <InstructorEventRoster eventId={selected.event.id} />}
           </DialogContent>
         </Dialog>
       </section>

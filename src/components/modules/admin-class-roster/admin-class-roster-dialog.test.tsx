@@ -6,6 +6,15 @@ import { AdminClassRosterDialog } from './admin-class-roster-dialog';
 import { DansshipAPI } from '@core/api';
 import '@core/i18n';
 
+vi.mock('@contexts', async () => {
+  const actual = await vi.importActual<typeof import('@contexts')>('@contexts');
+
+  return {
+    ...actual,
+    useOrPermissions: () => false,
+  };
+});
+
 const pairRoster = [
   {
     id: 'reg-1',
@@ -33,9 +42,9 @@ const pairRoster = [
   },
 ];
 
-describe('AdminClassRosterDialog workshop mode', () => {
+describe('AdminClassRosterDialog event mode', () => {
   beforeEach(() => {
-    vi.spyOn(DansshipAPI.talleresAdmin, 'listRoster').mockResolvedValue({
+    vi.spyOn(DansshipAPI.eventosAdmin, 'listRoster').mockResolvedValue({
       ok: true,
       data: pairRoster,
     } as never);
@@ -47,9 +56,7 @@ describe('AdminClassRosterDialog workshop mode', () => {
   });
 
   it('shows pair members together with combo origin and no class attendance controls', async () => {
-    render(
-      <AdminClassRosterDialog kind='workshop' id='workshop-1' title='Salsa 1' open onOpenChange={() => undefined} />,
-    );
+    render(<AdminClassRosterDialog kind='event' id='event-1' title='Salsa 1' open onOpenChange={() => undefined} />);
 
     await waitFor(() => {
       expect(screen.getByText('Ana Pérez')).toBeInTheDocument();

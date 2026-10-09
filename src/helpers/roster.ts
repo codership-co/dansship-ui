@@ -1,4 +1,4 @@
-import type { RosterStudent, WorkshopRosterEntry } from '@core/api';
+import type { RosterStudent, EventRosterEntry } from '@core/api';
 
 export function rosterStudentName(student: RosterStudent, fallback = '-') {
   return student.user_full_name || student.user_name || student.user_email || fallback;
@@ -19,14 +19,14 @@ export function splitRosterAttendees(enrolled: Array<RosterStudent>) {
   return { students, instructorAttendees };
 }
 
-export interface WorkshopRosterGroup {
+export interface EventRosterGroup {
   purchaseId: string;
-  members: Array<WorkshopRosterEntry>;
+  members: Array<EventRosterEntry>;
 }
 
-export function groupWorkshopRosterByPurchase(rows: Array<WorkshopRosterEntry>): Array<WorkshopRosterGroup> {
+export function groupEventRosterByPurchase(rows: Array<EventRosterEntry>): Array<EventRosterGroup> {
   const order: Array<string> = [];
-  const membersByPurchase = new Map<string, Array<WorkshopRosterEntry>>();
+  const membersByPurchase = new Map<string, Array<EventRosterEntry>>();
 
   for (const row of rows) {
     const existing = membersByPurchase.get(row.purchase_id);

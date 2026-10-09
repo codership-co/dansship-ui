@@ -12,6 +12,74 @@ export interface UserListPage {
   offset: number;
 }
 
+export interface AdminEmailLookupResponse {
+  status: 'available' | 'placeholder' | 'registered';
+  user_id: string | null;
+  full_name: string | null;
+  phone_country_code: string | null;
+  phone_number: string | null;
+}
+
+export interface AdminRegisterUserPayload {
+  email: string;
+  email_confirmation: string;
+  terms_accepted: true;
+  profile: Record<string, unknown>;
+  health: Record<string, unknown>;
+  preferences: Record<string, unknown>;
+}
+
+export interface AdminRegisterUserResponse {
+  user_id: string;
+  temporary_password: string;
+  temporary_password_expires_at: string;
+  is_email_verified: boolean;
+  completed_placeholder: boolean;
+}
+
+export interface AdminUpdateOnboardingPayload {
+  profile: Record<string, unknown>;
+  health: Record<string, unknown>;
+  preferences: Record<string, unknown>;
+}
+
+export interface InPersonPlanPreview {
+  is_valid: boolean;
+  original_price: string | number;
+  final_price: string | number;
+  amount_to_charge: string | number;
+  wallet_amount_applied: string | number;
+  tax_type_name: string;
+  tax_rate_percentage: string | number;
+  tax_amount: string | number;
+  base_amount: string | number;
+  rejection_reason: string | null;
+}
+
+export interface InPersonPlanPurchasePayload {
+  plan_id: string;
+  payment_method_type: 'transfer';
+  discount_code?: string | null;
+  referral_code?: string | null;
+  is_quarterly?: boolean;
+  idempotency_key?: string;
+}
+
+export interface InPersonPlanPurchaseResponse {
+  id: string;
+  status: string;
+  amount: string | number;
+  user_id: string;
+  subscription_id: string | null;
+  proof_url: string | null;
+}
+
+export interface TemporaryPasswordResponse {
+  user_id: string;
+  temporary_password: string;
+  temporary_password_expires_at: string;
+}
+
 export interface UserDeactivateResponse {
   deactivated: boolean;
 }
@@ -108,6 +176,7 @@ export interface AdminUserDetailsResponse {
   updated_at: string;
   is_active: boolean;
   is_email_verified: boolean;
+  must_change_password?: boolean;
   requires_onboarding: boolean;
   onboarding_completed: boolean;
   onboarding_pending_steps: Array<string>;

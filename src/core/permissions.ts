@@ -11,6 +11,8 @@ export enum PERMISSION {
   USER_READ = 'read:user',
   USER_MANAGE = 'manage:user',
   USER_CONTEXT_MANAGE = 'manage:user_context',
+  USER_REGISTER = 'register:user',
+  PLAN_PURCHASE_REGISTER = 'register:plan_purchase',
 
   // ATTENDANCE
   ATTENDANCE_MARK = 'mark:attendance',
@@ -23,6 +25,7 @@ export enum PERMISSION {
   BOOKING_CANCEL = 'cancel:booking',
   BOOKING_CREATE = 'create:booking',
   BOOKING_MANAGE = 'manage:booking',
+  CLASS_CREDIT_REFUND = 'refund:class_credit',
   BOOKING_READ = 'read:booking',
 
   // CLASS CATALOG
@@ -84,8 +87,8 @@ export enum PERMISSION {
   // STUDIO RENTAL REPORT
   STUDIO_RENTAL_REPORT_READ = 'read:studio_rental_report',
 
-  // WORKSHOP REPORT
-  WORKSHOP_REPORT_READ = 'read:workshop_report',
+  // EVENT REPORT
+  EVENT_REPORT_READ = 'read:event_report',
 
   // ROLE
   ROLE_MANAGE = 'manage:role',
@@ -124,9 +127,9 @@ export enum PERMISSION {
   // CAMPAIGN
   CAMPAIGN_MANAGE = 'manage:campaign',
 
-  // WORKSHOP
-  WORKSHOP_MANAGE = 'manage:workshop',
-  WORKSHOP_PURCHASE = 'purchase:workshop',
+  // EVENT
+  EVENT_MANAGE = 'manage:event',
+  EVENT_PURCHASE = 'purchase:event',
 
   // CLASS FEEDBACK
   CLASS_FEEDBACK_READ = 'read:class_feedback',
@@ -151,11 +154,13 @@ export const StudentPermissions = {
   bookings: [PERMISSION.BOOKING_READ, PERMISSION.BOOKING_CREATE, PERMISSION.BOOKING_CANCEL],
   subscription: [PERMISSION.SUBSCRIPTION_READ, PERMISSION.SUBSCRIPTION_PURCHASE],
   studioRental: [PERMISSION.STUDIO_RENTAL_READ, PERMISSION.STUDIO_RENTAL_CREATE],
-  talleres: [PERMISSION.WORKSHOP_PURCHASE],
+  eventos: [PERMISSION.EVENT_PURCHASE],
 };
 
 export const AdminPermissions = {
   users: [PERMISSION.USER_MANAGE],
+  userRegistration: [PERMISSION.USER_REGISTER],
+  planPurchaseRegistration: [PERMISSION.PLAN_PURCHASE_REGISTER],
   userContext: [PERMISSION.USER_CONTEXT_MANAGE],
   roles: [PERMISSION.ROLE_MANAGE],
   scheduleBuilder: [PERMISSION.SCHEDULE_MANAGE, PERMISSION.SCHEDULE_DRAFT_CREATE],
@@ -167,6 +172,7 @@ export const AdminPermissions = {
     PERMISSION.PLAN_MANAGE,
   ],
   bookings: [PERMISSION.BOOKING_MANAGE],
+  classCreditRefund: [PERMISSION.CLASS_CREDIT_REFUND],
   payments: [PERMISSION.PAYMENT_MANAGE],
   wallet: [PERMISSION.WALLET_MANAGE],
   doorCode: [PERMISSION.DOOR_CODE_MANAGE],
@@ -180,12 +186,12 @@ export const AdminPermissions = {
   studentReports: [PERMISSION.STUDENT_REPORT_READ],
   instructorReports: [PERMISSION.INSTRUCTOR_REPORT_READ],
   studioRentalReports: [PERMISSION.STUDIO_RENTAL_REPORT_READ],
-  workshopReports: [PERMISSION.WORKSHOP_REPORT_READ],
+  eventReports: [PERMISSION.EVENT_REPORT_READ],
   financialReports: [PERMISSION.FINANCIAL_REPORT_READ],
   notifications: [PERMISSION.NOTIFICATION_MANAGE],
   studioRental: [PERMISSION.STUDIO_RENTAL_MANAGE],
   campaigns: [PERMISSION.CAMPAIGN_MANAGE],
-  talleres: [PERMISSION.WORKSHOP_MANAGE],
+  eventos: [PERMISSION.EVENT_MANAGE],
   classFeedback: [PERMISSION.CLASS_FEEDBACK_READ],
 };
 

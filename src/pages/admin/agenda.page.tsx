@@ -121,7 +121,7 @@ function AdminAgendaPage() {
     },
     {
       value: 'workshop',
-      label: t('admin:agenda.filters.workshop', { defaultValue: 'Taller' }),
+      label: t('admin:agenda.filters.event', { defaultValue: 'Evento' }),
     },
   ];
 

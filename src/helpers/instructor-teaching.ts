@@ -1,6 +1,6 @@
 import { addDaysToFormat, toColombiaDateKey } from './date';
 
-import type { InstructorTeachingWorkshop, ScheduledClass } from '@core/api';
+import type { InstructorTeachingEvent, ScheduledClass } from '@core/api';
 
 export interface TeachingClassItem {
   kind: 'class';
@@ -10,15 +10,15 @@ export interface TeachingClassItem {
   scheduledClass: ScheduledClass;
 }
 
-export interface TeachingWorkshopItem {
-  kind: 'workshop';
+export interface TeachingEventItem {
+  kind: 'event';
   id: string;
   startTime: string;
   endTime: string;
-  workshop: InstructorTeachingWorkshop;
+  event: InstructorTeachingEvent;
 }
 
-export type TeachingItem = TeachingClassItem | TeachingWorkshopItem;
+export type TeachingItem = TeachingClassItem | TeachingEventItem;
 
 export interface TeachingDay {
   day: string;
@@ -27,7 +27,7 @@ export interface TeachingDay {
 
 export type NextTeaching =
   | { kind: 'class'; scheduledClass: ScheduledClass }
-  | { kind: 'workshop'; workshop: InstructorTeachingWorkshop };
+  | { kind: 'event'; event: InstructorTeachingEvent };
 
 interface ClassUpcomingPayload {
   resolved_week_start: string;
@@ -37,7 +37,7 @@ interface ClassUpcomingPayload {
 
 interface TeachingUpcomingPayload {
   resolved_week_start: string;
-  workshops: Array<InstructorTeachingWorkshop>;
+  events: Array<InstructorTeachingEvent>;
   focus_day: string | null;
 }
 
@@ -46,14 +46,14 @@ export interface TeachingResolution {
   jumped: boolean;
   /** Null means the chosen week still needs a class fetch. */
   classes: Array<ScheduledClass> | null;
-  /** Null means the chosen week still needs a workshop fetch. */
-  workshops: Array<InstructorTeachingWorkshop> | null;
+  /** Null means the chosen week still needs a event fetch. */
+  events: Array<InstructorTeachingEvent> | null;
   focusDay: string | null;
 }
 
 export function mergeTeachingWeek(
   classes: Array<ScheduledClass>,
-  workshops: Array<InstructorTeachingWorkshop>,
+  events: Array<InstructorTeachingEvent>,
   weekMonday: string,
 ): Array<TeachingDay> {
   const rangeDays = Object.fromEntries(
@@ -74,17 +74,17 @@ export function mergeTeachingWeek(
     });
   }
 
-  for (const workshop of workshops) {
-    const bucket = rangeDays[toColombiaDateKey(workshop.starts_at)];
+  for (const event of events) {
+    const bucket = rangeDays[toColombiaDateKey(event.starts_at)];
 
     if (!bucket) continue;
 
     bucket.push({
-      kind: 'workshop',
-      id: workshop.id,
-      startTime: workshop.starts_at,
-      endTime: workshop.ends_at,
-      workshop,
+      kind: 'event',
+      id: event.id,
+      startTime: event.starts_at,
+      endTime: event.ends_at,
+      event,
     });
   }
 
@@ -123,7 +123,7 @@ export function resolveActiveTeachingDay(
 
 export function findNextTeaching(
   classes: Array<ScheduledClass>,
-  workshops: Array<InstructorTeachingWorkshop>,
+  events: Array<InstructorTeachingEvent>,
   now = new Date(),
 ): NextTeaching | null {
   const nowMs = now.getTime();
@@ -140,12 +140,12 @@ export function findNextTeaching(
     });
   }
 
-  for (const workshop of workshops) {
-    if (new Date(workshop.ends_at).getTime() <= nowMs) continue;
+  for (const event of events) {
+    if (new Date(event.ends_at).getTime() <= nowMs) continue;
 
     candidates.push({
-      start: new Date(workshop.starts_at).getTime(),
-      item: { kind: 'workshop', workshop },
+      start: new Date(event.starts_at).getTime(),
+      item: { kind: 'event', event },
     });
   }
 
@@ -154,16 +154,12 @@ export function findNextTeaching(
   return candidates[0]?.item ?? null;
 }
 
-export function chooseTeachingWeek(
-  classWeek: string | null,
-  workshopWeek: string | null,
-  fallbackWeek: string,
-): string {
-  if (classWeek && workshopWeek) {
-    return classWeek <= workshopWeek ? classWeek : workshopWeek;
+export function chooseTeachingWeek(classWeek: string | null, eventWeek: string | null, fallbackWeek: string): string {
+  if (classWeek && eventWeek) {
+    return classWeek <= eventWeek ? classWeek : eventWeek;
   }
 
-  return classWeek ?? workshopWeek ?? fallbackWeek;
+  return classWeek ?? eventWeek ?? fallbackWeek;
 }
 
 export function resolveTeachingSchedule(input: {
@@ -173,9 +169,9 @@ export function resolveTeachingSchedule(input: {
 }): TeachingResolution {
   const { currentWeek, classUpcoming, teachingUpcoming } = input;
   const classWeek = classUpcoming && classUpcoming.classes.length > 0 ? classUpcoming.resolved_week_start : null;
-  const workshopWeek =
-    teachingUpcoming && teachingUpcoming.workshops.length > 0 ? teachingUpcoming.resolved_week_start : null;
-  const week = chooseTeachingWeek(classWeek, workshopWeek, currentWeek);
+  const eventWeek =
+    teachingUpcoming && teachingUpcoming.events.length > 0 ? teachingUpcoming.resolved_week_start : null;
+  const week = chooseTeachingWeek(classWeek, eventWeek, currentWeek);
 
   let classes: Array<ScheduledClass> | null;
 
@@ -189,16 +185,16 @@ export function resolveTeachingSchedule(input: {
     classes = null;
   }
 
-  let workshops: Array<InstructorTeachingWorkshop> | null;
+  let events: Array<InstructorTeachingEvent> | null;
 
   if (!teachingUpcoming) {
-    workshops = null;
-  } else if (workshopWeek === week) {
-    workshops = teachingUpcoming.workshops;
-  } else if (workshopWeek === null) {
-    workshops = [];
+    events = null;
+  } else if (eventWeek === week) {
+    events = teachingUpcoming.events;
+  } else if (eventWeek === null) {
+    events = [];
   } else {
-    workshops = null;
+    events = null;
   }
 
   const focusDay =
@@ -210,7 +206,7 @@ export function resolveTeachingSchedule(input: {
     week,
     jumped: week !== currentWeek,
     classes,
-    workshops,
+    events,
     focusDay,
   };
 }

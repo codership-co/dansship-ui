@@ -32,7 +32,7 @@ interface ClassSlotFormData {
 
 const UNASSIGNED_INSTRUCTOR = '__tba__';
 
-type RosterView = { kind: 'class' | 'workshop'; id: string; title?: string };
+type RosterView = { kind: 'class' | 'event'; id: string; title?: string };
 
 function isScheduleBuilderOverlayEvent(event: AgendaEvent) {
   if (event.event_type === 'space_rental_external' || event.event_type === 'internal_reserved_use') {
@@ -436,13 +436,13 @@ function AdminScheduleBuilderPage() {
                       return;
                     }
 
-                    const workshopEvent = (agendaEvents?.data ?? []).find(
+                    const agendaEvent = (agendaEvents?.data ?? []).find(
                       event => event.event_type === 'workshop' && event.source_id === target.id,
                     );
                     setRosterView({
-                      kind: 'workshop',
+                      kind: 'event',
                       id: target.id,
-                      title: workshopEvent?.metadata?.title,
+                      title: agendaEvent?.metadata?.title,
                     });
                   }
                 : undefined

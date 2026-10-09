@@ -27,17 +27,21 @@ import {
   SecureAdminReportsPage,
   SecureAdminScheduleBuilderPage,
   SecureAdminStudioRentalPage,
-  SecureAdminTalleresPage,
-  SecureAdminTallerComboEditPage,
-  SecureAdminTallerEditPage,
+  SecureAdminEventosPage,
+  SecureAdminEventoComboEditPage,
+  SecureAdminEventoEditPage,
   SecureAdminUserDetailsPage,
+  SecureAdminUserEditPage,
   SecureAdminUserListPage,
+  SecureAdminUserPlanPurchasePage,
+  SecureAdminUserRegisterPage,
   SecureBookingsPage,
   SecureClassesPage,
   SecureFigureCompletedPage,
   SecureFigureSavedPage,
   SecureFiguresDetailsPage,
   SecureFiguresPage,
+  SecureChangePasswordPage,
   SecureForgotPasswordPage,
   SecureGiftClaimPage,
   SecureGiftsPage,
@@ -57,10 +61,10 @@ import {
   SecureStudioRentalRequestsPage,
   SecureStudioRentalResultPage,
   SecureSubscriptionPage,
-  SecureTalleresPage,
-  SecureTallerLandingPage,
-  SecureManagedWorkshopsPage,
-  SecureManagedWorkshopDetailPage,
+  SecureEventosPage,
+  SecureEventoLandingPage,
+  SecureManagedEventsPage,
+  SecureManagedEventDetailPage,
   SecureVerifyEmailPage,
   SecureWalletPage,
   StudioRentalResultLoader,
@@ -110,18 +114,45 @@ const routes: Array<RouteObject> = [
         children: [
           { index: true, Component: HomePage },
           { path: 'plans', Component: SecurePlansPage },
-          { path: 'workshops', Component: SecureTalleresPage },
-          { path: 'workshops/managed', Component: SecureManagedWorkshopsPage },
-          { path: 'workshops/managed/:workshopId', Component: SecureManagedWorkshopDetailPage },
-          { path: 'workshops/:slug', Component: SecureTallerLandingPage },
+          { path: 'eventos', Component: SecureEventosPage },
+          { path: 'eventos/managed', Component: SecureManagedEventsPage },
+          { path: 'eventos/managed/:eventId', Component: SecureManagedEventDetailPage },
+          { path: 'eventos/:slug', Component: SecureEventoLandingPage },
           {
             path: 'talleres',
-            loader: ({ request }) => redirect(`${PageURLS.talleres}${new URL(request.url).search}`),
+            loader: ({ request }) => redirect(`${PageURLS.eventos}${new URL(request.url).search}`),
+          },
+          {
+            path: 'talleres/managed',
+            loader: ({ request }) => redirect(`${PageURLS.managedEvents}${new URL(request.url).search}`),
+          },
+          {
+            path: 'talleres/managed/:eventId',
+            loader: ({ params, request }) =>
+              redirect(`${PageURLS.managedEvent(params.eventId ?? '')}${new URL(request.url).search}`),
           },
           {
             path: 'talleres/:slug',
             loader: ({ params, request }) =>
-              redirect(`${PageURLS.tallerLanding(params.slug ?? '')}${new URL(request.url).search}`),
+              redirect(`${PageURLS.eventoLanding(params.slug ?? '')}${new URL(request.url).search}`),
+          },
+          {
+            path: 'workshops',
+            loader: ({ request }) => redirect(`${PageURLS.eventos}${new URL(request.url).search}`),
+          },
+          {
+            path: 'workshops/managed',
+            loader: ({ request }) => redirect(`${PageURLS.managedEvents}${new URL(request.url).search}`),
+          },
+          {
+            path: 'workshops/managed/:eventId',
+            loader: ({ params, request }) =>
+              redirect(`${PageURLS.managedEvent(params.eventId ?? '')}${new URL(request.url).search}`),
+          },
+          {
+            path: 'workshops/:slug',
+            loader: ({ params, request }) =>
+              redirect(`${PageURLS.eventoLanding(params.slug ?? '')}${new URL(request.url).search}`),
           },
           { path: 'classes', Component: SecureClassesPage },
           { path: 'legal', Component: SecureLegalPage },
@@ -129,6 +160,7 @@ const routes: Array<RouteObject> = [
           { path: 'ui', Component: UiPage },
 
           { path: 'auth/onboarding', Component: SecureOnboardingPage },
+          { path: 'auth/change-password', Component: SecureChangePasswordPage },
 
           { path: 'figures', Component: SecureFiguresPage },
           { path: 'figures/:id', Component: SecureFiguresDetailsPage },
@@ -200,6 +232,9 @@ const routes: Array<RouteObject> = [
               { path: 'merch/pos', Component: SecureAdminMerchPosPage },
               { path: 'figures', Component: SecureAdminFiguresPage },
               { path: 'users', Component: SecureAdminUserListPage },
+              { path: 'users/new', Component: SecureAdminUserRegisterPage },
+              { path: 'users/:userId/edit', Component: SecureAdminUserEditPage },
+              { path: 'users/:userId/plan-purchase', Component: SecureAdminUserPlanPurchasePage },
               { path: 'users/:userId', Component: SecureAdminUserDetailsPage },
               { path: 'classes/:classId/roster', Component: SecureAdminClassRosterPage },
               { path: 'studio-rental', Component: SecureAdminStudioRentalPage },
@@ -208,24 +243,54 @@ const routes: Array<RouteObject> = [
                 loader: () => redirect(`${PageURLS.admin.inventory}?tab=doorCode`),
               },
               { path: 'campaigns', Component: SecureAdminCampaignsPage },
-              { path: 'workshops', Component: SecureAdminTalleresPage },
-              { path: 'workshops/new', Component: SecureAdminTallerEditPage },
-              { path: 'workshops/combos/new', Component: SecureAdminTallerComboEditPage },
-              { path: 'workshops/combos/:comboId', Component: SecureAdminTallerComboEditPage },
-              { path: 'workshops/:workshopId', Component: SecureAdminTallerEditPage },
-              { path: 'talleres', loader: () => redirect(PageURLS.admin.talleres) },
-              { path: 'talleres/new', loader: () => redirect(PageURLS.admin.tallerNew) },
+              { path: 'eventos', Component: SecureAdminEventosPage },
+              { path: 'eventos/new', Component: SecureAdminEventoEditPage },
+              { path: 'eventos/combos/new', Component: SecureAdminEventoComboEditPage },
+              { path: 'eventos/combos/:comboId', Component: SecureAdminEventoComboEditPage },
+              { path: 'eventos/:eventId', Component: SecureAdminEventoEditPage },
+              {
+                path: 'workshops',
+                loader: ({ request }) => redirect(`${PageURLS.admin.eventos}${new URL(request.url).search}`),
+              },
+              {
+                path: 'workshops/new',
+                loader: ({ request }) => redirect(`${PageURLS.admin.eventoNew}${new URL(request.url).search}`),
+              },
+              {
+                path: 'workshops/combos/new',
+                loader: ({ request }) => redirect(`${PageURLS.admin.eventoComboNew}${new URL(request.url).search}`),
+              },
+              {
+                path: 'workshops/combos/:comboId',
+                loader: ({ params, request }) =>
+                  redirect(`${PageURLS.admin.eventoComboEdit(params.comboId ?? '')}${new URL(request.url).search}`),
+              },
+              {
+                path: 'workshops/:eventId',
+                loader: ({ params, request }) =>
+                  redirect(`${PageURLS.admin.eventoEdit(params.eventId ?? '')}${new URL(request.url).search}`),
+              },
+              {
+                path: 'talleres',
+                loader: ({ request }) => redirect(`${PageURLS.admin.eventos}${new URL(request.url).search}`),
+              },
+              {
+                path: 'talleres/new',
+                loader: ({ request }) => redirect(`${PageURLS.admin.eventoNew}${new URL(request.url).search}`),
+              },
               {
                 path: 'talleres/combos/new',
-                loader: () => redirect(PageURLS.admin.tallerComboNew),
+                loader: ({ request }) => redirect(`${PageURLS.admin.eventoComboNew}${new URL(request.url).search}`),
               },
               {
                 path: 'talleres/combos/:comboId',
-                loader: ({ params }) => redirect(PageURLS.admin.tallerComboEdit(params.comboId ?? '')),
+                loader: ({ params, request }) =>
+                  redirect(`${PageURLS.admin.eventoComboEdit(params.comboId ?? '')}${new URL(request.url).search}`),
               },
               {
-                path: 'talleres/:workshopId',
-                loader: ({ params }) => redirect(PageURLS.admin.tallerEdit(params.workshopId ?? '')),
+                path: 'talleres/:eventId',
+                loader: ({ params, request }) =>
+                  redirect(`${PageURLS.admin.eventoEdit(params.eventId ?? '')}${new URL(request.url).search}`),
               },
             ],
           },

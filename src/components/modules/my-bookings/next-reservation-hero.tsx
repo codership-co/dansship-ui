@@ -124,7 +124,7 @@ export function NextReservationHero({ item, isCancelDisabled, onCancelClass }: N
     return <NextClassHero booking={item.booking} isCancelDisabled={isCancelDisabled} onCancel={onCancelClass} />;
   }
 
-  if (item.kind === 'workshop') {
+  if (item.kind === 'event') {
     const registration = item.registration;
     const start = new Date(registration.starts_at);
     const end = new Date(registration.ends_at);
@@ -136,7 +136,7 @@ export function NextReservationHero({ item, isCancelDisabled, onCancelClass }: N
         start={start}
         endLabel={`${format(start, 'HH:mm')} – ${format(end, 'HH:mm')}`}
         roomLabel={registration.room_name ?? t('bookings:unknown')}
-        statusLabel={t(`bookings:workshopStatus.${registration.status}`)}
+        statusLabel={t(`bookings:eventStatus.${registration.status}`)}
         detail={
           registration.source === 'combo' && registration.combo_name
             ? registration.combo_name
@@ -149,9 +149,9 @@ export function NextReservationHero({ item, isCancelDisabled, onCancelClass }: N
               variant='outline'
               size='lg'
               className='h-11 max-w-full border-white/80 bg-transparent text-white hover:bg-white/10 hover:text-white'
-              onClick={() => navigate(PageURLS.tallerLanding(registration.workshop_slug))}
+              onClick={() => navigate(PageURLS.eventoLanding(registration.event_slug))}
             >
-              {t('bookings:viewWorkshop')}
+              {t('bookings:viewEvent')}
             </Button>
             {registration.payment_intent_id && registration.status !== 'confirmed' ? (
               <Button

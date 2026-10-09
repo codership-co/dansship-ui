@@ -27,6 +27,7 @@ export interface AuthUser {
   has_instructor_profile?: boolean;
   has_password?: boolean;
   has_google?: boolean;
+  must_change_password?: boolean;
   cuenta_de_cobro_enabled?: boolean | null;
   profile_completion_percent?: number;
   referral_code?: string | null;
@@ -89,6 +90,7 @@ export interface User {
   hasInstructorProfile?: boolean;
   hasPassword?: boolean;
   hasGoogle?: boolean;
+  mustChangePassword?: boolean;
   cuentaDeCobroEnabled?: boolean | null;
   profileCompletionPercent?: number;
   referralCode?: string | null;

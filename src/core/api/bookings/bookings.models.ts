@@ -60,6 +60,22 @@ export interface BookingCancelPayload {
   cancellation_reason?: string;
 }
 
+export interface ClassCreditRefundSkip {
+  booking_id: string;
+  user_id: string;
+  reason: string;
+}
+
+export interface ClassCreditRefundResult {
+  refund_id: string;
+  restored_count: number;
+  skipped: Array<ClassCreditRefundSkip>;
+}
+
+export interface ClassCreditRefundPayload {
+  reason: string;
+}
+
 export interface AdminReimburseCreditPayload {
   reason?: string;
 }

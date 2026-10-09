@@ -40,7 +40,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { logout, isAuthenticated } = useAuth();
-  const { response: collaborations } = usePromise(() => DansshipAPI.talleres.listCollaborations(), isAuthenticated);
+  const { response: collaborations } = usePromise(() => DansshipAPI.eventos.listCollaborations(), isAuthenticated);
   const scheduleBuilderNavItem = getScheduleBuilderNavItem(t);
   const canAccessAdminMenu = useOrPermissions(getAdminMenuPermissions());
 
@@ -48,7 +48,7 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
     ...(isAuthenticated ? [getMobileProfileNavItem(t)] : []),
     ...getPrimaryNavItems(t, {
       isAuthenticated,
-      showManagedWorkshops: (collaborations?.data?.length ?? 0) > 0,
+      showManagedEvents: (collaborations?.data?.length ?? 0) > 0,
     }),
   ];
 
@@ -83,9 +83,9 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       icon: LuClipboardList,
     },
     {
-      to: PageURLS.admin.talleres,
-      label: t('nav:adminMenu.talleres'),
-      orPermissions: AdminPermissions.talleres,
+      to: PageURLS.admin.eventos,
+      label: t('nav:adminMenu.eventos'),
+      orPermissions: AdminPermissions.eventos,
       featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
       icon: LuClipboardList,
     },
