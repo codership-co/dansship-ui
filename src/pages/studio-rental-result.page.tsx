@@ -19,7 +19,7 @@ import {
 } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { cn, formatDateTime, formatPrice } from '@helpers';
-import { useCallablePromise } from '@hooks';
+import { useCallablePromise, useMetaPixelPurchase } from '@hooks';
 
 const rentalStatusKey: Record<RentalRequestStatus, string> = {
   pending_payment: 'studioRental:status.pendingPayment',
@@ -57,6 +57,19 @@ function StudioRentalResultPage() {
   const navigate = useNavigate();
   const revalidator = useRevalidator();
   const { intentId, result } = useLoaderData<StudioRentalResultLoaderData>();
+  const payment = result?.payment;
+
+  useMetaPixelPurchase(
+    payment
+      ? {
+          intentId: payment.id,
+          status: payment.status,
+          amount: payment.amount,
+          walletAmountApplied: payment.wallet_amount_applied,
+          currency: payment.currency,
+        }
+      : null,
+  );
   const { call: getProofViewUrlPromise, isLoading: isGettingProofViewUrl } = useCallablePromise((id: string) =>
     DansshipAPI.payments.getProofViewUrl(id),
   );
@@ -110,7 +123,6 @@ function StudioRentalResultPage() {
     input.click();
   };
 
-  const payment = result?.payment;
   const canUploadProof =
     (result?.rental_status === 'pending_payment' || result?.rental_status === 'on_hold') &&
     payment?.payment_method_type === PaymentMethod.TRANSFER &&

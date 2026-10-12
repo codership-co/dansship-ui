@@ -336,7 +336,7 @@ function EventoCheckoutContent({ landing, onClose }: { landing: EventLanding; on
         }}
         onSubmit={intentId => {
           onClose();
-          navigate(`${PageURLS.paymentsResult}?intentId=${intentId}`);
+          navigate(`${PageURLS.paymentsResult}?intentId=${intentId}&checkout=1`);
         }}
         paymentQrUrl={landing.payment_qr_url}
       />

@@ -675,7 +675,7 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
       onCreateIntent={submitBooking}
       onSubmit={intentId => {
         onClose();
-        navigate(`${PageURLS.studioRentalResult}?intentId=${intentId}`);
+        navigate(`${PageURLS.studioRentalResult}?intentId=${intentId}&checkout=1`);
       }}
     />
   ) : (
