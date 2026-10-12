@@ -17,7 +17,7 @@ import {
 } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { cn, formatDateTime, formatPrice } from '@helpers';
-import { useCallablePromise } from '@hooks';
+import { useCallablePromise, useMetaPixelPurchase } from '@hooks';
 
 export interface PaymentsResultsLoaderData {
   intentId: string;
@@ -34,7 +34,9 @@ export async function PaymentsResultsLoader({ url }: LoaderFunctionArgs): Promis
   const { data } = await DansshipAPI.payments.getIntent(intentId);
 
   if (data?.purchase_type === 'studio_rental' && intentId) {
-    throw redirect(`${PageURLS.studioRentalResult}?intentId=${intentId}`);
+    const params = new URLSearchParams(url.search);
+    params.set('intentId', intentId);
+    throw redirect(`${PageURLS.studioRentalResult}?${params.toString()}`);
   }
 
   return {
@@ -48,6 +50,18 @@ function PaymentsResultPage() {
   const { t, i18n } = useTranslation();
   const revalidator = useRevalidator();
   const { intent, intentId } = useLoaderData<PaymentsResultsLoaderData>();
+
+  useMetaPixelPurchase(
+    intent
+      ? {
+          intentId: intent.id,
+          status: intent.status,
+          amount: intent.amount,
+          walletAmountApplied: intent.wallet_amount_applied,
+          currency: intent.currency,
+        }
+      : null,
+  );
   const { call: getProofViewUrlPromise, isLoading: isGettingProofViewUrl } = useCallablePromise((id: string) =>
     DansshipAPI.payments.getProofViewUrl(id),
   );
