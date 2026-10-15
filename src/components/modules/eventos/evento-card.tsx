@@ -14,7 +14,12 @@ interface EventoCardProps {
 export function EventoCard({ card }: EventoCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const price = formatPrice(Number(card.price_from), 'COP');
+  const perInstallment =
+    card.installment_price_from !== null && card.installment_price_from !== undefined
+      ? Number(card.installment_price_from)
+      : null;
+  const price = formatPrice(perInstallment ?? Number(card.price_from), 'COP');
+  const total = formatPrice(Number(card.price_from), 'COP');
 
   return (
     <article className='overflow-hidden rounded-2xl border bg-white shadow-sm'>
@@ -42,8 +47,13 @@ export function EventoCard({ card }: EventoCardProps) {
           {card.room_label}
         </p>
         <p className='m-0 font-semibold'>
-          {t(card.priced_per_pair ? 'eventos:list.fromPricePair' : 'eventos:list.fromPrice', { price })}
+          {perInstallment !== null
+            ? t('eventos:list.fromInstallment', { price })
+            : t(card.priced_per_pair ? 'eventos:list.fromPricePair' : 'eventos:list.fromPrice', { price })}
         </p>
+        {perInstallment !== null ? (
+          <p className='m-0 text-sm text-muted-foreground'>{t('eventos:list.totalFrom', { price: total })}</p>
+        ) : null}
         <Button
           type='button'
           color='primary'

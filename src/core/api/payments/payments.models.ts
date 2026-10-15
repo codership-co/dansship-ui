@@ -13,7 +13,15 @@ export enum PaymentStatus {
   EXPIRED = 'expired',
 }
 
-export type PurchaseType = 'plan' | 'merch' | 'workshop' | 'event' | 'private_class' | 'studio_rental' | (string & {});
+export type PurchaseType =
+  | 'plan'
+  | 'merch'
+  | 'workshop'
+  | 'event'
+  | 'event_installment'
+  | 'private_class'
+  | 'studio_rental'
+  | (string & {});
 
 export enum PaymentProofContentType {
   JPEG = 'image/jpeg',

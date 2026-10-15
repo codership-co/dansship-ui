@@ -1,5 +1,7 @@
 import { HttpClient } from 'polpo-http-client';
 
+import { putFileToPresignedUrl } from '../common/put-file-to-presigned-url';
+
 import { DansshipAPIError } from '@core/api';
 
 import type {
@@ -19,6 +21,10 @@ import type {
   EventLanding,
   EventRosterEntry,
   EventUpdatePayload,
+  InstallmentProofContentType,
+  InstallmentQuote,
+  ManualInstallmentConfirmPayload,
+  ManualInstallmentPaymentResult,
 } from './eventos.models';
 
 export class EventosAdminAPI {
@@ -72,6 +78,49 @@ export class EventosAdminAPI {
     return this.httpClient.callNoError<Array<EventRosterEntry>>({
       path: `/admin/events/${id}/roster`,
       method: 'GET',
+    });
+  }
+
+  async quoteInstallments(eventId: string, userId: string) {
+    return this.httpClient.callNoError<InstallmentQuote>({
+      path: `/admin/events/${eventId}/installment-quote`,
+      method: 'GET',
+      params: { user_id: userId },
+    });
+  }
+
+  async presignInstallmentProof(contentType: InstallmentProofContentType) {
+    return this.httpClient.callNoError<{ upload_url: string; file_key: string }>({
+      path: '/admin/events/installment-proofs/upload-url',
+      method: 'POST',
+      data: { content_type: contentType },
+    });
+  }
+
+  async confirmInstallmentPayment(eventId: string, payload: ManualInstallmentConfirmPayload) {
+    return this.httpClient.callNoError<ManualInstallmentPaymentResult, ManualInstallmentConfirmPayload>({
+      path: `/admin/events/${eventId}/installment-payments`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async uploadInstallmentProof(file: File) {
+    const presign = await this.presignInstallmentProof(file.type as InstallmentProofContentType);
+
+    if (!presign.data?.upload_url || !presign.data.file_key) {
+      return presign;
+    }
+
+    await putFileToPresignedUrl(file, presign.data.upload_url, { contentType: file.type });
+
+    return presign;
+  }
+
+  async withdrawRegistrant(eventId: string, registrationId: string) {
+    return this.httpClient.callNoError<EventRosterEntry>({
+      path: `/admin/events/${eventId}/registrations/${registrationId}/withdraw`,
+      method: 'POST',
     });
   }
 

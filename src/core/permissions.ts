@@ -13,6 +13,7 @@ export enum PERMISSION {
   USER_CONTEXT_MANAGE = 'manage:user_context',
   USER_REGISTER = 'register:user',
   PLAN_PURCHASE_REGISTER = 'register:plan_purchase',
+  EVENT_INSTALLMENT_PAYMENT_REGISTER = 'register:event_installment_payment',
 
   // ATTENDANCE
   ATTENDANCE_MARK = 'mark:attendance',
@@ -161,6 +162,7 @@ export const AdminPermissions = {
   users: [PERMISSION.USER_MANAGE],
   userRegistration: [PERMISSION.USER_REGISTER],
   planPurchaseRegistration: [PERMISSION.PLAN_PURCHASE_REGISTER],
+  eventInstallmentPayment: [PERMISSION.EVENT_INSTALLMENT_PAYMENT_REGISTER],
   userContext: [PERMISSION.USER_CONTEXT_MANAGE],
   roles: [PERMISSION.ROLE_MANAGE],
   scheduleBuilder: [PERMISSION.SCHEDULE_MANAGE, PERMISSION.SCHEDULE_DRAFT_CREATE],

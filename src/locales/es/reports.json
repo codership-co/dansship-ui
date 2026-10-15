@@ -81,7 +81,8 @@
       "plan": "Plan",
       "merch": "Merch",
       "studioRental": "Alquiler de estudio",
-      "event": "Evento"
+      "event": "Evento",
+      "eventInstallment": "Cuota de evento"
     }
   },
   "tax": {

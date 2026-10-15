@@ -44,7 +44,9 @@ export function ComboEditForm({ combo }: ComboEditFormProps) {
 
   const { response: listResponse } = usePromise(() => DansshipAPI.eventosAdmin.list());
   const { response: conditionsResponse } = usePromise(() => DansshipAPI.eventosAdmin.listPriceConditions());
-  const events = (listResponse?.data ?? []).filter(item => item.kind === 'event' && item.type !== 'clase_especial');
+  const events = (listResponse?.data ?? []).filter(
+    item => item.kind === 'event' && item.type !== 'clase_especial' && item.type !== 'recital',
+  );
   const conditions = Array.isArray(conditionsResponse?.data) ? conditionsResponse.data : [];
 
   const toggleEvent = (id: string, checked: boolean) => {

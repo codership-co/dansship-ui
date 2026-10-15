@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
 import { EventoRoster } from './evento-roster';
+import { InstallmentPaymentDialog } from './installment-payment-dialog';
 import { PriceTiersEditor } from './price-tiers-editor';
 
 import { OptionalFileUpload } from '@components/forms/optional-file-upload';
@@ -21,6 +22,7 @@ import {
   Textarea,
   Badge,
 } from '@components/ui';
+import { useOrPermissions } from '@contexts';
 import {
   DansshipAPI,
   DansshipAPIError,
@@ -31,7 +33,23 @@ import {
   type EventType,
 } from '@core/api';
 import { PageURLS } from '@core/constants';
+import { AdminPermissions } from '@core/permissions';
+import { formatPrice } from '@helpers';
 import { useCallablePromise, usePromise } from '@hooks';
+
+type InstallmentDraft = { due_date: string; base: string; plan: string };
+
+function installmentDraftsFrom(event?: EventAdmin): Array<InstallmentDraft> {
+  if (event?.installments?.length) {
+    return event.installments.map(row => ({
+      due_date: row.due_date,
+      base: String(row.amounts.find(amount => amount.tier_position === null)?.amount ?? ''),
+      plan: String(row.amounts.find(amount => amount.tier_position === 0)?.amount ?? ''),
+    }));
+  }
+
+  return [{ due_date: '', base: '', plan: '' }];
+}
 
 function colombiaParts(iso: string) {
   const date = new Date(iso);
@@ -76,6 +94,8 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
   const [endTime, setEndTime] = useState(endParts.time === startParts.time ? '12:00' : endParts.time);
   const [capacity, setCapacity] = useState(String(event?.capacity ?? 24));
   const [roomId, setRoomId] = useState(event?.room_id ?? '');
+  const [externalLocation, setExternalLocation] = useState(event?.external_location ?? '');
+  const [installmentDrafts, setInstallmentDrafts] = useState(installmentDraftsFrom(event));
   const [instructorId, setInstructorId] = useState(event?.instructor_id ?? '');
   const [requiresPartner, setRequiresPartner] = useState(event?.requires_partner ?? false);
   const [isCollaboration, setIsCollaboration] = useState(event?.is_collaboration ?? false);
@@ -98,14 +118,18 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
   const [qrFile, setQrFile] = useState<File | null>(null);
   const [qrPreviewUrl, setQrPreviewUrl] = useState<string | null>(event?.payment_qr_url ?? null);
   const [saving, setSaving] = useState(false);
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [installmentDateError, setInstallmentDateError] = useState(false);
+  const canRegisterPayment = useOrPermissions(AdminPermissions.eventInstallmentPayment);
+  const canWithdraw = useOrPermissions(AdminPermissions.eventos);
 
   const { response: roomsResponse } = usePromise(() => DansshipAPI.inventoryAdmin.getRooms({ is_active: true }));
   const { response: instructorsResponse } = usePromise(() => DansshipAPI.instructorsAdmin.getInstructors());
   const { response: conditionsResponse } = usePromise(() => DansshipAPI.eventosAdmin.listPriceConditions());
   const { response: rosterResponse, reFetch: reFetchRoster } = usePromise(
     () => DansshipAPI.eventosAdmin.listRoster(event?.id ?? ''),
-    Boolean(event?.id && (event.is_collaboration || isCollaboration)),
-    [event?.id, isCollaboration],
+    Boolean(event?.id && (event.is_collaboration || isCollaboration || event.type === 'recital')),
+    [event?.id, isCollaboration, event?.type],
   );
   const { call: lookupCollaborator } = useCallablePromise((email: string) =>
     DansshipAPI.eventosAdmin.lookupCollaborator(email),
@@ -159,24 +183,68 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
       return;
     }
 
+    if (eventType === 'recital' && !locked) {
+      const lastDue = installmentDrafts
+        .map(row => row.due_date)
+        .filter(Boolean)
+        .sort()
+        .at(-1);
+      const dueBeforeEvent = Boolean(lastDue && lastDue < date);
+      setInstallmentDateError(!dueBeforeEvent);
+
+      if (!dueBeforeEvent) {
+        toast.error(t('eventos:admin.installmentDueBeforeEvent'));
+
+        return;
+      }
+    }
+
     setSaving(true);
-    const payload = {
-      name: name.trim(),
-      description: description.trim() || null,
-      starts_at: toIso(date, startTime),
-      ends_at: toIso(date, endTime),
-      room_id: roomId,
-      instructor_id: instructorId,
-      capacity: Number(capacity),
-      requires_partner: requiresPartner,
-      is_collaboration: isCollaboration,
-      collaborator_email: isCollaboration && collaboratorEmail.trim() ? collaboratorEmail.trim() : null,
-      clear_collaborator: isCollaboration && !collaboratorEmail.trim(),
-      collaborator_participation_percentage: Number(participation || 0),
-      base_price: Number(basePrice),
-      price_tiers: tiers,
-      ...(locked ? {} : { type: eventType }),
-    };
+    const isRecital = eventType === 'recital';
+    const installmentPayload = installmentDrafts.map((row, index) => ({
+      sequence: index + 1,
+      due_date: row.due_date,
+      amounts: [
+        { tier_position: null, amount: Number(row.base) },
+        { tier_position: 0, amount: Number(row.plan) },
+      ],
+    }));
+    const payload = isRecital
+      ? {
+          name: name.trim(),
+          description: description.trim() || null,
+          starts_at: toIso(date, startTime),
+          ends_at: toIso(date, endTime),
+          external_location: externalLocation.trim(),
+          instructor_id: instructorId,
+          capacity: Number(capacity),
+          requires_partner: false,
+          is_collaboration: false,
+          ...(event
+            ? {}
+            : {
+                base_price: 0,
+                price_tiers: [{ condition_type: 'has_active_plan', condition_params: {}, price: 0 }],
+              }),
+          ...(locked ? {} : { type: eventType, installments: installmentPayload }),
+        }
+      : {
+          name: name.trim(),
+          description: description.trim() || null,
+          starts_at: toIso(date, startTime),
+          ends_at: toIso(date, endTime),
+          room_id: roomId,
+          instructor_id: instructorId,
+          capacity: Number(capacity),
+          requires_partner: requiresPartner,
+          is_collaboration: isCollaboration,
+          collaborator_email: isCollaboration && collaboratorEmail.trim() ? collaboratorEmail.trim() : null,
+          clear_collaborator: isCollaboration && !collaboratorEmail.trim(),
+          collaborator_participation_percentage: Number(participation || 0),
+          base_price: Number(basePrice),
+          price_tiers: tiers,
+          ...(locked ? {} : { type: eventType }),
+        };
 
     try {
       if (event) {
@@ -215,7 +283,20 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
 
         toast.success(t('eventos:admin.updateSuccess'));
       } else {
-        const { data, ok } = await DansshipAPI.eventosAdmin.createEvent(payload);
+        const basePriceValue = payload.base_price;
+        const priceTiers = payload.price_tiers;
+
+        if (basePriceValue === undefined || priceTiers === undefined) {
+          toast.error(t('eventos:admin.saveFailed'));
+
+          return;
+        }
+
+        const { data, ok } = await DansshipAPI.eventosAdmin.createEvent({
+          ...payload,
+          base_price: basePriceValue,
+          price_tiers: priceTiers,
+        });
 
         if (!ok || !data) {
           toast.error(t('eventos:admin.saveFailed'));
@@ -361,6 +442,7 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
               >
                 <option value='taller'>{t('eventos:types.taller')}</option>
                 <option value='clase_especial'>{t('eventos:types.clase_especial')}</option>
+                <option value='recital'>{t('eventos:types.recital')}</option>
               </select>
             </div>
             <div className='grid gap-2'>
@@ -377,21 +459,35 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
           </div>
           <div className='grid gap-4 md:grid-cols-2'>
             <div className='grid gap-2'>
-              <Label htmlFor='event-room'>{t('eventos:admin.room')}</Label>
-              <select
-                id='event-room'
-                className='rounded-2xl bg-gray-200/50 px-6 py-4'
-                value={roomId}
-                onChange={event => setRoomId(event.target.value)}
-                required
-              >
-                <option value='' />
-                {rooms.map(room => (
-                  <option key={room.id} value={room.id}>
-                    {room.name}
-                  </option>
-                ))}
-              </select>
+              {eventType === 'recital' ? (
+                <>
+                  <Label htmlFor='event-location'>{t('eventos:admin.externalLocation')}</Label>
+                  <Input
+                    id='event-location'
+                    value={externalLocation}
+                    onChange={change => setExternalLocation(change.target.value)}
+                    required
+                  />
+                </>
+              ) : (
+                <>
+                  <Label htmlFor='event-room'>{t('eventos:admin.room')}</Label>
+                  <select
+                    id='event-room'
+                    className='rounded-2xl bg-gray-200/50 px-6 py-4'
+                    value={roomId}
+                    onChange={change => setRoomId(change.target.value)}
+                    required
+                  >
+                    <option value='' />
+                    {rooms.map(room => (
+                      <option key={room.id} value={room.id}>
+                        {room.name}
+                      </option>
+                    ))}
+                  </select>
+                </>
+              )}
             </div>
             <div className='grid gap-2'>
               <Label htmlFor='event-instructor'>{t('eventos:admin.instructor')}</Label>
@@ -433,104 +529,230 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('eventos:admin.collaboration')}</CardTitle>
-        </CardHeader>
-        <CardContent className='grid gap-4'>
-          <div className='flex items-center justify-between gap-4'>
-            <span>{t('eventos:admin.isCollaboration')}</span>
-            <Switch checked={isCollaboration} onCheckedChange={checked => setIsCollaboration(checked)} />
-          </div>
-          {isCollaboration ? (
-            <>
-              <div className='grid gap-2'>
-                <Label htmlFor='collaborator-email'>{t('eventos:admin.collaboratorEmail')}</Label>
-                <Input
-                  id='collaborator-email'
-                  type='email'
-                  value={collaboratorEmail}
-                  onChange={event => setCollaboratorEmail(event.target.value)}
+      {eventType === 'recital' ? null : (
+        <Card>
+          <CardHeader>
+            <CardTitle>{t('eventos:admin.collaboration')}</CardTitle>
+          </CardHeader>
+          <CardContent className='grid gap-4'>
+            <div className='flex items-center justify-between gap-4'>
+              <span>{t('eventos:admin.isCollaboration')}</span>
+              <Switch checked={isCollaboration} onCheckedChange={checked => setIsCollaboration(checked)} />
+            </div>
+            {isCollaboration ? (
+              <>
+                <div className='grid gap-2'>
+                  <Label htmlFor='collaborator-email'>{t('eventos:admin.collaboratorEmail')}</Label>
+                  <Input
+                    id='collaborator-email'
+                    type='email'
+                    value={collaboratorEmail}
+                    onChange={event => setCollaboratorEmail(event.target.value)}
+                  />
+                  {collaboratorName ? (
+                    <p className='m-0 text-sm text-primary'>{collaboratorName}</p>
+                  ) : collaboratorError ? (
+                    <p className='m-0 text-sm text-destructive'>{t('eventos:admin.collaboratorNotFound')}</p>
+                  ) : null}
+                </div>
+                <div className='grid gap-2'>
+                  <Label htmlFor='participation'>{t('eventos:admin.participation')}</Label>
+                  <Input
+                    id='participation'
+                    type='number'
+                    min={0}
+                    max={100}
+                    value={participation}
+                    onChange={event => setParticipation(event.target.value)}
+                  />
+                  <p className='m-0 text-xs text-muted-foreground'>{t('eventos:admin.participationHint')}</p>
+                </div>
+                <OptionalFileUpload
+                  value={qrFile}
+                  previewUrl={qrPreviewUrl}
+                  acceptedTypes={Object.values(PaymentProofContentType)}
+                  isUploading={saving}
+                  helperText={t('eventos:admin.qrHint')}
+                  onChange={(file, nextPreviewUrl) => {
+                    setQrFile(file);
+                    setQrPreviewUrl(nextPreviewUrl ?? event?.payment_qr_url ?? null);
+                  }}
                 />
-                {collaboratorName ? (
-                  <p className='m-0 text-sm text-primary'>{collaboratorName}</p>
-                ) : collaboratorError ? (
-                  <p className='m-0 text-sm text-destructive'>{t('eventos:admin.collaboratorNotFound')}</p>
-                ) : null}
-              </div>
-              <div className='grid gap-2'>
-                <Label htmlFor='participation'>{t('eventos:admin.participation')}</Label>
-                <Input
-                  id='participation'
-                  type='number'
-                  min={0}
-                  max={100}
-                  value={participation}
-                  onChange={event => setParticipation(event.target.value)}
-                />
-                <p className='m-0 text-xs text-muted-foreground'>{t('eventos:admin.participationHint')}</p>
-              </div>
-              <OptionalFileUpload
-                value={qrFile}
-                previewUrl={qrPreviewUrl}
-                acceptedTypes={Object.values(PaymentProofContentType)}
-                isUploading={saving}
-                helperText={t('eventos:admin.qrHint')}
-                onChange={(file, nextPreviewUrl) => {
-                  setQrFile(file);
-                  setQrPreviewUrl(nextPreviewUrl ?? event?.payment_qr_url ?? null);
-                }}
-              />
-            </>
-          ) : null}
-        </CardContent>
-      </Card>
+              </>
+            ) : null}
+          </CardContent>
+        </Card>
+      )}
+
+      {eventType === 'recital' ? null : (
+        <Card>
+          <CardContent className='flex items-center justify-between gap-4 pt-6'>
+            <span>{t('eventos:admin.requiresPartner')}</span>
+            <Switch
+              checked={requiresPartner}
+              disabled={locked}
+              onCheckedChange={checked => setRequiresPartner(checked)}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
-        <CardContent className='flex items-center justify-between gap-4 pt-6'>
-          <span>{t('eventos:admin.requiresPartner')}</span>
-          <Switch
-            checked={requiresPartner}
-            disabled={locked}
-            onCheckedChange={checked => setRequiresPartner(checked)}
-          />
-        </CardContent>
-      </Card>
-
-      <Card>
         <CardHeader>
-          <CardTitle>{t('eventos:admin.priceRules')}</CardTitle>
+          <CardTitle>
+            {eventType === 'recital' ? t('eventos:admin.installments') : t('eventos:admin.priceRules')}
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <PriceTiersEditor
-            conditions={conditions}
-            tiers={tiers}
-            basePrice={basePrice}
-            baseLabel={requiresPartner ? t('eventos:admin.basePricePair') : t('eventos:admin.basePrice')}
-            locked={locked}
-            onChange={setTiers}
-            onBasePriceChange={setBasePrice}
-          />
+          {eventType === 'recital' ? (
+            <div className='grid gap-4'>
+              {installmentDrafts.map((row, index) => (
+                <div key={index} className='grid gap-2 md:grid-cols-[1fr_1fr_1fr_auto]'>
+                  <div className='grid gap-1'>
+                    <Label>{t('eventos:admin.installmentDue')}</Label>
+                    <Input
+                      type='date'
+                      disabled={locked}
+                      value={row.due_date}
+                      onChange={change =>
+                        setInstallmentDrafts(current =>
+                          current.map((item, itemIndex) =>
+                            itemIndex === index ? { ...item, due_date: change.target.value } : item,
+                          ),
+                        )
+                      }
+                      required
+                    />
+                  </div>
+                  <div className='grid gap-1'>
+                    <Label>{t('eventos:admin.installmentBase')}</Label>
+                    <Input
+                      type='number'
+                      min={1}
+                      disabled={locked}
+                      value={row.base}
+                      onChange={change =>
+                        setInstallmentDrafts(current =>
+                          current.map((item, itemIndex) =>
+                            itemIndex === index ? { ...item, base: change.target.value } : item,
+                          ),
+                        )
+                      }
+                      required
+                    />
+                  </div>
+                  <div className='grid gap-1'>
+                    <Label>{t('eventos:admin.installmentPlan')}</Label>
+                    <Input
+                      type='number'
+                      min={1}
+                      disabled={locked}
+                      value={row.plan}
+                      onChange={change =>
+                        setInstallmentDrafts(current =>
+                          current.map((item, itemIndex) =>
+                            itemIndex === index ? { ...item, plan: change.target.value } : item,
+                          ),
+                        )
+                      }
+                      required
+                    />
+                  </div>
+                  <div className='flex items-end'>
+                    <Button
+                      type='button'
+                      variant='outline'
+                      disabled={locked || installmentDrafts.length < 2}
+                      onClick={() =>
+                        setInstallmentDrafts(current => current.filter((_, itemIndex) => itemIndex !== index))
+                      }
+                    >
+                      {t('eventos:admin.removeInstallment')}
+                    </Button>
+                  </div>
+                </div>
+              ))}
+              <Button
+                type='button'
+                variant='outline'
+                disabled={locked}
+                onClick={() => setInstallmentDrafts(current => [...current, { due_date: '', base: '', plan: '' }])}
+              >
+                {t('eventos:admin.addInstallment')}
+              </Button>
+              {installmentDateError ? (
+                <p className='m-0 text-sm text-destructive'>{t('eventos:admin.installmentDueBeforeEvent')}</p>
+              ) : null}
+              <p className='m-0 text-sm'>
+                {t('eventos:admin.installmentTotalBase')}:{' '}
+                {formatPrice(
+                  installmentDrafts.reduce((sum, row) => sum + Number(row.base || 0), 0),
+                  'COP',
+                )}
+              </p>
+              <p className='m-0 text-sm'>
+                {t('eventos:admin.installmentTotalPlan')}:{' '}
+                {formatPrice(
+                  installmentDrafts.reduce((sum, row) => sum + Number(row.plan || 0), 0),
+                  'COP',
+                )}
+              </p>
+            </div>
+          ) : (
+            <PriceTiersEditor
+              conditions={conditions}
+              tiers={tiers}
+              basePrice={basePrice}
+              baseLabel={requiresPartner ? t('eventos:admin.basePricePair') : t('eventos:admin.basePrice')}
+              locked={locked}
+              onChange={setTiers}
+              onBasePriceChange={setBasePrice}
+            />
+          )}
         </CardContent>
       </Card>
-      {event && isCollaboration ? (
+      {event && (isCollaboration || event.type === 'recital') ? (
         <Card>
           <CardHeader>
             <CardTitle>{t('eventos:admin.roster')}</CardTitle>
           </CardHeader>
           <CardContent className='grid gap-4'>
-            <DirectRegistrationForm
-              onSubmit={async payload => {
-                const { ok } = await DansshipAPI.eventosAdmin.registerDirectly(event.id, payload);
+            {isCollaboration ? (
+              <DirectRegistrationForm
+                onSubmit={async payload => {
+                  const { ok } = await DansshipAPI.eventosAdmin.registerDirectly(event.id, payload);
 
-                if (ok) {
-                  await reFetchRoster();
-                }
+                  if (ok) {
+                    await reFetchRoster();
+                  }
 
-                return ok;
+                  return ok;
+                }}
+              />
+            ) : null}
+            {event.type === 'recital' && canRegisterPayment ? (
+              <Button type='button' variant='outline' onClick={() => setPaymentOpen(true)}>
+                {t('eventos:admin.registerInstallmentPayment')}
+              </Button>
+            ) : null}
+            <EventoRoster
+              rows={rosterResponse?.data ?? []}
+              eventId={event.id}
+              canWithdraw={event.type === 'recital' && canWithdraw}
+              onWithdrawn={() => {
+                void reFetchRoster();
               }}
             />
-            <EventoRoster rows={rosterResponse?.data ?? []} />
+            {event.type === 'recital' ? (
+              <InstallmentPaymentDialog
+                eventId={event.id}
+                open={paymentOpen}
+                onOpenChange={setPaymentOpen}
+                onRegistered={() => {
+                  void reFetchRoster();
+                }}
+              />
+            ) : null}
           </CardContent>
         </Card>
       ) : null}

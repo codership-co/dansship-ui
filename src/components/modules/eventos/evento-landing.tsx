@@ -76,7 +76,7 @@ function EventDetails({ landing }: { landing: EventLanding }) {
           <dt className='text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground'>
             {t('eventos:landing.room')}
           </dt>
-          <dd className='m-0 text-sm font-semibold leading-snug'>{landing.room_name}</dd>
+          <dd className='m-0 text-sm font-semibold leading-snug'>{landing.room_name || landing.external_location}</dd>
         </div>
       </dl>
       <div className='flex items-center gap-2.5'>
@@ -90,6 +90,23 @@ function EventDetails({ landing }: { landing: EventLanding }) {
       </div>
     </div>
   );
+}
+
+function installmentCaption(
+  amounts: Array<string | number>,
+  t: (key: string, options?: Record<string, unknown>) => string,
+) {
+  const values = amounts.map(amount => Number(amount));
+  const same = values.every(value => value === values[0]);
+
+  if (same) {
+    return t('eventos:landing.equalInstallments', {
+      count: values.length,
+      price: formatPrice(values[0], 'COP'),
+    });
+  }
+
+  return values.map(value => formatPrice(value, 'COP')).join(' · ');
 }
 
 function PriceBlock({ landing }: { landing: EventLanding }) {
@@ -109,8 +126,15 @@ function PriceBlock({ landing }: { landing: EventLanding }) {
             }`}
           >
             <span className='text-sm'>{row.label}</span>
-            <span className={`shrink-0 text-base font-bold ${index === 0 ? 'text-primary' : ''}`}>
-              {formatPrice(Number(row.price), 'COP')}
+            <span className='shrink-0 text-right'>
+              {row.installment_amounts && row.installment_amounts.length > 0 ? (
+                <span className='mb-1 block text-xs font-medium text-muted-foreground'>
+                  {installmentCaption(row.installment_amounts, t)}
+                </span>
+              ) : null}
+              <span className={`block text-base font-bold ${index === 0 ? 'text-primary' : ''}`}>
+                {formatPrice(Number(row.price), 'COP')}
+              </span>
             </span>
           </div>
         ))}

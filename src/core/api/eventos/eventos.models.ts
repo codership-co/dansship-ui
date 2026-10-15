@@ -1,8 +1,61 @@
 export type EventStatus = 'draft' | 'published';
-export type EventType = 'taller' | 'clase_especial';
+export type EventType = 'taller' | 'clase_especial' | 'recital';
 export type EventOfferingKind = 'event' | 'combo';
 export type EventRegistrationSource = 'direct' | 'combo';
-export type EventRegistrationStatus = 'pending_payment' | 'confirmed' | 'expired' | 'rejected';
+export type EventRegistrationStatus = 'pending_payment' | 'confirmed' | 'expired' | 'rejected' | 'withdrawn';
+
+export interface EventInstallmentAmount {
+  tier_position: number | null;
+  price_tier_id?: string | null;
+  amount: string | number;
+}
+
+export interface EventInstallmentDefinition {
+  sequence: number;
+  due_date: string;
+  amounts: Array<EventInstallmentAmount>;
+}
+
+export const INSTALLMENT_PROOF_CONTENT_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'] as const;
+
+export type InstallmentProofContentType = (typeof INSTALLMENT_PROOF_CONTENT_TYPES)[number];
+
+export interface RegistrationInstallment {
+  sequence: number;
+  due_date: string;
+  amount: string | number;
+  status: string;
+  payment_intent_id?: string | null;
+  registered_by?: string | null;
+  registered_by_name?: string | null;
+}
+
+export interface InstallmentQuoteLine {
+  sequence: number;
+  due_date: string;
+  amount: string | number;
+  status: string;
+  selectable: boolean;
+}
+
+export interface InstallmentQuote {
+  registered: boolean;
+  registration_id: string | null;
+  lines: Array<InstallmentQuoteLine>;
+  default_sequences: Array<number>;
+}
+
+export interface ManualInstallmentConfirmPayload {
+  user_id: string;
+  sequences: Array<number>;
+  proof_key: string;
+  idempotency_key: string;
+}
+
+export interface ManualInstallmentPaymentResult {
+  purchase_id: string;
+  payment_intent_id: string;
+}
 
 export interface EventPriceTierInput {
   condition_type: string;
@@ -29,6 +82,7 @@ export interface EventCatalogCard {
   instructor_label: string;
   room_label: string;
   price_from: string | number;
+  installment_price_from?: string | number | null;
   priced_per_pair: boolean;
   remaining: number;
   capacity: number;
@@ -40,6 +94,7 @@ export interface EventCatalogCard {
 export interface LandingPriceRow {
   label: string;
   price: string | number;
+  installment_amounts?: Array<string | number>;
 }
 
 export interface LandingComponentCard {
@@ -70,6 +125,7 @@ export interface EventLanding {
   starts_at?: string | null;
   ends_at?: string | null;
   room_name?: string | null;
+  external_location?: string | null;
   instructor?: InstructorLanding | null;
   remaining: number;
   capacity: number;
@@ -102,7 +158,8 @@ export interface EventAdmin {
   description: string | null;
   starts_at: string;
   ends_at: string;
-  room_id: string;
+  room_id: string | null;
+  external_location?: string | null;
   instructor_id: string;
   capacity: number;
   image_key: string | null;
@@ -123,6 +180,7 @@ export interface EventAdmin {
   status: EventStatus;
   published_at: string | null;
   price_tiers: Array<EventPriceTier>;
+  installments?: Array<EventInstallmentDefinition>;
   holding_registrations: number;
   fields_locked: boolean;
   created_at: string;
@@ -164,7 +222,8 @@ export interface EventCreatePayload {
   description?: string | null;
   starts_at: string;
   ends_at: string;
-  room_id: string;
+  room_id?: string | null;
+  external_location?: string | null;
   instructor_id: string;
   capacity: number;
   requires_partner: boolean;
@@ -174,6 +233,7 @@ export interface EventCreatePayload {
   base_price: number | string;
   type?: EventType;
   price_tiers: Array<EventPriceTierInput>;
+  installments?: Array<EventInstallmentDefinition>;
 }
 
 export interface EventUpdatePayload {
@@ -193,6 +253,8 @@ export interface EventUpdatePayload {
   type?: EventType;
   status?: EventStatus;
   price_tiers?: Array<EventPriceTierInput>;
+  external_location?: string | null;
+  installments?: Array<EventInstallmentDefinition>;
 }
 
 export interface ComboCreatePayload {
@@ -238,9 +300,10 @@ export interface EventPurchaseResponse {
 }
 
 export interface InstructorTeachingRoom {
-  id: string;
+  id: string | null;
   name: string;
   image_url: string | null;
+  external_location?: string | null;
 }
 
 export interface InstructorTeachingEvent {
@@ -279,6 +342,7 @@ export interface EventRosterEntry {
   combo_name: string | null;
   purchase_id: string;
   created_at: string;
+  installments?: Array<RegistrationInstallment> | null;
 }
 
 export interface AdminUserEventComboComponent {
@@ -324,6 +388,8 @@ export interface MyEventRegistration {
   purchase_id: string;
   payment_intent_id: string | null;
   payment_status: string | null;
+  external_location?: string | null;
+  installments?: Array<RegistrationInstallment> | null;
   created_at: string;
 }
 
