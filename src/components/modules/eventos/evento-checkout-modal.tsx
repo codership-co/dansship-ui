@@ -5,6 +5,8 @@ import { LuCreditCard, LuInfo, LuList } from 'react-icons/lu';
 import { useLocation, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
+import { landingHasInstallmentAmounts, paymentNotice } from './installment-notice';
+
 import { CheckoutPaymentProofForm } from '@components/forms/checkout-payment-proof-form';
 import { FormStepperLayout } from '@components/layouts/form-stepper-layout';
 import { PaymentMethodSelector } from '@components/modules/payments/payment-method-selector';
@@ -30,11 +32,12 @@ enum CheckoutStep {
 
 interface EventoCheckoutModalProps {
   landing: EventLanding;
+  accessToken?: string;
   isOpen: boolean;
   onClose: () => void;
 }
 
-export function EventoCheckoutModal({ landing, isOpen, onClose }: EventoCheckoutModalProps) {
+export function EventoCheckoutModal({ landing, accessToken, isOpen, onClose }: EventoCheckoutModalProps) {
   return (
     <ActionModal
       closeOnClickOutside={false}
@@ -45,12 +48,20 @@ export function EventoCheckoutModal({ landing, isOpen, onClose }: EventoCheckout
       onClose={onClose}
       className='w-dvw max-w-[100dvw] overflow-x-clip p-0 rounded-none sm:w-[96dvw] sm:max-w-[96dvw] sm:rounded-xl xl:max-w-7xl'
     >
-      <EventoCheckoutContent landing={landing} onClose={onClose} />
+      <EventoCheckoutContent landing={landing} accessToken={accessToken} onClose={onClose} />
     </ActionModal>
   );
 }
 
-function EventoCheckoutContent({ landing, onClose }: { landing: EventLanding; onClose: () => void }) {
+function EventoCheckoutContent({
+  landing,
+  accessToken,
+  onClose,
+}: {
+  landing: EventLanding;
+  accessToken?: string;
+  onClose: () => void;
+}) {
   const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
@@ -62,9 +73,9 @@ function EventoCheckoutContent({ landing, onClose }: { landing: EventLanding; on
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
 
   const { response: previewResponse } = usePromise(
-    () => DansshipAPI.eventos.previewPricing(landing.slug),
+    () => DansshipAPI.eventos.previewPricing(landing.slug, accessToken),
     Boolean(isAuthenticated && canPurchase),
-    [landing.slug],
+    [landing.slug, accessToken],
   );
   const preview = previewResponse?.data as PaymentPreviewMappedResponse | undefined;
 
@@ -145,6 +156,7 @@ function EventoCheckoutContent({ landing, onClose }: { landing: EventLanding; on
         slug: landing.slug,
         payment_method_type: isWalletCovered ? PaymentMethod.WALLET : paymentMethod,
         partner_email: landing.requires_partner ? partnerEmail.trim() : undefined,
+        access_token: accessToken,
       });
 
       if (!ok || !data) {
@@ -167,7 +179,7 @@ function EventoCheckoutContent({ landing, onClose }: { landing: EventLanding; on
 
       return null;
     }
-  }, [isWalletCovered, landing.requires_partner, landing.slug, partnerEmail, paymentMethod, preview, t]);
+  }, [accessToken, isWalletCovered, landing.requires_partner, landing.slug, partnerEmail, paymentMethod, preview, t]);
 
   const applyPaymentPreview = useCallback((method: PaymentMethod) => {
     setPaymentMethod(method);
@@ -191,6 +203,15 @@ function EventoCheckoutContent({ landing, onClose }: { landing: EventLanding; on
   const priceLabel = hasPlanPrice
     ? t(isPair ? 'eventos:checkout.yourPricePlanPair' : 'eventos:checkout.yourPricePlan')
     : t('eventos:checkout.yourPrice');
+  const notice = paymentNotice(
+    {
+      kind: landing.kind,
+      installmentDueDates: landing.installment_due_dates,
+      hasInstallmentAmounts: landingHasInstallmentAmounts(landing.price_rows),
+      surface: 'checkout',
+    },
+    t,
+  );
 
   const reviewForm = (
     <div className='grid content-start gap-4'>
@@ -253,10 +274,12 @@ function EventoCheckoutContent({ landing, onClose }: { landing: EventLanding; on
           </span>
         </div>
       ) : null}
-      <div className='flex items-start gap-2.5 text-muted-foreground'>
-        <LuInfo className='mt-0.5 size-4 shrink-0' aria-hidden />
-        <p className='m-0 text-[12.5px] leading-relaxed font-medium'>{t('eventos:checkout.nonRefundableNote')}</p>
-      </div>
+      {notice ? (
+        <div className='flex items-start gap-2.5 text-muted-foreground'>
+          <LuInfo className='mt-0.5 size-4 shrink-0' aria-hidden />
+          <p className='m-0 text-[12.5px] leading-relaxed font-medium'>{notice}</p>
+        </div>
+      ) : null}
       <div className='flex flex-wrap justify-end gap-2'>
         <Button type='button' color='primary' variant='outlined' onClick={onClose}>
           {t('eventos:checkout.cancel')}

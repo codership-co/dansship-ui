@@ -5,6 +5,8 @@ import { LuInfo } from 'react-icons/lu';
 import { Link, useLocation, useNavigate } from 'react-router';
 
 import { EventoCheckoutModal } from './evento-checkout-modal';
+import { landingHasInstallmentAmounts, paymentNotice } from './installment-notice';
+import { sessionSummaryText } from './session-summary';
 
 import { SpinnerLoader } from '@components/loaders';
 import { Badge } from '@components/ui';
@@ -56,6 +58,7 @@ function LandingHero({ landing }: { landing: EventLanding }) {
 
 function EventDetails({ landing }: { landing: EventLanding }) {
   const { t } = useTranslation();
+  const sessionSummary = sessionSummaryText(landing, t);
 
   return (
     <div className='grid gap-4 rounded-[14px] border bg-white p-4'>
@@ -79,6 +82,7 @@ function EventDetails({ landing }: { landing: EventLanding }) {
           <dd className='m-0 text-sm font-semibold leading-snug'>{landing.room_name || landing.external_location}</dd>
         </div>
       </dl>
+      {sessionSummary ? <p className='m-0 text-sm font-medium'>{sessionSummary}</p> : null}
       <div className='flex items-center gap-2.5'>
         <div className='grid size-8 shrink-0 place-content-center rounded-full bg-primary/15 text-[11px] font-semibold text-primary'>
           {landing.instructor?.initials}
@@ -144,7 +148,15 @@ function PriceBlock({ landing }: { landing: EventLanding }) {
   );
 }
 
-export function EventoLanding({ slug, preview }: { slug: string; preview: boolean }) {
+export function EventoLanding({
+  slug,
+  preview,
+  accessToken,
+}: {
+  slug: string;
+  preview: boolean;
+  accessToken?: string;
+}) {
   const { t } = useTranslation();
   const { isAuthenticated, ready } = useAuth();
   const navigate = useNavigate();
@@ -152,12 +164,17 @@ export function EventoLanding({ slug, preview }: { slug: string; preview: boolea
   const canPreview = useOrPermissions(AdminPermissions.eventos);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const useAdminPreview = preview && canPreview;
-  const canFetch = Boolean(slug) && (!preview || (ready && canPreview));
+  const canFetch = Boolean(accessToken || slug) && (!preview || (ready && canPreview));
 
   const { response, isLoading } = usePromise(
-    () => (useAdminPreview ? DansshipAPI.eventosAdmin.preview(slug) : DansshipAPI.eventos.getBySlug(slug)),
+    () =>
+      accessToken
+        ? DansshipAPI.eventos.getByAccessToken(accessToken)
+        : useAdminPreview
+          ? DansshipAPI.eventosAdmin.preview(slug)
+          : DansshipAPI.eventos.getBySlug(slug),
     canFetch,
-    [slug, preview, useAdminPreview, isAuthenticated],
+    [slug, preview, useAdminPreview, isAuthenticated, accessToken],
   );
   const landing = response?.data;
 
@@ -206,6 +223,15 @@ export function EventoLanding({ slug, preview }: { slug: string; preview: boolea
     : landing.sold_out
       ? t('eventos:landing.ctaSoldOut')
       : t('eventos:landing.cta');
+  const notice = paymentNotice(
+    {
+      kind: landing.kind,
+      installmentDueDates: landing.installment_due_dates,
+      hasInstallmentAmounts: landingHasInstallmentAmounts(landing.price_rows),
+      surface: 'landing',
+    },
+    t,
+  );
 
   return (
     <div className='mx-auto grid max-w-xl gap-5 pb-8 lg:max-w-3xl'>
@@ -241,12 +267,12 @@ export function EventoLanding({ slug, preview }: { slug: string; preview: boolea
         </div>
       )}
       <PriceBlock landing={landing} />
-      <div className='flex items-start gap-2.5 rounded-xl bg-secondary p-3'>
-        <LuInfo className='mt-0.5 size-4 shrink-0' aria-hidden />
-        <p className='m-0 text-xs font-medium leading-relaxed'>
-          {landing.kind === 'combo' ? t('eventos:landing.nonRefundableCombo') : t('eventos:landing.nonRefundable')}
-        </p>
-      </div>
+      {notice ? (
+        <div className='flex items-start gap-2.5 rounded-xl bg-secondary p-3'>
+          <LuInfo className='mt-0.5 size-4 shrink-0' aria-hidden />
+          <p className='m-0 text-xs font-medium leading-relaxed'>{notice}</p>
+        </div>
+      ) : null}
       <div className='flex justify-end'>
         <Button type='button' color='primary' variant='solid' disabled={ctaDisabled} onClick={startCheckout}>
           {ctaLabel}
@@ -254,6 +280,7 @@ export function EventoLanding({ slug, preview }: { slug: string; preview: boolea
       </div>
       <EventoCheckoutModal
         landing={landing}
+        accessToken={accessToken}
         isOpen={checkoutOpen && !ctaDisabled}
         onClose={() => setCheckoutOpen(false)}
       />

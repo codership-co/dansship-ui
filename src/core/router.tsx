@@ -117,6 +117,7 @@ const routes: Array<RouteObject> = [
           { path: 'eventos', Component: SecureEventosPage },
           { path: 'eventos/managed', Component: SecureManagedEventsPage },
           { path: 'eventos/managed/:eventId', Component: SecureManagedEventDetailPage },
+          { path: 'eventos/acceso/:token', Component: SecureEventoLandingPage },
           { path: 'eventos/:slug', Component: SecureEventoLandingPage },
           {
             path: 'talleres',

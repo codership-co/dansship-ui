@@ -16,6 +16,8 @@
   "viewPayment": "Ver pago",
   "payInstallment": "Pagar cuota",
   "installmentLine": "Cuota {{sequence}} · {{amount}} · vence {{due}}",
+  "sessionLine": "{{when}}{{place}}",
+  "sessionCancelled": "Cancelada",
   "installmentStatus": {
     "paid": "Pagada",
     "in_review": "En revisión",

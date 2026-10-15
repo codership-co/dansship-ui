@@ -524,7 +524,7 @@ export function ScheduleGrid({
                 const rosterTarget: RosterTarget | null =
                   'event_type' in cls
                     ? cls.event_type === 'workshop'
-                      ? { kind: 'event', id: cls.source_id }
+                      ? { kind: 'event', id: cls.metadata?.event_id || cls.source_id }
                       : null
                     : { kind: 'class', id: cls.id };
                 const showRosterIcon = Boolean(onViewRoster && rosterTarget);

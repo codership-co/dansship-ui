@@ -3,6 +3,7 @@ import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { EventSessionLines } from './event-session-lines';
 import { NextClassHero } from './next-class-hero';
 
 import { Button } from '@components/ui';
@@ -66,6 +67,7 @@ function GenericHero({
   roomLabel,
   statusLabel,
   detail,
+  notes,
   actions,
 }: {
   item: ReservationItem;
@@ -75,6 +77,7 @@ function GenericHero({
   roomLabel: string;
   statusLabel: string;
   detail?: string | null;
+  notes?: ReactNode;
   actions: ReactNode;
 }) {
   const { t } = useTranslation();
@@ -108,6 +111,7 @@ function GenericHero({
             {detail ? <span className='text-[12.5px] leading-[1.3] opacity-80'>{detail}</span> : null}
           </div>
         </div>
+        {notes}
         <div className='flex min-w-0 flex-wrap items-center justify-end gap-2 border-t border-white/22 pt-3.5'>
           {actions}
         </div>
@@ -141,6 +145,12 @@ export function NextReservationHero({ item, isCancelDisabled, onCancelClass }: N
           registration.source === 'combo' && registration.combo_name
             ? registration.combo_name
             : (registration.instructor_name ?? null)
+        }
+        notes={
+          <EventSessionLines
+            sessions={registration.sessions}
+            className='grid gap-1 text-[12.5px] leading-[1.3] text-primary-foreground'
+          />
         }
         actions={
           <>

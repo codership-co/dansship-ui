@@ -18,9 +18,12 @@ import type {
   EventImageConfirmRequest,
   EventImageUploadRequest,
   EventImageUploadResponse,
+  EventInvite,
   EventLanding,
   EventRosterEntry,
+  EventSession,
   EventUpdatePayload,
+  RecurrencePreview,
   InstallmentProofContentType,
   InstallmentQuote,
   ManualInstallmentConfirmPayload,
@@ -290,5 +293,113 @@ export class EventosAdminAPI {
     }
 
     return this.confirmPaymentQr(id, { file_key });
+  }
+
+  async listSessions(eventId: string) {
+    return this.httpClient.callNoError<Array<EventSession>>({
+      path: `/admin/events/${eventId}/sessions`,
+      method: 'GET',
+    });
+  }
+
+  async addSession(
+    eventId: string,
+    payload: {
+      starts_at: string;
+      ends_at: string;
+      room_id?: string | null;
+      external_location?: string | null;
+      label?: string | null;
+    },
+  ) {
+    return this.httpClient.callNoError<EventSession>({
+      path: `/admin/events/${eventId}/sessions`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async cancelSession(eventId: string, sessionId: string) {
+    return this.httpClient.callNoError<EventSession>({
+      path: `/admin/events/${eventId}/sessions/${sessionId}/cancel`,
+      method: 'POST',
+    });
+  }
+
+  async previewRecurrence(
+    eventId: string,
+    payload: {
+      weekday: number;
+      start_time: string;
+      end_time: string;
+      first_date: string;
+      last_date: string;
+      room_id?: string | null;
+      external_location?: string | null;
+      label?: string | null;
+    },
+  ) {
+    return this.httpClient.callNoError<RecurrencePreview>({
+      path: `/admin/events/${eventId}/recurrence/preview`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async applyRecurrence(
+    eventId: string,
+    payload: {
+      weekday: number;
+      start_time: string;
+      end_time: string;
+      first_date: string;
+      last_date: string;
+      room_id?: string | null;
+      external_location?: string | null;
+      label?: string | null;
+    },
+  ) {
+    return this.httpClient.callNoError<Array<EventSession>>({
+      path: `/admin/events/${eventId}/recurrence`,
+      method: 'POST',
+      data: payload,
+    });
+  }
+
+  async setVisibility(eventId: string, visibility: 'public' | 'link_only' | 'invite_only') {
+    return this.httpClient.callNoError<EventAdmin>({
+      path: `/admin/events/${eventId}/visibility`,
+      method: 'PUT',
+      data: { visibility },
+    });
+  }
+
+  async rotateAccessToken(eventId: string) {
+    return this.httpClient.callNoError<EventAdmin>({
+      path: `/admin/events/${eventId}/access-token/rotate`,
+      method: 'POST',
+    });
+  }
+
+  async listInvites(eventId: string) {
+    return this.httpClient.callNoError<Array<EventInvite>>({
+      path: `/admin/events/${eventId}/invites`,
+      method: 'GET',
+    });
+  }
+
+  async invite(eventId: string, userId: string) {
+    return this.httpClient.callNoError<EventInvite>({
+      path: `/admin/events/${eventId}/invites`,
+      method: 'POST',
+      data: { user_id: userId },
+    });
+  }
+
+  async uninvite(eventId: string, userId: string) {
+    return this.httpClient.callNoError<void>({
+      path: `/admin/events/${eventId}/invites/${userId}`,
+      method: 'DELETE',
+    });
   }
 }

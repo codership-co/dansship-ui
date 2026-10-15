@@ -134,6 +134,13 @@ export interface EventLanding {
   date_label?: string | null;
   schedule_label?: string | null;
   price_rows: Array<LandingPriceRow>;
+  installment_due_dates?: Array<string>;
+  session_summary?: {
+    extra_count: number;
+    weekday: number | null;
+    start_time: string | null;
+    end_time: string | null;
+  } | null;
   components: Array<LandingComponentCard>;
   payment_qr_url?: string | null;
 }
@@ -183,6 +190,9 @@ export interface EventAdmin {
   installments?: Array<EventInstallmentDefinition>;
   holding_registrations: number;
   fields_locked: boolean;
+  visibility?: 'public' | 'link_only' | 'invite_only';
+  access_token?: string | null;
+  sessions?: Array<EventSession>;
   created_at: string;
   updated_at: string;
 }
@@ -286,6 +296,7 @@ export interface EventPurchaseCreatePayload {
   slug: string;
   payment_method_type: 'transfer' | 'card' | 'wallet';
   partner_email?: string | null;
+  access_token?: string | null;
 }
 
 export interface EventPurchaseResponse {
@@ -316,6 +327,7 @@ export interface InstructorTeachingEvent {
   type_label?: string | null;
   capacity: number;
   registered_count: number;
+  sessions?: Array<InstructorTeachingSession>;
 }
 
 export interface InstructorTeachingUpcomingWeek {
@@ -369,6 +381,62 @@ export interface AdminUserEventRegistration {
 
 export type MyEventRegistrationScope = 'upcoming' | 'history';
 
+export interface EventSession {
+  id: string;
+  starts_at: string;
+  ends_at: string;
+  room_id: string | null;
+  room_name?: string | null;
+  external_location?: string | null;
+  status: 'active' | 'cancelled';
+  label: string | null;
+  is_main: boolean;
+  occurrence_date?: string | null;
+}
+
+export interface RegistrationSession {
+  id: string;
+  starts_at: string;
+  ends_at: string;
+  status: string;
+  label: string | null;
+  room_name: string | null;
+  external_location: string | null;
+  is_main: boolean;
+}
+
+export interface InstructorTeachingSession {
+  id: string;
+  starts_at: string;
+  ends_at: string;
+  label: string | null;
+  room_name: string | null;
+  external_location: string | null;
+  is_main: boolean;
+}
+
+export interface EventInvite {
+  id: string;
+  user_id: string;
+  email: string;
+  display_name: string | null;
+}
+
+export interface RecurrencePreview {
+  occurrences: Array<{
+    occurrence_date: string;
+    starts_at: string;
+    ends_at: string;
+    skipped: boolean;
+  }>;
+  conflicts: Array<{
+    occurrence_date: string;
+    kind: string;
+    label: string;
+    source_id: string | null;
+  }>;
+}
+
 export interface MyEventRegistration {
   id: string;
   event_id: string;
@@ -390,6 +458,7 @@ export interface MyEventRegistration {
   payment_status: string | null;
   external_location?: string | null;
   installments?: Array<RegistrationInstallment> | null;
+  sessions?: Array<RegistrationSession>;
   created_at: string;
 }
 
