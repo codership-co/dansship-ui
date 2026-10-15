@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
+import { EventSessionsPanel } from './event-sessions-panel';
 import { EventoRoster } from './evento-roster';
 import { InstallmentPaymentDialog } from './installment-payment-dialog';
 import { PriceTiersEditor } from './price-tiers-editor';
@@ -711,6 +712,7 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
           )}
         </CardContent>
       </Card>
+      {event ? <EventSessionsPanel event={event} rooms={rooms} /> : null}
       {event && (isCollaboration || event.type === 'recital') ? (
         <Card>
           <CardHeader>

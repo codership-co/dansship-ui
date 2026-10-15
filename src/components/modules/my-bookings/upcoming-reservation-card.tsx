@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { EventSessionLines } from './event-session-lines';
 import { UpcomingBookingCard } from './upcoming-booking-card';
 
 import { CheckoutPaymentProofForm } from '@components/forms/checkout-payment-proof-form';
@@ -128,6 +129,9 @@ export function UpcomingReservationCard({ item, isCancelDisabled, onCancelClass 
               </li>
             ))}
           </ul>
+        ) : null}
+        {item.kind === 'event' ? (
+          <EventSessionLines sessions={item.registration.sessions} className='mt-2 grid gap-1 text-xs' />
         ) : null}
         {item.kind === 'event' && payingSequence !== null ? (
           <CheckoutPaymentProofForm

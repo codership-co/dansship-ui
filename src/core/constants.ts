@@ -160,6 +160,7 @@ export const PageURLS = {
   studioRentalResult: '/studio-rental/result',
   eventos: '/eventos',
   eventoLanding: (slug: string) => `/eventos/${slug}`,
+  eventoAccess: (token: string) => `/eventos/acceso/${token}`,
   managedEvents: '/eventos/managed',
   managedEvent: (id: string) => `/eventos/managed/${id}`,
   talleres: '/eventos',

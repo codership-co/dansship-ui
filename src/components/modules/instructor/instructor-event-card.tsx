@@ -73,6 +73,19 @@ export function InstructorEventCard({ event, highlighted = false, onClick }: Ins
             <label>{t('bookings:room')}</label>
           </section>
         </section>
+        {event.sessions?.length ? (
+          <ul className='grid gap-1 text-sm'>
+            {event.sessions.map(session => (
+              <li key={session.id}>
+                {format(new Date(session.starts_at), 'EEE d MMM H:mm')}
+                {session.label ? ` · ${session.label}` : ''}
+                {session.room_name || session.external_location
+                  ? ` · ${session.room_name || session.external_location}`
+                  : ''}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </section>
 
       <Button

@@ -42,11 +42,19 @@ export class EventosAPI {
     });
   }
 
-  async previewPricing(slug: string) {
+  async getByAccessToken(token: string) {
+    return this.httpClient.callNoError<EventLanding>({
+      path: `/events/by-access/${token}`,
+      method: 'GET',
+    });
+  }
+
+  async previewPricing(slug: string, accessToken?: string | null) {
     return this.httpClient.callNoError<PaymentPreviewResponse, object, PaymentPreviewMappedResponse>(
       {
         path: `/events/by-slug/${slug}/pricing`,
         method: 'GET',
+        params: accessToken ? { access_token: accessToken } : undefined,
       },
       data => ({
         ...data,

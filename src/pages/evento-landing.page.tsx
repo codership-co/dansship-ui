@@ -5,13 +5,13 @@ import { EventoLanding } from '@components/modules/eventos';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 
 function EventoLandingPage() {
-  const { slug = '' } = useParams();
+  const { slug = '', token } = useParams();
   const [params] = useSearchParams();
   const preview = params.get('preview') === '1';
 
   return (
     <Section navbarPadding>
-      <EventoLanding slug={slug} preview={preview} />
+      <EventoLanding slug={slug} preview={preview} accessToken={token} />
     </Section>
   );
 }

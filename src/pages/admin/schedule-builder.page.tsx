@@ -437,7 +437,9 @@ function AdminScheduleBuilderPage() {
                     }
 
                     const agendaEvent = (agendaEvents?.data ?? []).find(
-                      event => event.event_type === 'workshop' && event.source_id === target.id,
+                      event =>
+                        event.event_type === 'workshop' &&
+                        (event.metadata?.event_id === target.id || event.source_id === target.id),
                     );
                     setRosterView({
                       kind: 'event',
