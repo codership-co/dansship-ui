@@ -14,6 +14,14 @@
   "historyCount": "{{loaded}} de {{total}}",
   "viewEvent": "Ver evento",
   "viewPayment": "Ver pago",
+  "payInstallment": "Pagar cuota",
+  "installmentLine": "Cuota {{sequence}} · {{amount}} · vence {{due}}",
+  "installmentStatus": {
+    "paid": "Pagada",
+    "in_review": "En revisión",
+    "overdue": "Vencida",
+    "pending": "Pendiente"
+  },
   "viewRental": "Ver solicitud",
   "eventNamedTitle": "Evento: {{name}}",
   "rentalNamedTitle": "Renta: {{name}}",

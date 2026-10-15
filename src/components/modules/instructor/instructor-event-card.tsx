@@ -69,7 +69,7 @@ export function InstructorEventCard({ event, highlighted = false, onClick }: Ins
             <label>{t('bookings:duration')}</label>
           </section>
           <section className='text-center col-span-2 sm:col-span-1'>
-            <h4 className='m-0'>{event.room?.name || t('bookings:roomTBA')}</h4>
+            <h4 className='m-0'>{event.room?.name || event.room?.external_location || t('bookings:roomTBA')}</h4>
             <label>{t('bookings:room')}</label>
           </section>
         </section>

@@ -94,6 +94,7 @@
     "plan": "Plan",
     "merch": "Mercancía",
     "event": "Evento",
+    "event_installment": "Cuota de evento",
     "private_class": "Clase privada",
     "studio_rental": "Alquiler de estudio"
   },

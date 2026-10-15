@@ -28,6 +28,8 @@ const purchaseTypeLabel = (value: string, t: (key: string) => string) => {
 
   if (value === 'event') return t('reports:cash.purchaseTypes.event');
 
+  if (value === 'event_installment') return t('reports:cash.purchaseTypes.eventInstallment');
+
   return value;
 };
 

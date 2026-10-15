@@ -81,6 +81,14 @@ export class EventosAPI {
     });
   }
 
+  async payInstallments(registrationId: string, sequences: Array<number>) {
+    return this.httpClient.callNoError<EventPurchaseResponse, { sequences: Array<number> }>({
+      path: `/events/registrations/${registrationId}/installments/pay`,
+      method: 'POST',
+      data: { sequences },
+    });
+  }
+
   async createPurchase(payload: EventPurchaseCreatePayload) {
     return this.httpClient.callNoError<EventPurchaseResponse, EventPurchaseCreatePayload>({
       path: '/events/purchases',

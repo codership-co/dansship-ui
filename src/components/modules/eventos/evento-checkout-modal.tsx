@@ -122,8 +122,8 @@ function EventoCheckoutContent({ landing, onClose }: { landing: EventLanding; on
         : [
             {
               name: landing.name,
-              date: [landing.date_label, landing.room_name].filter(Boolean).join(' · '),
-              room: landing.room_name ?? '',
+              date: [landing.date_label, landing.room_name || landing.external_location].filter(Boolean).join(' · '),
+              room: landing.room_name || landing.external_location || '',
               instructor: landing.instructor?.name ?? '',
             },
           ],

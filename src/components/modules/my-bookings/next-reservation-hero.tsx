@@ -153,7 +153,9 @@ export function NextReservationHero({ item, isCancelDisabled, onCancelClass }: N
             >
               {t('bookings:viewEvent')}
             </Button>
-            {registration.payment_intent_id && registration.status !== 'confirmed' ? (
+            {registration.payment_intent_id &&
+            registration.status !== 'confirmed' &&
+            !registration.installments?.length ? (
               <Button
                 type='button'
                 variant='outline'
