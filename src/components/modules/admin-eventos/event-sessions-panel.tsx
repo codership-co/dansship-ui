@@ -1,8 +1,9 @@
+import { Button } from 'polpo/components';
 import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
-import { Button, Input, Label } from '@components/ui';
+import { Input, Label } from '@components/ui';
 import { DansshipAPI, type EventAdmin, type EventInvite, type EventSession, type RecurrencePreview } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { usePromise } from '@hooks';
@@ -187,7 +188,9 @@ export function EventSessionsPanel({ event, rooms }: EventSessionsPanelProps) {
           </select>
         </Label>
         <div className='md:col-span-2'>
-          <Button type='submit'>{t('eventos:admin.addSession')}</Button>
+          <Button color='primary' variant='solid' type='submit'>
+            {t('eventos:admin.addSession')}
+          </Button>
         </div>
       </form>
       <div className='grid gap-3 md:grid-cols-3'>
@@ -222,10 +225,10 @@ export function EventSessionsPanel({ event, rooms }: EventSessionsPanelProps) {
           <Input required type='date' value={lastDate} onChange={event => setLastDate(event.target.value)} />
         </Label>
         <div className='flex items-end gap-2'>
-          <Button type='button' variant='outline' onClick={() => void previewSeries()}>
+          <Button color='primary' variant='outlined' type='button' onClick={() => void previewSeries()}>
             {t('eventos:admin.previewSeries')}
           </Button>
-          <Button type='button' onClick={() => void applySeries()}>
+          <Button color='primary' variant='solid' type='button' onClick={() => void applySeries()}>
             {t('eventos:admin.applySeries')}
           </Button>
         </div>
@@ -259,7 +262,7 @@ export function EventSessionsPanel({ event, rooms }: EventSessionsPanelProps) {
       {visibility === 'link_only' && token ? (
         <div className='flex flex-wrap items-center gap-2'>
           <Input readOnly value={`${window.location.origin}${PageURLS.eventoAccess(token)}`} />
-          <Button type='button' variant='outline' onClick={() => void rotate()}>
+          <Button color='primary' variant='outlined' type='button' onClick={() => void rotate()}>
             {t('eventos:admin.rotateLink')}
           </Button>
         </div>
@@ -269,7 +272,7 @@ export function EventSessionsPanel({ event, rooms }: EventSessionsPanelProps) {
           {t('eventos:admin.inviteSearch')}
           <Input value={inviteQuery} onChange={event => setInviteQuery(event.target.value)} />
         </Label>
-        <Button type='button' variant='outline' onClick={() => void searchInvites()}>
+        <Button color='primary' variant='outlined' type='button' onClick={() => void searchInvites()}>
           {t('eventos:admin.searchPeople')}
         </Button>
         {matches.map(person => (
@@ -289,8 +292,9 @@ export function EventSessionsPanel({ event, rooms }: EventSessionsPanelProps) {
                 {invite.display_name} · {invite.email}
               </span>
               <Button
+                color='primary'
+                variant='outlined'
                 type='button'
-                variant='outline'
                 onClick={() =>
                   void DansshipAPI.eventosAdmin.uninvite(event.id, invite.user_id).then(() => reFetchInvites())
                 }
@@ -325,8 +329,9 @@ function SessionRow({
       </span>
       {!session.is_main && session.status === 'active' ? (
         <Button
+          color='primary'
+          variant='outlined'
           type='button'
-          variant='outline'
           onClick={() => void DansshipAPI.eventosAdmin.cancelSession(eventId, session.id).then(() => onChanged())}
         >
           {t('eventos:admin.cancelSession')}

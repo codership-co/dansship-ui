@@ -1,7 +1,8 @@
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
-import { Badge, Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
+import { Badge, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { type AdminEventListItem } from '@core/api';
 import { PageURLS } from '@core/constants';
 
@@ -44,15 +45,15 @@ export function EventosList({ items }: EventosListProps) {
               {item.capacity !== null ? `${item.holding_registrations}/${item.capacity}` : item.holding_registrations}
             </TableCell>
             <TableCell>
-              <Button asChild variant='outline' size='sm'>
-                <Link
-                  to={
-                    item.kind === 'combo' ? PageURLS.admin.eventoComboEdit(item.id) : PageURLS.admin.eventoEdit(item.id)
-                  }
-                >
+              <Link
+                to={
+                  item.kind === 'combo' ? PageURLS.admin.eventoComboEdit(item.id) : PageURLS.admin.eventoEdit(item.id)
+                }
+              >
+                <Button color='primary' variant='outlined' size='small'>
                   {t('eventos:admin.columns.edit')}
-                </Link>
-              </Button>
+                </Button>
+              </Link>
             </TableCell>
           </TableRow>
         ))}

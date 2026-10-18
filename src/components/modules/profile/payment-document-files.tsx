@@ -1,9 +1,8 @@
+import { Button } from 'polpo/components';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuEye, LuUpload } from 'react-icons/lu';
 import { toast } from 'sonner';
-
-import { Button } from '@components/ui';
 
 import type { PaymentDocumentKind, PaymentProfile } from '@core/api';
 
@@ -59,9 +58,11 @@ function PaymentFileCard({
           </div>
           <div className='flex shrink-0 gap-1'>
             <Button
+              color='primary'
+              variant='text'
+              size='small'
+              forIcon
               type='button'
-              variant='ghost'
-              size='icon-sm'
               aria-label={t('profile:paymentDocuments.viewFile')}
               title={t('profile:paymentDocuments.viewFile')}
               disabled={isUploading || isOpeningFile}
@@ -70,9 +71,11 @@ function PaymentFileCard({
               <LuEye />
             </Button>
             <Button
+              color='primary'
+              variant='outlined'
+              size='small'
+              forIcon
               type='button'
-              variant='outline'
-              size='icon-sm'
               aria-label={t('profile:paymentDocuments.replaceFile')}
               title={t('profile:paymentDocuments.replaceFile')}
               disabled={isUploading}
@@ -90,9 +93,11 @@ function PaymentFileCard({
           </div>
           <div className='flex items-center gap-2.5'>
             <Button
+              color='primary'
+              variant='outlined'
+              size='small'
+              forIcon
               type='button'
-              variant='outline'
-              size='icon-sm'
               aria-label={t('profile:paymentDocuments.uploadFile')}
               title={t('profile:paymentDocuments.uploadFile')}
               disabled={isUploading}

@@ -1,8 +1,9 @@
+import { Button } from 'polpo/components';
 import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
-import { Button, Input, Label } from '@components/ui';
+import { Input, Label } from '@components/ui';
 import { DansshipAPIError, type DirectRegistrationPayload } from '@core/api';
 
 interface DirectRegistrationFormProps {
@@ -83,7 +84,7 @@ export function DirectRegistrationForm({ layout = 'inline', onSubmit }: DirectRe
         </div>
       </div>
       <div className={stacked ? 'flex justify-end' : 'flex items-end'}>
-        <Button type='submit' disabled={saving || (stacked && !email.trim())}>
+        <Button color='primary' variant='solid' type='submit' disabled={saving || (stacked && !email.trim())}>
           {saving ? t('eventos:admin.saving') : t('eventos:managed.registerPaid')}
         </Button>
       </div>

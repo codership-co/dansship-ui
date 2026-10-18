@@ -1,10 +1,12 @@
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
+import { SectionHeading } from '@components/containers';
 import { ConfirmDialog } from '@components/modals';
-import { Badge, Button, Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
+import { Badge, Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { DansshipAPI, GiftListItem, GiftOrderStatus } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -76,7 +78,13 @@ function GiftCard({
 
       {direction === 'received' && gift.can_claim && onClaim ? (
         <div className='mt-4'>
-          <Button variant='outline' size='sm' disabled={claimingId === gift.id} onClick={() => onClaim(gift)}>
+          <Button
+            color='primary'
+            variant='outlined'
+            size='small'
+            disabled={claimingId === gift.id}
+            onClick={() => onClaim(gift)}
+          >
             {claimingId === gift.id ? t('gifts:claimProcessing') : t('gifts:claimCta')}
           </Button>
         </div>
@@ -141,10 +149,7 @@ function GiftsPage() {
 
   return (
     <div className='max-w-6xl mx-auto py-10 px-4 pt-20'>
-      <div className='mb-10'>
-        <h1 className='text-3xl font-bold text-gray-900'>{t('profile:gifts.title')}</h1>
-        <p className='text-gray-500 mt-2'>{t('profile:gifts.subtitle')}</p>
-      </div>
+      <SectionHeading title={t('profile:gifts.title')} subtitle={t('profile:gifts.subtitle')} />
 
       <div className='bg-white rounded-lg shadow-sm border border-gray-100 p-6'>
         {isLoading ? (

@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -5,7 +6,7 @@ import { ClassModal } from './class-modal';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { ClassDefinition } from '@core/api';
 import { useClassGroups, useClasses } from '@hooks';
 
@@ -80,7 +81,7 @@ export function ClassesTab() {
     <div className='space-y-4'>
       <div className='flex justify-between items-center'>
         <h2 className='text-xl font-semibold'>{t('inventory:classes.catalog')}</h2>
-        <Button onClick={() => handleOpenModal()} disabled={classGroups.length === 0}>
+        <Button color='primary' variant='solid' onClick={() => handleOpenModal()} disabled={classGroups.length === 0}>
           {t('inventory:classes.addClass')}
         </Button>
       </div>
@@ -123,13 +124,20 @@ export function ClassesTab() {
                     </span>
                   </TableCell>
                   <TableCell className='text-right space-x-2'>
-                    <Button variant='outline' size='sm' onClick={() => handleOpenModal(cls)} disabled={!cls.is_active}>
+                    <Button
+                      color='primary'
+                      variant='outlined'
+                      size='small'
+                      onClick={() => handleOpenModal(cls)}
+                      disabled={!cls.is_active}
+                    >
                       {t('common:edit')}
                     </Button>
                     {cls.is_active && (
                       <Button
-                        variant='destructive'
-                        size='sm'
+                        color='alert'
+                        variant='solid'
+                        size='small'
                         onClick={() => handleDeactivate(cls)}
                         disabled={isDeleting}
                       >
@@ -138,8 +146,9 @@ export function ClassesTab() {
                     )}
                     {!cls.is_active && (
                       <Button
-                        variant='default'
-                        size='sm'
+                        color='primary'
+                        variant='solid'
+                        size='small'
                         onClick={() => handleReactivate(cls.id)}
                         disabled={isReactivating}
                       >

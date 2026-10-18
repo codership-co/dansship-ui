@@ -1,9 +1,11 @@
+import { Button } from 'polpo/components';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
-import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
+import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { buildAgendaConflicts, DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -127,12 +129,13 @@ function AdminAgendaConflictsPage() {
   return (
     <div className='mx-auto max-w-7xl px-4 py-8 space-y-4 pt-20'>
       <header className='rounded-[calc(var(--radius)+4px)] bg-[hsl(var(--surface-container-low))] p-5'>
-        <h1 className='text-primary'>{t('admin.conflicts.title', { defaultValue: 'Occupancy Conflict Queue' })}</h1>
-        <p className='mt-1 text-sm text-muted-foreground'>
-          {t('admin.conflicts.subtitle', {
+        <SectionHeading
+          className='mb-0'
+          title={t('admin.conflicts.title', { defaultValue: 'Occupancy Conflict Queue' })}
+          subtitle={t('admin.conflicts.subtitle', {
             defaultValue: 'Review overlapping room occupancy and resolve operational collisions.',
           })}
-        </p>
+        />
 
         <div className='mt-4 grid gap-2 sm:grid-cols-3'>
           <div className='rounded-[var(--radius)] bg-[hsl(var(--surface-container-highest))] px-3 py-2'>
@@ -253,7 +256,13 @@ function AdminAgendaConflictsPage() {
                     defaultValue: 'Unable to evaluate occupancy conflicts.',
                   })}
                 </p>
-                <Button className='mt-2' size='sm' variant='outline' onClick={() => void getAgendaEvents()}>
+                <Button
+                  color='primary'
+                  variant='outlined'
+                  size='small'
+                  className='mt-2'
+                  onClick={() => void getAgendaEvents()}
+                >
                   {t('admin.conflicts.list.retry', { defaultValue: 'Retry' })}
                 </Button>
               </div>
@@ -344,15 +353,16 @@ function AdminAgendaConflictsPage() {
 
               <div className='flex flex-wrap gap-2'>
                 <Button
-                  size='sm'
-                  variant={selectedIsResolved ? 'outline' : 'default'}
+                  color='primary'
+                  variant={selectedIsResolved ? 'outlined' : 'solid'}
+                  size='small'
                   onClick={() => toggleResolved(selectedConflict.id)}
                 >
                   {selectedIsResolved
                     ? t('admin.conflicts.actions.markOpen', { defaultValue: 'Mark Open' })
                     : t('admin.conflicts.actions.resolve', { defaultValue: 'Resolve' })}
                 </Button>
-                <Button size='sm' variant='outline' onClick={openSource}>
+                <Button color='primary' variant='outlined' size='small' onClick={openSource}>
                   {t('admin.conflicts.actions.openSource', { defaultValue: 'Open Event Source' })}
                 </Button>
               </div>

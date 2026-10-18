@@ -1,10 +1,11 @@
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import { SpinnerLoader } from '@components/loaders';
 import { PaymentProofUpload, PaymentStatusBadge } from '@components/modules';
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { useOrPermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PERMISSION } from '@core/permissions';
@@ -130,9 +131,10 @@ export function OrderDetail({ orderId, onCancelOrder, isCancelling = false }: Or
                 </a>
               ) : canManagePayment ? (
                 <Button
+                  color='primary'
+                  variant='outlined'
+                  size='small'
                   type='button'
-                  variant='outline'
-                  size='sm'
                   disabled={isOpeningProof}
                   onClick={() => void handleViewProof()}
                 >
@@ -205,7 +207,8 @@ export function OrderDetail({ orderId, onCancelOrder, isCancelling = false }: Or
       {order?.data?.status === 'pending' && onCancelOrder ? (
         <div className='flex justify-end'>
           <Button
-            variant='destructive'
+            color='alert'
+            variant='solid'
             disabled={isCancelling || !order?.data?.id}
             onClick={order?.data?.id ? () => void onCancelOrder(order?.data?.id) : undefined}
           >

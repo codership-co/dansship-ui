@@ -1,10 +1,10 @@
+import { Button } from 'polpo/components';
 import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuTrash2, LuUpload } from 'react-icons/lu';
 import { toast } from 'sonner';
 
 import { Spinner } from '@components/loaders';
-import { Button } from '@components/ui';
 import { PaymentProofContentType } from '@core/api';
 import { cn } from '@helpers';
 
@@ -96,7 +96,14 @@ export function OptionalFileUpload({
           </label>
 
           {(value || localPreviewUrl) && !isUploading ? (
-            <Button type='button' variant='ghost' size='sm' onClick={handleClear} className='h-8 px-2'>
+            <Button
+              color='primary'
+              variant='text'
+              size='small'
+              type='button'
+              onClick={handleClear}
+              className='h-8 px-2'
+            >
               <LuTrash2 className='h-4 w-4' />
               <span className='sr-only'>{t('common:fileUpload.remove')}</span>
             </Button>

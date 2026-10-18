@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -8,7 +9,7 @@ import { RefundClassCreditsDialog } from './refund-class-credits-dialog';
 import { RetroactiveAttendanceDialog } from './retroactive-attendance-dialog';
 
 import { SpinnerLoader } from '@components/loaders';
-import { Button, Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@components/ui';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@components/ui';
 import { useOrPermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { AdminPermissions } from '@core/permissions';
@@ -95,12 +96,12 @@ export function AdminClassRosterDialog({ kind, id, open, onOpenChange, title }: 
               {canRefundClass || canRegisterRetroactive ? (
                 <div className='flex flex-wrap items-center gap-2'>
                   {canRefundClass ? (
-                    <Button type='button' variant='outline' onClick={() => setIsRefundOpen(true)}>
+                    <Button color='primary' variant='outlined' type='button' onClick={() => setIsRefundOpen(true)}>
                       {t('admin:roster.refundCredits')}
                     </Button>
                   ) : null}
                   {canRegisterRetroactive ? (
-                    <Button type='button' onClick={() => setIsRetroactiveOpen(true)}>
+                    <Button color='primary' variant='solid' type='button' onClick={() => setIsRetroactiveOpen(true)}>
                       {t('admin:roster.registerRetroactive')}
                     </Button>
                   ) : null}

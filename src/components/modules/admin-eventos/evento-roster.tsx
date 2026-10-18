@@ -1,10 +1,10 @@
 import { format } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -179,10 +179,11 @@ export function EventoRoster({ rows, eventId, canWithdraw = false, onWithdrawn }
                         .filter(member => member.status === 'confirmed')
                         .map(member => (
                           <Button
+                            color='primary'
+                            variant='outlined'
+                            size='small'
                             key={member.id}
                             type='button'
-                            variant='outline'
-                            size='sm'
                             onClick={() => setPending(member)}
                           >
                             {t('eventos:admin.withdraw')}
@@ -203,10 +204,22 @@ export function EventoRoster({ rows, eventId, canWithdraw = false, onWithdrawn }
             <DialogDescription>{t('eventos:admin.withdrawBody')}</DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button type='button' variant='outline' disabled={withdrawing} onClick={() => setPending(null)}>
+            <Button
+              color='primary'
+              variant='outlined'
+              type='button'
+              disabled={withdrawing}
+              onClick={() => setPending(null)}
+            >
               {t('eventos:admin.withdrawCancel')}
             </Button>
-            <Button type='button' disabled={withdrawing} onClick={() => void confirmWithdraw()}>
+            <Button
+              color='primary'
+              variant='solid'
+              type='button'
+              disabled={withdrawing}
+              onClick={() => void confirmWithdraw()}
+            >
               {t('eventos:admin.withdrawConfirm')}
             </Button>
           </DialogFooter>

@@ -1,11 +1,11 @@
 import { addDays, format, parseISO } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -127,7 +127,13 @@ export function UserSubscriptionsTab({ userId }: { userId: string }) {
                 </TableCell>
                 <TableCell>
                   {canExtend(subscription) ? (
-                    <Button type='button' size='sm' variant='outline' onClick={() => openExtendDialog(subscription)}>
+                    <Button
+                      color='primary'
+                      variant='outlined'
+                      size='small'
+                      type='button'
+                      onClick={() => openExtendDialog(subscription)}
+                    >
                       {t('admin:users.details.extend.action')}
                     </Button>
                   ) : (
@@ -188,14 +194,21 @@ export function UserSubscriptionsTab({ userId }: { userId: string }) {
           </div>
           <DialogFooter>
             <Button
+              color='primary'
+              variant='outlined'
               type='button'
-              variant='outline'
               onClick={() => setSubscriptionToExtend(null)}
               disabled={isExtending}
             >
               {t('common:cancel')}
             </Button>
-            <Button type='button' onClick={() => void handleConfirmExtend()} disabled={!canSubmit || isExtending}>
+            <Button
+              color='primary'
+              variant='solid'
+              type='button'
+              onClick={() => void handleConfirmExtend()}
+              disabled={!canSubmit || isExtending}
+            >
               {t('admin:users.details.extend.confirm')}
             </Button>
           </DialogFooter>

@@ -1,9 +1,10 @@
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
-import { Button, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
+import { Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
 import { DansshipAPI, type ClassLevel, type StudentClassLevelItem } from '@core/api';
 import { CLASS_LEVELS, classLevelLabelKey } from '@helpers';
 import { useCallablePromise, usePromise } from '@hooks';
@@ -103,6 +104,8 @@ export function ClassLevelsSection() {
               </Select>
             </div>
             <Button
+              color='primary'
+              variant='solid'
               type='button'
               disabled={isRowSaving || (!isDirty && Boolean(item.level))}
               onClick={() => {

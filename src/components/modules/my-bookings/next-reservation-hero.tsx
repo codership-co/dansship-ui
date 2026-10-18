@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { Button } from 'polpo/components';
 import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -6,7 +7,6 @@ import { useNavigate } from 'react-router';
 import { EventSessionLines } from './event-session-lines';
 import { NextClassHero } from './next-class-hero';
 
-import { Button } from '@components/ui';
 import { PageURLS } from '@core/constants';
 import { getBookingCountdown, rentalStatusI18nKey, reservationDisplayTitle, type ReservationItem } from '@helpers';
 import { useDateLocale } from '@hooks';
@@ -155,9 +155,10 @@ export function NextReservationHero({ item, isCancelDisabled, onCancelClass }: N
         actions={
           <>
             <Button
+              color='primary'
+              variant='outlined'
+              size='large'
               type='button'
-              variant='outline'
-              size='lg'
               className='h-11 max-w-full border-white/80 bg-transparent text-white hover:bg-white/10 hover:text-white'
               onClick={() => navigate(PageURLS.eventoLanding(registration.event_slug))}
             >
@@ -167,9 +168,10 @@ export function NextReservationHero({ item, isCancelDisabled, onCancelClass }: N
             registration.status !== 'confirmed' &&
             !registration.installments?.length ? (
               <Button
+                color='primary'
+                variant='outlined'
+                size='large'
                 type='button'
-                variant='outline'
-                size='lg'
                 className='h-11 max-w-full border-white/80 bg-transparent text-white hover:bg-white/10 hover:text-white'
                 onClick={() => navigate(`${PageURLS.paymentsResult}?intentId=${registration.payment_intent_id}`)}
               >
@@ -201,9 +203,10 @@ export function NextReservationHero({ item, isCancelDisabled, onCancelClass }: N
         statusLabel={t(`studioRental:status.${rentalStatusI18nKey(request.status)}`)}
         actions={
           <Button
+            color='primary'
+            variant='outlined'
+            size='large'
             type='button'
-            variant='outline'
-            size='lg'
             className='h-11 max-w-full border-white/80 bg-transparent text-white hover:bg-white/10 hover:text-white'
             onClick={() =>
               navigate(
@@ -234,9 +237,10 @@ export function NextReservationHero({ item, isCancelDisabled, onCancelClass }: N
       detail={t(`common:days.${series.day_of_week}`)}
       actions={
         <Button
+          color='primary'
+          variant='outlined'
+          size='large'
           type='button'
-          variant='outline'
-          size='lg'
           className='h-11 max-w-full border-white/80 bg-transparent text-white hover:bg-white/10 hover:text-white'
           onClick={() =>
             navigate(

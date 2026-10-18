@@ -1,11 +1,12 @@
 import { format, parseISO } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
-import { Button, Label, Textarea } from '@components/ui';
+import { Label, Textarea } from '@components/ui';
 import { DansshipAPI } from '@core/api';
 import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
 
@@ -66,7 +67,7 @@ export function UserNotesTab({ userId }: { userId: string }) {
           />
         </div>
         <div className='flex justify-end'>
-          <Button type='submit' disabled={!canSubmitNote || isCreatingNote}>
+          <Button color='primary' variant='solid' type='submit' disabled={!canSubmitNote || isCreatingNote}>
             {t('admin:users.details.notesAndChannels.addNote')}
           </Button>
         </div>

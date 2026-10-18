@@ -1,4 +1,5 @@
 import { format, parseISO } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -6,7 +7,6 @@ import { toast } from 'sonner';
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
 import {
-  Button,
   Input,
   Label,
   Select,
@@ -173,7 +173,7 @@ export function UserWalletTab({ userId }: { userId: string }) {
         </div>
 
         <div className='flex justify-end'>
-          <Button type='submit' disabled={!canSubmit || isSubmitting}>
+          <Button color='primary' variant='solid' type='submit' disabled={!canSubmit || isSubmitting}>
             {t('admin:users.details.wallet.submit')}
           </Button>
         </div>

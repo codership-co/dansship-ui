@@ -1,11 +1,11 @@
 'use client';
 
 import { format } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { ClassNames, DateRange, PropsBase } from 'react-day-picker';
 import { LuCalendar as CalendarIcon } from 'react-icons/lu';
 
-import { Button } from './button';
 import { Calendar } from './calendar';
 import { Popover, PopoverContent, PopoverTrigger } from './popover';
 
@@ -124,7 +124,8 @@ export const DatePicker = (props: DatePickerProps) => {
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
           <Button
-            variant='outline'
+            color='primary'
+            variant='outlined'
             className={cn('w-full justify-start text-left font-normal', !dateRange?.from && 'text-muted-foreground')}
             disabled={triggerButtonDisabled}
           >
@@ -162,7 +163,8 @@ export const DatePicker = (props: DatePickerProps) => {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant='outline'
+          color='primary'
+          variant='outlined'
           className={cn('w-full justify-start text-left font-normal', !date && 'text-muted-foreground')}
           disabled={triggerButtonDisabled}
         >

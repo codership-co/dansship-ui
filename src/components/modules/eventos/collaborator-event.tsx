@@ -1,4 +1,5 @@
 import { format, isToday, isYesterday, parseISO } from 'date-fns';
+import { Button } from 'polpo/components';
 import { ChangeEvent, DragEvent, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuImage } from 'react-icons/lu';
@@ -7,7 +8,7 @@ import { toast } from 'sonner';
 
 import { DirectRegistrationForm } from './direct-registration-form';
 
-import { Badge, Button } from '@components/ui';
+import { Badge } from '@components/ui';
 import {
   DansshipAPI,
   type CollaboratorPaymentItem,
@@ -205,6 +206,8 @@ export function CollaboratorEvent({
                 {payment.status === PENDING_REVIEW ? (
                   <div className='flex gap-2'>
                     <Button
+                      color='primary'
+                      variant='solid'
                       type='button'
                       disabled={reviewingId === payment.id}
                       onClick={() => void review(payment.id, 'approve')}
@@ -212,8 +215,9 @@ export function CollaboratorEvent({
                       {t('eventos:managed.approve')}
                     </Button>
                     <Button
+                      color='primary'
+                      variant='outlined'
                       type='button'
-                      variant='outline'
                       disabled={reviewingId === payment.id}
                       onClick={() => void review(payment.id, 'reject')}
                     >

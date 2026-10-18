@@ -1,20 +1,10 @@
+import { Button } from 'polpo/components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
-import {
-  Button,
-  Input,
-  Label,
-  Switch,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@components/ui';
+import { Input, Label, Switch, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { useBenefitWindows } from '@hooks';
 
 interface DateDraft {
@@ -142,7 +132,13 @@ export function BenefitWindowsPanel() {
                   />
                 </TableCell>
                 <TableCell>
-                  <Button type='button' disabled={isSaving} onClick={() => void saveDates(window.id)}>
+                  <Button
+                    color='primary'
+                    variant='solid'
+                    type='button'
+                    disabled={isSaving}
+                    onClick={() => void saveDates(window.id)}
+                  >
                     {t('admin:inventory.promotionsPanel.save')}
                   </Button>
                 </TableCell>

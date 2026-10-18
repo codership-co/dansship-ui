@@ -1,10 +1,11 @@
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
-import { Button, Checkbox, Input, Label } from '@components/ui';
+import { Checkbox, Input, Label } from '@components/ui';
 import { DansshipAPI, type CommunicationPlatform, type CreateUserChannelPayload } from '@core/api';
 import { buildInstagramLink, buildWhatsAppLink } from '@helpers';
 import { useCallablePromise, usePromise } from '@hooks';
@@ -135,7 +136,7 @@ export function UserChannelsSection({ userId }: { userId: string }) {
           {t('admin:users.details.notesAndChannels.markFavorite')}
         </label>
         <div className='flex justify-end'>
-          <Button type='submit' disabled={!canSubmitChannel || isSubmitting}>
+          <Button color='primary' variant='solid' type='submit' disabled={!canSubmitChannel || isSubmitting}>
             {t('admin:users.details.notesAndChannels.addChannel')}
           </Button>
         </div>
@@ -177,8 +178,9 @@ export function UserChannelsSection({ userId }: { userId: string }) {
                 </div>
                 {channel.is_favorite ? null : (
                   <Button
+                    color='primary'
+                    variant='outlined'
                     type='button'
-                    variant='outline'
                     disabled={isSubmitting}
                     onClick={() =>
                       setPendingWrite({

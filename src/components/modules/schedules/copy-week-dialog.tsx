@@ -1,9 +1,9 @@
 import { format, parseISO } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -207,10 +207,18 @@ export function CopyWeekDialog({
         </div>
 
         <DialogFooter>
-          <Button type='button' variant='outline' onClick={() => onOpenChange(false)} disabled={isLoading}>
+          <Button
+            color='primary'
+            variant='outlined'
+            type='button'
+            onClick={() => onOpenChange(false)}
+            disabled={isLoading}
+          >
             {t('schedules:copyWeek.cancel')}
           </Button>
           <Button
+            color='primary'
+            variant='solid'
             type='button'
             onClick={() => void handleConfirm()}
             disabled={isLoading || selectableWeeks.length === 0}

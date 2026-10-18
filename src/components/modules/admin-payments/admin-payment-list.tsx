@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -16,7 +17,6 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Button,
   Table,
   TableBody,
   TableCell,
@@ -198,7 +198,12 @@ export function AdminPaymentList({
 
                         <TableCell className='text-right'>
                           {!readOnly ? (
-                            <Button size='sm' variant='outline' onClick={() => setSelectedIntent(intent)}>
+                            <Button
+                              color='primary'
+                              variant='outlined'
+                              size='small'
+                              onClick={() => setSelectedIntent(intent)}
+                            >
                               {intent.status === PaymentStatus.PENDING_MANUAL_REVIEW
                                 ? t('payments:admin.review')
                                 : t('payments:admin.view')}

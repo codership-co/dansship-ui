@@ -1,12 +1,13 @@
 import { addWeeks, format, startOfWeek, subWeeks } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuChevronLeft, LuChevronRight } from 'react-icons/lu';
 
+import { SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
 import { AdminClassRosterDialog, ClassSlotModal, CopyWeekDialog, ScheduleGrid } from '@components/modules';
-import { Button } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
 import {
   DANSSHIP_ERROR_CODE,
@@ -335,18 +336,19 @@ function AdminScheduleBuilderPage() {
   return (
     <div className='max-w-350 mx-auto py-8 px-4 pt-20'>
       <div className='flex justify-between items-end mb-8'>
-        <div>
-          <h1 className='text-3xl font-bold text-gray-900'>{t('schedules:builderTitle')}</h1>
-          <p className='text-gray-500 mt-2'>{t('schedules:builderSubtitle')}</p>
-        </div>
+        <SectionHeading
+          className='mb-0'
+          title={t('schedules:builderTitle')}
+          subtitle={t('schedules:builderSubtitle')}
+        />
         <div className='flex items-center space-x-4'>
-          <Button variant='outline' size='icon' onClick={() => setCurrentDate(subWeeks(currentDate, 1))}>
+          <Button color='primary' variant='outlined' forIcon onClick={() => setCurrentDate(subWeeks(currentDate, 1))}>
             <LuChevronLeft className='h-4 w-4' />
           </Button>
           <div className='text-lg font-medium w-48 text-center'>
             {t('schedules:weekOf')} {format(currentDate, 'MMM d, yyyy')}
           </div>
-          <Button variant='outline' size='icon' onClick={() => setCurrentDate(addWeeks(currentDate, 1))}>
+          <Button color='primary' variant='outlined' forIcon onClick={() => setCurrentDate(addWeeks(currentDate, 1))}>
             <LuChevronRight className='h-4 w-4' />
           </Button>
         </div>
@@ -377,18 +379,20 @@ function AdminScheduleBuilderPage() {
               <div className='flex items-center gap-2'>
                 <span className='text-xs font-medium text-gray-600'>{t('schedules:dayWidth')}</span>
                 <Button
+                  color='primary'
+                  variant='outlined'
+                  size='small'
                   type='button'
-                  variant='outline'
-                  size='sm'
                   onClick={() => setDayColumnMinWidth(prev => Math.max(150, prev - 20))}
                 >
                   -
                 </Button>
                 <span className='w-14 text-center text-xs text-gray-700'>{dayColumnMinWidth}px</span>
                 <Button
+                  color='primary'
+                  variant='outlined'
+                  size='small'
                   type='button'
-                  variant='outline'
-                  size='sm'
                   onClick={() => setDayColumnMinWidth(prev => Math.min(280, prev + 20))}
                 >
                   +
@@ -396,13 +400,13 @@ function AdminScheduleBuilderPage() {
               </div>
 
               {canEditDraftSchedule && (
-                <Button type='button' variant='outline' onClick={() => setIsCopyWeekOpen(true)}>
+                <Button color='primary' variant='outlined' type='button' onClick={() => setIsCopyWeekOpen(true)}>
                   {t('schedules:copyWeek.button')}
                 </Button>
               )}
 
               {weekStatus === 'draft' && canManageFullSchedule && (
-                <Button onClick={handlePublish} disabled={isPublishing}>
+                <Button color='primary' variant='solid' onClick={handlePublish} disabled={isPublishing}>
                   {t('schedules:publishSchedule')}
                 </Button>
               )}

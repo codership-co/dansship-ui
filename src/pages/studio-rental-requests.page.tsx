@@ -1,14 +1,14 @@
 import { format } from 'date-fns';
-import { ActionModal } from 'polpo/components';
+import { Button, ActionModal } from 'polpo/components';
 import { KeyboardEvent, MouseEvent, ReactNode, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
+import { SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { PaymentProofUpload } from '@components/modules/payments/payment-proof-upload';
 import { TransferPaymentInstructions } from '@components/modules/payments/transfer-payment-instructions';
-import { Button } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import {
   type CancelRequestPayload,
@@ -250,10 +250,7 @@ function StudioRentalRequestsPage() {
 
   return (
     <div className='mx-auto max-w-6xl space-y-6 px-4 py-8 pt-20'>
-      <div>
-        <h1 className='text-3xl font-bold text-primary'>{t('studioRental:myRequests.title')}</h1>
-        <p className='mt-2 text-muted-foreground'>{t('studioRental:myRequests.subtitle')}</p>
-      </div>
+      <SectionHeading title={t('studioRental:myRequests.title')} subtitle={t('studioRental:myRequests.subtitle')} />
 
       <div className='space-y-4 rounded-xl border bg-card p-4 shadow-sm'>
         {isLoading ? (
@@ -291,7 +288,12 @@ function StudioRentalRequestsPage() {
                         showPay || showCancel ? (
                           <>
                             {showPay ? (
-                              <Button size='sm' onClick={() => setPayingIntentId(payment.intentId)}>
+                              <Button
+                                color='primary'
+                                variant='solid'
+                                size='small'
+                                onClick={() => setPayingIntentId(payment.intentId)}
+                              >
                                 {t(
                                   series.status === 'on_hold'
                                     ? 'studioRental:myRequests.payBalance'
@@ -301,8 +303,9 @@ function StudioRentalRequestsPage() {
                             ) : null}
                             {showCancel ? (
                               <Button
-                                variant='outline'
-                                size='sm'
+                                color='primary'
+                                variant='outlined'
+                                size='small'
                                 disabled={isCanceling}
                                 onClick={() => void handleCancelSeries(series.id)}
                               >
@@ -345,7 +348,12 @@ function StudioRentalRequestsPage() {
                         showPay || showCancel ? (
                           <>
                             {showPay ? (
-                              <Button size='sm' onClick={() => setPayingIntentId(payment.intentId)}>
+                              <Button
+                                color='primary'
+                                variant='solid'
+                                size='small'
+                                onClick={() => setPayingIntentId(payment.intentId)}
+                              >
                                 {t(
                                   request.status === 'on_hold'
                                     ? 'studioRental:myRequests.payBalance'
@@ -355,8 +363,9 @@ function StudioRentalRequestsPage() {
                             ) : null}
                             {showCancel ? (
                               <Button
-                                variant='outline'
-                                size='sm'
+                                color='primary'
+                                variant='outlined'
+                                size='small'
                                 disabled={isCanceling}
                                 onClick={() => void handleCancelRequest(request.id)}
                               >

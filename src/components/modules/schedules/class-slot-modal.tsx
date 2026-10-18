@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { addMinutes, format, parseISO, isValid } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useEffect, useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +13,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  Button,
   Input,
   Label,
   Select,
@@ -508,8 +508,9 @@ export function ClassSlotModal({
           <div className='flex shrink-0 items-center justify-between border-t pt-4 mt-4'>
             {initialData && !isReadOnlyCancelled && (!isPublishedEdit || canCancelPublishedClass) ? (
               <Button
+                color='alert'
+                variant='solid'
                 type='button'
-                variant='destructive'
                 onClick={() => setIsDeleteConfirmOpen(true)}
                 disabled={isBusy}
               >
@@ -520,11 +521,11 @@ export function ClassSlotModal({
             )}
 
             <div className='flex justify-end gap-2'>
-              <Button type='button' variant='outline' onClick={onClose} disabled={isBusy}>
+              <Button color='primary' variant='outlined' type='button' onClick={onClose} disabled={isBusy}>
                 {t('common:cancel')}
               </Button>
               {!isReadOnlyCancelled && canSave && (
-                <Button type='submit' disabled={isBusy}>
+                <Button color='primary' variant='solid' type='submit' disabled={isBusy}>
                   {isLoading ? t('common:saving') : t('schedules:saveClass')}
                 </Button>
               )}
@@ -554,14 +555,21 @@ export function ClassSlotModal({
               </div>
               <div className='flex justify-end gap-2 pt-2'>
                 <Button
+                  color='primary'
+                  variant='outlined'
                   type='button'
-                  variant='outline'
                   onClick={() => setIsDeleteConfirmOpen(false)}
                   disabled={isDeleting}
                 >
                   {t('common:keep')}
                 </Button>
-                <Button type='button' variant='destructive' onClick={() => void handleDelete()} disabled={isDeleting}>
+                <Button
+                  color='alert'
+                  variant='solid'
+                  type='button'
+                  onClick={() => void handleDelete()}
+                  disabled={isDeleting}
+                >
                   {isDeleting ? t('common:deleting') : t('schedules:cancelClassBtn')}
                 </Button>
               </div>

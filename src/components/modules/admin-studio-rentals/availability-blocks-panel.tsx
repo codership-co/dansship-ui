@@ -1,9 +1,10 @@
+import { Button } from 'polpo/components';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
-import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
+import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
 import { DansshipAPI, DayOfWeek, type RoomAvailabilityBlockCreatePayload } from '@core/api';
 import { useCallablePromise, usePromise } from '@hooks';
 
@@ -122,7 +123,13 @@ export function AvailabilityBlocksPanel() {
           <Input value={notes} onChange={event => setNotes(event.target.value)} />
         </div>
         <div className='flex items-end'>
-          <Button type='button' disabled={!roomId || isCreating} onClick={() => void createBlock()}>
+          <Button
+            color='primary'
+            variant='solid'
+            type='button'
+            disabled={!roomId || isCreating}
+            onClick={() => void createBlock()}
+          >
             {t('studioRental:admin.blocks.add')}
           </Button>
         </div>
@@ -154,9 +161,10 @@ export function AvailabilityBlocksPanel() {
                 </p>
               </div>
               <Button
+                color='primary'
+                variant='outlined'
+                size='small'
                 type='button'
-                size='sm'
-                variant='outline'
                 disabled={isDeleting}
                 onClick={() => void deleteBlock(block.id)}
               >

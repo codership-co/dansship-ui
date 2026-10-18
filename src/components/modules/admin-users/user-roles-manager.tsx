@@ -1,9 +1,10 @@
+import { Button } from 'polpo/components';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
-import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
 import { useOrPermissions } from '@contexts';
 import { DansshipAPI, type RbacRole } from '@core/api';
 import { AdminPermissions } from '@core/permissions';
@@ -156,7 +157,13 @@ export function UserRolesManager({ userId, onChanged }: UserRolesManagerProps) {
                 </SelectContent>
               </Select>
             </div>
-            <Button type='button' disabled={!selectedRoleId || isBusy} onClick={() => void handleAssign()}>
+            <Button
+              color='primary'
+              variant='solid'
+              type='button'
+              disabled={!selectedRoleId || isBusy}
+              onClick={() => void handleAssign()}
+            >
               {t('admin:users.details.roles.assign')}
             </Button>
           </div>

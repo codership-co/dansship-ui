@@ -1,9 +1,9 @@
 import { cva } from 'class-variance-authority';
+import { Button } from 'polpo/components';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuSearch, LuSlidersHorizontal, LuX } from 'react-icons/lu';
 
-import { Button } from '@components/ui';
 import { BrowseFigureFilters } from '@hooks';
 
 const DIFFICULTIES: Array<{ value: BrowseFigureFilters['difficulty']; labelKey: string }> = [
@@ -108,7 +108,12 @@ export const FigureCatalogMobileFilters = ({ filters, setFilters }: FigureCatalo
           />
         </div>
 
-        <Button variant='secondary' className='h-11 min-w-30' onClick={() => setIsPanelOpen(previous => !previous)}>
+        <Button
+          color='secondary'
+          variant='solid'
+          className='h-11 min-w-30'
+          onClick={() => setIsPanelOpen(previous => !previous)}
+        >
           <LuSlidersHorizontal className='h-4 w-4' />
           {t('browse:filters.more', { defaultValue: 'Filters' })}
         </Button>
@@ -128,8 +133,9 @@ export const FigureCatalogMobileFilters = ({ filters, setFilters }: FigureCatalo
             </button>
           ))}
           <Button
-            size='sm'
-            variant='ghost'
+            color='primary'
+            variant='text'
+            size='small'
             onClick={() =>
               setFilters({
                 difficulty: undefined,

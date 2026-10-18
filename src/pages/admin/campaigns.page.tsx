@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
+import { SectionHeading } from '@components/containers';
 import { CampaignsPanel } from '@components/modules';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { PageURLS } from '@core/constants';
@@ -10,10 +11,7 @@ function AdminCampaignsPage() {
 
   return (
     <div className='mx-auto max-w-7xl px-4 py-8 pt-20'>
-      <div className='mb-8'>
-        <h1 className='text-3xl font-bold text-gray-900'>{t('campaigns:admin.title')}</h1>
-        <p className='mt-2 text-gray-500'>{t('campaigns:admin.subtitle')}</p>
-      </div>
+      <SectionHeading title={t('campaigns:admin.title')} subtitle={t('campaigns:admin.subtitle')} />
       <div className='bg-white p-6 rounded-lg shadow-sm border border-gray-100'>
         <CampaignsPanel />
       </div>

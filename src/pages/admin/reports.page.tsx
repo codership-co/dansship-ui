@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { SectionHeading } from '@components/containers';
 import {
   ClassFeedbackTable,
   FinancialReports,
@@ -67,10 +68,7 @@ function AdminReportsPage() {
 
   return (
     <div className='max-w-7xl mx-auto py-8 px-4 pt-20'>
-      <div className='mb-8'>
-        <h1 className='text-3xl font-bold text-gray-900'>{t('admin:reports.title')}</h1>
-        <p className='text-gray-500 mt-2'>{t('admin:reports.subtitle')}</p>
-      </div>
+      <SectionHeading title={t('admin:reports.title')} subtitle={t('admin:reports.subtitle')} />
 
       <Tabs value={activeTab} onValueChange={setTab} className='w-full'>
         <TabsList className='mb-4 bg-white border border-gray-200 shadow-sm flex-wrap h-auto gap-1 p-1'>

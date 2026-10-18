@@ -1,4 +1,5 @@
 import { format, parseISO } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -7,7 +8,7 @@ import { toast } from 'sonner';
 import { OptionalFileUpload } from '@components/forms';
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
-import { Button, Label, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Textarea } from '@components/ui';
+import { Label, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Textarea } from '@components/ui';
 import {
   DANSSHIP_ERROR_CODE,
   DansshipAPI,
@@ -199,24 +200,27 @@ export function UserPaymentDocumentsTab({
         <h3 className='text-sm font-semibold'>{t('admin:users.details.paymentDocuments.filesTitle')}</h3>
         <div className='flex flex-wrap gap-2'>
           <Button
+            color='primary'
+            variant='outlined'
             type='button'
-            variant='outline'
             disabled={!profile?.has_rut || isOpeningFile}
             onClick={() => void handleOpenFile('rut')}
           >
             {t('admin:users.details.paymentDocuments.viewRut')}
           </Button>
           <Button
+            color='primary'
+            variant='outlined'
             type='button'
-            variant='outline'
             disabled={!profile?.has_bank_certificate || isOpeningFile}
             onClick={() => void handleOpenFile('bank-certificate')}
           >
             {t('admin:users.details.paymentDocuments.viewBankCertificate')}
           </Button>
           <Button
+            color='primary'
+            variant='outlined'
             type='button'
-            variant='outline'
             disabled={!profile?.has_signature || isOpeningFile}
             onClick={() => void handleOpenFile('signature')}
           >
@@ -224,8 +228,9 @@ export function UserPaymentDocumentsTab({
           </Button>
           {profile?.payment_type === 'fixed_amount' || profile?.has_social_security ? (
             <Button
+              color='primary'
+              variant='outlined'
               type='button'
-              variant='outline'
               disabled={!profile?.has_social_security || isOpeningFile}
               onClick={() => void handleOpenFile('social-security')}
             >
@@ -270,8 +275,9 @@ export function UserPaymentDocumentsTab({
           </div>
           <div className='flex justify-end gap-2'>
             <Button
+              color='primary'
+              variant='outlined'
               type='button'
-              variant='outline'
               onClick={() => {
                 setVoidTarget(null);
                 setVoidReason('');
@@ -280,8 +286,9 @@ export function UserPaymentDocumentsTab({
               {t('common:cancel')}
             </Button>
             <Button
+              color='alert'
+              variant='solid'
               type='button'
-              variant='destructive'
               disabled={!voidReason.trim()}
               onClick={() => setConfirmOpen(true)}
             >
@@ -309,8 +316,9 @@ export function UserPaymentDocumentsTab({
           />
           <div className='flex justify-end gap-2'>
             <Button
+              color='primary'
+              variant='outlined'
               type='button'
-              variant='outline'
               onClick={() => {
                 setPayTarget(null);
                 setReceiptFile(null);
@@ -318,7 +326,13 @@ export function UserPaymentDocumentsTab({
             >
               {t('common:cancel')}
             </Button>
-            <Button type='button' disabled={!receiptFile || isPaying} onClick={() => void handlePay()}>
+            <Button
+              color='primary'
+              variant='solid'
+              type='button'
+              disabled={!receiptFile || isPaying}
+              onClick={() => void handlePay()}
+            >
               {t('admin:users.details.paymentDocuments.pay')}
             </Button>
           </div>
@@ -382,9 +396,10 @@ export function UserPaymentDocumentsTab({
                     <TableCell>
                       <div className='flex justify-end gap-2'>
                         <Button
+                          color='primary'
+                          variant='outlined'
+                          size='small'
                           type='button'
-                          variant='outline'
-                          size='sm'
                           disabled={isOpeningDocument}
                           onClick={() => void handleOpenDocument(document.id)}
                         >
@@ -392,9 +407,10 @@ export function UserPaymentDocumentsTab({
                         </Button>
                         {document.payment_receipt_file_key ? (
                           <Button
+                            color='primary'
+                            variant='outlined'
+                            size='small'
                             type='button'
-                            variant='outline'
-                            size='sm'
                             disabled={isOpeningReceipt}
                             onClick={() => void handleOpenReceipt(document.id)}
                           >
@@ -402,12 +418,24 @@ export function UserPaymentDocumentsTab({
                           </Button>
                         ) : null}
                         {canPayThis ? (
-                          <Button type='button' size='sm' onClick={() => setPayTarget(document)}>
+                          <Button
+                            color='primary'
+                            variant='solid'
+                            size='small'
+                            type='button'
+                            onClick={() => setPayTarget(document)}
+                          >
                             {t('admin:users.details.paymentDocuments.pay')}
                           </Button>
                         ) : null}
                         {canVoidThis ? (
-                          <Button type='button' variant='destructive' size='sm' onClick={() => setVoidTarget(document)}>
+                          <Button
+                            color='alert'
+                            variant='solid'
+                            size='small'
+                            type='button'
+                            onClick={() => setVoidTarget(document)}
+                          >
                             {t('admin:users.details.paymentDocuments.void')}
                           </Button>
                         ) : null}

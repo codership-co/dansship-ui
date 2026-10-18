@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuChevronLeft } from 'react-icons/lu';
@@ -6,7 +7,6 @@ import { Link, useParams } from 'react-router';
 import { Section, SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { StudentProfile } from '@components/modules';
-import { Button } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -39,12 +39,12 @@ function InstructorStudentProfilePage() {
   return (
     <main className='min-h-dvh grid content-start'>
       <Section navbarPadding verticalPadding>
-        <Button asChild variant='ghost' className='mb-4 w-fit px-0 hover:bg-transparent'>
-          <Link to={PageURLS.instructor.root} viewTransition>
+        <Link to={PageURLS.instructor.root} viewTransition>
+          <Button color='primary' variant='text' className='mb-4'>
             <LuChevronLeft className='h-4 w-4' />
             {t('instructor:studentProfile.backToSchedule')}
-          </Link>
-        </Button>
+          </Button>
+        </Link>
         <SectionHeading
           title={profile?.full_name || t('instructor:studentProfile.title')}
           subtitle={t('instructor:studentProfile.subtitle')}

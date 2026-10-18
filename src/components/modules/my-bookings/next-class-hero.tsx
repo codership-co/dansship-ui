@@ -1,7 +1,8 @@
 import { format } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 
-import { Button, ProfilePicture } from '@components/ui';
+import { ProfilePicture } from '@components/ui';
 import { canCancelBooking, getBookingCountdown, resolvePlanDisplayName } from '@helpers';
 import { useDateLocale } from '@hooks';
 
@@ -139,9 +140,10 @@ export function NextClassHero({ booking, isCancelDisabled, onCancel }: NextClass
 
           {showCancel ? (
             <Button
+              color='primary'
+              variant='outlined'
+              size='large'
               type='button'
-              variant='outline'
-              size='lg'
               disabled={isCancelDisabled}
               className='h-11 max-w-full border-white/80 bg-transparent text-white hover:bg-white/10 hover:text-white'
               onClick={() => onCancel(booking)}

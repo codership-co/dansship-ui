@@ -6,7 +6,7 @@ import { LuChevronLeft, LuChevronRight, LuSearch } from 'react-icons/lu';
 import { Link } from 'react-router';
 
 import { SpinnerLoader } from '@components/loaders';
-import { Button as ActionButton, Checkbox, Input, Label } from '@components/ui';
+import { Checkbox, Input, Label } from '@components/ui';
 import { useOrPermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -91,9 +91,11 @@ export function UserList() {
 
         <div className='flex flex-wrap items-center gap-3'>
           {canRegister ? (
-            <ActionButton asChild>
-              <Link to={PageURLS.admin.userCreate}>{t('admin:users.create')}</Link>
-            </ActionButton>
+            <Link to={PageURLS.admin.userCreate}>
+              <Button color='primary' variant='solid'>
+                {t('admin:users.create')}
+              </Button>
+            </Link>
           ) : null}
           <p className='text-sm text-muted-foreground'>{t('admin:users.total', { count: total })}</p>
         </div>

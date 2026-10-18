@@ -1,11 +1,12 @@
 import { format, parseISO } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
-import { Button, Input, Label } from '@components/ui';
+import { Input, Label } from '@components/ui';
 import { DansshipAPI } from '@core/api';
 import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
 
@@ -96,7 +97,7 @@ export function DoorCodePanel() {
         </div>
 
         <div className='flex justify-end'>
-          <Button type='submit' disabled={!canSubmit || isSubmitting}>
+          <Button color='primary' variant='solid' type='submit' disabled={!canSubmit || isSubmitting}>
             {t('admin:doorCode.submit')}
           </Button>
         </div>

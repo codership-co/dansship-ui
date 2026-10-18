@@ -1,10 +1,11 @@
 import { format } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import { HistoryBookingCard } from './history-booking-card';
 
-import { Badge, Button } from '@components/ui';
+import { Badge } from '@components/ui';
 import { PageURLS } from '@core/constants';
 import { cn, rentalStatusI18nKey, reservationDisplayTitle, type ReservationItem } from '@helpers';
 import { useDateLocale } from '@hooks';
@@ -85,18 +86,20 @@ export function HistoryReservationCard({ item, alreadyRated, onRateClass }: Hist
           {item.kind === 'event' ? (
             <>
               <Button
+                color='primary'
+                variant='outlined'
+                size='small'
                 type='button'
-                variant='outlinePrimary'
-                size='sm'
                 onClick={() => navigate(PageURLS.eventoLanding(item.registration.event_slug))}
               >
                 {t('bookings:viewEvent')}
               </Button>
               {intentId && item.registration.status !== 'confirmed' ? (
                 <Button
+                  color='primary'
+                  variant='outlined'
+                  size='small'
                   type='button'
-                  variant='outlinePrimary'
-                  size='sm'
                   onClick={() => navigate(`${PageURLS.paymentsResult}?intentId=${intentId}`)}
                 >
                   {t('bookings:viewPayment')}
@@ -105,9 +108,10 @@ export function HistoryReservationCard({ item, alreadyRated, onRateClass }: Hist
             </>
           ) : (
             <Button
+              color='primary'
+              variant='outlined'
+              size='small'
               type='button'
-              variant='outlinePrimary'
-              size='sm'
               onClick={() =>
                 navigate(
                   intentId ? `${PageURLS.studioRentalResult}?intentId=${intentId}` : PageURLS.studioRentalRequests,

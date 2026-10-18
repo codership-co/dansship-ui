@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
@@ -5,9 +6,10 @@ import { toast } from 'sonner';
 
 import { PriceTiersEditor } from './price-tiers-editor';
 
+import { SectionHeading } from '@components/containers';
 import { OptionalFileUpload } from '@components/forms/optional-file-upload';
 import { SpinnerLoader } from '@components/loaders';
-import { Button, Card, CardContent, CardHeader, CardTitle, Checkbox, Switch, Badge } from '@components/ui';
+import { Card, CardContent, CardHeader, CardTitle, Checkbox, Switch, Badge } from '@components/ui';
 import {
   DANSSHIP_ERROR_CODE,
   DansshipAPI,
@@ -137,9 +139,10 @@ export function ComboEditForm({ combo }: ComboEditFormProps) {
             {t('eventos:admin.backToList')}
           </Link>
           <div className='flex flex-wrap items-center gap-2.5'>
-            <h1 className='m-0 text-2xl font-bold text-foreground'>
-              {combo ? t('eventos:admin.editCombo') : t('eventos:admin.newCombo')}
-            </h1>
+            <SectionHeading
+              className='mb-0'
+              title={combo ? t('eventos:admin.editCombo') : t('eventos:admin.newCombo')}
+            />
             <Badge variant={status === 'published' ? 'default' : 'outline'}>
               {status === 'published' ? t('eventos:admin.published') : t('eventos:admin.draft')}
             </Badge>
@@ -158,13 +161,13 @@ export function ComboEditForm({ combo }: ComboEditFormProps) {
             />
           </label>
           {combo ? (
-            <Button asChild variant='outline'>
-              <Link to={`${PageURLS.eventoLanding(combo.slug)}?preview=1`} target='_blank' rel='noreferrer'>
+            <Link to={`${PageURLS.eventoLanding(combo.slug)}?preview=1`} target='_blank' rel='noreferrer'>
+              <Button color='primary' variant='outlined'>
                 {t('eventos:admin.preview')}
-              </Link>
-            </Button>
+              </Button>
+            </Link>
           ) : null}
-          <Button type='submit' disabled={saving}>
+          <Button color='primary' variant='solid' type='submit' disabled={saving}>
             {saving ? t('eventos:admin.saving') : t('eventos:admin.saveCombo')}
           </Button>
         </div>

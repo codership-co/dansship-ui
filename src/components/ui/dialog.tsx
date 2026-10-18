@@ -1,8 +1,8 @@
+import { Button } from 'polpo/components';
 import { Dialog as DialogPrimitive } from 'radix-ui';
 import React from 'react';
 import { LuX } from 'react-icons/lu';
 
-import { Button } from '@components/ui/button';
 import { cn } from '@helpers';
 
 function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
@@ -97,7 +97,9 @@ function DialogFooter({
       {children}
       {showCloseButton && (
         <DialogPrimitive.Close asChild>
-          <Button variant='outline'>Close</Button>
+          <Button color='primary' variant='outlined'>
+            Close
+          </Button>
         </DialogPrimitive.Close>
       )}
     </div>

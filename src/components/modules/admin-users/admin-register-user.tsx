@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -6,7 +7,7 @@ import { toHealthPayload, toPreferencesPayload, toProfilePayload } from './admin
 import { TemporaryPasswordPanel } from './temporary-password-panel';
 
 import { BasicProfileForm, HealthProfileForm, PreferencesProfileForm } from '@components/forms';
-import { Button, Input, Label } from '@components/ui';
+import { Input, Label } from '@components/ui';
 import { useOrPermissions } from '@contexts';
 import { DansshipAPI, DansshipAPIError } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -136,13 +137,17 @@ export function AdminRegisterUser() {
         )}
         <div className='flex flex-wrap gap-2'>
           {canBuyPlan ? (
-            <Button asChild>
-              <Link to={PageURLS.admin.userPlanPurchase(created.user_id)}>{t('admin:users.registration.buyPlan')}</Link>
-            </Button>
+            <Link to={PageURLS.admin.userPlanPurchase(created.user_id)}>
+              <Button color='primary' variant='solid'>
+                {t('admin:users.registration.buyPlan')}
+              </Button>
+            </Link>
           ) : null}
-          <Button asChild variant='outline'>
-            <Link to={PageURLS.admin.userDetails(created.user_id)}>{t('admin:users.viewUser')}</Link>
-          </Button>
+          <Link to={PageURLS.admin.userDetails(created.user_id)}>
+            <Button color='primary' variant='outlined'>
+              {t('admin:users.viewUser')}
+            </Button>
+          </Link>
         </div>
       </section>
     );
@@ -173,12 +178,14 @@ export function AdminRegisterUser() {
         </div>
         {notice ? <p className='text-sm'>{notice}</p> : null}
         {existingUserId ? (
-          <Button asChild variant='outline' className='w-fit'>
-            <Link to={PageURLS.admin.userDetails(existingUserId)}>{t('admin:users.viewUser')}</Link>
-          </Button>
+          <Link to={PageURLS.admin.userDetails(existingUserId)}>
+            <Button color='primary' variant='outlined'>
+              {t('admin:users.viewUser')}
+            </Button>
+          </Link>
         ) : null}
         {error ? <p className='text-sm text-alert-600'>{error}</p> : null}
-        <Button type='submit' disabled={isLoading} className='w-fit'>
+        <Button color='primary' variant='solid' type='submit' disabled={isLoading}>
           {t('admin:users.registration.continue')}
         </Button>
       </form>

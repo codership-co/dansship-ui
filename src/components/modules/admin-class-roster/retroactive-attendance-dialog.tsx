@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuSearch, LuTriangleAlert } from 'react-icons/lu';
@@ -5,7 +6,6 @@ import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -229,10 +229,22 @@ export function RetroactiveAttendanceDialog({
         </div>
 
         <DialogFooter>
-          <Button type='button' variant='outline' onClick={() => onOpenChange(false)} disabled={isSubmitting}>
+          <Button
+            color='primary'
+            variant='outlined'
+            type='button'
+            onClick={() => onOpenChange(false)}
+            disabled={isSubmitting}
+          >
             {t('common:cancel')}
           </Button>
-          <Button type='button' onClick={() => void handleConfirm()} disabled={isSubmitting || !selectedUserId}>
+          <Button
+            color='primary'
+            variant='solid'
+            type='button'
+            onClick={() => void handleConfirm()}
+            disabled={isSubmitting || !selectedUserId}
+          >
             {isSubmitting ? t('admin:roster.submitting') : t('admin:roster.confirm')}
           </Button>
         </DialogFooter>

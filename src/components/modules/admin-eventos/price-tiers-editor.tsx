@@ -1,6 +1,7 @@
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 
-import { Button, Input, Label } from '@components/ui';
+import { Input, Label } from '@components/ui';
 import { type PriceConditionCatalogItem, type EventPriceTierInput } from '@core/api';
 
 const FALLBACK_CONDITIONS: Array<PriceConditionCatalogItem> = [
@@ -102,8 +103,9 @@ export function PriceTiersEditor({
               />
             </div>
             <Button
+              color='primary'
+              variant='outlined'
               type='button'
-              variant='outline'
               disabled={locked}
               onClick={() => onChange(tiers.filter((_, current) => current !== index))}
             >
@@ -124,8 +126,9 @@ export function PriceTiersEditor({
         />
       </div>
       <Button
+        color='primary'
+        variant='outlined'
         type='button'
-        variant='outline'
         disabled={locked}
         onClick={() =>
           onChange([

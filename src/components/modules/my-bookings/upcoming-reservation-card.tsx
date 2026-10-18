@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -7,7 +8,6 @@ import { EventSessionLines } from './event-session-lines';
 import { UpcomingBookingCard } from './upcoming-booking-card';
 
 import { CheckoutPaymentProofForm } from '@components/forms/checkout-payment-proof-form';
-import { Button } from '@components/ui';
 import { DansshipAPI, PaymentMethod, type MyBooking } from '@core/api';
 import { PageURLS } from '@core/constants';
 import {
@@ -118,9 +118,10 @@ export function UpcomingReservationCard({ item, isCancelDisabled, onCancelClass 
                 </span>
                 {installment.status === 'pending' || installment.status === 'overdue' ? (
                   <Button
+                    color='primary'
+                    variant='outlined'
+                    size='small'
                     type='button'
-                    variant='outlinePrimary'
-                    size='sm'
                     onClick={() => setPayingSequence(installment.sequence)}
                   >
                     {t('bookings:payInstallment')}
@@ -159,9 +160,10 @@ export function UpcomingReservationCard({ item, isCancelDisabled, onCancelClass 
           {item.kind === 'event' ? (
             <div className='flex flex-wrap gap-2'>
               <Button
+                color='primary'
+                variant='outlined'
+                size='small'
                 type='button'
-                variant='outlinePrimary'
-                size='sm'
                 onClick={() => navigate(PageURLS.eventoLanding(item.registration.event_slug))}
               >
                 {t('bookings:viewEvent')}
@@ -170,9 +172,10 @@ export function UpcomingReservationCard({ item, isCancelDisabled, onCancelClass 
               item.registration.status !== 'confirmed' &&
               !item.registration.installments?.length ? (
                 <Button
+                  color='primary'
+                  variant='outlined'
+                  size='small'
                   type='button'
-                  variant='outlinePrimary'
-                  size='sm'
                   onClick={() => navigate(`${PageURLS.paymentsResult}?intentId=${item.registration.payment_intent_id}`)}
                 >
                   {t('bookings:viewPayment')}
@@ -181,9 +184,10 @@ export function UpcomingReservationCard({ item, isCancelDisabled, onCancelClass 
             </div>
           ) : (
             <Button
+              color='primary'
+              variant='outlined'
+              size='small'
               type='button'
-              variant='outlinePrimary'
-              size='sm'
               onClick={() => {
                 const intentId =
                   item.kind === 'rental' ? item.request.payment_intent_id : item.series.payment_intent_id;

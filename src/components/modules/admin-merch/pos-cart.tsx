@@ -1,7 +1,8 @@
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { LuTrash2 } from 'react-icons/lu';
 
-import { Button, Input } from '@components/ui';
+import { Input } from '@components/ui';
 import { type CartItem } from '@core/api';
 import { formatMerchPrice } from '@helpers';
 
@@ -31,7 +32,13 @@ export function POSCart({ cart, cartTotal, onRemove, onUpdateQuantity }: POSCart
                   <p className='text-xs text-gray-500'>{formatMerchPrice(item.product.price)}</p>
                 </div>
 
-                <Button variant='ghost' size='sm' className='h-8 w-8 p-0' onClick={() => onRemove(item.product.id)}>
+                <Button
+                  color='primary'
+                  variant='text'
+                  size='small'
+                  className='h-8 w-8 p-0'
+                  onClick={() => onRemove(item.product.id)}
+                >
                   <LuTrash2 className='h-4 w-4' />
                 </Button>
               </div>

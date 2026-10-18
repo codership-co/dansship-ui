@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -7,7 +8,6 @@ import { ProductForm } from './product-form';
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
 import {
-  Button,
   Select,
   SelectContent,
   SelectItem,
@@ -172,7 +172,9 @@ export function ProductList() {
     <div className='space-y-4'>
       <div className='flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between'>
         <h2 className='text-xl font-semibold'>{t('merch:productsTitle')}</h2>
-        <Button onClick={openCreateModal}>{t('merch:addProduct')}</Button>
+        <Button color='primary' variant='solid' onClick={openCreateModal}>
+          {t('merch:addProduct')}
+        </Button>
       </div>
 
       <div className='grid grid-cols-1 gap-3 sm:grid-cols-2'>
@@ -261,12 +263,13 @@ export function ProductList() {
                   </TableCell>
                   <TableCell>
                     <div className='flex justify-end gap-2'>
-                      <Button variant='outline' size='sm' onClick={() => openEditModal(product)}>
+                      <Button color='primary' variant='outlined' size='small' onClick={() => openEditModal(product)}>
                         {t('common:edit')}
                       </Button>
                       <Button
-                        size='sm'
-                        variant={product.is_active ? 'destructive' : 'default'}
+                        color={product.is_active ? 'alert' : 'primary'}
+                        variant='solid'
+                        size='small'
                         onClick={() => setProductToToggle(product)}
                       >
                         {product.is_active ? t('common:deactivate') : t('common:reactivate')}

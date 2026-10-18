@@ -1,9 +1,9 @@
+import { Button } from 'polpo/components';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
 import { Section, SectionHeading } from '@components/containers';
-import { Button } from '@components/ui/button';
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui/card';
 import { useAuth, useOrPermissions } from '@contexts';
 import { buildAgendaConflicts, DansshipAPI } from '@core/api';
@@ -139,8 +139,9 @@ export const HomeAdminDashboard = () => {
         <div className='mt-4 flex flex-col gap-2 rounded-md bg-error-container px-4 py-3 text-sm text-destructive md:flex-row md:items-center md:justify-between'>
           <span>{t('home:admin.error')}</span>
           <Button
-            size='sm'
-            variant='outline'
+            color='primary'
+            variant='outlined'
+            size='small'
             onClick={() => {
               if (canManageStudioRental) void adminListRefetch();
 
@@ -166,7 +167,7 @@ export const HomeAdminDashboard = () => {
             <Link
               key={card.id}
               to={card.to}
-              className='rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ringprimary focus-visible:ring-offset-2'
+              className='rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2'
             >
               <Card className='border-secondary/50 bg-surface-container-low shadow-sm transition-colors duration-200 hover:bg-surface-container'>
                 <CardHeader>

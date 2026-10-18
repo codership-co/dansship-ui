@@ -1,10 +1,11 @@
+import { Button } from 'polpo/components';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
+import { SectionHeading } from '@components/containers';
 import { ConfirmDialog } from '@components/modals';
 import {
-  Button,
   Checkbox,
   Dialog,
   DialogContent,
@@ -252,16 +253,12 @@ function AdminFiguresPage() {
 
   return (
     <div className='mx-auto max-w-7xl px-4 py-8 pt-20'>
-      <div className='mb-8'>
-        <h1 className='text-3xl font-bold text-gray-900'>
-          {t('figures.admin.title', { defaultValue: 'Figure Management' })}
-        </h1>
-        <p className='mt-2 text-gray-500'>
-          {t('figures.admin.subtitle', {
-            defaultValue: 'Import draft figures in bulk or manage each figure before approval.',
-          })}
-        </p>
-      </div>
+      <SectionHeading
+        title={t('figures.admin.title', { defaultValue: 'Figure Management' })}
+        subtitle={t('figures.admin.subtitle', {
+          defaultValue: 'Import draft figures in bulk or manage each figure before approval.',
+        })}
+      />
 
       <Tabs
         value={activeTab}
@@ -304,7 +301,9 @@ function AdminFiguresPage() {
               </Select>
             </div>
 
-            <Button onClick={openCreate}>{t('figures.admin.actions.create', { defaultValue: 'New Figure' })}</Button>
+            <Button color='primary' variant='solid' onClick={openCreate}>
+              {t('figures.admin.actions.create', { defaultValue: 'New Figure' })}
+            </Button>
           </div>
 
           <div className='mb-3 text-sm text-gray-600'>
@@ -356,13 +355,14 @@ function AdminFiguresPage() {
                       <TableCell>{figure.ipsf_code ?? '-'}</TableCell>
                       <TableCell>
                         <div className='flex justify-end gap-2'>
-                          <Button variant='outline' size='sm' onClick={() => openEdit(figure)}>
+                          <Button color='primary' variant='outlined' size='small' onClick={() => openEdit(figure)}>
                             {t('common.edit', { defaultValue: 'Edit' })}
                           </Button>
                           {figure.status === 'draft' ? (
                             <Button
-                              size='sm'
-                              variant='secondary'
+                              color='secondary'
+                              variant='solid'
+                              size='small'
                               onClick={() => handleApprove(figure)}
                               disabled={isApproving}
                             >
@@ -370,8 +370,9 @@ function AdminFiguresPage() {
                             </Button>
                           ) : null}
                           <Button
-                            size='sm'
-                            variant='destructive'
+                            color='alert'
+                            variant='solid'
+                            size='small'
                             onClick={() => handleDelete(figure)}
                             disabled={isDeleting}
                           >
@@ -403,7 +404,7 @@ function AdminFiguresPage() {
               />
             </div>
 
-            <Button onClick={handleImport} disabled={!csvFile || isImporting}>
+            <Button color='primary' variant='solid' onClick={handleImport} disabled={!csvFile || isImporting}>
               {isImporting
                 ? t('figures.admin.bulk.importing', { defaultValue: 'Importing...' })
                 : t('figures.admin.bulk.importAction', { defaultValue: 'Import CSV' })}
@@ -618,9 +619,10 @@ function AdminFiguresPage() {
                             className='h-28 w-full rounded object-cover'
                           />
                           <Button
+                            color='alert'
+                            variant='solid'
+                            size='small'
                             type='button'
-                            size='sm'
-                            variant='destructive'
                             className='w-full'
                             disabled={isRemovingImage}
                             onClick={() => {
@@ -714,7 +716,8 @@ function AdminFiguresPage() {
           <div className='border-t px-6 py-4'>
             <div className='flex justify-end gap-2'>
               <Button
-                variant='outline'
+                color='primary'
+                variant='outlined'
                 onClick={() => {
                   setFormOpen(false);
                   resetForm();
@@ -722,7 +725,12 @@ function AdminFiguresPage() {
               >
                 {t('common.cancel', { defaultValue: 'Cancel' })}
               </Button>
-              <Button onClick={handleSubmit} disabled={isSubmitting || !formState.name.trim()}>
+              <Button
+                color='primary'
+                variant='solid'
+                onClick={handleSubmit}
+                disabled={isSubmitting || !formState.name.trim()}
+              >
                 {editingFigure
                   ? t('common.save', { defaultValue: 'Save' })
                   : t('common.create', { defaultValue: 'Create' })}

@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -9,7 +10,7 @@ import { AdminPaymentPricingBreakdown } from './admin-payment-pricing-breakdown'
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
 import { PaymentStatusBadge } from '@components/modules';
-import { Badge, Dialog, DialogContent, DialogHeader, DialogTitle, Button, Textarea } from '@components/ui';
+import { Badge, Dialog, DialogContent, DialogHeader, DialogTitle, Textarea } from '@components/ui';
 import { PaymentIntent, PaymentIntentDetail, AdminPaymentReviewPayload, DansshipAPI, PaymentStatus } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { paymentPurchaseLabel, purchaseTypeLabel, purchaseTypeLabelKey } from '@helpers';
@@ -270,23 +271,25 @@ export function AdminPaymentReviewModal({
               <div className='flex flex-wrap justify-end gap-2 pt-2'>
                 {canReview ? (
                   <>
-                    <Button variant='outline' onClick={() => onOpenChange(false)} disabled={busy}>
+                    <Button color='primary' variant='outlined' onClick={() => onOpenChange(false)} disabled={busy}>
                       {t('common:cancel')}
                     </Button>
                     {canSyncBold ? (
-                      <Button variant='outline' onClick={() => void handleSyncBold()} disabled={busy}>
+                      <Button color='primary' variant='outlined' onClick={() => void handleSyncBold()} disabled={busy}>
                         {isSyncingBold ? t('common:saving') : t('payments:admin.syncBold')}
                       </Button>
                     ) : null}
-                    <Button variant='destructive' onClick={() => setIsRejectConfirmOpen(true)} disabled={busy}>
+                    <Button color='alert' variant='solid' onClick={() => setIsRejectConfirmOpen(true)} disabled={busy}>
                       {t('payments:admin.reject')}
                     </Button>
-                    <Button onClick={() => void handleApprove()} disabled={busy}>
+                    <Button color='primary' variant='solid' onClick={() => void handleApprove()} disabled={busy}>
                       {isReviewing ? t('common:saving') : t('payments:admin.approve')}
                     </Button>
                   </>
                 ) : (
-                  <Button onClick={() => onOpenChange(false)}>{t('common:close')}</Button>
+                  <Button color='primary' variant='solid' onClick={() => onOpenChange(false)}>
+                    {t('common:close')}
+                  </Button>
                 )}
               </div>
             </div>

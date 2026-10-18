@@ -1,9 +1,10 @@
+import { Button } from 'polpo/components';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
-import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
+import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
 import { DansshipAPI, RoomResourceType } from '@core/api';
 import { useCallablePromise, usePromise } from '@hooks';
 
@@ -247,6 +248,8 @@ export function RentalPricingPanel() {
       </div>
 
       <Button
+        color='primary'
+        variant='solid'
         type='button'
         disabled={!roomId || !hourlyPrice || !taxTypeId || isSaving}
         onClick={() => void saveRoomPricing()}
@@ -379,16 +382,18 @@ export function RentalPricingPanel() {
                         </div>
                         <div className='flex flex-wrap gap-2'>
                           <Button
+                            color='secondary'
+                            variant='solid'
                             type='button'
-                            variant='secondary'
                             disabled={isSavingResource}
                             onClick={() => void saveResource(resource.id)}
                           >
                             {t('studioRental:admin.pricing.saveResource')}
                           </Button>
                           <Button
+                            color='primary'
+                            variant='outlined'
                             type='button'
-                            variant='outline'
                             disabled={isDeleting}
                             onClick={() => void removeResource(resource.id)}
                           >
@@ -461,6 +466,8 @@ export function RentalPricingPanel() {
               </Select>
             </div>
             <Button
+              color='primary'
+              variant='solid'
               type='button'
               disabled={!newResource.hourly_rental_price || !newResource.tax_type_id || isCreating}
               onClick={() => void addResource()}

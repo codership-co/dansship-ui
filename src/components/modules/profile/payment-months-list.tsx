@@ -1,6 +1,6 @@
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 
-import { Button } from '@components/ui';
 import { cn, formatPrice } from '@helpers';
 
 import type { PaymentDocument, PaymentMonthSummary } from '@core/api';
@@ -72,18 +72,26 @@ function DocumentActions({
     <div className={cn('flex flex-wrap items-center gap-1.5', alignEnd && 'justify-end')}>
       {document.status === 'issued' ? (
         <>
-          <Button type='button' size='sm' disabled={isConfirming} onClick={() => onConfirm(document.id)}>
+          <Button
+            color='primary'
+            variant='solid'
+            size='small'
+            type='button'
+            disabled={isConfirming}
+            onClick={() => onConfirm(document.id)}
+          >
             {t('profile:paymentDocuments.confirm')}
           </Button>
-          <Button type='button' variant='outline' size='sm' onClick={() => onDispute(document.id)}>
+          <Button color='primary' variant='outlined' size='small' type='button' onClick={() => onDispute(document.id)}>
             {t('profile:paymentDocuments.dispute')}
           </Button>
         </>
       ) : null}
       <Button
+        color='primary'
+        variant='outlined'
+        size='small'
         type='button'
-        variant='outline'
-        size='sm'
         disabled={isOpeningDocument}
         onClick={() => onDownload(document.id)}
       >
@@ -184,7 +192,14 @@ function MonthBlock({
               </p>
               <p className='mt-1.5 text-xs text-muted-foreground'>{generateNote}</p>
               <div className='mt-3'>
-                <Button type='button' size='sm' disabled={isGenerating} onClick={() => onGenerate(month)}>
+                <Button
+                  color='primary'
+                  variant='solid'
+                  size='small'
+                  type='button'
+                  disabled={isGenerating}
+                  onClick={() => onGenerate(month)}
+                >
                   {t('profile:paymentDocuments.generate')}
                 </Button>
               </div>
@@ -245,7 +260,14 @@ function MonthBlock({
             ))}
             {canGenerate ? (
               <div className='flex w-full justify-end pt-2.5'>
-                <Button type='button' size='sm' disabled={isGenerating} onClick={() => onGenerate(month)}>
+                <Button
+                  color='primary'
+                  variant='solid'
+                  size='small'
+                  type='button'
+                  disabled={isGenerating}
+                  onClick={() => onGenerate(month)}
+                >
                   {t('profile:paymentDocuments.generate')}
                 </Button>
               </div>

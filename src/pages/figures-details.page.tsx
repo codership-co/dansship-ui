@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuClock, LuChartBar, LuTag, LuBookmark, LuChevronLeft, LuChevronRight } from 'react-icons/lu';
@@ -5,7 +6,7 @@ import { Link, useParams } from 'react-router';
 
 import { SpinnerLoader } from '@components/loaders';
 import { FigureStatus, ProgressModal } from '@components/modules';
-import { Badge, Button } from '@components/ui';
+import { Badge } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { mapDifficultyToDisplay } from '@helpers';
 import { useFigureDetails } from '@hooks';
@@ -65,12 +66,12 @@ function FiguresDetailsPage() {
 
   return (
     <main className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-20'>
-      <Button asChild variant='ghost' size='default' className='mb-6 h-10 px-4 text-sm sm:h-11 sm:px-5 sm:text-base'>
-        <Link to='/figures'>
+      <Link to='/figures'>
+        <Button color='primary' variant='text' className='mb-6'>
           <LuChevronLeft className='h-5 w-5' />
           {t('figure:details.backToFigures')}
-        </Link>
-      </Button>
+        </Button>
+      </Link>
 
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-12'>
         {/* Left Column - Image */}
@@ -103,18 +104,20 @@ function FiguresDetailsPage() {
           {showCarouselControls && (
             <>
               <Button
+                color='secondary'
+                variant='solid'
+                forIcon
                 onClick={goToPreviousImage}
-                size='icon'
-                variant='secondary'
                 className='absolute top-1/2 left-4 -translate-y-1/2 rounded-full shadow-md'
                 aria-label={t('common:back')}
               >
                 <LuChevronLeft className='w-6 h-6' />
               </Button>
               <Button
+                color='secondary'
+                variant='solid'
+                forIcon
                 onClick={goToNextImage}
-                size='icon'
-                variant='secondary'
                 className='absolute top-1/2 right-4 -translate-y-1/2 rounded-full shadow-md'
                 aria-label={t('common:next')}
               >
@@ -140,10 +143,11 @@ function FiguresDetailsPage() {
           )}
 
           <Button
+            color={isSaved ? 'primary' : 'secondary'}
+            variant='solid'
+            forIcon
             onClick={handleSave}
             disabled={isSaving}
-            size='icon'
-            variant={isSaved ? 'default' : 'secondary'}
             className='absolute top-4 right-4 rounded-full shadow-md'
           >
             <LuBookmark className={`w-6 h-6 ${isSaving ? 'opacity-50' : ''}`} />
