@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -5,7 +6,7 @@ import { RoomModal } from './room-modal';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { Room } from '@core/api';
 import { useRooms } from '@hooks';
 
@@ -78,7 +79,9 @@ export function RoomsTab() {
     <div className='space-y-4'>
       <div className='flex justify-between items-center'>
         <h2 className='text-xl font-semibold'>{t('inventory:rooms.title')}</h2>
-        <Button onClick={() => handleOpenModal()}>{t('inventory:rooms.addRoom')}</Button>
+        <Button color='primary' variant='solid' onClick={() => handleOpenModal()}>
+          {t('inventory:rooms.addRoom')}
+        </Button>
       </div>
 
       <div className='border rounded-md'>
@@ -122,8 +125,9 @@ export function RoomsTab() {
                   </TableCell>
                   <TableCell className='text-right space-x-2'>
                     <Button
-                      variant='outline'
-                      size='sm'
+                      color='primary'
+                      variant='outlined'
+                      size='small'
                       onClick={() => handleOpenModal(room)}
                       disabled={!room.is_active}
                     >
@@ -131,8 +135,9 @@ export function RoomsTab() {
                     </Button>
                     {room.is_active && (
                       <Button
-                        variant='destructive'
-                        size='sm'
+                        color='alert'
+                        variant='solid'
+                        size='small'
                         onClick={() => handleDeactivate(room)}
                         disabled={isDeleting}
                       >
@@ -141,8 +146,9 @@ export function RoomsTab() {
                     )}
                     {!room.is_active && (
                       <Button
-                        variant='default'
-                        size='sm'
+                        color='primary'
+                        variant='solid'
+                        size='small'
                         onClick={() => handleReactivate(room.id)}
                         disabled={isReactivating}
                       >

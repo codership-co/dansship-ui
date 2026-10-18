@@ -1,6 +1,7 @@
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 
-import { Button, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui';
 import { formatPrice } from '@helpers';
 
 import type { StudioRentalRoomOption } from '@core/api';
@@ -44,7 +45,7 @@ export function StudioRentalRoomGrid({ rooms, onSelect }: StudioRentalRoomGridPr
               </p>
             </CardContent>
             <CardFooter className='px-5 pb-5'>
-              <Button type='button' className='w-full' onClick={() => onSelect(room)}>
+              <Button color='primary' variant='solid' type='button' className='w-full' onClick={() => onSelect(room)}>
                 {t('studioRental:browse.rentRoom')}
               </Button>
             </CardFooter>

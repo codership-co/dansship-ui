@@ -1,5 +1,5 @@
 import { addDays, getDay, parseISO, startOfWeek } from 'date-fns';
-import { ActionModal, Button as PolpoButton, Checkbox } from 'polpo/components';
+import { ActionModal, Button, Checkbox } from 'polpo/components';
 import { useEffect, useMemo, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import {
@@ -31,7 +31,7 @@ import { FormStepperLayout } from '@components/layouts';
 import { SpinnerLoader } from '@components/loaders';
 import { PaymentMethodSelector } from '@components/modules/payments/payment-method-selector';
 import { GridEvent, HourRangeSelection, ScheduleGrid } from '@components/modules/schedules/schedule-grid';
-import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
+import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
 import {
   AgendaEvent,
   CreateRentalRequestPayload,
@@ -346,16 +346,16 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
   const footer = (back: WizardStep | null, next: WizardStep | null, nextDisabled: boolean, nextLabel?: string) => (
     <div className='flex flex-wrap justify-end gap-2 pt-4'>
       {back ? (
-        <Button type='button' variant='outline' onClick={() => setStep(back)}>
+        <Button color='primary' variant='outlined' type='button' onClick={() => setStep(back)}>
           {t('common:back')}
         </Button>
       ) : (
-        <Button type='button' variant='outline' onClick={onClose}>
+        <Button color='primary' variant='outlined' type='button' onClick={onClose}>
           {t('common:cancel')}
         </Button>
       )}
       {next ? (
-        <Button type='button' disabled={nextDisabled} onClick={() => setStep(next)}>
+        <Button color='primary' variant='solid' type='button' disabled={nextDisabled} onClick={() => setStep(next)}>
           {nextLabel ?? t('common:next')}
         </Button>
       ) : null}
@@ -406,9 +406,10 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
     <div className='grid gap-4 content-start'>
       <div className='flex flex-wrap items-center gap-2'>
         <Button
+          color='primary'
+          variant='outlined'
+          size='small'
           type='button'
-          variant='outline'
-          size='sm'
           onClick={() => setWeekStart(formatDateInput(addDays(parseISO(weekStart), -7)))}
         >
           {t('studioRental:browse.prevWeek')}
@@ -417,9 +418,10 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
           {weekStart} – {weekEnd}
         </p>
         <Button
+          color='primary'
+          variant='outlined'
+          size='small'
           type='button'
-          variant='outline'
-          size='sm'
           onClick={() => setWeekStart(formatDateInput(addDays(parseISO(weekStart), 7)))}
         >
           {t('studioRental:browse.nextWeek')}
@@ -515,17 +517,19 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
           </div>
           <div className='flex gap-2'>
             <Button
+              color='primary'
+              variant={seriesTermination === 'end_date' ? 'solid' : 'outlined'}
+              size='small'
               type='button'
-              variant={seriesTermination === 'end_date' ? 'default' : 'outline'}
-              size='sm'
               onClick={() => setSeriesTermination('end_date')}
             >
               {t('studioRental:browse.byEndDate')}
             </Button>
             <Button
+              color='primary'
+              variant={seriesTermination === 'count' ? 'solid' : 'outlined'}
+              size='small'
               type='button'
-              variant={seriesTermination === 'count' ? 'default' : 'outline'}
-              size='sm'
               onClick={() => setSeriesTermination('count')}
             >
               {t('studioRental:browse.byCount')}
@@ -554,17 +558,19 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
         <Label>{t('studioRental:browse.paymentOption')}</Label>
         <div className='flex flex-wrap gap-2'>
           <Button
+            color='primary'
+            variant={paymentOption === 'full' ? 'solid' : 'outlined'}
+            size='small'
             type='button'
-            variant={paymentOption === 'full' ? 'default' : 'outline'}
-            size='sm'
             onClick={() => setPaymentOption('full')}
           >
             {t('studioRental:browse.paymentOptionFull')}
           </Button>
           <Button
+            color='primary'
+            variant={paymentOption === 'fifty_fifty' ? 'solid' : 'outlined'}
+            size='small'
             type='button'
-            variant={paymentOption === 'fifty_fifty' ? 'default' : 'outline'}
-            size='sm'
             onClick={() => setPaymentOption('fifty_fifty')}
           >
             {t('studioRental:browse.paymentOptionFiftyFifty')}
@@ -637,7 +643,7 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
       <PaymentMethodSelector value={paymentMethod} onChange={setPaymentMethod} />
 
       <div className='flex flex-wrap justify-end gap-2 pt-4'>
-        <PolpoButton
+        <Button
           type='button'
           color='primary'
           className='flex items-center'
@@ -646,9 +652,9 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
         >
           <LuArrowLeft />
           {t('common:back')}
-        </PolpoButton>
+        </Button>
 
-        <PolpoButton
+        <Button
           type='button'
           color='primary'
           className='flex items-center'
@@ -657,7 +663,7 @@ function WizardContent({ room, onClose }: { room: StudioRentalRoomOption; onClos
         >
           {t('common:next')}
           <LuArrowRight />
-        </PolpoButton>
+        </Button>
       </div>
     </section>
   );

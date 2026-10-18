@@ -1,7 +1,8 @@
 import { format } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 
-import { Button, ProfilePicture } from '@components/ui';
+import { ProfilePicture } from '@components/ui';
 import { canCancelBooking, getBookingCountdown, resolvePlanDisplayName } from '@helpers';
 import { useDateLocale } from '@hooks';
 
@@ -79,9 +80,10 @@ export function UpcomingBookingCard({ booking, isCancelDisabled, onCancel }: Upc
 
           {showCancel ? (
             <Button
+              color='primary'
+              variant='outlined'
+              size='small'
               type='button'
-              variant='outlinePrimary'
-              size='sm'
               disabled={isCancelDisabled}
               onClick={() => onCancel(booking)}
             >

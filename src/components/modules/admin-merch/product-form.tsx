@@ -1,11 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from 'polpo/components';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { LuImagePlus, LuX } from 'react-icons/lu';
 import { z } from 'zod';
 
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Input, Label, Textarea } from '@components/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, Input, Label, Textarea } from '@components/ui';
 import {
   CreateProductPayload,
   PaymentProofContentType,
@@ -229,9 +230,10 @@ export function ProductForm({ open, initialData, isLoading = false, onClose, onS
                   <p className='text-xs text-gray-500'>{(selectedImageFile.size / 1024 / 1024).toFixed(2)} MB</p>
                 </div>
                 <Button
+                  color='primary'
+                  variant='text'
+                  forIcon
                   type='button'
-                  size='icon'
-                  variant='ghost'
                   className='h-7 w-7'
                   disabled={isLoading}
                   onClick={() => {
@@ -252,9 +254,10 @@ export function ProductForm({ open, initialData, isLoading = false, onClose, onS
                     : t('merch:currentImage', { defaultValue: 'Current image' })}
                 </p>
                 <Button
+                  color='primary'
+                  variant='outlined'
+                  size='small'
                   type='button'
-                  size='sm'
-                  variant='outline'
                   disabled={isLoading}
                   onClick={() => {
                     setRemoveImage(previous => !previous);
@@ -284,10 +287,10 @@ export function ProductForm({ open, initialData, isLoading = false, onClose, onS
           </div>
 
           <div className='flex justify-end gap-2 pt-2'>
-            <Button type='button' variant='outline' onClick={onClose} disabled={isLoading}>
+            <Button color='primary' variant='outlined' type='button' onClick={onClose} disabled={isLoading}>
               {t('common:cancel')}
             </Button>
-            <Button type='submit' disabled={isLoading}>
+            <Button color='primary' variant='solid' type='submit' disabled={isLoading}>
               {isLoading ? t('common:saving') : t('common:save')}
             </Button>
           </div>

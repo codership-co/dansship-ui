@@ -1,9 +1,9 @@
+import { Button } from 'polpo/components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -79,10 +79,22 @@ export function RefundClassCreditsDialog({
           />
         </div>
         <DialogFooter>
-          <Button type='button' variant='outline' disabled={isLoading} onClick={() => onOpenChange(false)}>
+          <Button
+            color='primary'
+            variant='outlined'
+            type='button'
+            disabled={isLoading}
+            onClick={() => onOpenChange(false)}
+          >
             {t('common:cancel')}
           </Button>
-          <Button type='button' disabled={isLoading || reason.trim().length === 0} onClick={() => void handleConfirm()}>
+          <Button
+            color='primary'
+            variant='solid'
+            type='button'
+            disabled={isLoading || reason.trim().length === 0}
+            onClick={() => void handleConfirm()}
+          >
             {isLoading ? t('admin:roster.refundSubmitting') : t('admin:roster.refundConfirm')}
           </Button>
         </DialogFooter>

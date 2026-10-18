@@ -1,4 +1,5 @@
 import { format } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -9,7 +10,6 @@ import { OrderDetail } from './order-detail';
 import { SpinnerLoader } from '@components/loaders';
 import { PaymentStatusBadge } from '@components/modules';
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -165,7 +165,7 @@ export function OrderList() {
                   <TableCell>{format(new Date(order.created_at), 'yyyy-MM-dd HH:mm')}</TableCell>
                   <TableCell>{formatEntityDisplay(order.created_by_user)}</TableCell>
                   <TableCell className='text-right'>
-                    <Button variant='outline' size='sm' onClick={() => setSelectedOrder(order)}>
+                    <Button color='primary' variant='outlined' size='small' onClick={() => setSelectedOrder(order)}>
                       {t('merch:orderDetail')}
                     </Button>
                   </TableCell>

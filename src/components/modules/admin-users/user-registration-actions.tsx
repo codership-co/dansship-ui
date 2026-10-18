@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -5,7 +6,7 @@ import { toast } from 'sonner';
 
 import { TemporaryPasswordPanel } from './temporary-password-panel';
 
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '@components/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@components/ui';
 import { useOrPermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -66,24 +67,35 @@ export function UserRegistrationActions({
   return (
     <div className='flex flex-wrap gap-2'>
       {canRegister ? (
-        <Button asChild variant='outline' size='sm'>
-          <Link to={PageURLS.admin.userEdit(userId)}>{t('admin:users.registration.edit')}</Link>
-        </Button>
+        <Link to={PageURLS.admin.userEdit(userId)}>
+          <Button color='primary' variant='outlined' size='small'>
+            {t('admin:users.registration.edit')}
+          </Button>
+        </Link>
       ) : null}
       {canRegister && mustChangePassword ? (
-        <Button type='button' variant='outline' size='sm' disabled={isReissuing} onClick={() => void reissue()}>
+        <Button
+          color='primary'
+          variant='outlined'
+          size='small'
+          type='button'
+          disabled={isReissuing}
+          onClick={() => void reissue()}
+        >
           {t('admin:users.registration.reissuePassword')}
         </Button>
       ) : null}
       {canRegister && !isEmailVerified ? (
-        <Button type='button' variant='outline' size='sm' onClick={() => void resendVerification()}>
+        <Button color='primary' variant='outlined' size='small' type='button' onClick={() => void resendVerification()}>
           {t('admin:users.registration.resendVerification')}
         </Button>
       ) : null}
       {canBuyPlan ? (
-        <Button asChild size='sm'>
-          <Link to={PageURLS.admin.userPlanPurchase(userId)}>{t('admin:users.registration.buyPlan')}</Link>
-        </Button>
+        <Link to={PageURLS.admin.userPlanPurchase(userId)}>
+          <Button color='primary' variant='solid' size='small'>
+            {t('admin:users.registration.buyPlan')}
+          </Button>
+        </Link>
       ) : null}
       <Dialog open={issuedPassword !== null} onOpenChange={open => !open && setIssuedPassword(null)}>
         <DialogContent>

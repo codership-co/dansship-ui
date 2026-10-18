@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
+import { SectionHeading } from '@components/containers';
 import { AvailabilityBlocksPanel, InternalReservedUsePanel, RentalPricingPanel } from '@components/modules';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
@@ -57,10 +58,7 @@ function AdminStudioRentalPage() {
 
   return (
     <div className='mx-auto max-w-7xl space-y-6 px-4 py-8 pt-20'>
-      <div>
-        <h1 className='text-primary'>{t('studioRental:admin.title')}</h1>
-        <p className='mt-2 text-muted-foreground'>{t('studioRental:admin.subtitle')}</p>
-      </div>
+      <SectionHeading title={t('studioRental:admin.title')} subtitle={t('studioRental:admin.subtitle')} />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
         <TabsList className='mb-4 bg-[hsl(var(--surface-container-low))]'>

@@ -1,11 +1,12 @@
 import { format, parseISO } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { DansshipAPI, type MyBooking } from '@core/api';
 import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
 
@@ -91,7 +92,13 @@ export function UserBookingsTab({ userId }: { userId: string }) {
                 </TableCell>
                 <TableCell>
                   {canReimburse(booking) ? (
-                    <Button type='button' size='sm' variant='outline' onClick={() => setBookingToReimburse(booking)}>
+                    <Button
+                      color='primary'
+                      variant='outlined'
+                      size='small'
+                      type='button'
+                      onClick={() => setBookingToReimburse(booking)}
+                    >
                       {t('admin:users.details.reimburse')}
                     </Button>
                   ) : (

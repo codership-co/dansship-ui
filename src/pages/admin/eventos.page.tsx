@@ -1,9 +1,10 @@
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
+import { SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { EventosList } from '@components/modules/admin-eventos';
-import { Button } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -17,17 +18,18 @@ function AdminEventosPage() {
   return (
     <div className='mx-auto max-w-7xl space-y-6 px-4 py-8 pt-20'>
       <div className='flex flex-wrap items-end justify-between gap-4'>
-        <div>
-          <h1 className='text-3xl font-bold text-gray-900'>{t('eventos:admin.title')}</h1>
-          <p className='mt-2 text-gray-500'>{t('eventos:admin.subtitle')}</p>
-        </div>
+        <SectionHeading className='mb-0' title={t('eventos:admin.title')} subtitle={t('eventos:admin.subtitle')} />
         <div className='flex flex-wrap gap-2'>
-          <Button asChild variant='outline'>
-            <Link to={PageURLS.admin.eventoComboNew}>{t('eventos:admin.createCombo')}</Link>
-          </Button>
-          <Button asChild>
-            <Link to={PageURLS.admin.eventoNew}>{t('eventos:admin.createEvent')}</Link>
-          </Button>
+          <Link to={PageURLS.admin.eventoComboNew}>
+            <Button color='primary' variant='outlined'>
+              {t('eventos:admin.createCombo')}
+            </Button>
+          </Link>
+          <Link to={PageURLS.admin.eventoNew}>
+            <Button color='primary' variant='solid'>
+              {t('eventos:admin.createEvent')}
+            </Button>
+          </Link>
         </div>
       </div>
       {isLoading || response === null ? <SpinnerLoader /> : <EventosList items={response.data ?? []} />}

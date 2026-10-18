@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { type ReactNode, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +8,7 @@ import { CLASS_CSAT_TYPE } from '../../../helpers/class-feedback';
 import { ClassCsatForm } from './class-csat-form';
 import { CLASS_LEVEL_SELF_ASSESSMENT_TYPE, ClassLevelSelfAssessmentForm } from './class-level-self-assessment-form';
 
-import { Button, Checkbox, Label, Textarea } from '@components/ui';
+import { Checkbox, Label, Textarea } from '@components/ui';
 import { type CampaignAnswerValue, type CampaignQuestion, type PendingCampaign } from '@core/api';
 import { cn } from '@helpers';
 
@@ -103,11 +104,18 @@ function GenericCampaignQuestionForm({ campaign, isSubmitting, onSubmit, onDismi
         />
       ))}
       <div className='grid gap-2'>
-        <Button type='submit' disabled={isSubmitting} className='w-full'>
+        <Button color='primary' variant='solid' type='submit' disabled={isSubmitting} className='w-full'>
           {isSubmitting ? t('campaigns:overlay.submitting') : t('campaigns:overlay.submit')}
         </Button>
         {onDismiss ? (
-          <Button type='button' variant='ghost' disabled={isSubmitting} className='w-full' onClick={onDismiss}>
+          <Button
+            color='primary'
+            variant='text'
+            type='button'
+            disabled={isSubmitting}
+            className='w-full'
+            onClick={onDismiss}
+          >
             {t('campaigns:overlay.skip')}
           </Button>
         ) : null}

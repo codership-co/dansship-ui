@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { SectionHeading } from '@components/containers';
 import { POSCart, POSCheckout, POSProductSelector } from '@components/modules';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { PageURLS } from '@core/constants';
@@ -26,10 +27,7 @@ function AdminMerchPosPage() {
 
   return (
     <div className='mx-auto max-w-7xl space-y-6 px-4 py-8 pt-20'>
-      <div>
-        <h1 className='text-3xl font-bold text-gray-900'>{t('merch:posTitle')}</h1>
-        <p className='mt-2 text-gray-500'>{t('merch:completeSale')}</p>
-      </div>
+      <SectionHeading title={t('merch:posTitle')} subtitle={t('merch:completeSale')} />
 
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
         <section className='lg:col-span-2'>

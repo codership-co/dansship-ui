@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
+import { SectionHeading } from '@components/containers';
 import { OrderList, ProductList } from '@components/modules';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
@@ -27,10 +28,7 @@ function AdminMerchPage() {
 
   return (
     <div className='mx-auto max-w-7xl px-4 py-8 pt-20'>
-      <div className='mb-8'>
-        <h1 className='text-3xl font-bold text-gray-900'>{t('merch:productsTitle')}</h1>
-        <p className='mt-2 text-gray-500'>{subtitle}</p>
-      </div>
+      <SectionHeading title={t('merch:productsTitle')} subtitle={subtitle} />
 
       <Tabs
         value={activeTab}

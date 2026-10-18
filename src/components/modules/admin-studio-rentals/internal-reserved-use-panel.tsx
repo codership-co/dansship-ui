@@ -1,9 +1,10 @@
+import { Button } from 'polpo/components';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
-import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
+import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
 import {
   type AdminCancelInternalReservedUsePayload,
   DansshipAPI,
@@ -152,6 +153,8 @@ export function InternalReservedUsePanel() {
 
         <div className='mt-4'>
           <Button
+            color='primary'
+            variant='solid'
             onClick={() => {
               void handleCreate();
             }}
@@ -204,8 +207,9 @@ export function InternalReservedUsePanel() {
                   </div>
 
                   <Button
-                    variant='outline'
-                    size='sm'
+                    color='primary'
+                    variant='outlined'
+                    size='small'
                     onClick={() => {
                       const shouldCancel = window.confirm(
                         t('studioRental:admin.reservedUse.cancelConfirm', {

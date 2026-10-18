@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 
-import { Button } from '@components/ui/button';
+import { Button } from 'polpo/components';
+
 import {
   Dialog,
   DialogContent,
@@ -54,10 +55,22 @@ export function ConfirmDialog({
           {description ? <DialogDescription>{description}</DialogDescription> : null}
         </DialogHeader>
         <DialogFooter>
-          <Button type='button' variant='outline' onClick={() => onOpenChange(false)} disabled={isLoading}>
+          <Button
+            color='primary'
+            variant='outlined'
+            type='button'
+            onClick={() => onOpenChange(false)}
+            disabled={isLoading}
+          >
             {cancelLabel}
           </Button>
-          <Button type='button' variant={confirmVariant} onClick={() => void onConfirm()} disabled={isLoading}>
+          <Button
+            color={confirmVariant === 'destructive' ? 'alert' : 'primary'}
+            variant='solid'
+            type='button'
+            onClick={() => void onConfirm()}
+            disabled={isLoading}
+          >
             {isLoading ? 'Processing...' : confirmLabel}
           </Button>
         </DialogFooter>

@@ -1,4 +1,5 @@
 import { addMonths, differenceInCalendarDays, format, parseISO } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuChevronDown } from 'react-icons/lu';
@@ -8,7 +9,6 @@ import { toast } from 'sonner';
 import { SpinnerLoader } from '@components/loaders';
 import {
   Badge,
-  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -327,7 +327,7 @@ export function PaymentAssignmentsPanel({ onReady }: { onReady: (openCreate: () 
                           : t('admin:paymentAssignments.openRange', { start: formatDay(row.start_date) })}
                       </p>
                     </div>
-                    <Button type='button' variant='outline' onClick={() => openEdit(row)}>
+                    <Button color='primary' variant='outlined' type='button' onClick={() => openEdit(row)}>
                       {t('admin:paymentAssignments.edit')}
                     </Button>
                   </div>
@@ -359,7 +359,7 @@ export function PaymentAssignmentsPanel({ onReady }: { onReady: (openCreate: () 
                     <span className='block text-xs text-muted-foreground'>{person.email}</span>
                   </span>
                   {editing ? null : (
-                    <Button type='button' variant='outline' onClick={() => setPerson(null)}>
+                    <Button color='primary' variant='outlined' type='button' onClick={() => setPerson(null)}>
                       {t('admin:paymentAssignments.changePerson')}
                     </Button>
                   )}
@@ -450,10 +450,10 @@ export function PaymentAssignmentsPanel({ onReady }: { onReady: (openCreate: () 
           </div>
 
           <DialogFooter>
-            <Button type='button' variant='outline' onClick={closeDialog}>
+            <Button color='primary' variant='outlined' type='button' onClick={closeDialog}>
               {t('common:cancel')}
             </Button>
-            <Button type='button' onClick={() => void handleSave()} disabled={isSaving}>
+            <Button color='primary' variant='solid' type='button' onClick={() => void handleSave()} disabled={isSaving}>
               {t('admin:paymentAssignments.save')}
             </Button>
           </DialogFooter>

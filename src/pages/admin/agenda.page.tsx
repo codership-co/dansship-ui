@@ -1,10 +1,12 @@
+import { Button } from 'polpo/components';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
+import { SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { GridEvent, ScheduleGrid } from '@components/modules';
-import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
+import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { AgendaEventType, buildAgendaConflicts, DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -130,25 +132,26 @@ function AdminAgendaPage() {
       <header className='rounded-[calc(var(--radius)+4px)] bg-[hsl(var(--surface-container-low))] p-5'>
         <div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
           <div>
-            <h1 className='text-primary'>{t('admin:agenda.title', { defaultValue: 'Unified Agenda' })}</h1>
-            <p className='mt-1 text-sm text-muted-foreground'>
-              {t('admin:agenda.subtitle', {
+            <SectionHeading
+              className='mb-0'
+              title={t('admin:agenda.title', { defaultValue: 'Unified Agenda' })}
+              subtitle={t('admin:agenda.subtitle', {
                 defaultValue: 'Track classes, rentals, reserved use, and blocked-space occupancy in one timeline.',
               })}
-            </p>
+            />
           </div>
 
           <div className='flex flex-wrap gap-2'>
-            <Button asChild size='sm' variant='outline'>
-              <Link to='/admin/studio-rental?tab=reserved-use'>
+            <Link to='/admin/studio-rental?tab=reserved-use'>
+              <Button color='primary' variant='outlined' size='small'>
                 {t('admin:agenda.actions.addReservedUse', { defaultValue: 'Add Internal Reserved Use' })}
-              </Link>
-            </Button>
-            <Button asChild size='sm' variant='outline'>
-              <Link to='/admin/agenda/conflicts'>
+              </Button>
+            </Link>
+            <Link to='/admin/agenda/conflicts'>
+              <Button color='primary' variant='outlined' size='small'>
                 {t('admin:agenda.actions.openConflictQueue', { defaultValue: 'Open Conflict Queue' })}
-              </Link>
-            </Button>
+              </Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -161,11 +164,11 @@ function AdminAgendaPage() {
               defaultValue: `${conflicts.length} occupancy conflict(s) detected for this range.`,
             })}
           </span>
-          <Button asChild size='sm' variant='outline'>
-            <Link to='/admin/agenda/conflicts'>
+          <Link to='/admin/agenda/conflicts'>
+            <Button color='primary' variant='outlined' size='small'>
               {t('admin:agenda.conflictBannerAction', { defaultValue: 'Review conflicts' })}
-            </Link>
-          </Button>
+            </Button>
+          </Link>
         </div>
       ) : null}
 
@@ -211,9 +214,10 @@ function AdminAgendaPage() {
             <div className='mt-1 flex flex-wrap gap-1.5'>
               {typeOptions.map(option => (
                 <Button
+                  color='primary'
+                  variant={eventTypeFilter === option.value ? 'solid' : 'outlined'}
+                  size='small'
                   key={option.value}
-                  size='sm'
-                  variant={eventTypeFilter === option.value ? 'default' : 'outline'}
                   onClick={() => setEventTypeFilter(option.value)}
                 >
                   {option.label}
@@ -247,7 +251,13 @@ function AdminAgendaPage() {
                     defaultValue: 'Unable to load agenda events for this range.',
                   })}
                 </p>
-                <Button className='mt-2' size='sm' variant='outline' onClick={() => void getAgendaEvents()}>
+                <Button
+                  color='primary'
+                  variant='outlined'
+                  size='small'
+                  className='mt-2'
+                  onClick={() => void getAgendaEvents()}
+                >
                   {t('admin:agenda.timeline.retry', { defaultValue: 'Retry' })}
                 </Button>
               </div>

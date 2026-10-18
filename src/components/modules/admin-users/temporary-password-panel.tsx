@@ -1,7 +1,6 @@
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-
-import { Button } from '@components/ui';
 
 interface TemporaryPasswordPanelProps {
   password: string;
@@ -34,7 +33,7 @@ export function TemporaryPasswordPanel({ password, expiresAt }: TemporaryPasswor
           date: new Date(expiresAt).toLocaleString('es-CO'),
         })}
       </p>
-      <Button type='button' variant='outline' className='w-fit' onClick={() => void copyPassword()}>
+      <Button color='primary' variant='outlined' type='button' onClick={() => void copyPassword()}>
         {t('admin:users.registration.copy')}
       </Button>
     </div>

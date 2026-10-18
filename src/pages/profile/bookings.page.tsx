@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
@@ -12,7 +13,7 @@ import {
   UpcomingListSkeleton,
   UpcomingReservationCard,
 } from '@components/modules/my-bookings';
-import { Button, Dialog, DialogContent, DialogHeader, DialogTitle } from '@components/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useStudentSession } from '@contexts';
 import { DansshipAPI, MyBooking, type RentalRequest, type RentalSeries } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -275,7 +276,7 @@ function BookingsPage() {
                   {isLoadingMore ? (
                     <p className='text-sm text-muted-foreground'>{t('bookings:loadingMore')}</p>
                   ) : (
-                    <Button type='button' variant='ghost' onClick={() => void loadNextPage()}>
+                    <Button color='primary' variant='text' type='button' onClick={() => void loadNextPage()}>
                       {t('bookings:loadMore')}
                     </Button>
                   )}

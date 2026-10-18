@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { StudioRentalBookingWizard, StudioRentalRoomGrid } from '@components/modules/studio-rental';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
@@ -19,10 +20,7 @@ function StudioRentalBrowsePage() {
 
   return (
     <div className='mx-auto max-w-6xl space-y-6 px-4 py-8 pt-20'>
-      <div>
-        <h1 className='text-3xl font-bold text-primary'>{t('studioRental:browse.title')}</h1>
-        <p className='mt-2 text-muted-foreground'>{t('studioRental:browse.subtitle')}</p>
-      </div>
+      <SectionHeading title={t('studioRental:browse.title')} subtitle={t('studioRental:browse.subtitle')} />
 
       {isLoadingRooms ? (
         <SpinnerLoader message={t('studioRental:browse.roomsLoading')} />

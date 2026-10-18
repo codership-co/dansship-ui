@@ -1,11 +1,12 @@
 import { format } from 'date-fns';
+import { Button } from 'polpo/components';
 import { cn } from 'polpo/helpers';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { parseClassCsatDeliveryContext } from '../../../helpers/class-feedback';
 
-import { Button, Label, Textarea } from '@components/ui';
+import { Label, Textarea } from '@components/ui';
 import { type CampaignAnswerValue, type PendingCampaign } from '@core/api';
 
 interface ClassCsatFieldsProps {
@@ -154,11 +155,17 @@ export function ClassCsatFields({
       {error ? <p className='text-sm text-alert-600'>{error}</p> : null}
 
       <div className='flex flex-col gap-2'>
-        <Button type='button' disabled={isSubmitting} onClick={() => void handleSubmit()}>
+        <Button
+          color='primary'
+          variant='solid'
+          type='button'
+          disabled={isSubmitting}
+          onClick={() => void handleSubmit()}
+        >
           {isSubmitting ? t('campaigns:overlay.submitting') : (submitLabel ?? t('campaigns:overlay.submit'))}
         </Button>
         {onDismiss ? (
-          <Button type='button' variant='outline' disabled={isSubmitting} onClick={onDismiss}>
+          <Button color='primary' variant='outlined' type='button' disabled={isSubmitting} onClick={onDismiss}>
             {t('campaigns:overlay.skip')}
           </Button>
         ) : null}
@@ -183,7 +190,7 @@ export function ClassCsatForm({ campaign, isSubmitting, onSubmit, onDismiss }: C
       <div className='space-y-6 p-6'>
         <h2 className='text-xl font-semibold text-gray-900'>{campaign.title}</h2>
         {onDismiss ? (
-          <Button type='button' variant='outline' className='w-full' onClick={onDismiss}>
+          <Button color='primary' variant='outlined' type='button' className='w-full' onClick={onDismiss}>
             {t('common:close')}
           </Button>
         ) : null}

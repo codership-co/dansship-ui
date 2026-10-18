@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuSearch, LuUpload } from 'react-icons/lu';
@@ -5,7 +6,6 @@ import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -269,7 +269,7 @@ export function InstallmentPaymentDialog({ eventId, open, onOpenChange, onRegist
           </div>
         </div>
         <DialogFooter>
-          <Button type='button' disabled={!canSubmit} onClick={() => void submit()}>
+          <Button color='primary' variant='solid' type='button' disabled={!canSubmit} onClick={() => void submit()}>
             {submitting ? t('eventos:admin.saving') : t('eventos:admin.registerInstallmentPayment')}
           </Button>
         </DialogFooter>

@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
@@ -8,21 +9,11 @@ import { EventoRoster } from './evento-roster';
 import { InstallmentPaymentDialog } from './installment-payment-dialog';
 import { PriceTiersEditor } from './price-tiers-editor';
 
+import { SectionHeading } from '@components/containers';
 import { OptionalFileUpload } from '@components/forms/optional-file-upload';
 import { SpinnerLoader } from '@components/loaders';
 import { DirectRegistrationForm } from '@components/modules/eventos/direct-registration-form';
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Input,
-  Label,
-  Switch,
-  Textarea,
-  Badge,
-} from '@components/ui';
+import { Card, CardContent, CardHeader, CardTitle, Input, Label, Switch, Textarea, Badge } from '@components/ui';
 import { useOrPermissions } from '@contexts';
 import {
   DansshipAPI,
@@ -348,9 +339,10 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
             {t('eventos:admin.backToList')}
           </Link>
           <div className='flex flex-wrap items-center gap-2.5'>
-            <h1 className='m-0 text-2xl font-bold text-foreground'>
-              {event ? t('eventos:admin.editEvent') : t('eventos:admin.newEvent')}
-            </h1>
+            <SectionHeading
+              className='mb-0'
+              title={event ? t('eventos:admin.editEvent') : t('eventos:admin.newEvent')}
+            />
             <Badge variant={status === 'published' ? 'default' : 'outline'}>
               {status === 'published' ? t('eventos:admin.published') : t('eventos:admin.draft')}
             </Badge>
@@ -369,13 +361,13 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
             />
           </label>
           {event ? (
-            <Button asChild variant='outline'>
-              <Link to={`${PageURLS.eventoLanding(event.slug)}?preview=1`} target='_blank' rel='noreferrer'>
+            <Link to={`${PageURLS.eventoLanding(event.slug)}?preview=1`} target='_blank' rel='noreferrer'>
+              <Button color='primary' variant='outlined'>
                 {t('eventos:admin.preview')}
-              </Link>
-            </Button>
+              </Button>
+            </Link>
           ) : null}
-          <Button type='submit' disabled={saving}>
+          <Button color='primary' variant='solid' type='submit' disabled={saving}>
             {saving ? t('eventos:admin.saving') : t('eventos:admin.save')}
           </Button>
         </div>
@@ -661,8 +653,9 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
                   </div>
                   <div className='flex items-end'>
                     <Button
+                      color='primary'
+                      variant='outlined'
                       type='button'
-                      variant='outline'
                       disabled={locked || installmentDrafts.length < 2}
                       onClick={() =>
                         setInstallmentDrafts(current => current.filter((_, itemIndex) => itemIndex !== index))
@@ -674,8 +667,9 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
                 </div>
               ))}
               <Button
+                color='primary'
+                variant='outlined'
                 type='button'
-                variant='outline'
                 disabled={locked}
                 onClick={() => setInstallmentDrafts(current => [...current, { due_date: '', base: '', plan: '' }])}
               >
@@ -733,7 +727,7 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
               />
             ) : null}
             {event.type === 'recital' && canRegisterPayment ? (
-              <Button type='button' variant='outline' onClick={() => setPaymentOpen(true)}>
+              <Button color='primary' variant='outlined' type='button' onClick={() => setPaymentOpen(true)}>
                 {t('eventos:admin.registerInstallmentPayment')}
               </Button>
             ) : null}

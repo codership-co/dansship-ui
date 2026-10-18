@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
@@ -7,7 +8,7 @@ import { Section, SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
 import { PaymentDocumentFiles, PaymentMonthsList } from '@components/modules/profile';
-import { Button, Input, Label, Textarea } from '@components/ui';
+import { Input, Label, Textarea } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
 import {
   DANSSHIP_ERROR_CODE,
@@ -309,7 +310,7 @@ function PaymentDocumentsPage() {
                 </div>
               </div>
               <div className='flex justify-end'>
-                <Button type='submit' disabled={isSavingBank}>
+                <Button color='primary' variant='solid' type='submit' disabled={isSavingBank}>
                   {t('profile:paymentDocuments.saveBank')}
                 </Button>
               </div>
@@ -357,8 +358,9 @@ function PaymentDocumentsPage() {
           </div>
           <div className='flex justify-end gap-2'>
             <Button
+              color='primary'
+              variant='outlined'
               type='button'
-              variant='outline'
               onClick={() => {
                 setDisputeTargetId(null);
                 setDisputeReason('');
@@ -366,7 +368,13 @@ function PaymentDocumentsPage() {
             >
               {t('common:cancel')}
             </Button>
-            <Button type='button' disabled={!disputeReason.trim()} onClick={() => setDisputeConfirmOpen(true)}>
+            <Button
+              color='primary'
+              variant='solid'
+              type='button'
+              disabled={!disputeReason.trim()}
+              onClick={() => setDisputeConfirmOpen(true)}
+            >
               {t('profile:paymentDocuments.disputeContinue')}
             </Button>
           </div>

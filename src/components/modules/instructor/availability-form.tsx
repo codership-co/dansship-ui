@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from 'polpo/components';
 import { useCallback, useEffect } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +9,7 @@ import { z } from 'zod';
 
 import { Container } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
-import { Button, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Input } from '@components/ui';
+import { Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Input } from '@components/ui';
 import { DansshipAPI, UpdateAvailabilityPayload } from '@core/api';
 import { captureUnexpectedException, withSentrySpan } from '@core/sentry';
 import { useCallablePromise, usePromise } from '@hooks';
@@ -187,9 +188,10 @@ export function AvailabilityForm() {
 
                       <div className='pt-8'>
                         <Button
+                          color='primary'
+                          variant='text'
+                          forIcon
                           type='button'
-                          variant='ghost'
-                          size='icon'
                           className='text-alert-500 hover:bg-red-50 hover:text-alert-700'
                           onClick={() => remove(index)}
                         >
@@ -203,8 +205,9 @@ export function AvailabilityForm() {
 
               <div className='flex items-center justify-between pt-4'>
                 <Button
+                  color='primary'
+                  variant='outlined'
                   type='button'
-                  variant='outline'
                   onClick={() =>
                     append({
                       day_of_week: 0,
@@ -217,7 +220,7 @@ export function AvailabilityForm() {
                   {t('instructor:availability.addSlot')}
                 </Button>
 
-                <Button type='submit' disabled={isSaving || !isDirty}>
+                <Button color='primary' variant='solid' type='submit' disabled={isSaving || !isDirty}>
                   {isSaving ? t('common:saving') : t('instructor:availability.save')}
                 </Button>
               </div>

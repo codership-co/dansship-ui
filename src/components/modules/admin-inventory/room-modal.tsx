@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from 'polpo/components';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +11,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  Button,
   Input,
   Label,
   Select,
@@ -150,10 +150,10 @@ export function RoomModal({ isOpen, onClose, onSubmit, initialData, isLoading }:
           />
 
           <div className='flex justify-end space-x-2 pt-4'>
-            <Button type='button' variant='outline' onClick={onClose} disabled={isLoading}>
+            <Button color='primary' variant='outlined' type='button' onClick={onClose} disabled={isLoading}>
               {t('common:cancel')}
             </Button>
-            <Button type='submit' disabled={isLoading}>
+            <Button color='primary' variant='solid' type='submit' disabled={isLoading}>
               {isLoading ? t('common:saving') : t('common:save')}
             </Button>
           </div>

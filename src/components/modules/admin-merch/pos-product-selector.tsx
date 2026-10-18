@@ -1,9 +1,10 @@
+import { Button } from 'polpo/components';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuSearch } from 'react-icons/lu';
 
 import { SpinnerLoader } from '@components/loaders';
-import { Button, Input } from '@components/ui';
+import { Input } from '@components/ui';
 import { DansshipAPI, Product } from '@core/api';
 import { formatMerchPrice } from '@helpers';
 import { usePromise } from '@hooks';
@@ -71,17 +72,19 @@ export function POSProductSelector({ onAddToCart }: POSProductSelectorProps) {
 
         <div className='flex flex-wrap gap-2'>
           <Button
-            size='sm'
-            variant={categoryFilter === 'all' ? 'default' : 'outline'}
+            color='primary'
+            variant={categoryFilter === 'all' ? 'solid' : 'outlined'}
+            size='small'
             onClick={() => setCategoryFilter('all')}
           >
             {t('common:all', { defaultValue: 'All' })}
           </Button>
           {categories.map(category => (
             <Button
+              color='primary'
+              variant={categoryFilter === category ? 'solid' : 'outlined'}
+              size='small'
               key={category}
-              size='sm'
-              variant={categoryFilter === category ? 'default' : 'outline'}
               onClick={() => setCategoryFilter(category)}
             >
               {category}
@@ -121,7 +124,7 @@ export function POSProductSelector({ onAddToCart }: POSProductSelectorProps) {
               </p>
 
               <div className='mt-3'>
-                <Button className='w-full' onClick={() => onAddToCart(product, 1)}>
+                <Button color='primary' variant='solid' className='w-full' onClick={() => onAddToCart(product, 1)}>
                   {t('merch:addToCart')}
                 </Button>
               </div>

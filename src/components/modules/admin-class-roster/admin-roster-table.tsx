@@ -1,9 +1,10 @@
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuCircleCheck, LuCircleX } from 'react-icons/lu';
 
 import { Spinner } from '@components/loaders';
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Badge } from '@components/ui';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Badge } from '@components/ui';
 import { type RosterStudent } from '@core/api';
 import { classLevelLabelKey, rosterStudentName } from '@helpers';
 import { useAdminRoster } from '@hooks';
@@ -34,8 +35,9 @@ function AttendanceActions({ student, isPastStartTime, isUpdating, isDisabled, o
   return (
     <div className='relative inline-flex justify-end gap-2'>
       <Button
-        variant={student.status === 'attended' ? 'default' : 'outline'}
-        size='sm'
+        color='primary'
+        variant={student.status === 'attended' ? 'solid' : 'outlined'}
+        size='small'
         onClick={() => onAttendance(student.id, 'attended')}
         disabled={!isPastStartTime || isDisabled}
         className={student.status === 'attended' ? 'bg-active-600 hover:bg-active-700' : ''}
@@ -44,8 +46,9 @@ function AttendanceActions({ student, isPastStartTime, isUpdating, isDisabled, o
         <LuCircleCheck className='mr-1 h-4 w-4' /> {t('admin:roster.attended')}
       </Button>
       <Button
-        variant={student.status === 'no_show' ? 'destructive' : 'outline'}
-        size='sm'
+        color={student.status === 'no_show' ? 'alert' : 'primary'}
+        variant={student.status === 'no_show' ? 'solid' : 'outlined'}
+        size='small'
         onClick={() => onAttendance(student.id, 'no_show')}
         disabled={!isPastStartTime || isDisabled}
         title={!isPastStartTime ? t('admin:roster.cannotMarkBeforeStart') : ''}

@@ -1,9 +1,9 @@
+import { Button } from 'polpo/components';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { AdminPageLayout } from '@components/layouts';
 import { PaymentAssignmentsPanel } from '@components/modules';
-import { Button } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { PageURLS } from '@core/constants';
 import { PERMISSION } from '@core/permissions';
@@ -21,7 +21,7 @@ function PaymentAssignmentsPage() {
       subtitle={t('admin:paymentAssignments.subtitle')}
       dataComponent='PaymentAssignmentsPage'
       actions={
-        <Button type='button' onClick={() => openCreate?.()} disabled={!openCreate}>
+        <Button color='primary' variant='solid' type='button' onClick={() => openCreate?.()} disabled={!openCreate}>
           {t('admin:paymentAssignments.create')}
         </Button>
       }

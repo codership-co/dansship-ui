@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuUpload, LuX } from 'react-icons/lu';
@@ -5,7 +6,6 @@ import { LuUpload, LuX } from 'react-icons/lu';
 import { CustomerSearch } from './customer-search';
 
 import { PaymentMethodSelector } from '@components/modules';
-import { Button } from '@components/ui';
 import { useOrPermissions } from '@contexts';
 import {
   type CustomerSearchUser,
@@ -132,9 +132,10 @@ export function POSCheckout({
                 <p className='text-xs text-gray-500'>{(selectedProofFile.size / 1024 / 1024).toFixed(2)} MB</p>
               </div>
               <Button
+                color='primary'
+                variant='text'
+                forIcon
                 type='button'
-                size='icon'
-                variant='ghost'
                 className='h-7 w-7'
                 disabled={isSubmitting}
                 onClick={() => {
@@ -158,6 +159,8 @@ export function POSCheckout({
       ) : null}
 
       <Button
+        color='primary'
+        variant='solid'
         className='w-full'
         disabled={!canSubmit || isSubmitting}
         onClick={() => void onSubmit(selectedProofFile, proofUploadMode)}

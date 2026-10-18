@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { FormEvent, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -5,7 +6,7 @@ import { toast } from 'sonner';
 
 import { AdminPaymentPricingBreakdown } from '@components/modules/admin-payments/admin-payment-pricing-breakdown';
 import { TransferPaymentInstructions } from '@components/modules/payments/transfer-payment-instructions';
-import { Button, Input, Label } from '@components/ui';
+import { Input, Label } from '@components/ui';
 import { DansshipAPI, PaymentMethod, PaymentStatus } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { usePromise } from '@hooks';
@@ -130,9 +131,11 @@ export function AdminPlanPurchase({ userId }: AdminPlanPurchaseProps) {
     return (
       <section className='grid max-w-xl gap-4'>
         <p>{t('admin:users.registration.purchaseDone')}</p>
-        <Button asChild className='w-fit'>
-          <Link to={PageURLS.admin.userDetails(userId)}>{t('admin:users.registration.backToUser')}</Link>
-        </Button>
+        <Link to={PageURLS.admin.userDetails(userId)}>
+          <Button color='primary' variant='solid'>
+            {t('admin:users.registration.backToUser')}
+          </Button>
+        </Link>
       </section>
     );
   }
@@ -189,7 +192,7 @@ export function AdminPlanPurchase({ userId }: AdminPlanPurchaseProps) {
             />
           </div>
         </div>
-        <Button type='submit' className='w-fit' disabled={!planId}>
+        <Button color='primary' variant='solid' type='submit' disabled={!planId}>
           {t('admin:users.registration.preview')}
         </Button>
       </form>
@@ -210,8 +213,9 @@ export function AdminPlanPurchase({ userId }: AdminPlanPurchaseProps) {
             />
           </div>
           <Button
+            color='primary'
+            variant='solid'
             type='button'
-            className='w-fit'
             disabled={!proof || isSubmitting}
             onClick={() => void confirmPurchase()}
           >

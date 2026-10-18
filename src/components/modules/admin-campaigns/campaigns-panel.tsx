@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -6,7 +7,7 @@ import { CampaignResponsesDialog } from './campaign-responses-dialog';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { type Campaign, DansshipAPI } from '@core/api';
 import { useCampaigns, usePromise } from '@hooks';
 
@@ -84,7 +85,9 @@ export function CampaignsPanel() {
     <div className='space-y-4'>
       <div className='flex justify-between items-center'>
         <h2 className='text-xl font-semibold'>{t('campaigns:admin.title')}</h2>
-        <Button onClick={() => handleOpenModal()}>{t('campaigns:admin.create')}</Button>
+        <Button color='primary' variant='solid' onClick={() => handleOpenModal()}>
+          {t('campaigns:admin.create')}
+        </Button>
       </div>
       {sortedCampaigns.length === 0 ? (
         <p className='text-sm text-gray-500'>{t('campaigns:admin.empty')}</p>
@@ -110,7 +113,13 @@ export function CampaignsPanel() {
                 <TableCell>{t(`campaigns:admin.kind.${campaign.kind}`)}</TableCell>
                 <TableCell>{t(`campaigns:admin.planStatus.${campaign.audience.plan_status}`)}</TableCell>
                 <TableCell>
-                  <Button variant='ghost' size='sm' className='px-0' onClick={() => setResponsesCampaign(campaign)}>
+                  <Button
+                    color='primary'
+                    variant='text'
+                    size='small'
+                    className='px-0'
+                    onClick={() => setResponsesCampaign(campaign)}
+                  >
                     {t('campaigns:admin.viewResponses')} ({campaign.response_count})
                   </Button>
                 </TableCell>
@@ -123,21 +132,28 @@ export function CampaignsPanel() {
                 </TableCell>
                 <TableCell className='flex gap-2'>
                   <Button
-                    variant='outline'
-                    size='sm'
+                    color='primary'
+                    variant='outlined'
+                    size='small'
                     onClick={() => handleOpenModal(campaign)}
                     disabled={!campaign.is_active}
                   >
                     {t('common:edit')}
                   </Button>
                   {campaign.is_active ? (
-                    <Button variant='outline' size='sm' onClick={() => setCampaignToDeactivate(campaign)}>
+                    <Button
+                      color='primary'
+                      variant='outlined'
+                      size='small'
+                      onClick={() => setCampaignToDeactivate(campaign)}
+                    >
                       {t('common:deactivate')}
                     </Button>
                   ) : (
                     <Button
-                      variant='outline'
-                      size='sm'
+                      color='primary'
+                      variant='outlined'
+                      size='small'
                       disabled={isReactivating}
                       onClick={() => void reactivateCampaign(campaign.id)}
                     >

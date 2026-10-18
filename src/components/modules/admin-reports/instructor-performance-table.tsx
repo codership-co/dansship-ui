@@ -1,4 +1,5 @@
 import { format, startOfMonth, startOfYear, endOfMonth, subMonths } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -14,7 +15,6 @@ import {
   Card,
   Input,
   Label,
-  Button,
   Select,
   SelectContent,
   SelectItem,
@@ -166,7 +166,13 @@ export function InstructorPerformanceTable() {
             />
           </div>
           {preset === PRESETS.CUSTOM && (
-            <Button type='button' onClick={handleApplyCustom} disabled={isInvalidRange || isUnchangedRange}>
+            <Button
+              color='primary'
+              variant='solid'
+              type='button'
+              onClick={handleApplyCustom}
+              disabled={isInvalidRange || isUnchangedRange}
+            >
               {t('reports:applyDateRange', 'Apply')}
             </Button>
           )}

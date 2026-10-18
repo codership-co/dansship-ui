@@ -1,7 +1,8 @@
 import { format } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 
-import { Badge, Button, ProfilePicture } from '@components/ui';
+import { Badge, ProfilePicture } from '@components/ui';
 import { canRateBooking, cn, isAcademyCancelledBooking, resolvePlanDisplayName } from '@helpers';
 import { useDateLocale } from '@hooks';
 
@@ -116,7 +117,7 @@ export function HistoryBookingCard({ booking, alreadyRated, onRate }: HistoryBoo
           {alreadyRated && booking.status === 'attended' ? (
             <p className='text-sm text-muted-foreground'>{t('bookings:rated')}</p>
           ) : canRate ? (
-            <Button type='button' variant='outlinePrimary' size='sm' onClick={() => onRate(booking)}>
+            <Button color='primary' variant='outlined' size='small' type='button' onClick={() => onRate(booking)}>
               {t('bookings:rateClass')}
             </Button>
           ) : null}

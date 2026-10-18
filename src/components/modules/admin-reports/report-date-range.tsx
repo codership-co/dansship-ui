@@ -1,7 +1,8 @@
 import { format } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 
-import { Button, Input, Label } from '@components/ui';
+import { Input, Label } from '@components/ui';
 import { useDateLocale } from '@hooks';
 
 export type ReportDateRangeValue = {
@@ -53,7 +54,13 @@ export function ReportDateRange({ dateRange, appliedDateRange, onDateRangeChange
             onChange={event => onDateRangeChange({ ...dateRange, end: event.target.value })}
           />
         </div>
-        <Button type='button' onClick={onApply} disabled={isInvalidRange || isUnchangedRange}>
+        <Button
+          color='primary'
+          variant='solid'
+          type='button'
+          onClick={onApply}
+          disabled={isInvalidRange || isUnchangedRange}
+        >
           {t('reports:applyDateRange')}
         </Button>
       </div>

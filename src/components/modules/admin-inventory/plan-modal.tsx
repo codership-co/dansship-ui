@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from 'polpo/components';
 import { useEffect } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +10,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  Button,
   Input,
   Label,
   Select,
@@ -318,7 +318,13 @@ export function PlanModal({
           <div className='space-y-3'>
             <div className='flex items-center justify-between gap-2'>
               <Label>{t('billing:features')}</Label>
-              <Button type='button' variant='outline' size='sm' onClick={() => appendFeature({ value: '' })}>
+              <Button
+                color='primary'
+                variant='outlined'
+                size='small'
+                type='button'
+                onClick={() => appendFeature({ value: '' })}
+              >
                 {t('billing:addFeature')}
               </Button>
             </div>
@@ -329,7 +335,13 @@ export function PlanModal({
               featureFields.map((field, index) => (
                 <div key={field.id} className='flex gap-2'>
                   <Input {...register(`features.${index}.value`)} placeholder={t('billing:featurePlaceholder')} />
-                  <Button type='button' variant='outline' size='sm' onClick={() => removeFeature(index)}>
+                  <Button
+                    color='primary'
+                    variant='outlined'
+                    size='small'
+                    type='button'
+                    onClick={() => removeFeature(index)}
+                  >
                     {t('common:remove')}
                   </Button>
                 </div>
@@ -342,9 +354,10 @@ export function PlanModal({
             <div className='flex items-center justify-between gap-2'>
               <Label>{t('billing:classGroupAllowances')}</Label>
               <Button
+                color='primary'
+                variant='outlined'
+                size='small'
                 type='button'
-                variant='outline'
-                size='sm'
                 onClick={() =>
                   appendAllowance({
                     class_group_id: classGroups[0]?.id ?? '',
@@ -385,9 +398,10 @@ export function PlanModal({
                   {...register(`class_group_allowances.${index}.max_classes`)}
                 />
                 <Button
+                  color='primary'
+                  variant='outlined'
+                  size='small'
                   type='button'
-                  variant='outline'
-                  size='sm'
                   onClick={() => removeAllowance(index)}
                   disabled={allowanceFields.length <= 1}
                 >
@@ -449,10 +463,15 @@ export function PlanModal({
           </div>
 
           <div className='flex justify-end space-x-2 pt-4'>
-            <Button type='button' variant='outline' onClick={onClose} disabled={isLoading}>
+            <Button color='primary' variant='outlined' type='button' onClick={onClose} disabled={isLoading}>
               {t('common:cancel')}
             </Button>
-            <Button type='submit' disabled={isLoading || classGroups.length === 0 || taxTypes.length === 0}>
+            <Button
+              color='primary'
+              variant='solid'
+              type='submit'
+              disabled={isLoading || classGroups.length === 0 || taxTypes.length === 0}
+            >
               {isLoading ? t('common:saving') : t('common:save')}
             </Button>
           </div>

@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuEllipsisVertical } from 'react-icons/lu';
@@ -5,7 +6,6 @@ import { toast } from 'sonner';
 
 import { ConfirmDialog } from '@components/modals';
 import {
-  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -296,9 +296,10 @@ export function UserDetailsActions({
       <Popover open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <PopoverTrigger asChild>
           <Button
+            color='primary'
+            variant='outlined'
+            forIcon
             type='button'
-            variant='outline'
-            size='icon'
             aria-label={t('admin:users.details.actionsMenu')}
             disabled={isLoading}
           >
@@ -432,10 +433,10 @@ export function UserDetailsActions({
               </DialogHeader>
               <p className='break-all text-sm text-foreground'>{issuedActivationLink}</p>
               <DialogFooter>
-                <Button type='button' variant='outline' onClick={closeInviteDialog}>
+                <Button color='primary' variant='outlined' type='button' onClick={closeInviteDialog}>
                   {t('common:close')}
                 </Button>
-                <Button type='button' onClick={() => void handleCopyActivationLink()}>
+                <Button color='primary' variant='solid' type='button' onClick={() => void handleCopyActivationLink()}>
                   {t('admin:users.details.copyInstructorInviteLink')}
                 </Button>
               </DialogFooter>
@@ -470,10 +471,22 @@ export function UserDetailsActions({
                 </Label>
               </fieldset>
               <DialogFooter>
-                <Button type='button' variant='outline' onClick={closeInviteDialog} disabled={isInviting}>
+                <Button
+                  color='primary'
+                  variant='outlined'
+                  type='button'
+                  onClick={closeInviteDialog}
+                  disabled={isInviting}
+                >
                   {t('common:cancel')}
                 </Button>
-                <Button type='button' onClick={() => void handleInviteInstructor()} disabled={isInviting}>
+                <Button
+                  color='primary'
+                  variant='solid'
+                  type='button'
+                  onClick={() => void handleInviteInstructor()}
+                  disabled={isInviting}
+                >
                   {t('admin:users.details.sendInstructorInvite')}
                 </Button>
               </DialogFooter>

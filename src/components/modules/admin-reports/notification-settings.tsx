@@ -1,19 +1,10 @@
+import { Button } from 'polpo/components';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
-import {
-  Card,
-  Switch,
-  Label,
-  Input,
-  Button,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-} from '@components/ui';
+import { Card, Switch, Label, Input, CardContent, CardHeader, CardTitle, CardDescription } from '@components/ui';
 import { DansshipAPI, type UpdateNotificationConfigPayload } from '@core/api';
 import { useCallablePromise, usePromise } from '@hooks';
 
@@ -108,11 +99,23 @@ export function NotificationSettings() {
 
                             <span className='text-sm text-gray-500'>{t('common:minutes')}</span>
 
-                            <Button size='sm' variant='secondary' onClick={saveLeadTime} className='h-8'>
+                            <Button
+                              color='secondary'
+                              variant='solid'
+                              size='small'
+                              onClick={saveLeadTime}
+                              className='h-8'
+                            >
                               {t('common:save')}
                             </Button>
 
-                            <Button size='sm' variant='ghost' onClick={() => setEditingType(null)} className='h-8'>
+                            <Button
+                              color='primary'
+                              variant='text'
+                              size='small'
+                              onClick={() => setEditingType(null)}
+                              className='h-8'
+                            >
                               {t('common:cancel')}
                             </Button>
                           </div>
@@ -123,8 +126,9 @@ export function NotificationSettings() {
                             </span>
 
                             <Button
-                              size='sm'
-                              variant='link'
+                              color='primary'
+                              variant='text'
+                              size='small'
                               onClick={() => startEditing(config.type, config.lead_time_minutes)}
                               className='h-6 px-2 text-purple-600'
                             >

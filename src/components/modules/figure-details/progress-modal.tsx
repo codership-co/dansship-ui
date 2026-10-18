@@ -1,3 +1,4 @@
+import { Button } from 'polpo/components';
 import { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuX, LuChevronDown, LuChevronUp } from 'react-icons/lu';
@@ -5,7 +6,6 @@ import { toast } from 'sonner';
 
 import { ProgressButtons, ProgressLevel } from './progress-buttons';
 
-import { Button } from '@components/ui';
 import { DansshipAPI, FigureProgress } from '@core/api';
 import { formatDate } from '@helpers';
 
@@ -83,9 +83,10 @@ export function ProgressModal({ isOpen, onClose, figureId }: ProgressModalProps)
         <div className='sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center'>
           <h2 className='text-xl font-bold text-gray-900'>{t('figure:progress.title')}</h2>
           <Button
+            color='primary'
+            variant='text'
+            forIcon
             onClick={onClose}
-            variant='ghost'
-            size='icon'
             type='button'
             className='text-gray-500 hover:text-gray-700'
           >
@@ -116,9 +117,10 @@ export function ProgressModal({ isOpen, onClose, figureId }: ProgressModalProps)
               {progressHistory.length > 0 && (
                 <div>
                   <Button
+                    color='primary'
+                    variant='text'
                     onClick={() => setShowHistory(!showHistory)}
                     type='button'
-                    variant='ghost'
                     className='px-0 text-purple-600 hover:text-purple-700'
                   >
                     {showHistory ? <LuChevronUp /> : <LuChevronDown />}
@@ -161,10 +163,10 @@ export function ProgressModal({ isOpen, onClose, figureId }: ProgressModalProps)
               )}
 
               <div className='flex justify-end gap-4 pt-4 border-t'>
-                <Button onClick={onClose} type='button' variant='outline' disabled={isSaving}>
+                <Button color='primary' variant='outlined' onClick={onClose} type='button' disabled={isSaving}>
                   {t('common:cancel')}
                 </Button>
-                <Button onClick={handleSave} type='button' disabled={isSaving}>
+                <Button color='primary' variant='solid' onClick={handleSave} type='button' disabled={isSaving}>
                   {isSaving ? t('common:saving') : t('common:save')}
                 </Button>
               </div>

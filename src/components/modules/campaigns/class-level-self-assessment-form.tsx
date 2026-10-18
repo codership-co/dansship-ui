@@ -1,7 +1,8 @@
+import { Button } from 'polpo/components';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { Button, Label } from '@components/ui';
+import { Label } from '@components/ui';
 import { type CampaignAnswerValue, type PendingCampaign } from '@core/api';
 import { CLASS_LEVELS, classLevelLabelKey, cn } from '@helpers';
 
@@ -67,7 +68,7 @@ export function ClassLevelSelfAssessmentForm({
       <div className='space-y-6 p-6'>
         <h2 className='text-xl font-semibold text-gray-900'>{campaign.title}</h2>
         {onDismiss ? (
-          <Button type='button' variant='outline' className='w-full' onClick={onDismiss}>
+          <Button color='primary' variant='outlined' type='button' className='w-full' onClick={onDismiss}>
             {t('common:close')}
           </Button>
         ) : null}
@@ -120,13 +121,13 @@ export function ClassLevelSelfAssessmentForm({
       {error ? <p className='text-sm text-destructive'>{error}</p> : null}
       <div className='grid grid-cols-2 gap-2'>
         {onDismiss ? (
-          <Button type='button' variant='outline' disabled={isSubmitting} onClick={onDismiss}>
+          <Button color='primary' variant='outlined' type='button' disabled={isSubmitting} onClick={onDismiss}>
             {t('common:close')}
           </Button>
         ) : (
           <span />
         )}
-        <Button type='submit' disabled={isSubmitting}>
+        <Button color='primary' variant='solid' type='submit' disabled={isSubmitting}>
           {isSubmitting
             ? t('campaigns:overlay.submitting')
             : isLastStep

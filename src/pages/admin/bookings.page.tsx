@@ -1,21 +1,13 @@
 import { format, parseISO } from 'date-fns';
+import { Button } from 'polpo/components';
 import { SubmitEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuChevronLeft, LuChevronRight, LuSearch } from 'react-icons/lu';
 import { toast } from 'sonner';
 
+import { SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
-import {
-  Button,
-  Input,
-  Label,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Textarea,
-} from '@components/ui';
+import { Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { type AdminBookClassPayload, DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -186,10 +178,7 @@ function AdminBookingsPage() {
 
   return (
     <div className='max-w-6xl mx-auto py-8 px-4 space-y-6 pt-20'>
-      <div>
-        <h1 className='text-3xl font-bold text-gray-900'>{t('admin:bookings.title')}</h1>
-        <p className='text-gray-500 mt-2'>{t('admin:bookings.subtitle')}</p>
-      </div>
+      <SectionHeading title={t('admin:bookings.title')} subtitle={t('admin:bookings.subtitle')} />
 
       <div className='rounded-lg border border-gray-200 bg-white p-6 shadow-sm'>
         <form className='space-y-5' onSubmit={handleSubmit}>
@@ -244,9 +233,10 @@ function AdminBookingsPage() {
           <div className='space-y-3'>
             <div className='grid grid-cols-[auto_1fr_auto] items-center gap-3'>
               <Button
+                color='primary'
+                variant='outlined'
+                size='small'
                 type='button'
-                variant='outline'
-                size='sm'
                 onClick={() => setCurrentWeek(getPrevMonday(currentWeek))}
                 aria-label={t('common:prevWeek')}
               >
@@ -257,9 +247,10 @@ function AdminBookingsPage() {
                 {format(parseISO(currentWeek), 'MMM d, yyyy')}
               </div>
               <Button
+                color='primary'
+                variant='outlined'
+                size='small'
                 type='button'
-                variant='outline'
-                size='sm'
                 onClick={() => setCurrentWeek(getNextMonday(currentWeek))}
                 aria-label={t('common:nextWeek')}
               >
@@ -332,7 +323,7 @@ function AdminBookingsPage() {
             </div>
           )}
 
-          <Button type='submit' disabled={isBooking}>
+          <Button color='primary' variant='solid' type='submit' disabled={isBooking}>
             {isBooking ? t('admin:bookings.submitting') : t('admin:bookings.submit')}
           </Button>
         </form>

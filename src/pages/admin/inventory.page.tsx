@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
+import { SectionHeading } from '@components/containers';
 import { BenefitWindowsPanel, ClassesTab, DoorCodePanel, PlansTab, RoomsTab } from '@components/modules';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
@@ -68,10 +69,7 @@ function AdminInventoryPage() {
 
   return (
     <div className='max-w-7xl mx-auto py-8 px-4 pt-20'>
-      <div className='mb-8'>
-        <h1 className='text-3xl font-bold text-gray-900'>{t('admin:inventory.title')}</h1>
-        <p className='text-gray-500 mt-2'>{t('admin:inventory.subtitle')}</p>
-      </div>
+      <SectionHeading title={t('admin:inventory.title')} subtitle={t('admin:inventory.subtitle')} />
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className='w-full'>
         <TabsList className='mb-4 bg-white border border-gray-200 shadow-sm'>

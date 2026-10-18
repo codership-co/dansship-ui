@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from 'polpo/components';
 import { useEffect } from 'react';
 import { Resolver, useFieldArray, useForm, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
 
 import {
-  Button,
   Checkbox,
   Dialog,
   DialogContent,
@@ -497,18 +497,31 @@ export function CampaignModal({
               <div className='flex flex-wrap items-center justify-between gap-2'>
                 <Label>{t('campaigns:admin.modal.questions')}</Label>
                 <div className='flex flex-wrap gap-2'>
-                  <Button type='button' variant='outline' size='sm' onClick={() => append(emptyQuestion('text'))}>
+                  <Button
+                    color='primary'
+                    variant='outlined'
+                    size='small'
+                    type='button'
+                    onClick={() => append(emptyQuestion('text'))}
+                  >
                     {t('campaigns:admin.modal.questionTypes.text')}
                   </Button>
                   <Button
+                    color='primary'
+                    variant='outlined'
+                    size='small'
                     type='button'
-                    variant='outline'
-                    size='sm'
                     onClick={() => append(emptyQuestion('multiple_choice'))}
                   >
                     {t('campaigns:admin.modal.questionTypes.multiple_choice')}
                   </Button>
-                  <Button type='button' variant='outline' size='sm' onClick={() => append(emptyQuestion('scale'))}>
+                  <Button
+                    color='primary'
+                    variant='outlined'
+                    size='small'
+                    type='button'
+                    onClick={() => append(emptyQuestion('scale'))}
+                  >
                     {t('campaigns:admin.modal.questionTypes.scale')}
                   </Button>
                 </div>
@@ -527,7 +540,13 @@ export function CampaignModal({
                   <div key={field.id} className='rounded-lg border border-gray-200 p-4 space-y-3'>
                     <div className='flex justify-between gap-2'>
                       <p className='text-sm font-medium'>{t(`campaigns:admin.modal.questionTypes.${questionType}`)}</p>
-                      <Button type='button' variant='outline' size='sm' onClick={() => remove(index)}>
+                      <Button
+                        color='primary'
+                        variant='outlined'
+                        size='small'
+                        type='button'
+                        onClick={() => remove(index)}
+                      >
                         {t('common:remove')}
                       </Button>
                     </div>
@@ -562,10 +581,10 @@ export function CampaignModal({
             </div>
           ) : null}
           <div className='flex justify-end gap-2'>
-            <Button type='button' variant='outline' onClick={onClose}>
+            <Button color='primary' variant='outlined' type='button' onClick={onClose}>
               {t('common:cancel')}
             </Button>
-            <Button type='submit' disabled={isLoading}>
+            <Button color='primary' variant='solid' type='submit' disabled={isLoading}>
               {t('common:save')}
             </Button>
           </div>
@@ -594,12 +613,18 @@ function MultipleChoiceEditor({ form, index }: { form: UseFormReturn<CampaignFor
       {fields.map((option, optionIndex) => (
         <div key={option.id} className='flex gap-2'>
           <Input {...form.register(`questions.${index}.options.${optionIndex}.label`)} />
-          <Button type='button' variant='outline' size='sm' onClick={() => remove(optionIndex)}>
+          <Button color='primary' variant='outlined' size='small' type='button' onClick={() => remove(optionIndex)}>
             {t('common:remove')}
           </Button>
         </div>
       ))}
-      <Button type='button' variant='outline' size='sm' onClick={() => append({ id: createQuestionId(), label: '' })}>
+      <Button
+        color='primary'
+        variant='outlined'
+        size='small'
+        type='button'
+        onClick={() => append({ id: createQuestionId(), label: '' })}
+      >
         {t('campaigns:admin.modal.addOption')}
       </Button>
     </div>

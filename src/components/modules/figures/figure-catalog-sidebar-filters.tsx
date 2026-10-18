@@ -1,9 +1,9 @@
 import { cva } from 'class-variance-authority';
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { LuCheck, LuSearch, LuX } from 'react-icons/lu';
 
 import { catalogFilterChipVariants } from '@components/modules';
-import { Button } from '@components/ui';
 import { BrowseFigureFilters } from '@hooks';
 
 const DIFFICULTIES: Array<{ value: BrowseFigureFilters['difficulty']; labelKey: string }> = [
@@ -121,8 +121,9 @@ export const FigureCatalogSidebarFilters = ({ filters, setFilters }: FigureCatal
 
         <div className='mt-6'>
           <Button
-            variant='ghost'
-            size='sm'
+            color='primary'
+            variant='text'
+            size='small'
             onClick={() =>
               setFilters({
                 difficulty: undefined,

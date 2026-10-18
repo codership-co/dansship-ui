@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Button } from 'polpo/components';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +10,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  Button,
   Input,
   Label,
   Select,
@@ -211,10 +211,10 @@ export function ClassModal({ isOpen, onClose, onSubmit, initialData, classGroups
           </div>
 
           <div className='flex justify-end space-x-2 pt-4'>
-            <Button type='button' variant='outline' onClick={onClose} disabled={isLoading}>
+            <Button color='primary' variant='outlined' type='button' onClick={onClose} disabled={isLoading}>
               {t('common:cancel')}
             </Button>
-            <Button type='submit' disabled={isLoading || classGroups.length === 0}>
+            <Button color='primary' variant='solid' type='submit' disabled={isLoading || classGroups.length === 0}>
               {isLoading ? t('common:saving') : t('common:save')}
             </Button>
           </div>

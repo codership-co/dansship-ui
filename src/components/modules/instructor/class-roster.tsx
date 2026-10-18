@@ -1,11 +1,12 @@
 import { format } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuCircleCheck, LuSearch, LuCircleX } from 'react-icons/lu';
 import { Link } from 'react-router';
 
 import { SpinnerLoader, Spinner } from '@components/loaders';
-import { Button, Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Input, Badge } from '@components/ui';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, Input, Badge } from '@components/ui';
 import { useOrPermissions } from '@contexts';
 import { DansshipAPI, InstructorUserSearchResult, RosterStudent } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -82,8 +83,9 @@ function AttendanceActions({
   return (
     <div className={`relative ${stacked ? 'grid grid-cols-2 gap-2 w-full' : 'inline-flex gap-2 justify-end'}`}>
       <Button
-        variant={student.status === 'attended' ? 'default' : 'outline'}
-        size='sm'
+        color='primary'
+        variant={student.status === 'attended' ? 'solid' : 'outlined'}
+        size='small'
         onClick={() => onAttendance(student.id, 'attended')}
         disabled={!isPastStartTime || isDisabled}
         className={`${stacked ? 'w-full' : ''} ${student.status === 'attended' ? 'bg-active-600 hover:bg-active-700' : ''}`}
@@ -92,8 +94,9 @@ function AttendanceActions({
         <LuCircleCheck className='h-4 w-4 mr-1' /> {t('instructor:roster.attended')}
       </Button>
       <Button
-        variant={student.status === 'no_show' ? 'destructive' : 'outline'}
-        size='sm'
+        color={student.status === 'no_show' ? 'alert' : 'primary'}
+        variant={student.status === 'no_show' ? 'solid' : 'outlined'}
+        size='small'
         onClick={() => onAttendance(student.id, 'no_show')}
         disabled={!isPastStartTime || isDisabled}
         className={stacked ? 'w-full' : ''}
@@ -362,6 +365,8 @@ export function ClassRoster({ classId, className, startTime }: ClassRosterProps)
               {searchDropdown}
             </div>
             <Button
+              color='primary'
+              variant='solid'
               onClick={handleManualAdd}
               disabled={isAdding || !selectedUser}
               className='w-full sm:w-auto shrink-0'
