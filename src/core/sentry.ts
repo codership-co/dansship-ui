@@ -1,4 +1,6 @@
-import { setUser, setTag, addBreadcrumb, withScope, captureException, startSpan } from '@sentry/react';
+import { setUser, setTag, addBreadcrumb, withScope, captureException, captureMessage, startSpan } from '@sentry/react';
+
+import { isDynamicImportError } from '../helpers/chunk-load';
 
 import { DANSSHIP_ERROR_CODE, DansshipAPIError } from './api/dansship.error';
 
@@ -74,6 +76,23 @@ export function isExpectedAuthError(error: unknown): boolean {
   return error instanceof DansshipAPIError && EXPECTED_AUTH_ERROR_CODES.has(error.body.error_code);
 }
 
+const TRANSPORT_FAILURE_RE =
+  /Failed to fetch|NetworkError|Load failed|network error|The Internet connection appears to be offline/i;
+
+export function isTransportFailure(error: unknown): boolean {
+  if (isDynamicImportError(error)) {
+    return false;
+  }
+
+  if (error instanceof DansshipAPIError && error.status > 0) {
+    return false;
+  }
+
+  const message = error instanceof Error ? error.message : typeof error === 'string' ? error : '';
+
+  return TRANSPORT_FAILURE_RE.test(message);
+}
+
 export function captureUnexpectedException(
   error: unknown,
   context?: {
@@ -93,6 +112,22 @@ export function captureUnexpectedException(
   if (context?.skipIfExpected === 'auth' && isExpectedAuthError(error)) {
     addSentryBreadcrumb('auth.expected_error', 'Expected auth domain error', {
       error_code: error instanceof DansshipAPIError ? error.body.error_code : undefined,
+    });
+
+    return;
+  }
+
+  if (isTransportFailure(error)) {
+    addSentryBreadcrumb('http.transport', 'Request failed before an HTTP response', undefined, 'warning');
+    withScope(scope => {
+      scope.setLevel('warning');
+      scope.setFingerprint(['http-transport']);
+
+      if (context?.tags) {
+        Object.entries(context.tags).forEach(([key, value]) => scope.setTag(key, value));
+      }
+
+      captureMessage('HTTP transport failure');
     });
 
     return;

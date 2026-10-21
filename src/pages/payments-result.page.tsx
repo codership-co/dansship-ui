@@ -29,7 +29,15 @@ export async function PaymentsResultsLoader({ url }: LoaderFunctionArgs): Promis
   const intentIdParam = url.searchParams.get('intentId');
   const boldIntentIdParam = url.searchParams.get('bold-order-id');
   const boldStatusParam = url.searchParams.get('bold-tx-status') || '';
-  const intentId = intentIdParam || boldIntentIdParam || '';
+  const intentId = (intentIdParam || boldIntentIdParam || '').trim();
+
+  if (!intentId) {
+    return {
+      intentId: '',
+      boldStatusParam,
+      intent: null,
+    };
+  }
 
   const { data } = await DansshipAPI.payments.getIntent(intentId);
 
@@ -241,23 +249,29 @@ function PaymentsResultPage() {
         </Section>
       )}
 
-      {!intent && intentId && (
+      {!intent && (
         <Section contentClassName='grid gap-20' navbarPadding>
           <section className='rounded-2xl shadow-2xl'>
             <section className='bg-white rounded-2xl grid md:grid-cols-[3fr_2fr] overflow-hidden'>
               <section className='grid px-8 py-40 place-content-center gap-4 justify-items-center text-center'>
-                <p className='whitespace-pre-line m-0'>{t('payments:intentDetailsNotFound')}</p>
-                <section className='flex min-w-0 overflow-hidden rounded-2xl bg-gray-200/60'>
-                  <small className='m-0 block shrink-0 bg-gray-200 px-4 py-2'>{t('payments:intentId')}</small>
-                  <small className='m-0 block min-w-0 flex-1 truncate font-code px-4 py-2'>{intentId}</small>
-                </section>
-                <Button
-                  color='primary'
-                  onClick={() => revalidator.revalidate()}
-                  isLoading={revalidator.state === 'loading'}
-                >
-                  {t('payments:retryIntentDetails')}
-                </Button>
+                <p className='whitespace-pre-line m-0'>
+                  {t(intentId ? 'payments:intentDetailsNotFound' : 'payments:intentDetailsMissing')}
+                </p>
+                {intentId ? (
+                  <section className='flex min-w-0 overflow-hidden rounded-2xl bg-gray-200/60'>
+                    <small className='m-0 block shrink-0 bg-gray-200 px-4 py-2'>{t('payments:intentId')}</small>
+                    <small className='m-0 block min-w-0 flex-1 truncate font-code px-4 py-2'>{intentId}</small>
+                  </section>
+                ) : null}
+                {intentId ? (
+                  <Button
+                    color='primary'
+                    onClick={() => revalidator.revalidate()}
+                    isLoading={revalidator.state === 'loading'}
+                  >
+                    {t('payments:retryIntentDetails')}
+                  </Button>
+                ) : null}
               </section>
               <section className='relative bg-primary hidden md:block'>
                 <img

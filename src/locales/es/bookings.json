@@ -110,6 +110,7 @@
   "classFullDesc": "Esta clase ha alcanzado su capacidad máxima.",
   "bookingFailed": "Reserva Fallida",
   "bookingFailedDesc": "No se pudo reservar la clase.",
+  "connectionFailedDesc": "No pudimos conectar. Revisa tu conexión e inténtalo de nuevo.",
   "lateJoinClosedDesc": "El plazo para reservar esta clase ya cerró.",
   "timeOverlapDesc": "Ya tienes otra clase reservada en ese horario.",
   "instructorOwnClassDesc": "No puedes reservar la clase que estás asignado a dictar.",
