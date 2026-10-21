@@ -326,6 +326,24 @@ export class EventosAdminAPI {
     });
   }
 
+  async updateSession(
+    eventId: string,
+    sessionId: string,
+    payload: {
+      starts_at?: string;
+      ends_at?: string;
+      room_id?: string | null;
+      external_location?: string | null;
+      label?: string | null;
+    },
+  ) {
+    return this.httpClient.callNoError<EventSession>({
+      path: `/admin/events/${eventId}/sessions/${sessionId}`,
+      method: 'PATCH',
+      data: payload,
+    });
+  }
+
   async previewRecurrence(
     eventId: string,
     payload: {
@@ -334,6 +352,7 @@ export class EventosAdminAPI {
       end_time: string;
       first_date: string;
       last_date: string;
+      excluded_dates?: Array<string>;
       room_id?: string | null;
       external_location?: string | null;
       label?: string | null;
@@ -354,6 +373,7 @@ export class EventosAdminAPI {
       end_time: string;
       first_date: string;
       last_date: string;
+      excluded_dates?: Array<string>;
       room_id?: string | null;
       external_location?: string | null;
       label?: string | null;

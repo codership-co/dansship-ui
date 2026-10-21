@@ -8,15 +8,9 @@ import { SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
 import { AdminClassRosterDialog, ClassSlotModal, CopyWeekDialog, ScheduleGrid } from '@components/modules';
+import { isScheduleBuilderOverlayEvent } from '@components/modules/schedules/schedule-builder-events';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
-import {
-  DANSSHIP_ERROR_CODE,
-  DansshipAPI,
-  DansshipAPIError,
-  ScheduledClass,
-  type AgendaEvent,
-  type ScheduleWeek,
-} from '@core/api';
+import { DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError, ScheduledClass, type ScheduleWeek } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions, PERMISSION } from '@core/permissions';
 import { useClasses, usePromise, useRooms, useSchedules } from '@hooks';
@@ -34,14 +28,6 @@ interface ClassSlotFormData {
 const UNASSIGNED_INSTRUCTOR = '__tba__';
 
 type RosterView = { kind: 'class' | 'event'; id: string; title?: string };
-
-function isScheduleBuilderOverlayEvent(event: AgendaEvent) {
-  if (event.event_type === 'space_rental_external' || event.event_type === 'internal_reserved_use') {
-    return true;
-  }
-
-  return event.event_type === 'workshop' && event.status === 'published';
-}
 
 function resolveInstructorId(instructorId: string): string | null {
   if (!instructorId || instructorId === UNASSIGNED_INSTRUCTOR) {
