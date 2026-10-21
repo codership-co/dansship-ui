@@ -13,6 +13,7 @@
   "name": "Nombre",
   "moreDetails": "Más Detalles",
   "intentDetailsNotFound": "No pudimos encontrar el pago con este ID,\ninténtalo de nuevo.",
+  "intentDetailsMissing": "No encontramos un pago para mostrar.\nAbre de nuevo el enlace de confirmación.",
   "retryIntentDetails": "Volver a buscar",
   "iva": "IVA",
   "intentStatus": "Estado",

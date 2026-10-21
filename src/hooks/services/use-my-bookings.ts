@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { useCallablePromise } from '../use-callable-promise';
 
 import { BookClassPayload, BookClassResponse, DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError } from '@core/api';
-import { captureUnexpectedException, withSentrySpan } from '@core/sentry';
+import { captureUnexpectedException, isTransportFailure, withSentrySpan } from '@core/sentry';
 
 const companionErrorToastKey = (errorCode: string | undefined) => {
   switch (errorCode) {
@@ -77,7 +77,7 @@ export const useMyBookings = () => {
               tags: { flow: 'booking.create', class_id: payload.scheduled_class_id },
             });
           } else {
-            toast.error(t('bookings:bookingFailedDesc'));
+            toast.error(t(isTransportFailure(error) ? 'bookings:connectionFailedDesc' : 'bookings:bookingFailedDesc'));
             captureUnexpectedException(error, {
               tags: { flow: 'booking.create', class_id: payload.scheduled_class_id },
             });

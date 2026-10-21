@@ -29,6 +29,7 @@ if (import.meta.env.PROD && dsn) {
       }),
     ],
     ignoreErrors: IGNORE_ERRORS,
+    denyUrls: [/connect\.facebook\.net/i, /\/signals\/iwl\.js/i],
     beforeSend(event) {
       const frames = event.exception?.values?.flatMap(value => value.stacktrace?.frames ?? []) ?? [];
       const isInAppBrowserBridge = frames.some(

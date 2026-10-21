@@ -5,6 +5,8 @@ import { uploadFileWithPresignedRetry } from '../common/put-file-to-presigned-ur
 import { mapAppliedDiscounts, normalizeIntent, toNumber } from './payments.helpers';
 
 import {
+  DANSSHIP_ERROR_CATEGORY,
+  DANSSHIP_ERROR_CODE,
   DansshipAPIError,
   PaymentPreviewMappedResponse,
   PaymentPreviewRequest,
@@ -107,9 +109,39 @@ export class PaymentsAPI {
   }
 
   async getIntent(id: string) {
+    const intentId = id.trim();
+
+    if (!intentId) {
+      const message = 'Payment intent id is required';
+
+      return {
+        ok: false as const,
+        data: null,
+        status: 0,
+        error: new DansshipAPIError(
+          {
+            category: DANSSHIP_ERROR_CATEGORY.VALIDATION_ERROR,
+            error_code: DANSSHIP_ERROR_CODE.BAD_REQUEST,
+            message,
+            status: 0,
+            timestamp: new Date(0).toISOString(),
+            path: '/payments/intents',
+            details: {
+              next_action: '',
+              resend_verification_endpoint: '',
+            },
+            request_id: null,
+            trace_id: null,
+          },
+          0,
+          message,
+        ),
+      };
+    }
+
     return this.httpClient.callNoError<PaymentIntentDetail>(
       {
-        path: `/payments/intents/${id}`,
+        path: `/payments/intents/${intentId}`,
         method: 'GET',
       },
       intent => normalizeIntent(intent) as PaymentIntentDetail,
