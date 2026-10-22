@@ -12,7 +12,13 @@ import {
   DialogTitle,
   Label,
 } from '@components/ui';
-import { DANSSHIP_ERROR_CODE, DansshipAPIError, type ScheduleWeek, type WeekCopyConflict } from '@core/api';
+import {
+  DANSSHIP_ERROR_CODE,
+  DansshipAPIError,
+  type CopyWeekResult,
+  type ScheduleWeek,
+  type WeekCopyConflict,
+} from '@core/api';
 
 interface CopyWeekDialogProps {
   open: boolean;
@@ -23,7 +29,7 @@ interface CopyWeekDialogProps {
   isLoading?: boolean;
   onConfirm: (sourceWeekId: string) => Promise<{
     ok: boolean;
-    data: ScheduleWeek | null;
+    data: CopyWeekResult | null;
     error: DansshipAPIError | null;
   }>;
   onSuccess: (week: ScheduleWeek) => void;
@@ -54,7 +60,9 @@ export function CopyWeekDialog({
   const { t } = useTranslation();
   const [sourceWeekId, setSourceWeekId] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [noticeMessage, setNoticeMessage] = useState<string | null>(null);
   const [conflicts, setConflicts] = useState<Array<WeekCopyConflict>>([]);
+  const [copyCompleted, setCopyCompleted] = useState(false);
 
   const selectableWeeks = useMemo(
     () =>
@@ -70,13 +78,22 @@ export function CopyWeekDialog({
     }
 
     setErrorMessage(null);
+    setNoticeMessage(null);
     setConflicts([]);
+    setCopyCompleted(false);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open || copyCompleted) {
+      return;
+    }
+
     const preferred =
       defaultSourceWeekId && selectableWeeks.some(week => week.id === defaultSourceWeekId)
         ? defaultSourceWeekId
         : (selectableWeeks[0]?.id ?? '');
     setSourceWeekId(preferred);
-  }, [open, defaultSourceWeekId, selectableWeeks]);
+  }, [open, copyCompleted, defaultSourceWeekId, selectableWeeks]);
 
   const destinationLabel = useMemo(() => {
     try {
@@ -94,10 +111,22 @@ export function CopyWeekDialog({
     }
 
     setErrorMessage(null);
+    setNoticeMessage(null);
     setConflicts([]);
     const result = await onConfirm(sourceWeekId);
 
     if (result.ok && result.data) {
+      const skipped = result.data.skipped_classes ?? [];
+
+      if (skipped.length > 0) {
+        setConflicts(skipped);
+        setNoticeMessage(t('schedules:copyWeek.partialIntro'));
+        setCopyCompleted(true);
+        onSuccess(result.data);
+
+        return;
+      }
+
       onOpenChange(false);
       onSuccess(result.data);
 
@@ -136,7 +165,7 @@ export function CopyWeekDialog({
   };
 
   const conflictTypeLabel = (conflictType: string) => {
-    if (conflictType === 'instructor') {
+    if (conflictType === 'instructor' || conflictType === 'instructor_schedule') {
       return t('schedules:copyWeek.conflictTypeInstructor');
     }
 
@@ -146,6 +175,21 @@ export function CopyWeekDialog({
 
     return t('schedules:copyWeek.conflictTypeOccupancy');
   };
+
+  const conflictList =
+    conflicts.length > 0 ? (
+      <ul className='mt-2 list-disc space-y-1 pl-5'>
+        {conflicts.map(conflict => (
+          <li key={`${conflict.source_class_id}-${conflict.conflict_type}-${conflict.start_time}`}>
+            {t('schedules:copyWeek.conflictItem', {
+              type: conflictTypeLabel(conflict.conflict_type),
+              time: format(parseISO(conflict.start_time), 'MMM d, HH:mm'),
+              message: conflict.message,
+            })}
+          </li>
+        ))}
+      </ul>
+    ) : null;
 
   return (
     <Dialog
@@ -172,7 +216,7 @@ export function CopyWeekDialog({
               className='border-input bg-background ring-offset-background focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50'
               value={sourceWeekId}
               onChange={event => setSourceWeekId(event.target.value)}
-              disabled={isLoading || selectableWeeks.length === 0}
+              disabled={isLoading || copyCompleted || selectableWeeks.length === 0}
             >
               {selectableWeeks.length === 0 ? (
                 <option value=''>{t('schedules:copyWeek.noSourceWeeks')}</option>
@@ -186,22 +230,17 @@ export function CopyWeekDialog({
             </select>
           </div>
 
+          {noticeMessage ? (
+            <div className='rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900'>
+              <p>{noticeMessage}</p>
+              {conflictList}
+            </div>
+          ) : null}
+
           {errorMessage ? (
             <div className='rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800'>
               <p>{errorMessage}</p>
-              {conflicts.length > 0 ? (
-                <ul className='mt-2 list-disc space-y-1 pl-5'>
-                  {conflicts.map(conflict => (
-                    <li key={`${conflict.source_class_id}-${conflict.conflict_type}-${conflict.start_time}`}>
-                      {t('schedules:copyWeek.conflictItem', {
-                        type: conflictTypeLabel(conflict.conflict_type),
-                        time: format(parseISO(conflict.start_time), 'MMM d, HH:mm'),
-                        message: conflict.message,
-                      })}
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
+              {conflictList}
             </div>
           ) : null}
         </div>
@@ -220,10 +259,22 @@ export function CopyWeekDialog({
             color='primary'
             variant='solid'
             type='button'
-            onClick={() => void handleConfirm()}
-            disabled={isLoading || selectableWeeks.length === 0}
+            onClick={() => {
+              if (copyCompleted) {
+                onOpenChange(false);
+
+                return;
+              }
+
+              void handleConfirm();
+            }}
+            disabled={!copyCompleted && (isLoading || selectableWeeks.length === 0)}
           >
-            {isLoading ? t('schedules:copyWeek.copying') : t('schedules:copyWeek.confirm')}
+            {copyCompleted
+              ? t('schedules:copyWeek.done')
+              : isLoading
+                ? t('schedules:copyWeek.copying')
+                : t('schedules:copyWeek.confirm')}
           </Button>
         </DialogFooter>
       </DialogContent>
