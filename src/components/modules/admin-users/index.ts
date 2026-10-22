@@ -10,6 +10,7 @@ export * from './user-subscriptions-tab';
 export * from './user-bookings-tab';
 export * from './user-benefits-tab';
 export * from './user-events-tab';
+export * from './user-family-tab';
 export * from './user-instructor-classes-tab';
 export * from './user-instructor-csat-tab';
 export * from './user-wallet-tab';

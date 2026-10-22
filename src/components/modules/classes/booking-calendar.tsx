@@ -30,6 +30,10 @@ interface BookingCalendarProps {
   /** Backend focus day (YYYY-MM-DD) from upcoming-week; used for first-paint day selection. */
   initialFocusDay?: string | null;
   onBookingChange?: () => void | Promise<void>;
+  attendeeUserId?: string | null;
+  attendeeName?: string | null;
+  attendeeOptions?: Array<{ id: string; label: string }>;
+  onAttendeeChange?: (attendeeUserId: string) => void;
 }
 
 export function BookingCalendar({
@@ -40,6 +44,10 @@ export function BookingCalendar({
   initialClasses = null,
   initialFocusDay = null,
   onBookingChange,
+  attendeeUserId = null,
+  attendeeName = null,
+  attendeeOptions = [],
+  onAttendeeChange,
 }: BookingCalendarProps) {
   const { t } = useTranslation();
   const locale = useDateLocale();
@@ -51,7 +59,11 @@ export function BookingCalendar({
 
   const { call, isLoading, error } = useCallablePromise(async (weekMonday: string) => {
     const { startAt, endAt } = getColombiaWeekRangeUtc(weekMonday);
-    const { data: classes } = await DansshipAPI.schedules.getPublishedClassesByRange(startAt, endAt);
+    const { data: classes } = await DansshipAPI.schedules.getPublishedClassesByRange(
+      startAt,
+      endAt,
+      attendeeUserId ?? undefined,
+    );
 
     return {
       classes: classes ?? [],
@@ -185,6 +197,10 @@ export function BookingCalendar({
         subscriptions={subscriptions}
         isTrialEligible={isTrialEligible}
         onBookingChange={handleBookingChange}
+        attendeeUserId={attendeeUserId}
+        attendeeName={attendeeName}
+        attendeeOptions={attendeeOptions}
+        onAttendeeChange={onAttendeeChange}
       />
     </section>
   );

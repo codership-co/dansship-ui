@@ -62,6 +62,8 @@ export const mapAuthUserToUser = (authUser: AuthUser): User => {
     cuentaDeCobroEnabled: authUser.cuenta_de_cobro_enabled,
     profileCompletionPercent: authUser.profile_completion_percent,
     referralCode: authUser.referral_code ?? null,
+    isManaged: authUser.is_managed ?? false,
+    managedUsersEnabled: authUser.managed_users_enabled ?? false,
     instructorProfile: authUser.instructor_profile
       ? {
           id: authUser.instructor_profile.id,

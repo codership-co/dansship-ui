@@ -2,7 +2,7 @@ import { format } from 'date-fns';
 import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 
-import { ProfilePicture } from '@components/ui';
+import { Badge, ProfilePicture } from '@components/ui';
 import { canCancelBooking, getBookingCountdown, resolvePlanDisplayName } from '@helpers';
 import { useDateLocale } from '@hooks';
 
@@ -51,6 +51,7 @@ export function UpcomingBookingCard({ booking, isCancelDisabled, onCancel }: Upc
         <div className='flex min-w-0 items-baseline justify-between gap-2'>
           <h3 className='m-0 min-w-0 break-words font-title text-base leading-none font-semibold text-foreground'>
             {className}
+            {booking.attendee_name ? <Badge className='ml-2'>{booking.attendee_name}</Badge> : null}
           </h3>
           <p className='shrink-0 text-right text-[11px] leading-none font-medium text-primary'>{relativeLabel}</p>
         </div>

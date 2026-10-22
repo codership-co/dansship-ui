@@ -1,5 +1,5 @@
 import { Button } from 'polpo/components';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
@@ -13,8 +13,18 @@ import {
   UpcomingListSkeleton,
   UpcomingReservationCard,
 } from '@components/modules/my-bookings';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@components/ui';
-import { FEATURE_FLAG, SecurityGuard, useStudentSession } from '@contexts';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@components/ui';
+import { FEATURE_FLAG, SecurityGuard, useAuth, useStudentSession } from '@contexts';
 import { DansshipAPI, MyBooking, type RentalRequest, type RentalSeries } from '@core/api';
 import { PageURLS } from '@core/constants';
 import {
@@ -31,6 +41,11 @@ import { useMyBookings, useMyBookingsHistory, usePromise } from '@hooks';
 
 function BookingsPage() {
   const { t } = useTranslation();
+  const { user } = useAuth();
+  const familyEnabled = Boolean(user?.managedUsersEnabled) && !user?.isManaged;
+  const { response: familyResponse } = usePromise(() => DansshipAPI.family.listMine(), familyEnabled);
+  const [attendeeFilter, setAttendeeFilter] = useState('all');
+  const minors = familyResponse?.data?.minors ?? [];
   const {
     bookings: upcomingBookings,
     bookingsResponse: upcomingResponse,
@@ -95,8 +110,13 @@ function BookingsPage() {
     [rentalSeriesResponse?.data],
   );
 
+  const matchesAttendee = useCallback(
+    (booking: MyBooking) => attendeeFilter === 'all' || booking.user_id === attendeeFilter,
+    [attendeeFilter],
+  );
+
   const upcomingItems = useMemo(() => {
-    const classes = upcomingBookings.map(classReservation);
+    const classes = upcomingBookings.filter(matchesAttendee).map(classReservation);
     const events = (eventUpcomingResponse?.data ?? []).map(eventReservation);
     const rentals = rentalRequests
       .filter(request => isUpcomingRental(request))
@@ -105,8 +125,20 @@ function BookingsPage() {
       .filter(item => isUpcomingRentalSeries(item))
       .map(item => rentalSeriesReservation(item, roomNameById[item.room_id] ?? ''));
 
-    return sortReservationsAscending([...classes, ...events, ...rentals, ...series]);
-  }, [upcomingBookings, eventUpcomingResponse?.data, rentalRequests, rentalSeries, roomNameById]);
+    const others =
+      attendeeFilter === 'all' || attendeeFilter === String(user?.id) ? [...events, ...rentals, ...series] : [];
+
+    return sortReservationsAscending([...classes, ...others]);
+  }, [
+    upcomingBookings,
+    eventUpcomingResponse?.data,
+    rentalRequests,
+    rentalSeries,
+    roomNameById,
+    attendeeFilter,
+    user?.id,
+    matchesAttendee,
+  ]);
 
   const extraHistory = useMemo(() => {
     const events = (eventHistoryResponse?.data ?? []).map(eventReservation);
@@ -121,8 +153,12 @@ function BookingsPage() {
   }, [eventHistoryResponse?.data, rentalRequests, rentalSeries, roomNameById]);
 
   const historyReservations = useMemo(
-    () => sortReservationsDescending([...historyItems.map(classReservation), ...extraHistory]),
-    [historyItems, extraHistory],
+    () =>
+      sortReservationsDescending([
+        ...historyItems.filter(matchesAttendee).map(classReservation),
+        ...(attendeeFilter === 'all' || attendeeFilter === String(user?.id) ? extraHistory : []),
+      ]),
+    [historyItems, extraHistory, attendeeFilter, user?.id, matchesAttendee],
   );
 
   const nextReservation = upcomingItems[0] ?? null;
@@ -203,6 +239,25 @@ function BookingsPage() {
     <>
       <Section navbarPadding className='overflow-x-hidden pb-10'>
         <SectionHeading title={t('bookings:myBookingsTitle')} subtitle={t('bookings:myBookingsSubtitle')} />
+        {minors.length > 0 && user ? (
+          <label className='grid max-w-sm gap-1 text-sm'>
+            {t('family:viewBookingsOf')}
+            <Select value={attendeeFilter} onValueChange={setAttendeeFilter}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value='all'>{t('family:everyone')}</SelectItem>
+                <SelectItem value={String(user.id)}>{t('family:myself')}</SelectItem>
+                {minors.map(minor => (
+                  <SelectItem key={minor.user_id} value={minor.user_id}>
+                    {minor.full_name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </label>
+        ) : null}
 
         <section className='mb-8 flex flex-col gap-2.5'>
           <div className='flex items-center gap-2'>

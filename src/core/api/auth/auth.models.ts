@@ -31,6 +31,8 @@ export interface AuthUser {
   cuenta_de_cobro_enabled?: boolean | null;
   profile_completion_percent?: number;
   referral_code?: string | null;
+  is_managed?: boolean;
+  managed_users_enabled?: boolean;
   instructor_profile?: {
     id: string;
     bio: string | null;
@@ -94,6 +96,8 @@ export interface User {
   cuentaDeCobroEnabled?: boolean | null;
   profileCompletionPercent?: number;
   referralCode?: string | null;
+  isManaged?: boolean;
+  managedUsersEnabled?: boolean;
   instructorProfile?: {
     id: string;
     bio?: string | null;

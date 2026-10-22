@@ -9,6 +9,7 @@ export * from './class-feedback/class-feedback.models';
 export * from './class-levels/class-levels.models';
 export * from './door-code/door-code.models';
 export * from './door-code/door-code.admin.api';
+export * from './family/family.models';
 export * from './figures/figures.models';
 export * from './gifts/gifts.models';
 export * from './instructor-payments/instructor-payments.models';

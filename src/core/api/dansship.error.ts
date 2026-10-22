@@ -21,6 +21,7 @@ export enum DANSSHIP_ERROR_CODE {
   RESOURCE_NOT_FOUND = 'RESOURCE_NOT_FOUND', // RESOURCE_NOT_FOUND = Generic not-found error |
   METHOD_NOT_ALLOWED = 'METHOD_NOT_ALLOWED', // BUSINESS_RULE_VIOLATION = HTTP method not allowed on resource |
   CONFLICT = 'CONFLICT', // CONFLICT = Generic conflict (e.g., duplicate, state violation) |
+  DOCUMENT_NOT_AVAILABLE = 'DOCUMENT_NOT_AVAILABLE', // CONFLICT = Document cannot be used for a managed account; no account is identified |
   TOO_MANY_REQUESTS = 'TOO_MANY_REQUESTS', // BUSINESS_RULE_VIOLATION = Rate limit exceeded |
   VALIDATION_FAILED = 'VALIDATION_FAILED', // VALIDATION_ERROR = Request validation failed (see `details.errors` for field-level errors) |
   CLIENT_ERROR = 'CLIENT_ERROR', // BUSINESS_RULE_VIOLATION = Catch-all for unspecified 4xx errors |

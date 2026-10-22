@@ -9,9 +9,10 @@ import { useNavigate } from 'react-router';
 import { Container } from '@components/containers';
 import { EmailField } from '@components/form-fields';
 import { ConfirmDialog } from '@components/modals';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
 import { ProfilePicture } from '@components/ui/profile-picture';
 import { useAuth, useStudentSession } from '@contexts';
-import { ActiveSubscription, DANSSHIP_ERROR_CODE, PublishedClass } from '@core/api';
+import { ActiveSubscription, DANSSHIP_ERROR_CODE, DansshipAPI, PublishedClass } from '@core/api';
 import { DEFAULT_ROOM_IMAGE, PageURLS } from '@core/constants';
 import {
   formatTimeDifference,
@@ -32,6 +33,10 @@ interface BookingModalProps {
   subscriptions?: Array<ActiveSubscription>;
   isTrialEligible?: boolean;
   onBookingChange?: () => void | Promise<void>;
+  attendeeUserId?: string | null;
+  attendeeName?: string | null;
+  attendeeOptions?: Array<{ id: string; label: string }>;
+  onAttendeeChange?: (attendeeUserId: string) => void;
 }
 
 export function BookingModal({
@@ -41,6 +46,10 @@ export function BookingModal({
   subscriptions = [],
   isTrialEligible = false,
   onBookingChange,
+  attendeeUserId = null,
+  attendeeName = null,
+  attendeeOptions = [],
+  onAttendeeChange,
 }: BookingModalProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -59,13 +68,60 @@ export function BookingModal({
     isLoadingSubscriptions,
   } = useStudentSession();
   const myBookings = sessionBookings;
-  const resolvedSubscriptions = isAuthenticated
+  const familyMode = attendeeOptions.length > 0;
+  const [payerSubscriptions, setPayerSubscriptions] = useState<Array<ActiveSubscription> | null>(null);
+  const [payerTrialEligible, setPayerTrialEligible] = useState(false);
+
+  useEffect(() => {
+    if (!familyMode || !attendeeUserId || !isOpen) {
+      return;
+    }
+
+    let cancelled = false;
+
+    void DansshipAPI.family.getBookingPayer(attendeeUserId).then(result => {
+      if (cancelled || !result.ok || !result.data) {
+        return;
+      }
+
+      setPayerTrialEligible(result.data.trial_eligible);
+      setPayerSubscriptions(
+        result.data.subscriptions.map(item => ({
+          id: item.id,
+          plan_id: item.id,
+          status: item.status === 'active' ? 'active' : 'expired',
+          plan_name_snapshot: item.plan_name ?? '',
+          class_count_snapshot: item.remaining_classes,
+          price_snapshot: 0,
+          expiration_policy_snapshot: '',
+          remaining_classes: item.remaining_classes,
+          start_date: item.start_date ?? toColombiaDateKey(new Date()),
+          expiration_date: item.expiration_date ?? item.start_date ?? toColombiaDateKey(new Date()),
+          original_price: 0,
+          final_price: 0,
+        })),
+      );
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [attendeeUserId, familyMode, isOpen]);
+
+  const sessionResolvedSubscriptions = isAuthenticated
     ? sessionSubscriptions.length > 0
       ? sessionSubscriptions
       : subscriptions
     : subscriptions;
-  const resolvedTrialEligible = isAuthenticated ? sessionTrialEligible : isTrialEligible;
-  const subscriptionsReady = !isAuthenticated || !isLoadingSubscriptions || resolvedSubscriptions.length > 0;
+  const resolvedSubscriptions = familyMode && payerSubscriptions ? payerSubscriptions : sessionResolvedSubscriptions;
+  const resolvedTrialEligible = familyMode
+    ? payerTrialEligible
+    : isAuthenticated
+      ? sessionTrialEligible
+      : isTrialEligible;
+  const subscriptionsReady = familyMode
+    ? payerSubscriptions !== null
+    : !isAuthenticated || !isLoadingSubscriptions || resolvedSubscriptions.length > 0;
 
   useEffect(() => {
     companionForm.reset({ companion_email: '' });
@@ -110,7 +166,8 @@ export function BookingModal({
     setCompanionFieldError(null);
     const result = await bookClass({
       scheduled_class_id: selectedClass.id,
-      companion_email: companionEmail || undefined,
+      companion_email: bookingForOther ? undefined : companionEmail || undefined,
+      attendee_user_id: attendeeUserId ?? undefined,
     });
 
     if (!result.ok) {
@@ -151,11 +208,13 @@ export function BookingModal({
     navigate(PageURLS.profile.user(selectedClass.instructor.id));
   };
 
-  const eligibility = getClassBookingEligibility(
-    resolvedSubscriptions,
-    selectedClass.start_time,
-    resolvedTrialEligible,
-  );
+  const paidEligibility = getClassBookingEligibility(resolvedSubscriptions, selectedClass.start_time, false);
+  const eligibility =
+    familyMode && paidEligibility.status !== 'ok' && resolvedTrialEligible
+      ? getClassBookingEligibility([], selectedClass.start_time, true)
+      : familyMode
+        ? paidEligibility
+        : getClassBookingEligibility(resolvedSubscriptions, selectedClass.start_time, resolvedTrialEligible);
   const showSubscriptionWarning =
     subscriptionsReady &&
     eligibility.status === 'no_subscription' &&
@@ -184,6 +243,7 @@ export function BookingModal({
     subscriptionsReady && eligibility.status === 'trial' && !isBooked && !isPast && !isCancelled && !isOwnClass,
   );
   const paidPlanCoversClass = hasPaidPlanCoveringClass(resolvedSubscriptions, selectedClass.start_time);
+  const bookingForOther = Boolean(attendeeUserId && user?.id && attendeeUserId !== String(user.id));
   const showThursday2x1Note = Boolean(
     subscriptionsReady &&
     selectedClass.jueves_2x1_eligible &&
@@ -193,7 +253,7 @@ export function BookingModal({
     !isCancelled &&
     !isOwnClass,
   );
-  const showCompanionField = Boolean(showThursday2x1Note && !isFull && !hasTimeOverlap);
+  const showCompanionField = Boolean(showThursday2x1Note && !isFull && !hasTimeOverlap && !bookingForOther);
 
   return (
     <>
@@ -214,6 +274,23 @@ export function BookingModal({
             <h3 className='text-center text-primary'>
               {selectedClass.class_definition?.name || t('bookings:classDefault')}
             </h3>
+            {familyMode && attendeeUserId ? (
+              <label className='grid gap-1 text-sm'>
+                {t('family:bookFor')}
+                <Select value={attendeeUserId} onValueChange={value => onAttendeeChange?.(value)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {attendeeOptions.map(option => (
+                      <SelectItem key={option.id} value={option.id}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </label>
+            ) : null}
             {selectedClass.class_definition?.description ? (
               <p className='m-0 text-center text-sm text-muted-foreground whitespace-pre-wrap'>
                 {selectedClass.class_definition.description}
@@ -324,7 +401,9 @@ export function BookingModal({
 
             {showTrialNote && (
               <label className='bg-primary/5 p-3 rounded text-primary border border-primary/20'>
-                {t('bookings:trialClassNote')}
+                {bookingForOther && attendeeName
+                  ? t('bookings:trialClassNoteNamed', { name: attendeeName })
+                  : t('bookings:trialClassNote')}
               </label>
             )}
 
