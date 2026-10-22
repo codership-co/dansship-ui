@@ -98,7 +98,7 @@ export interface CopyWeekPayload {
   source_week_id: string;
 }
 
-export type WeekCopyConflictType = 'room_occupancy' | 'instructor' | 'room';
+export type WeekCopyConflictType = 'room_occupancy' | 'instructor' | 'instructor_schedule' | 'room';
 
 export interface WeekCopyConflict {
   source_class_id: string;
@@ -109,6 +109,10 @@ export interface WeekCopyConflict {
   conflict_type: WeekCopyConflictType | string;
   message: string;
   conflicting_source_id?: string | null;
+}
+
+export interface CopyWeekResult extends ScheduleWeek {
+  skipped_classes: Array<WeekCopyConflict>;
 }
 
 export interface UpcomingWeekResponse<TClass = ScheduledClass> {

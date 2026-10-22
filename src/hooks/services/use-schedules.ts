@@ -11,8 +11,8 @@ import {
   DansshipAPIError,
   DANSSHIP_ERROR_CODE,
   type CancelPublishedClassPayload,
+  type CopyWeekResult,
   type EditPublishedClassPayload,
-  type ScheduleWeek,
   type UpdateClassPayload,
 } from '@core/api';
 
@@ -185,14 +185,19 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
     async (sourceWeekId: string) => {
       const result = await copyWeekPromise(sourceWeekId);
 
-      if (result.ok) {
-        toast.success(t('schedules:copyWeek.success'));
+      if (result.ok && result.data) {
+        if (result.data.skipped_classes.length > 0) {
+          toast.warning(t('schedules:copyWeek.partialSuccess'));
+        } else {
+          toast.success(t('schedules:copyWeek.success'));
+        }
+
         await reFetchWeeks();
       }
 
       return result as {
         ok: boolean;
-        data: ScheduleWeek | null;
+        data: CopyWeekResult | null;
         error: (typeof result)['error'];
       };
     },
