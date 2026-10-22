@@ -54,6 +54,8 @@
     "cta": "Reservar mi lugar",
     "ctaSoldOut": "Cupos agotados",
     "ctaAlreadyRegistered": "Ya tienes un cupo",
+    "loadFailed": "No pudimos cargar este evento. Revisa tu conexión e intenta de nuevo.",
+    "retry": "Intentar de nuevo",
     "viewEvent": "Ver detalle del evento →",
     "comboDescription": "Inscríbanse en pareja a ambos eventos y ahorren frente al precio individual de cada uno.",
     "notFound": "No encontramos este evento."

@@ -166,7 +166,7 @@ export function EventoLanding({
   const useAdminPreview = preview && canPreview;
   const canFetch = Boolean(accessToken || slug) && (!preview || (ready && canPreview));
 
-  const { response, isLoading } = usePromise(
+  const { response, isLoading, error, reFetch } = usePromise(
     () =>
       accessToken
         ? DansshipAPI.eventos.getByAccessToken(accessToken)
@@ -176,7 +176,8 @@ export function EventoLanding({
     canFetch,
     [slug, preview, useAdminPreview, isAuthenticated, accessToken],
   );
-  const landing = response?.data;
+  const landing = response?.ok ? response.data : undefined;
+  const requestFailed = Boolean(error) || Boolean(response && !response.ok && response.status !== 404);
 
   useEffect(() => {
     if (!landing || !isAuthenticated) {
@@ -194,8 +195,19 @@ export function EventoLanding({
     return <p className='text-muted-foreground'>{t('eventos:landing.notFound')}</p>;
   }
 
-  if ((preview && !ready) || isLoading || response === null) {
+  if ((preview && !ready) || isLoading || (canFetch && response === null && !error)) {
     return <SpinnerLoader />;
+  }
+
+  if (requestFailed) {
+    return (
+      <div className='grid justify-items-center gap-3 py-8 text-center'>
+        <p className='m-0 text-muted-foreground'>{t('eventos:landing.loadFailed')}</p>
+        <Button type='button' color='primary' variant='solid' onClick={() => void reFetch()}>
+          {t('eventos:landing.retry')}
+        </Button>
+      </div>
+    );
   }
 
   if (!landing) {
