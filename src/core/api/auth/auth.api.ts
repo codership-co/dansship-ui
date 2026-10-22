@@ -22,9 +22,17 @@ import type {
   VerifyEmailPayload,
   VerifyEmailResponse,
 } from './auth.models';
+import type { AgePolicy } from '../family/family.models';
 
 export class AuthAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
+
+  async getAgePolicy() {
+    return this.httpClient.callNoError<AgePolicy>({
+      path: '/auth/age-policy',
+      method: 'GET',
+    });
+  }
 
   async refreshToken() {
     return this.httpClient.call<void>({

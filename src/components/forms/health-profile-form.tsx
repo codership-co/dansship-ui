@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { TFunction } from 'i18next';
-import { Button } from 'polpo/components';
+import { Button, Checkbox } from 'polpo/components';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { LuPhone } from 'react-icons/lu';
@@ -9,8 +9,8 @@ import { z } from 'zod';
 import { PhoneField, SelectField, TextareaField, TextField } from '@components/form-fields';
 import { RELATIVE_OPTIONS } from '@core/constants';
 
-export const createHealthDataSchema = (t: TFunction) =>
-  z.object({
+export const createHealthDataSchema = (t: TFunction, requireHealth = false) => {
+  const fields = z.object({
     emergency_contact_name: z.string().optional(),
     emergency_contact_relative: z.string().optional(),
     emergency_contact_phone_country_code: z.string().optional(),
@@ -21,7 +21,41 @@ export const createHealthDataSchema = (t: TFunction) =>
       .or(z.literal('')),
     eps: z.string().optional(),
     existing_medical_conditions: z.string().optional(),
+    no_medical_conditions: z.boolean().optional(),
   });
+
+  if (!requireHealth) {
+    return fields;
+  }
+
+  return fields.superRefine((values, context) => {
+    if (!values.emergency_contact_name?.trim()) {
+      context.addIssue({
+        code: 'custom',
+        path: ['emergency_contact_name'],
+        message: t('auth:onboarding.validationRequired'),
+      });
+    }
+
+    if (!/^\d{10}$/.test(values.emergency_contact_phone_number ?? '')) {
+      context.addIssue({
+        code: 'custom',
+        path: ['emergency_contact_phone_number'],
+        message: t('auth:onboarding.validationPhoneLength'),
+      });
+    }
+
+    const hasConditions = Boolean(values.existing_medical_conditions?.trim());
+
+    if (!values.no_medical_conditions && !hasConditions) {
+      context.addIssue({
+        code: 'custom',
+        path: ['existing_medical_conditions'],
+        message: t('family:healthRequired'),
+      });
+    }
+  });
+};
 
 export type HealthDataFormValues = z.infer<ReturnType<typeof createHealthDataSchema>>;
 
@@ -33,6 +67,8 @@ interface HealthProfileFormProps {
   defaultValues?: HealthDataFormValues;
   submitLabel?: string;
   showSkip?: boolean;
+  requireHealth?: boolean;
+  guardianContact?: { name: string; phoneCountryCode?: string; phoneNumber?: string };
 }
 
 export function HealthProfileForm({
@@ -43,11 +79,13 @@ export function HealthProfileForm({
   defaultValues,
   submitLabel,
   showSkip = true,
+  requireHealth = false,
+  guardianContact,
 }: HealthProfileFormProps) {
   const { t } = useTranslation();
-  const schema = createHealthDataSchema(t);
+  const schema = createHealthDataSchema(t, requireHealth);
 
-  const { handleSubmit, control } = useForm<HealthDataFormValues>({
+  const { handleSubmit, control, setValue, watch } = useForm<HealthDataFormValues>({
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     resolver: zodResolver(schema),
@@ -58,13 +96,29 @@ export function HealthProfileForm({
       emergency_contact_phone_number: '',
       eps: '',
       existing_medical_conditions: '',
+      no_medical_conditions: false,
       ...defaultValues,
     },
   });
+  const noConditions = watch('no_medical_conditions');
 
   return (
     <div className='space-y-6' data-sentry-mask>
       <form className='space-y-6' onSubmit={handleSubmit(onContinue)}>
+        {guardianContact ? (
+          <Button
+            type='button'
+            variant='outlined'
+            color='secondary'
+            onClick={() => {
+              setValue('emergency_contact_name', guardianContact.name);
+              setValue('emergency_contact_phone_country_code', guardianContact.phoneCountryCode || '+57');
+              setValue('emergency_contact_phone_number', guardianContact.phoneNumber || '');
+            }}
+          >
+            {t('family:useMyContact')}
+          </Button>
+        ) : null}
         <div className='grid grid-cols-1 gap-4 lg:grid-cols-2 items-end'>
           <TextField
             control={control}
@@ -104,12 +158,30 @@ export function HealthProfileForm({
           />
         </div>
 
+        {requireHealth ? (
+          <Checkbox
+            label={t('family:noConditions')}
+            name='no_medical_conditions'
+            value={Boolean(noConditions)}
+            setValue={() => {
+              const next = !noConditions;
+
+              setValue('no_medical_conditions', next);
+
+              if (next) {
+                setValue('existing_medical_conditions', '');
+              }
+            }}
+          />
+        ) : null}
+
         <TextareaField
           control={control}
           rows={8}
           name='existing_medical_conditions'
           label={t('auth:onboarding.fields.medicalConditions.label')}
           placeholder={t('auth:onboarding.fields.medicalConditions.placeholder')}
+          disabled={Boolean(noConditions)}
         />
 
         {error ? <p className='text-sm text-alert-600'>{error}</p> : null}

@@ -1,0 +1,70 @@
+{
+  "tab": "Mi familia",
+  "title": "Mi familia",
+  "empty": "Todavía no administras ninguna cuenta.",
+  "add": "Agregar persona",
+  "pending": "Estamos revisando el registro",
+  "edit": "Editar",
+  "trialAvailable": "Clase de prueba disponible",
+  "trialUsed": "Clase de prueba usada",
+  "documentUnavailable": "No pudimos completar el registro. Escríbenos a Dansship para ayudarte.",
+  "contact": "Contactar a Dansship",
+  "saveError": "No pudimos guardar. Inténtalo de nuevo.",
+  "steps": {
+    "identity": "Datos",
+    "health": "Salud",
+    "permission": "Permiso"
+  },
+  "fields": {
+    "givenName": "Nombre",
+    "familyName": "Apellido",
+    "birthDate": "Fecha de nacimiento",
+    "documentType": "Tipo de documento",
+    "documentValue": "Número de documento",
+    "relationship": "Parentesco",
+    "reason": "Motivo"
+  },
+  "relationships": {
+    "mother": "Madre",
+    "father": "Padre",
+    "guardian": "Tutor(a)",
+    "grandparent": "Abuelo(a)",
+    "aunt_uncle": "Tío(a)",
+    "sibling": "Hermano(a)",
+    "other": "Otro"
+  },
+  "documents": {
+    "RC": "R.C. (Registro Civil)",
+    "TI": "T.I. (Tarjeta de Identidad)",
+    "CE": "C.E. (Cédula de Extranjería)",
+    "PA": "Pasaporte"
+  },
+  "ageHint": "Desde los 10 años también puede crear su propia cuenta; si prefieres, puedes seguir administrándola tú.",
+  "healthRequired": "La información de salud es obligatoria.",
+  "noConditions": "Sin condiciones médicas",
+  "useMyContact": "Usar mis datos como contacto de emergencia",
+  "permission": "Declaro que tengo permiso para administrar esta cuenta.",
+  "policy": "Acepto la política de cuentas administradas.",
+  "continue": "Continuar",
+  "back": "Atrás",
+  "save": "Guardar",
+  "readOnlyIdentity": "El documento y la fecha de nacimiento solo los puede cambiar el equipo de Dansship.",
+  "reservingFor": "Reservando para",
+  "myself": "Yo",
+  "bookFor": "Reservar a nombre de",
+  "viewBookingsOf": "Ver reservas de",
+  "everyone": "Toda la familia",
+  "trialNote": "Esta será la clase de prueba gratuita de {{name}}. No podrá cancelarse una vez reservada.",
+  "admin": {
+    "tab": "Familia",
+    "guardian": "Acudiente",
+    "minors": "Personas administradas",
+    "reviews": "En revisión",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "transfer": "Cambiar acudiente",
+    "deactivate": "Desactivar",
+    "identity": "Documento y nacimiento",
+    "noFamily": "Esta cuenta no tiene vínculos familiares."
+  }
+}

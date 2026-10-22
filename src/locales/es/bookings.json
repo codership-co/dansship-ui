@@ -102,6 +102,7 @@
   "subscriptionNotStartedWarning": "Tu plan inicia el {{date}}. Solo puedes reservar clases a partir de esa fecha.",
   "subscriptionExpiredWarning": "Tu plan venció el {{date}}. No puedes reservar esta clase.",
   "trialClassNote": "Esta será tu clase de prueba gratuita. No podrá cancelarse una vez reservada.",
+  "trialClassNoteNamed": "Esta será la clase de prueba gratuita de {{name}}. No podrá cancelarse una vez reservada.",
   "buyPlan": "Comprar un plan",
   "cancelling": "Cancelando...",
   "booking": "Reservando...",
