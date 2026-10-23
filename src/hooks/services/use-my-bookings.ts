@@ -4,8 +4,48 @@ import { toast } from 'sonner';
 
 import { useCallablePromise } from '../use-callable-promise';
 
-import { BookClassPayload, BookClassResponse, DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError } from '@core/api';
+import {
+  BookClassPayload,
+  BookClassResponse,
+  DANSSHIP_ERROR_CODE,
+  DansshipAPI,
+  DansshipAPIError,
+  isDansshipTransportError,
+  type MyBookingsPage,
+} from '@core/api';
 import { captureUnexpectedException, isTransportFailure, withSentrySpan } from '@core/sentry';
+
+function pageIsComplete(page: MyBookingsPage): boolean {
+  return page.offset + page.items.length >= page.total;
+}
+
+async function hasActiveBookingForClass(scheduledClassId: string): Promise<boolean | null> {
+  const { ok, data } = await DansshipAPI.bookings.getMyBookings({ scope: 'upcoming', limit: 100 });
+
+  if (!ok || !data) {
+    return null;
+  }
+
+  if (data.items.some(item => item.scheduled_class_id === scheduledClassId && item.status === 'active')) {
+    return true;
+  }
+
+  return pageIsComplete(data) ? false : null;
+}
+
+async function bookingNoLongerActive(bookingId: string): Promise<boolean | null> {
+  const { ok, data } = await DansshipAPI.bookings.getMyBookings({ scope: 'upcoming', limit: 100 });
+
+  if (!ok || !data) {
+    return null;
+  }
+
+  if (data.items.some(item => item.id === bookingId && item.status === 'active')) {
+    return false;
+  }
+
+  return pageIsComplete(data) ? true : null;
+}
 
 const companionErrorToastKey = (errorCode: string | undefined) => {
   switch (errorCode) {
@@ -38,7 +78,21 @@ export const useMyBookings = () => {
         const { error, data } = await bookClassPromise(payload);
 
         if (error) {
-          if (error instanceof DansshipAPIError) {
+          if (isDansshipTransportError(error)) {
+            const booked = await hasActiveBookingForClass(payload.scheduled_class_id);
+
+            captureUnexpectedException(error, {
+              tags: { flow: 'booking.create', class_id: payload.scheduled_class_id },
+            });
+
+            if (booked) {
+              toast.success(t('bookings:bookSuccess'));
+
+              return { ok: true };
+            }
+
+            toast.error(t('bookings:connectionFailedDesc'));
+          } else if (error instanceof DansshipAPIError) {
             const { error_code } = error.body;
 
             if (
@@ -122,6 +176,24 @@ export const useMyBookings = () => {
             toast.success(t('bookings:cancelSuccess'));
 
             return true;
+          }
+
+          if (isDansshipTransportError(error)) {
+            const cancelled = await bookingNoLongerActive(id);
+
+            captureUnexpectedException(error, {
+              tags: { flow: 'booking.cancel', booking_id: id },
+            });
+
+            if (cancelled) {
+              toast.success(t('bookings:cancelSuccess'));
+
+              return true;
+            }
+
+            toast.error(t('bookings:cancellationFailedDesc'));
+
+            return false;
           }
 
           toast.error(t('bookings:cancellationFailedDesc'));

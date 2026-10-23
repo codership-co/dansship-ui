@@ -20,3 +20,4 @@ export * from './class-feedback';
 export * from './my-bookings';
 export * from './reservations';
 export * from './chunk-load';
+export * from './view-transition';

@@ -1,5 +1,3 @@
-import { HttpClient } from 'polpo-http-client';
-
 import { AuthAPI } from './auth/auth.api';
 import { BenefitsAdminAPI } from './benefits/benefits.admin.api';
 import { BillingAdminAPI } from './billing/billing.admin.api';
@@ -9,7 +7,8 @@ import { CampaignsAdminAPI } from './campaigns/campaigns.admin.api';
 import { CampaignsAPI } from './campaigns/campaigns.api';
 import { ClassFeedbackAdminAPI, ClassFeedbackAPI } from './class-feedback/class-feedback.api';
 import { ClassLevelsAPI } from './class-levels/class-levels.api';
-import { DansshipAPIError, getResponseError, logger } from './dansship.error';
+import { DansshipHttpClient } from './dansship-http-client';
+import { getResponseError, logger } from './dansship.error';
 import { DoorCodeAdminAPI } from './door-code/door-code.admin.api';
 import { EventosAdminAPI } from './eventos/eventos.admin.api';
 import { EventosAPI } from './eventos/eventos.api';
@@ -42,7 +41,7 @@ import { AUTH_SESSION_KEY } from '@core/constants';
 const AUTH_REFRESH_SKIP_PATHS = new Set(['/auth/refresh-token', '/auth/signin', '/auth/signup', '/auth/signout']);
 
 export class DansshipAPI {
-  static readonly httpClient = new HttpClient<DansshipAPIError>({
+  static readonly httpClient = new DansshipHttpClient({
     apiName: 'DANSSHIP',
     baseURL: `${import.meta.env.VITE_DANSSHIP_API_URL}`,
     mode: 'cors',

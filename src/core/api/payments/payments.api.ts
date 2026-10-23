@@ -25,6 +25,42 @@ import type {
   ProofViewUrlResponse,
 } from './payments.models';
 
+const MISSING_INTENT_ID_MESSAGE = 'Payment intent id is required';
+
+function missingPaymentIntentError(path: string) {
+  return new DansshipAPIError(
+    {
+      category: DANSSHIP_ERROR_CATEGORY.VALIDATION_ERROR,
+      error_code: DANSSHIP_ERROR_CODE.BAD_REQUEST,
+      message: MISSING_INTENT_ID_MESSAGE,
+      status: 0,
+      timestamp: new Date(0).toISOString(),
+      path,
+      details: {
+        next_action: '',
+        resend_verification_endpoint: '',
+      },
+      request_id: null,
+      trace_id: null,
+    },
+    0,
+    MISSING_INTENT_ID_MESSAGE,
+  );
+}
+
+function paymentIntentId(id: string): string {
+  return id.trim();
+}
+
+function missingIntentResult(path: string) {
+  return {
+    ok: false as const,
+    data: null,
+    status: 0,
+    error: missingPaymentIntentError(path),
+  };
+}
+
 export class PaymentsAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
@@ -53,7 +89,13 @@ export class PaymentsAPI {
     );
   }
 
-  async createBoldCheckoutForIntent(intentId: string) {
+  async createBoldCheckoutForIntent(id: string) {
+    const intentId = paymentIntentId(id);
+
+    if (!intentId) {
+      return missingIntentResult('/payments/intents/bold/checkout');
+    }
+
     return this.httpClient.callNoError<BoldCheckoutBootstrapResponse>(
       {
         path: `/payments/intents/${intentId}/bold/checkout`,
@@ -109,34 +151,10 @@ export class PaymentsAPI {
   }
 
   async getIntent(id: string) {
-    const intentId = id.trim();
+    const intentId = paymentIntentId(id);
 
     if (!intentId) {
-      const message = 'Payment intent id is required';
-
-      return {
-        ok: false as const,
-        data: null,
-        status: 0,
-        error: new DansshipAPIError(
-          {
-            category: DANSSHIP_ERROR_CATEGORY.VALIDATION_ERROR,
-            error_code: DANSSHIP_ERROR_CODE.BAD_REQUEST,
-            message,
-            status: 0,
-            timestamp: new Date(0).toISOString(),
-            path: '/payments/intents',
-            details: {
-              next_action: '',
-              resend_verification_endpoint: '',
-            },
-            request_id: null,
-            trace_id: null,
-          },
-          0,
-          message,
-        ),
-      };
+      return missingIntentResult('/payments/intents');
     }
 
     return this.httpClient.callNoError<PaymentIntentDetail>(
@@ -149,9 +167,15 @@ export class PaymentsAPI {
   }
 
   async cancelIntent(id: string) {
+    const intentId = paymentIntentId(id);
+
+    if (!intentId) {
+      return missingIntentResult('/payments/intents/cancel');
+    }
+
     return this.httpClient.callNoError<PaymentIntent>(
       {
-        path: `/payments/intents/${id}/cancel`,
+        path: `/payments/intents/${intentId}/cancel`,
         method: 'POST',
       },
       normalizeIntent,
@@ -159,17 +183,29 @@ export class PaymentsAPI {
   }
 
   private async getProofUploadUrl(id: string, payload: PaymentProofUploadRequest) {
+    const intentId = paymentIntentId(id);
+
+    if (!intentId) {
+      throw missingPaymentIntentError('/payments/intents/proof/upload-url');
+    }
+
     return this.httpClient.call<PresignedUrlResponse, PaymentProofUploadRequest>({
-      path: `/payments/intents/${id}/proof/upload-url`,
+      path: `/payments/intents/${intentId}/proof/upload-url`,
       method: 'POST',
       data: payload,
     });
   }
 
   private async confirmProofUpload(id: string, payload: ConfirmPaymentProofPayload) {
+    const intentId = paymentIntentId(id);
+
+    if (!intentId) {
+      throw missingPaymentIntentError('/payments/intents/proof/confirm');
+    }
+
     return this.httpClient.call<PaymentIntent, ConfirmPaymentProofPayload>(
       {
-        path: `/payments/intents/${id}/proof/confirm`,
+        path: `/payments/intents/${intentId}/proof/confirm`,
         method: 'POST',
         data: payload,
       },
@@ -189,8 +225,14 @@ export class PaymentsAPI {
   }
 
   async getProofViewUrl(id: string) {
+    const intentId = paymentIntentId(id);
+
+    if (!intentId) {
+      return missingIntentResult('/payments/intents/proof/view-url');
+    }
+
     return this.httpClient.callNoError<ProofViewUrlResponse>({
-      path: `/payments/intents/${id}/proof/view-url`,
+      path: `/payments/intents/${intentId}/proof/view-url`,
       method: 'GET',
     });
   }
