@@ -87,6 +87,7 @@
   "priceBefore": "Antes {{amount}}",
   "discount": "Descuento",
   "discountFirstPlan": "Descuento primer plan",
+  "discountHalloween": "Descuento Halloween",
   "discountCode": "Descuento por código",
   "bonusClassesCheckoutNote": "Incluye +{{count}} clases bonus que vencen en {{days}} días (independiente del plan).",
   "bonusClassesRemaining": "Clases bonus",

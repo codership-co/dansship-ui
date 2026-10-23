@@ -67,10 +67,12 @@ describe('HalloweenPage', () => {
   it('draws slices from the wheel config', async () => {
     render(<HalloweenPage />);
 
-    expect(await screen.findAllByText('10 % de descuento')).toHaveLength(4);
-    expect(screen.getAllByText('15 % de descuento')).toHaveLength(3);
-    expect(screen.getAllByText('20 % de descuento')).toHaveLength(1);
-    expect(screen.getAllByText('1 clase gratis')).toHaveLength(2);
+    expect(await screen.findAllByText('10%')).toHaveLength(4);
+    expect(screen.getAllByText('15%')).toHaveLength(3);
+    expect(screen.getAllByText('20%')).toHaveLength(1);
+    expect(screen.getAllByText('descuento')).toHaveLength(8);
+    expect(screen.getAllByText('1 clase')).toHaveLength(2);
+    expect(screen.getAllByText('gratis')).toHaveLength(2);
   });
 
   it('disables Girar when the student has already spun', async () => {
@@ -93,9 +95,12 @@ describe('HalloweenPage', () => {
     expect(await screen.findByRole('button', { name: /Ana Ruiz/ }, { timeout: 2000 })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Ana Ruiz/ }));
 
-    expect(await screen.findByText('Entregado a Ana Ruiz')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Girar' })).toBeDisabled();
+    expect(await screen.findByRole('heading', { name: '¡Felicitaciones!' })).toBeInTheDocument();
+    expect(screen.getByText('Entregado a Ana Ruiz')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Girar', hidden: true })).toBeDisabled();
     expect(DansshipAPI.halloweenAdmin.spin).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole('button', { name: 'Siguiente persona' }));
+    expect(screen.getByLabelText('Estudiante')).toHaveValue('');
   });
 
   it('does not rotate the wheel when the spin request fails', async () => {

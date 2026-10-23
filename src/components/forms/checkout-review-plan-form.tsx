@@ -152,6 +152,10 @@ function discountLineLabel(t: TFunction, discount: AppliedDiscountMapped): strin
     return t('subscriptions:discountFirstPlan');
   }
 
+  if (discount.code.startsWith('HALLOWEEN_PCT_')) {
+    return t('subscriptions:discountHalloween');
+  }
+
   if (discount.type === 'percentage_discount' || discount.type === 'percentage') {
     return t('subscriptions:discountCode');
   }
