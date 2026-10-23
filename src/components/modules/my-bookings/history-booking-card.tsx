@@ -82,6 +82,7 @@ export function HistoryBookingCard({ booking, alreadyRated, onRate }: HistoryBoo
         <div className='flex min-w-0 items-start justify-between gap-2'>
           <h3 className='m-0 min-w-0 break-words font-title text-base leading-[1.2] font-semibold text-foreground'>
             {className}
+            {booking.attendee_name ? <Badge className='ml-2'>{booking.attendee_name}</Badge> : null}
           </h3>
           <Badge
             variant='outline'

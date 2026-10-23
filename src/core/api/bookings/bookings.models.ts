@@ -19,6 +19,8 @@ export interface Booking {
   is_cancellable?: boolean;
   is_instructor_benefit?: boolean;
   is_jueves_2x1?: boolean;
+  attendee_name?: string | null;
+  booked_by_user_id?: string | null;
 
   scheduled_class?: ScheduledClass;
 }
@@ -31,6 +33,7 @@ export interface GetMyBookingsParams {
   scope: MyBookingsScope;
   limit?: number;
   offset?: number;
+  attendee_user_id?: string;
 }
 
 export interface MyBookingsPage {
@@ -43,6 +46,7 @@ export interface MyBookingsPage {
 export interface BookClassPayload {
   scheduled_class_id: string;
   companion_email?: string | null;
+  attendee_user_id?: string;
 }
 
 export interface CompanionBookingError {

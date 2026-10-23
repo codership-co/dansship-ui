@@ -206,7 +206,8 @@
         "wallet": "Billetera",
         "paymentDocuments": "Documentos de pago",
         "instructorClasses": "Clases del instructor",
-        "instructorCsat": "CSAT"
+        "instructorCsat": "CSAT",
+        "family": "Familia"
       },
       "columns": {
         "plan": "Plan",

@@ -12,6 +12,7 @@ import { getResponseError, logger } from './dansship.error';
 import { DoorCodeAdminAPI } from './door-code/door-code.admin.api';
 import { EventosAdminAPI } from './eventos/eventos.admin.api';
 import { EventosAPI } from './eventos/eventos.api';
+import { FamilyAPI } from './family/family.api';
 import { FiguresAdminAPI } from './figures/figures.admin.api';
 import { FiguresAPI } from './figures/figures.api';
 import { GiftsAPI } from './gifts/gifts.api';
@@ -66,6 +67,7 @@ export class DansshipAPI {
   static classFeedback = new ClassFeedbackAPI(this.httpClient);
   static classFeedbackAdmin = new ClassFeedbackAdminAPI(this.httpClient);
   static classLevels = new ClassLevelsAPI(this.httpClient);
+  static family = new FamilyAPI(this.httpClient);
   static figures = new FiguresAPI(this.httpClient);
   static figuresAdmin = new FiguresAdminAPI(this.httpClient);
   static gifts = new GiftsAPI(this.httpClient);

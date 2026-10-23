@@ -13,24 +13,40 @@ import {
   ProfileHeader,
   ProfileAbout,
   ProfileEdit,
+  FamilyTab,
 } from '@components/modules';
 import { FEATURE_FLAG, useAuth, SecurityGuard, useOrPermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { InstructorPermissions, PERMISSION } from '@core/permissions';
+import { toColombiaDateKey } from '@helpers';
 import { usePromise } from '@hooks';
 
 enum ProfileTabs {
   ABOUT = 'ABOUT',
+  FAMILY = 'FAMILY',
   FIGURES = 'FIGURES',
   SCHEDULE = 'SCHEDULE',
   AVAILABILITY = 'AVAILABILITY',
+}
+
+function ageInColombia(birthDate: string) {
+  const [year, month, day] = birthDate.slice(0, 10).split('-').map(Number);
+  const today = toColombiaDateKey(new Date()).split('-').map(Number);
+  const years = today[0] - year;
+  const before = today[1] < month || (today[1] === month && today[2] < day);
+
+  return before ? years - 1 : years;
 }
 
 function ProfilePage() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { response: savedFiguresResponse } = usePromise(() => DansshipAPI.figures.getSavedFigures());
+  const { response: agePolicyResponse } = usePromise(() => DansshipAPI.auth.getAgePolicy());
+  const adultFrom = agePolicyResponse?.data?.guardian_contact_required_before_age ?? 18;
+  const age = user?.birthDate ? ageInColombia(user.birthDate) : null;
+  const showFamily = Boolean(user?.managedUsersEnabled) && !user?.isManaged && age !== null && age >= adultFrom;
   const hasInstructorPermissions = useOrPermissions([...InstructorPermissions.dashboard, PERMISSION.SCHEDULE_MANAGE]);
   const savedFigures = savedFiguresResponse?.data ?? [];
   const [editMode, setEditMode] = useState(false);
@@ -56,6 +72,7 @@ function ProfilePage() {
               variant='ghost'
               tabs={[
                 { id: ProfileTabs.ABOUT, label: t('profile:profile') },
+                ...(showFamily ? [{ id: ProfileTabs.FAMILY, label: t('family:tab') }] : []),
                 { id: ProfileTabs.FIGURES, label: t('profile:stats.savedFigures') },
                 ...(hasInstructorPermissions
                   ? [
@@ -72,6 +89,10 @@ function ProfilePage() {
             <section className='pt-8'>
               <Tabs.TabPanel id={ProfileTabs.ABOUT}>
                 <ProfileAbout />
+              </Tabs.TabPanel>
+
+              <Tabs.TabPanel id={ProfileTabs.FAMILY}>
+                <FamilyTab />
               </Tabs.TabPanel>
 
               <Tabs.TabPanel id={ProfileTabs.FIGURES}>
