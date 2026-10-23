@@ -629,10 +629,9 @@ export function SecurityGuard(
         return <UnauthorizedPage />;
       }
 
-      const isHalloweenKiosk = pathname === PageURLS.halloween;
       const isChangePassword = pathname === PageURLS.auth.changePassword;
 
-      if (isAuthenticated && mustChangePassword && !isHalloweenKiosk) {
+      if (isAuthenticated && mustChangePassword) {
         if (!isChangePassword) {
           return <Navigate to={PageURLS.auth.changePassword} state={{ from: location }} />;
         }
@@ -643,7 +642,6 @@ export function SecurityGuard(
       if (
         isAuthenticated &&
         requireOnboarding &&
-        !isHalloweenKiosk &&
         !isChangePassword &&
         pathname !== PageURLS.auth.onboarding &&
         pathname !== PageURLS.auth.verifyInstructor
@@ -653,16 +651,11 @@ export function SecurityGuard(
 
       const pendingEventoSlug = getPendingEventoCheckoutIntent();
 
-      if (
-        isAuthenticated &&
-        pendingEventoSlug &&
-        !isHalloweenKiosk &&
-        pathname !== PageURLS.eventoLanding(pendingEventoSlug)
-      ) {
+      if (isAuthenticated && pendingEventoSlug && pathname !== PageURLS.eventoLanding(pendingEventoSlug)) {
         return <Navigate to={PageURLS.eventoLanding(pendingEventoSlug)} state={{ from: location }} />;
       }
 
-      if (isAuthenticated && getPendingPlanCheckoutIntent() && !isHalloweenKiosk && pathname !== PageURLS.plans) {
+      if (isAuthenticated && getPendingPlanCheckoutIntent() && pathname !== PageURLS.plans) {
         return <Navigate to={PageURLS.plans} state={{ from: location }} />;
       }
 

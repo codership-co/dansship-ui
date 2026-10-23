@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-import { HALLOWEEN_SLICES, HALLOWEEN_SPIN_DURATION_MS } from './pick-winning-slice';
+import { HALLOWEEN_SPIN_DURATION_MS, wedgeSpan, type WheelWedge } from './pick-winning-slice';
 
 const SIZE = 100;
 const CENTER = 50;
@@ -24,24 +24,36 @@ function point(angleDeg: number, radius: number) {
   };
 }
 
-function wedgePath(index: number, count: number) {
-  const slice = 360 / count;
-  const start = index * slice - slice / 2;
-  const end = start + slice;
+function wedgePath(centerAngle: number, span: number) {
+  const start = centerAngle - span / 2;
+  const end = centerAngle + span / 2;
   const startPoint = point(start, RADIUS);
   const endPoint = point(end, RADIUS);
+  const largeArc = span > 180 ? 1 : 0;
 
-  return `M ${CENTER} ${CENTER} L ${startPoint.x} ${startPoint.y} A ${RADIUS} ${RADIUS} 0 0 1 ${endPoint.x} ${endPoint.y} Z`;
+  return `M ${CENTER} ${CENTER} L ${startPoint.x} ${startPoint.y} A ${RADIUS} ${RADIUS} 0 ${largeArc} 1 ${endPoint.x} ${endPoint.y} Z`;
+}
+
+function centerAngle(wedges: ReadonlyArray<WheelWedge>, index: number) {
+  let cursor = -wedgeSpan(wedges, 0) / 2;
+
+  for (let current = 0; current < index; current += 1) {
+    cursor += wedgeSpan(wedges, current);
+  }
+
+  return cursor + wedgeSpan(wedges, index) / 2;
 }
 
 interface HalloweenWheelProps {
+  wedges: ReadonlyArray<WheelWedge>;
   rotation: number;
   onSpinEnd: () => void;
+  labelFor: (wedge: WheelWedge) => string;
 }
 
-export function HalloweenWheel({ rotation, onSpinEnd }: HalloweenWheelProps) {
+export function HalloweenWheel({ wedges, rotation, onSpinEnd, labelFor }: HalloweenWheelProps) {
   const { t } = useTranslation();
-  const count = HALLOWEEN_SLICES.length;
+  const fontSize = wedges.length > 8 ? 3.2 : 4.6;
 
   return (
     <div className='relative size-[min(92vw,28rem)]'>
@@ -74,34 +86,31 @@ export function HalloweenWheel({ rotation, onSpinEnd }: HalloweenWheelProps) {
         }}
       >
         <svg viewBox={`0 0 ${SIZE} ${SIZE}`} role='img' aria-label={t('halloween:wheelLabel')} className='size-full'>
-          {HALLOWEEN_SLICES.map((slice, index) => {
-            const style = SLICE_STYLES[index];
-            const centerAngle = index * (360 / count);
-            const labelPoint = point(centerAngle, RADIUS * 0.64);
-            const label = t(slice.labelKey);
-            const lines = label.split(' ');
+          {wedges.map((wedge, index) => {
+            const style = SLICE_STYLES[index % SLICE_STYLES.length];
+            const center = centerAngle(wedges, index);
+            const labelPoint = point(center, RADIUS * 0.64);
+            const label = labelFor(wedge);
 
             return (
-              <g key={`${slice.id}-${index}`}>
-                <path d={wedgePath(index, count)} className={`${style.fill} stroke-background`} strokeWidth='0.8' />
+              <g key={`${wedge.code}-${index}`}>
+                <path
+                  d={wedgePath(center, wedgeSpan(wedges, index))}
+                  className={`${style.fill} stroke-background`}
+                  strokeWidth='0.8'
+                />
                 <text
                   x={labelPoint.x}
                   y={labelPoint.y}
                   textAnchor='middle'
                   dominantBaseline='middle'
-                  transform={`rotate(${centerAngle} ${labelPoint.x} ${labelPoint.y})`}
-                  fontSize='4.6'
+                  transform={`rotate(${center} ${labelPoint.x} ${labelPoint.y})`}
+                  fontSize={fontSize}
                   fontWeight='700'
                   className={style.text}
                   style={{ fontFamily: 'var(--font-title)' }}
                 >
-                  {lines.length === 1
-                    ? label
-                    : lines.map((line, lineIndex) => (
-                        <tspan key={line} x={labelPoint.x} dy={lineIndex === 0 ? '-0.55em' : '1.15em'}>
-                          {line}
-                        </tspan>
-                      ))}
+                  {label}
                 </text>
               </g>
             );

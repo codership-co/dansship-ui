@@ -142,6 +142,12 @@ export enum DANSSHIP_ERROR_CODE {
   // Payment Gateway Integration
   UNSUPPORTED_PURCHASE_TYPE = 'UNSUPPORTED_PURCHASE_TYPE', // VALIDATION_ERROR = Payment gateway does not support the requested purchase type |
 
+  // Halloween wheel
+  HALLOWEEN_WHEEL_CLOSED = 'HALLOWEEN_WHEEL_CLOSED', // CONFLICT = The promotional window is closed |
+  HALLOWEEN_ALREADY_SPUN = 'HALLOWEEN_ALREADY_SPUN', // CONFLICT = This student already has a spin |
+  HALLOWEEN_STUDENT_NOT_FOUND = 'HALLOWEEN_STUDENT_NOT_FOUND', // RESOURCE_NOT_FOUND = The user id does not exist |
+  HALLOWEEN_WHEEL_MISCONFIGURED = 'HALLOWEEN_WHEEL_MISCONFIGURED', // SYSTEM_ERROR = Wheel weights or prize rows are invalid |
+
   // Events
   INSTRUCTOR_PROFILE_NOT_FOUND = 'INSTRUCTOR_PROFILE_NOT_FOUND', // RESOURCE_NOT_FOUND = Authenticated user has no instructor profile |
   EVENT_INSTRUCTOR_FORBIDDEN = 'EVENT_INSTRUCTOR_FORBIDDEN', // AUTHORIZATION_ERROR = User is not the assigned event instructor |
