@@ -1,5 +1,5 @@
 import { Button } from 'polpo/components';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { HalloweenWheel } from './halloween-wheel';
@@ -12,7 +12,14 @@ import {
 } from './pick-winning-slice';
 
 import { Input } from '@components/ui';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@components/ui/dialog';
 import {
   DANSSHIP_ERROR_CODE,
   DansshipAPI,
@@ -60,6 +67,45 @@ function errorMessage(t: (key: string) => string, error: unknown) {
   return t('halloween:errors.network');
 }
 
+function FitSquare({ children }: { children: ReactNode }) {
+  const frameRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState(0);
+
+  useEffect(() => {
+    const frame = frameRef.current;
+
+    if (!frame) {
+      return;
+    }
+
+    const measure = () => {
+      const bounds = frame.getBoundingClientRect();
+
+      setSize(Math.max(0, Math.floor(Math.min(bounds.width, bounds.height))));
+    };
+
+    measure();
+
+    if (typeof ResizeObserver === 'undefined') {
+      return;
+    }
+
+    const observer = new ResizeObserver(measure);
+
+    observer.observe(frame);
+
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={frameRef} className='flex min-h-0 w-full flex-1 items-center justify-center'>
+      <div className='relative max-h-full max-w-full' style={size > 0 ? { width: size, height: size } : undefined}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 export function HalloweenKiosk() {
   const { t } = useTranslation();
   const { config, configError, isLoading } = useHalloweenWheel();
@@ -80,6 +126,7 @@ export function HalloweenKiosk() {
   const [pendingResult, setPendingResult] = useState<HalloweenSpinResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSpinningRequest, setIsSpinningRequest] = useState(false);
+  const [searchGeneration, setSearchGeneration] = useState(0);
 
   const shownResult = phase === 'result' ? (pendingResult ?? knownResult) : knownResult;
   const windowOpen = config?.window_open === true;
@@ -88,6 +135,38 @@ export function HalloweenKiosk() {
   function finishSpin() {
     setPhase(current => (current === 'spinning' ? 'result' : current));
   }
+
+  useEffect(() => {
+    const html = document.documentElement;
+    const body = document.body;
+    const previous = {
+      htmlOverflow: html.style.overflow,
+      bodyOverflow: body.style.overflow,
+      bodyPosition: body.style.position,
+      bodyInset: body.style.inset,
+      bodyWidth: body.style.width,
+      htmlHeight: html.style.height,
+      bodyHeight: body.style.height,
+    };
+
+    html.style.overflow = 'hidden';
+    html.style.height = '100dvh';
+    body.style.overflow = 'hidden';
+    body.style.position = 'fixed';
+    body.style.inset = '0';
+    body.style.width = '100%';
+    body.style.height = '100dvh';
+
+    return () => {
+      html.style.overflow = previous.htmlOverflow;
+      html.style.height = previous.htmlHeight;
+      body.style.overflow = previous.bodyOverflow;
+      body.style.position = previous.bodyPosition;
+      body.style.inset = previous.bodyInset;
+      body.style.width = previous.bodyWidth;
+      body.style.height = previous.bodyHeight;
+    };
+  }, []);
 
   useEffect(() => {
     if (phase !== 'spinning') {
@@ -151,73 +230,90 @@ export function HalloweenKiosk() {
     setPendingResult(null);
     setPhase('idle');
     setError(null);
+    setSearchGeneration(current => current + 1);
   }
 
   return (
-    <main className='relative min-h-dvh overflow-hidden bg-background text-foreground'>
+    <main className='fixed top-0 left-0 h-dvh w-full overflow-hidden overscroll-none bg-background text-foreground'>
       <HalloweenDecor />
 
-      <div className='relative z-10 mx-auto flex min-h-dvh w-full max-w-3xl flex-col items-center justify-center gap-6 px-4 py-10'>
-        <header className='text-center'>
-          <p className='m-0 font-brand text-3xl text-highlight'>{t('halloween:kicker')}</p>
-          <h1 className='m-0 mt-2 font-title text-header2 text-primary'>{t('halloween:title')}</h1>
-          <p className='m-0 mt-2 text-muted-foreground'>{t('halloween:subtitle')}</p>
+      <div className='relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col items-center gap-3 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))]'>
+        <header className='shrink-0 text-center'>
+          <p className='m-0 font-brand text-2xl leading-none text-highlight'>{t('halloween:kicker')}</p>
+          <h1 className='m-0 mt-1 font-title text-2xl leading-tight text-primary sm:text-3xl'>
+            {t('halloween:title')}
+          </h1>
+          <p className='m-0 mt-1 text-sm text-muted-foreground'>{t('halloween:subtitle')}</p>
         </header>
 
-        <StudentSearch selected={student} onSelect={next => void onSelect(next)} />
+        <StudentSearch key={searchGeneration} selected={student} onSelect={next => void onSelect(next)} />
 
-        {wedges.length > 0 ? (
-          <HalloweenWheel
-            wedges={wedges}
-            rotation={rotation}
-            onSpinEnd={finishSpin}
-            labelFor={wedge => prizeLabel(t, wedge.labelKey, wedge.percent)}
-          />
-        ) : null}
+        <FitSquare>
+          {wedges.length > 0 ? <HalloweenWheel wedges={wedges} rotation={rotation} onSpinEnd={finishSpin} /> : null}
+        </FitSquare>
 
-        {configError ? (
-          <p role='alert' className='m-0 text-sm text-destructive'>
-            {t('halloween:errors.misconfigured')}
-          </p>
-        ) : null}
-        {config && !windowOpen ? (
-          <p className='m-0 text-sm text-muted-foreground'>{t('halloween:windowClosed')}</p>
-        ) : null}
-        {error ? (
-          <p role='alert' className='m-0 text-sm text-destructive'>
-            {error}
-          </p>
-        ) : null}
+        <div className='flex w-full max-w-md shrink-0 flex-col items-center gap-2'>
+          {configError ? (
+            <p role='alert' className='m-0 text-sm text-destructive'>
+              {t('halloween:errors.misconfigured')}
+            </p>
+          ) : null}
+          {config && !windowOpen ? (
+            <p className='m-0 text-sm text-muted-foreground'>{t('halloween:windowClosed')}</p>
+          ) : null}
+          {error ? (
+            <p role='alert' className='m-0 text-center text-sm text-destructive'>
+              {error}
+            </p>
+          ) : null}
 
-        <Button
-          color='highlight'
-          size='large'
-          type='button'
-          disabled={!canSpin || isLoading}
-          onClick={() => void spin()}
-        >
-          {t('halloween:spin')}
-        </Button>
-
-        {shownResult && student && phase === 'result' ? (
-          <Card className='w-full max-w-md border-border bg-card text-center'>
-            <CardHeader>
-              <CardTitle className='font-title text-header4 text-primary'>
-                {prizeLabel(t, shownResult.label_key, shownResult.percent)}
-              </CardTitle>
-              <CardDescription>
-                {t('halloween:expires', { date: formatExpiry(shownResult.expires_at) })}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className='flex flex-col items-center gap-4'>
-              <p className='m-0 text-foreground'>{t('halloween:delivered', { name: student.full_name })}</p>
-              <Button color='primary' size='large' type='button' onClick={reset}>
-                {t('halloween:next')}
-              </Button>
-            </CardContent>
-          </Card>
-        ) : null}
+          <Button
+            color='highlight'
+            size='large'
+            type='button'
+            disabled={!canSpin || isLoading}
+            onClick={() => void spin()}
+          >
+            {t('halloween:spin')}
+          </Button>
+        </div>
       </div>
+
+      <Dialog
+        open={Boolean(shownResult && student && phase === 'result')}
+        onOpenChange={open => {
+          if (!open) {
+            reset();
+          }
+        }}
+      >
+        <DialogContent className='border-border bg-card text-card-foreground sm:max-w-lg'>
+          {shownResult && student ? (
+            <>
+              <DialogHeader className='items-center gap-3 sm:text-center'>
+                <p className='m-0 text-5xl leading-none' aria-hidden>
+                  {t('halloween:congratsEmoji')}
+                </p>
+                <DialogTitle className='text-3xl leading-tight'>{t('halloween:congrats')}</DialogTitle>
+                <DialogDescription className='text-center text-xl'>
+                  {prizeLabel(t, shownResult.label_key, shownResult.percent)}
+                </DialogDescription>
+                <p className='m-0 text-center text-lg text-muted-foreground'>
+                  {t('halloween:expires', { date: formatExpiry(shownResult.expires_at) })}
+                </p>
+                <p className='m-0 text-center text-lg text-muted-foreground'>
+                  {t('halloween:delivered', { name: student.full_name })}
+                </p>
+              </DialogHeader>
+              <DialogFooter className='sm:justify-center'>
+                <Button color='primary' size='large' type='button' onClick={reset}>
+                  {t('halloween:next')}
+                </Button>
+              </DialogFooter>
+            </>
+          ) : null}
+        </DialogContent>
+      </Dialog>
     </main>
   );
 }
@@ -261,12 +357,13 @@ function StudentSearch({
   const users = response?.ok ? response.data.items : [];
 
   return (
-    <div className='w-full max-w-md' ref={dropdownRef}>
-      <label className='mb-2 block text-sm font-medium' htmlFor='halloween-student-search'>
+    <div className='relative w-full max-w-md shrink-0' ref={dropdownRef}>
+      <label className='mb-1 block text-sm font-medium' htmlFor='halloween-student-search'>
         {t('halloween:searchLabel')}
       </label>
       <Input
         id='halloween-student-search'
+        className='py-3'
         value={searchInput}
         placeholder={t('halloween:searchPlaceholder')}
         onChange={event => {
@@ -275,9 +372,9 @@ function StudentSearch({
         }}
         onFocus={() => setOpen(true)}
       />
-      {selected ? <p className='mt-2 mb-0 text-sm text-foreground'>{selected.full_name}</p> : null}
+      {selected ? <p className='mt-1 mb-0 text-sm text-foreground'>{selected.full_name}</p> : null}
       {open && debounced.length > 2 ? (
-        <div className='mt-2 max-h-56 overflow-auto rounded-md border border-border bg-card shadow-sm'>
+        <div className='absolute z-20 mt-1 max-h-40 w-full overflow-auto rounded-md border border-border bg-card shadow-sm'>
           {isLoading ? null : users.length === 0 ? (
             <p className='px-3 py-2 text-sm text-muted-foreground'>{t('halloween:noUsers')}</p>
           ) : (

@@ -44,19 +44,45 @@ function centerAngle(wedges: ReadonlyArray<WheelWedge>, index: number) {
   return cursor + wedgeSpan(wedges, index) / 2;
 }
 
+function uprightRotation(center: number) {
+  const normalized = ((center % 360) + 360) % 360;
+
+  return normalized > 90 && normalized < 270 ? center + 180 : center;
+}
+
+interface SliceLine {
+  text: string;
+  size: number;
+}
+
+function sliceLines(
+  t: (key: string, options?: Record<string, unknown>) => string,
+  wedge: WheelWedge,
+): Array<SliceLine> {
+  if (wedge.percent !== null) {
+    return [
+      { text: t('halloween:prizes.sliceValue', { percent: wedge.percent }), size: 4.6 },
+      { text: t('halloween:prizes.sliceDiscount'), size: 2.3 },
+    ];
+  }
+
+  return [
+    { text: t('halloween:prizes.sliceFreeClass'), size: 3.2 },
+    { text: t('halloween:prizes.sliceFreeClassCaption'), size: 2.3 },
+  ];
+}
+
 interface HalloweenWheelProps {
   wedges: ReadonlyArray<WheelWedge>;
   rotation: number;
   onSpinEnd: () => void;
-  labelFor: (wedge: WheelWedge) => string;
 }
 
-export function HalloweenWheel({ wedges, rotation, onSpinEnd, labelFor }: HalloweenWheelProps) {
+export function HalloweenWheel({ wedges, rotation, onSpinEnd }: HalloweenWheelProps) {
   const { t } = useTranslation();
-  const fontSize = wedges.length > 8 ? 3.2 : 4.6;
 
   return (
-    <div className='relative size-[min(92vw,28rem)]'>
+    <div className='relative size-full'>
       <svg
         viewBox='0 0 36 42'
         className='pointer-events-none absolute top-0 left-1/2 z-10 w-9 -translate-x-1/2 -translate-y-1'
@@ -89,29 +115,39 @@ export function HalloweenWheel({ wedges, rotation, onSpinEnd, labelFor }: Hallow
           {wedges.map((wedge, index) => {
             const style = SLICE_STYLES[index % SLICE_STYLES.length];
             const center = centerAngle(wedges, index);
-            const labelPoint = point(center, RADIUS * 0.64);
-            const label = labelFor(wedge);
+            const span = wedgeSpan(wedges, index);
+            const path = wedgePath(center, span);
+            const lines = sliceLines(t, wedge);
+            const textRotation = uprightRotation(center);
 
             return (
               <g key={`${wedge.code}-${index}`}>
-                <path
-                  d={wedgePath(center, wedgeSpan(wedges, index))}
-                  className={`${style.fill} stroke-background`}
-                  strokeWidth='0.8'
-                />
-                <text
-                  x={labelPoint.x}
-                  y={labelPoint.y}
-                  textAnchor='middle'
-                  dominantBaseline='middle'
-                  transform={`rotate(${center} ${labelPoint.x} ${labelPoint.y})`}
-                  fontSize={fontSize}
-                  fontWeight='700'
-                  className={style.text}
-                  style={{ fontFamily: 'var(--font-title)' }}
-                >
-                  {label}
-                </text>
+                <path d={path} className={`${style.fill} stroke-background`} strokeWidth='0.8' />
+                <clipPath id={`halloween-wedge-${index}`}>
+                  <path d={path} />
+                </clipPath>
+                <g clipPath={`url(#halloween-wedge-${index})`}>
+                  {lines.map((line, lineIndex) => {
+                    const labelPoint = point(center, RADIUS * 0.74 - lineIndex * 5.4);
+
+                    return (
+                      <text
+                        key={line.text}
+                        x={labelPoint.x}
+                        y={labelPoint.y}
+                        textAnchor='middle'
+                        dominantBaseline='middle'
+                        transform={`rotate(${textRotation} ${labelPoint.x} ${labelPoint.y})`}
+                        fontSize={line.size}
+                        fontWeight='700'
+                        className={style.text}
+                        style={{ fontFamily: 'var(--font-title)' }}
+                      >
+                        {line.text}
+                      </text>
+                    );
+                  })}
+                </g>
               </g>
             );
           })}
