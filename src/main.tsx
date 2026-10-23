@@ -14,8 +14,9 @@ import { Error404 } from '@components/svg';
 import '@core/i18n';
 import { Router } from '@core/router';
 import '@core/styles';
-import { isDynamicImportError, listenForStaleChunkLoads, reloadForStaleChunk } from '@helpers';
+import { guardViewTransitions, isDynamicImportError, listenForStaleChunkLoads, reloadForStaleChunk } from '@helpers';
 
+guardViewTransitions();
 listenForStaleChunkLoads();
 
 function AppErrorFallback({ error }: FallbackProps) {

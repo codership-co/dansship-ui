@@ -1,6 +1,9 @@
 import { addBreadcrumb, withScope, captureException } from '@sentry/react';
 import { HttpClientError, LoggerParams, RequestState } from 'polpo-http-client';
 
+import { isDynamicImportError } from '../../helpers/chunk-load';
+import { toPathTemplate } from '../http-path';
+
 export enum DANSSHIP_ERROR_CATEGORY {
   AUTHENTICATION_ERROR = 'AUTHENTICATION_ERROR',
   VALIDATION_ERROR = 'VALIDATION_ERROR',
@@ -178,6 +181,70 @@ export class DansshipAPIError extends HttpClientError<DansshipResponseError> {
   }
 }
 
+export type TransportFailureKind = 'aborted' | 'offline' | 'network';
+
+export class DansshipTransportError extends Error {
+  readonly status = 0;
+
+  readonly kind: TransportFailureKind;
+
+  readonly method: string;
+
+  readonly path: string;
+
+  constructor(kind: TransportFailureKind, method: string, path: string, cause: unknown) {
+    super(cause instanceof Error ? cause.message : 'Request failed before an HTTP response', { cause });
+    this.name = 'DansshipTransportError';
+    this.kind = kind;
+    this.method = method;
+    this.path = path;
+  }
+}
+
+function isBrowserOffline(): boolean {
+  return typeof navigator !== 'undefined' && navigator.onLine === false;
+}
+
+function readErrorName(error: unknown): string {
+  if (typeof error !== 'object' || error === null || !('name' in error)) {
+    return '';
+  }
+
+  return typeof error.name === 'string' ? error.name : '';
+}
+
+export function isAbortFailure(error: unknown): boolean {
+  return readErrorName(error) === 'AbortError';
+}
+
+export function isDansshipTransportError(error: unknown): error is DansshipTransportError {
+  return error instanceof DansshipTransportError;
+}
+
+/**
+ * Turns a failure that never received an HTTP response into a typed error.
+ * HTTP client errors and stale chunk loads are left untouched.
+ */
+export function toDansshipTransportError(error: unknown, method: string, path: string): DansshipTransportError | null {
+  if (error instanceof DansshipTransportError) {
+    return error;
+  }
+
+  if (isDynamicImportError(error) || error instanceof HttpClientError) {
+    return null;
+  }
+
+  let kind: TransportFailureKind = 'network';
+
+  if (isAbortFailure(error)) {
+    kind = 'aborted';
+  } else if (isBrowserOffline()) {
+    kind = 'offline';
+  }
+
+  return new DansshipTransportError(kind, method, path, error);
+}
+
 export async function getResponseError(response: Response, message: string) {
   const body = (await response.json()) as DansshipResponseError;
 
@@ -241,7 +308,7 @@ const SKIP_API_ERROR_CODES = new Set<DANSSHIP_ERROR_CODE>([
   DANSSHIP_ERROR_CODE.INSTRUCTOR_PAYMENT_MONTH_NOT_CLOSED,
 ]);
 
-export async function logger({ state, response }: LoggerParams) {
+export async function logger({ state, response, request, urlParams, buildURL }: LoggerParams) {
   if (state !== RequestState.REJECTED) {
     return;
   }
@@ -264,7 +331,15 @@ export async function logger({ state, response }: LoggerParams) {
     return;
   }
 
+  const method = (request.method ?? 'GET').toUpperCase();
+  const pathTemplate = toPathTemplate(urlParams.path || buildURL.pathname);
+  const errorCode = error instanceof DansshipAPIError ? error.body.error_code : 'unknown';
+
   withScope(scope => {
+    scope.setTag('http.method', method);
+    scope.setTag('http.path', pathTemplate);
+    scope.setFingerprint(['api-error', method, pathTemplate, String(status ?? 'unknown'), errorCode]);
+
     if (status !== undefined) {
       scope.setTag('http.status_code', String(status));
     }

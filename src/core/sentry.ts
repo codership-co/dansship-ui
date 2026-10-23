@@ -2,7 +2,8 @@ import { setUser, setTag, addBreadcrumb, withScope, captureException, captureMes
 
 import { isDynamicImportError } from '../helpers/chunk-load';
 
-import { DANSSHIP_ERROR_CODE, DansshipAPIError } from './api/dansship.error';
+import { DANSSHIP_ERROR_CODE, DansshipAPIError, DansshipTransportError, isAbortFailure } from './api/dansship.error';
+import { toPathTemplate } from './http-path';
 
 import type { User } from './api/auth/auth.models';
 
@@ -79,9 +80,17 @@ export function isExpectedAuthError(error: unknown): boolean {
 const TRANSPORT_FAILURE_RE =
   /Failed to fetch|NetworkError|Load failed|network error|The Internet connection appears to be offline/i;
 
+function isBrowserOffline(): boolean {
+  return typeof navigator !== 'undefined' && navigator.onLine === false;
+}
+
 export function isTransportFailure(error: unknown): boolean {
   if (isDynamicImportError(error)) {
     return false;
+  }
+
+  if (error instanceof DansshipTransportError) {
+    return true;
   }
 
   if (error instanceof DansshipAPIError && error.status > 0) {
@@ -91,6 +100,30 @@ export function isTransportFailure(error: unknown): boolean {
   const message = error instanceof Error ? error.message : typeof error === 'string' ? error : '';
 
   return TRANSPORT_FAILURE_RE.test(message);
+}
+
+function transportKind(error: unknown): 'aborted' | 'offline' | 'network' {
+  if (error instanceof DansshipTransportError) {
+    return error.kind;
+  }
+
+  if (isAbortFailure(error)) {
+    return 'aborted';
+  }
+
+  if (isBrowserOffline()) {
+    return 'offline';
+  }
+
+  return 'network';
+}
+
+function transportCause(error: unknown): unknown {
+  if (error instanceof DansshipTransportError) {
+    return error.cause;
+  }
+
+  return error;
 }
 
 export function captureUnexpectedException(
@@ -117,15 +150,42 @@ export function captureUnexpectedException(
     return;
   }
 
-  if (isTransportFailure(error)) {
-    addSentryBreadcrumb('http.transport', 'Request failed before an HTTP response', undefined, 'warning');
+  if (error instanceof DansshipTransportError || isAbortFailure(error) || isTransportFailure(error)) {
+    const kind = transportKind(error);
+    const method = error instanceof DansshipTransportError ? error.method : 'unknown';
+    const pathTemplate = toPathTemplate(error instanceof DansshipTransportError ? error.path : '');
+
+    if (kind === 'aborted' || kind === 'offline') {
+      addSentryBreadcrumb(
+        'http.transport',
+        'Request failed before an HTTP response',
+        { method, path: pathTemplate, kind },
+        'warning',
+      );
+
+      return;
+    }
+
+    const cause = transportCause(error);
+
     withScope(scope => {
       scope.setLevel('warning');
-      scope.setFingerprint(['http-transport']);
+      scope.setFingerprint(['http-transport', method, pathTemplate]);
+      scope.setTag('http.method', method);
+      scope.setTag('http.path', pathTemplate);
+      scope.setTag('transport.kind', kind);
 
       if (context?.tags) {
         Object.entries(context.tags).forEach(([key, value]) => scope.setTag(key, value));
       }
+
+      scope.setExtras({
+        'cause.name': cause instanceof Error ? cause.name : typeof cause,
+        'cause.message': cause instanceof Error ? cause.message : String(cause ?? ''),
+        online: typeof navigator === 'undefined' ? undefined : navigator.onLine,
+        visibilityState: typeof document === 'undefined' ? undefined : document.visibilityState,
+        ...context?.extras,
+      });
 
       captureMessage('HTTP transport failure');
     });
