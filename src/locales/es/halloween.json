@@ -4,15 +4,22 @@
   "subtitle": "Gira la ruleta si vienes disfrazado",
   "spin": "Girar",
   "next": "Siguiente persona",
-  "resultKicker": "¡Boo!",
-  "resultTitle": "1 clase adicional gratis",
-  "resultBody": "Premio de esta noche de disfraces",
   "wheelLabel": "Ruleta de Halloween",
-  "slices": {
-    "class": "Clase boo",
-    "candy": "Dulce",
-    "trick": "Truco",
-    "sticker": "Sticker",
-    "hug": "Abrazo"
+  "searchLabel": "Estudiante",
+  "searchPlaceholder": "Busca por nombre o correo",
+  "noUsers": "No encontramos a nadie con ese dato",
+  "windowClosed": "La ruleta está cerrada",
+  "delivered": "Entregado a {{name}}",
+  "expires": "Válido hasta {{date}}",
+  "errors": {
+    "closed": "La ruleta está cerrada",
+    "alreadySpun": "Esta persona ya giró",
+    "notFound": "No encontramos a ese estudiante",
+    "misconfigured": "La ruleta no está configurada",
+    "network": "No pudimos girar. Inténtalo de nuevo"
+  },
+  "prizes": {
+    "discount": "{{percent}} % de descuento",
+    "freeClass": "1 clase gratis"
   }
 }

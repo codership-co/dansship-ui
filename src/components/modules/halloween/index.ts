@@ -1,11 +1,10 @@
 export { HalloweenKiosk } from './halloween-kiosk';
 export {
-  HALLOWEEN_REST_INDEX,
-  HALLOWEEN_SLICE_COUNT,
-  HALLOWEEN_SLICES,
   HALLOWEEN_SPIN_TURNS,
+  MAX_EQUAL_SLICES,
   pickWinningSlice,
   rotationForSlice,
-  WINNING_SLICE_ID,
-  winningSliceIndexes,
+  spreadSlices,
+  wedgeIndexes,
 } from './pick-winning-slice';
+export type { WheelOutcome, WheelWedge } from './pick-winning-slice';

@@ -11,6 +11,7 @@ export * from './door-code/door-code.models';
 export * from './door-code/door-code.admin.api';
 export * from './figures/figures.models';
 export * from './gifts/gifts.models';
+export * from './halloween/halloween.models';
 export * from './instructor-payments/instructor-payments.models';
 export * from './instructors/instructors.models';
 export * from './inventory/inventory.models';

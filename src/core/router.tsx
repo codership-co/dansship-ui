@@ -9,7 +9,7 @@ import { RouterRootLayout } from '@components/layouts/router-root-layout';
 import { PageURLS } from '@core/constants';
 import {
   Error404Page,
-  HalloweenPage,
+  SecureHalloweenPage,
   HomePage,
   LocationPage,
   PaymentsResultsLoader,
@@ -108,7 +108,7 @@ const routes: Array<RouteObject> = [
           },
         ],
       },
-      { path: 'halloween', Component: HalloweenPage },
+      { path: 'halloween', Component: SecureHalloweenPage },
       {
         Component: RouterPageLayout,
         children: [

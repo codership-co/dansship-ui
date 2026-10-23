@@ -124,6 +124,7 @@ export enum PERMISSION {
   // BENEFIT
   BENEFIT_READ = 'read:benefit',
   BENEFIT_MANAGE = 'manage:benefit',
+  HALLOWEEN_WHEEL_MANAGE = 'manage:halloween_wheel',
 
   // CAMPAIGN
   CAMPAIGN_MANAGE = 'manage:campaign',
@@ -181,6 +182,7 @@ export const AdminPermissions = {
   subscriptions: [PERMISSION.SUBSCRIPTION_MANAGE],
   benefits: [PERMISSION.BENEFIT_READ],
   benefitWindows: [PERMISSION.BENEFIT_MANAGE],
+  halloweenWheel: [PERMISSION.HALLOWEEN_WHEEL_MANAGE],
   merch: [PERMISSION.PRODUCT_MANAGE],
   merchPos: [PERMISSION.ORDER_CREATE],
   figures: [PERMISSION.FIGURE_MANAGE],
