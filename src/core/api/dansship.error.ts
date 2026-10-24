@@ -189,7 +189,7 @@ export class DansshipAPIError extends HttpClientError<DansshipResponseError> {
   }
 }
 
-export type TransportFailureKind = 'aborted' | 'offline' | 'network';
+export type TransportFailureKind = 'aborted' | 'offline' | 'network' | 'timeout';
 
 export class DansshipTransportError extends Error {
   readonly status = 0;
@@ -225,6 +225,10 @@ export function isAbortFailure(error: unknown): boolean {
   return readErrorName(error) === 'AbortError';
 }
 
+export function isTimeoutFailure(error: unknown): boolean {
+  return readErrorName(error) === 'TimeoutError';
+}
+
 export function isDansshipTransportError(error: unknown): error is DansshipTransportError {
   return error instanceof DansshipTransportError;
 }
@@ -244,7 +248,9 @@ export function toDansshipTransportError(error: unknown, method: string, path: s
 
   let kind: TransportFailureKind = 'network';
 
-  if (isAbortFailure(error)) {
+  if (isTimeoutFailure(error)) {
+    kind = 'timeout';
+  } else if (isAbortFailure(error)) {
     kind = 'aborted';
   } else if (isBrowserOffline()) {
     kind = 'offline';

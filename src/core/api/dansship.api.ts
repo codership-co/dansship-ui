@@ -7,7 +7,7 @@ import { CampaignsAdminAPI } from './campaigns/campaigns.admin.api';
 import { CampaignsAPI } from './campaigns/campaigns.api';
 import { ClassFeedbackAdminAPI, ClassFeedbackAPI } from './class-feedback/class-feedback.api';
 import { ClassLevelsAPI } from './class-levels/class-levels.api';
-import { DansshipHttpClient } from './dansship-http-client';
+import { abortInFlight, DansshipHttpClient } from './dansship-http-client';
 import { getResponseError, logger } from './dansship.error';
 import { DoorCodeAdminAPI } from './door-code/door-code.admin.api';
 import { EventosAdminAPI } from './eventos/eventos.admin.api';
@@ -38,9 +38,7 @@ import { UserContextAdminAPI } from './user-context/user-context.admin.api';
 import { UsersAdminAPI } from './users/users.admin.api';
 import { WalletsAdminAPI, WalletsAPI } from './wallets/wallets.api';
 
-import { AUTH_SESSION_KEY } from '@core/constants';
-
-const AUTH_REFRESH_SKIP_PATHS = new Set(['/auth/refresh-token', '/auth/signin', '/auth/signup', '/auth/signout']);
+import { resumeAbortCutoff, subscribePageLifecycle } from '@core/page-lifecycle';
 
 export class DansshipAPI {
   static readonly httpClient = new DansshipHttpClient({
@@ -99,20 +97,17 @@ export class DansshipAPI {
   static doorCodeAdmin = new DoorCodeAdminAPI(this.httpClient);
 
   static {
-    this.httpClient.setOnErrorInterceptor(async (request, response) => {
-      if (
-        response.status === 401 &&
-        !request.isReFetch &&
-        localStorage.getItem(AUTH_SESSION_KEY) === '1' &&
-        !AUTH_REFRESH_SKIP_PATHS.has(request.urlParams.path ?? '')
-      ) {
-        try {
-          await this.auth.refreshToken();
+    subscribePageLifecycle(event => {
+      if (event.type === 'suspend') {
+        abortInFlight();
 
-          return request.reFetch();
-        } catch {
-          window.dispatchEvent(new CustomEvent('auth:session-expired'));
-        }
+        return;
+      }
+
+      const cutoff = resumeAbortCutoff(event);
+
+      if (cutoff !== null) {
+        abortInFlight({ startedBefore: cutoff });
       }
     });
   }

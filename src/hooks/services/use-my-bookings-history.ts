@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { usePageResume } from '../use-page-resume';
+
 import { DansshipAPI, type MyBooking } from '@core/api';
+import { whenSessionSettled } from '@core/api/session-coordinator';
 
 export const MY_BOOKINGS_HISTORY_PAGE_SIZE = 20;
 
@@ -13,72 +16,132 @@ export function useMyBookingsHistory(attendeeUserId?: string) {
   const [error, setError] = useState<Error | null>(null);
   const inFlightRef = useRef(false);
   const requestIdRef = useRef(0);
+  const attendeeRef = useRef(attendeeUserId);
+  const hasItemsRef = useRef(false);
+  const pendingLoad = useRef<{
+    nextOffset: number;
+    append: boolean;
+    forAttendee?: string;
+    background: boolean;
+  } | null>(null);
+  const pendingWaiters = useRef<Array<() => void>>([]);
 
-  const loadPage = useCallback(async (nextOffset: number, append: boolean, forAttendee?: string) => {
-    if (inFlightRef.current) {
-      return;
-    }
+  attendeeRef.current = attendeeUserId;
+  hasItemsRef.current = items.length > 0;
 
-    const requestId = ++requestIdRef.current;
-
-    inFlightRef.current = true;
-    setError(null);
-
-    if (append) {
-      setIsLoadingMore(true);
-    } else {
-      setIsLoading(true);
-    }
-
-    try {
-      const { data, error: requestError } = await DansshipAPI.bookings.getMyBookings({
-        scope: 'history',
-        limit: MY_BOOKINGS_HISTORY_PAGE_SIZE,
-        offset: nextOffset,
-        ...(forAttendee ? { attendee_user_id: forAttendee } : {}),
-      });
-
-      if (requestId !== requestIdRef.current) {
+  const loadPage = useCallback(
+    async (nextOffset: number, append: boolean, forAttendee?: string, background = false) => {
+      if (forAttendee !== attendeeRef.current) {
         return;
       }
 
-      if (requestError || !data) {
-        setError(requestError ?? new Error('Failed to load booking history'));
+      if (inFlightRef.current) {
+        pendingLoad.current = { nextOffset, append, forAttendee, background };
 
-        return;
+        return new Promise<void>(resolve => {
+          pendingWaiters.current.push(resolve);
+        });
       }
 
-      setTotal(data.total);
-      const loaded = nextOffset + data.items.length;
-      setOffset(loaded < data.total ? loaded : undefined);
-      setItems(previous =>
-        append
-          ? [...previous, ...data.items.filter(item => !previous.some(existing => existing.id === item.id))]
-          : data.items,
-      );
-    } catch (err) {
-      if (requestId !== requestIdRef.current) {
-        return;
+      const requestId = ++requestIdRef.current;
+
+      inFlightRef.current = true;
+
+      if (!background) {
+        setError(null);
       }
 
-      setError(err instanceof Error ? err : new Error('Failed to load booking history'));
-    } finally {
-      if (requestId === requestIdRef.current) {
-        inFlightRef.current = false;
-        setIsLoading(false);
-        setIsLoadingMore(false);
+      if (append) {
+        setIsLoadingMore(true);
+      } else if (!background) {
+        setIsLoading(true);
       }
-    }
-  }, []);
+
+      try {
+        const { data, error: requestError } = await DansshipAPI.bookings.getMyBookings({
+          scope: 'history',
+          limit: MY_BOOKINGS_HISTORY_PAGE_SIZE,
+          offset: nextOffset,
+          ...(forAttendee ? { attendee_user_id: forAttendee } : {}),
+        });
+
+        if (requestId !== requestIdRef.current) {
+          return;
+        }
+
+        if (requestError || !data) {
+          if (!background) {
+            setError(requestError ?? new Error('Failed to load booking history'));
+          }
+
+          return;
+        }
+
+        setError(null);
+
+        setTotal(data.total);
+        const loaded = nextOffset + data.items.length;
+        setOffset(loaded < data.total ? loaded : undefined);
+        setItems(previous =>
+          append
+            ? [...previous, ...data.items.filter(item => !previous.some(existing => existing.id === item.id))]
+            : data.items,
+        );
+      } catch (err) {
+        if (requestId !== requestIdRef.current) {
+          return;
+        }
+
+        if (!background) {
+          setError(err instanceof Error ? err : new Error('Failed to load booking history'));
+        }
+      } finally {
+        if (requestId === requestIdRef.current) {
+          inFlightRef.current = false;
+
+          if (!background) {
+            setIsLoading(false);
+          }
+
+          setIsLoadingMore(false);
+
+          const pending = pendingLoad.current;
+
+          if (pending) {
+            pendingLoad.current = null;
+            await loadPage(pending.nextOffset, pending.append, pending.forAttendee, pending.background);
+          }
+
+          const waiters = pendingWaiters.current;
+
+          pendingWaiters.current = [];
+          waiters.forEach(resolve => resolve());
+        }
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     inFlightRef.current = false;
     requestIdRef.current += 1;
+    pendingLoad.current = null;
+    const waiters = pendingWaiters.current;
+
+    pendingWaiters.current = [];
+    waiters.forEach(resolve => resolve());
     setItems([]);
     setOffset(0);
     setTotal(0);
     void loadPage(0, false, attendeeUserId);
   }, [attendeeUserId, loadPage]);
+
+  usePageResume(() => {
+    void (async () => {
+      await whenSessionSettled();
+      await loadPage(0, false, attendeeRef.current, hasItemsRef.current);
+    })();
+  });
 
   const loadNextPage = useCallback(async () => {
     if (offset === undefined || inFlightRef.current) {

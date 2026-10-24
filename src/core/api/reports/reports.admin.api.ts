@@ -1,6 +1,4 @@
-import { HttpClient } from 'polpo-http-client';
-
-import { DansshipAPIError } from '@core/api';
+import { REPORT_GET_TIMEOUT_MS, type DansshipHttpClient } from '../dansship-http-client';
 
 import type {
   ActiveStudentsListReport,
@@ -38,12 +36,13 @@ type DateRangeParams = {
 };
 
 export class ReportsAdminAPI {
-  constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
+  constructor(private readonly httpClient: DansshipHttpClient) {}
 
   async getOccupancyReport(startDate?: string, endDate?: string, filters: OccupancyFilters = {}) {
     return this.httpClient.callNoError<ClassOccupancyReport>({
       path: '/admin/reports/class-occupancy',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: {
         ...this.dateParams(startDate, endDate),
         class_type: filters.classType,
@@ -57,6 +56,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<AttendanceReport>({
       path: '/admin/reports/attendance',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: {
         ...this.dateParams(startDate, endDate),
         class_type: filters.classType,
@@ -70,6 +70,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<UnderutilizedScheduleReport>({
       path: '/admin/reports/underutilized-schedule',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: {
         ...this.dateParams(startDate, endDate),
         room_id: filters.roomId,
@@ -82,6 +83,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<InstructorPerformanceReport>({
       path: '/admin/reports/instructor-performance',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -90,6 +92,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<InstructorCancellationReport>({
       path: '/admin/reports/instructor-cancellations',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -98,6 +101,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<CashRevenueReport>({
       path: '/admin/reports/revenue',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -106,6 +110,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<RevenueIndicatorsReport>({
       path: '/admin/reports/revenue-indicators',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -114,6 +119,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<TaxCollectedReport>({
       path: '/admin/reports/tax-collected',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -122,6 +128,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<WalletLiabilityReport>({
       path: '/admin/reports/wallet-liability',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
     });
   }
 
@@ -129,6 +136,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<GiftValueReport>({
       path: '/admin/reports/gift-value',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -137,6 +145,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<BenefitCostReport>({
       path: '/admin/reports/benefit-cost',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -145,6 +154,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<ActiveStudentsReport>({
       path: '/admin/reports/active-students',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -153,6 +163,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<AcquisitionReport>({
       path: '/admin/reports/acquisition',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -161,6 +172,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<RenewalChurnReport>({
       path: '/admin/reports/renewal-churn',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -169,6 +181,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<TrialConversionReport>({
       path: '/admin/reports/trial-conversion',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -177,6 +190,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<TrialStudentsWithoutPlanReport>({
       path: '/admin/reports/trial-students-without-plan',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -185,6 +199,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<PendingDuoAssignmentsReport>({
       path: '/admin/reports/pending-duo-assignments',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
     });
   }
 
@@ -192,11 +207,13 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<ActiveStudentsListReport>({
       path: '/admin/reports/active-students-list',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
 
   async exportActiveStudentsCsv() {
+    // Raw fetch: this download skips DansshipHttpClient, so it does not refresh a 401 or abort on resume.
     const response = await fetch(`${import.meta.env.VITE_DANSSHIP_API_URL}/admin/reports/active-students-list.csv`, {
       method: 'GET',
       credentials: 'include',
@@ -222,6 +239,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<NetRevenueByClassTypeReport>({
       path: '/admin/reports/net-revenue-by-class-type',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -230,6 +248,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<SubscriptionUsageReport>({
       path: '/admin/reports/subscription-usage',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -238,6 +257,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<CashRevenueReport>({
       path: '/admin/reports/studio-rentals/revenue',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -246,6 +266,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<StudioRentalUtilizationReport>({
       path: '/admin/reports/studio-rentals/utilization',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -254,6 +275,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<StudioRentalFunnelReport>({
       path: '/admin/reports/studio-rentals/funnel',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -262,6 +284,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<StudioRentalMixReport>({
       path: '/admin/reports/studio-rentals/mix',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }
@@ -270,6 +293,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<EventRevenueReport>({
       path: '/admin/reports/events/revenue',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: {
         ...this.dateParams(startDate, endDate),
         ...(eventType ? { type: eventType } : {}),
@@ -281,6 +305,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<EventFillReport>({
       path: '/admin/reports/events/fill',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: {
         ...this.dateParams(startDate, endDate),
         ...(eventType ? { type: eventType } : {}),
@@ -292,6 +317,7 @@ export class ReportsAdminAPI {
     return this.httpClient.callNoError<ClassCancellationReport>({
       path: '/admin/reports/class-cancellations',
       method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
   }

@@ -102,7 +102,7 @@ export function isTransportFailure(error: unknown): boolean {
   return TRANSPORT_FAILURE_RE.test(message);
 }
 
-function transportKind(error: unknown): 'aborted' | 'offline' | 'network' {
+function transportKind(error: unknown): 'aborted' | 'offline' | 'network' | 'timeout' {
   if (error instanceof DansshipTransportError) {
     return error.kind;
   }
