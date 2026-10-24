@@ -9,7 +9,6 @@ import { Container, Section, SectionHeading } from '@components/containers';
 import { BookingCalendar } from '@components/modules/classes/booking-calendar';
 import { ClassesCalendarSkeleton } from '@components/modules/classes/classes-calendar-skeleton';
 import { WeekSelector } from '@components/modules/schedules/week-selector';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useAuth, useStudentSession } from '@contexts';
 import { DansshipAPI, type PublishedClass } from '@core/api';
 import { getMonday } from '@helpers';
@@ -19,7 +18,7 @@ function ClassesPage() {
   const { t } = useTranslation();
   const locale = useDateLocale();
   const { isAuthenticated, ready, user } = useAuth();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { subscriptions, bookings, isTrialEligible, reFetch: reFetchSession } = useStudentSession();
   const currentWeek = getMonday(new Date());
   const [week, setWeek] = useState(() => currentWeek);
@@ -31,9 +30,13 @@ function ClassesPage() {
   const hasAppliedUpcoming = useRef(false);
   const hasUserChangedWeek = useRef(false);
   const familyEnabled = Boolean(user?.managedUsersEnabled) && !user?.isManaged;
-  const { response: familyResponse } = usePromise(() => DansshipAPI.family.listMine(), familyEnabled);
-  const minors = familyResponse?.data?.minors ?? [];
-  const [attendeeId, setAttendeeId] = useState<string | null>(searchParams.get('for'));
+  const { response: familyResponse, error: familyError } = usePromise(
+    () => DansshipAPI.family.listMine(),
+    familyEnabled,
+  );
+  const minors = (familyResponse?.data?.minors ?? []).filter(minor => minor.is_active !== false);
+  const requestedAttendeeId = searchParams.get('for');
+  const [attendeeId, setAttendeeId] = useState<string | null>(requestedAttendeeId);
   const attendeeOptions =
     minors.length > 0 && user
       ? [
@@ -44,28 +47,30 @@ function ClassesPage() {
           })),
         ]
       : [];
+  const familySettled = !familyEnabled || familyResponse !== undefined || Boolean(familyError);
+  const attendeePending = Boolean(
+    familyEnabled && !familySettled && attendeeId && user && attendeeId !== String(user.id),
+  );
   const selectedAttendeeId = attendeeOptions.some(option => option.id === attendeeId)
     ? attendeeId
-    : (attendeeOptions[0]?.id ?? null);
+    : !familySettled && attendeeId
+      ? attendeeId
+      : (attendeeOptions[0]?.id ?? (familyEnabled ? attendeeId : null));
   const selectedAttendee = attendeeOptions.find(option => option.id === selectedAttendeeId);
 
   const { response, reFetch } = usePromise(
     async () => {
-      const { data: upcoming } = await DansshipAPI.schedules.getUpcomingWeek(
-        currentWeek,
-        selectedAttendeeId ?? undefined,
-      );
+      const { data: upcoming } = await DansshipAPI.schedules.getUpcomingWeek(currentWeek);
 
       return upcoming ?? null;
     },
     ready,
-    [isAuthenticated, selectedAttendeeId],
+    [isAuthenticated],
   );
 
   useEffect(() => {
-    hasAppliedUpcoming.current = false;
-    setInitialClasses(null);
-  }, [selectedAttendeeId]);
+    setAttendeeId(requestedAttendeeId);
+  }, [requestedAttendeeId]);
 
   useEffect(() => {
     if (!response || hasAppliedUpcoming.current) {
@@ -99,7 +104,7 @@ function ClassesPage() {
   };
 
   const goToNextAvailable = async () => {
-    const { data, ok } = await DansshipAPI.schedules.getUpcomingWeek(currentWeek, selectedAttendeeId ?? undefined);
+    const { data, ok } = await DansshipAPI.schedules.getUpcomingWeek(currentWeek);
 
     if (!ok || !data) {
       return;
@@ -117,26 +122,6 @@ function ClassesPage() {
       <SectionHeading title={t('classes:title')} subtitle={t('classes:subtitle')} />
 
       <section className='grid gap-8'>
-        {attendeeOptions.length > 0 && selectedAttendeeId ? (
-          <Container>
-            <label className='grid max-w-sm gap-1 text-sm'>
-              {t('family:reservingFor')}
-              <Select value={selectedAttendeeId} onValueChange={setAttendeeId}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {attendeeOptions.map(option => (
-                    <SelectItem key={option.id} value={option.id}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </label>
-          </Container>
-        ) : null}
-
         <Container>
           <WeekSelector week={week} setWeek={handleSetWeek} disablePastWeeks>
             <Button
@@ -187,7 +172,19 @@ function ClassesPage() {
             attendeeUserId={selectedAttendeeId}
             attendeeName={selectedAttendee?.label ?? null}
             attendeeOptions={attendeeOptions}
-            onAttendeeChange={setAttendeeId}
+            attendeePending={attendeePending}
+            onAttendeeChange={nextId => {
+              setAttendeeId(nextId);
+              const nextParams = new URLSearchParams(searchParams);
+
+              if (user && nextId === String(user.id)) {
+                nextParams.delete('for');
+              } else {
+                nextParams.set('for', nextId);
+              }
+
+              setSearchParams(nextParams, { replace: true });
+            }}
             onBookingChange={async () => {
               await Promise.all([reFetchSession(), reFetch()]);
             }}

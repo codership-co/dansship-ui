@@ -45,6 +45,7 @@ export interface MinorSummary {
   document_type: string | null;
   document_value_masked: string | null;
   health_summary: string | null;
+  health?: MinorHealthPayload | null;
   trial_available: boolean;
   trial_used: boolean;
   is_active: boolean;
@@ -75,6 +76,8 @@ export interface BookingPayerSubscription {
   expiration_date: string | null;
   start_date: string | null;
   remaining_classes: number | null;
+  bonus_classes_remaining?: number;
+  bonus_expires_at?: string | null;
   status: string;
 }
 

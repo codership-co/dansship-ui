@@ -7,23 +7,14 @@ import { Section, SectionHeading } from '@components/containers';
 import { ConfirmDialog } from '@components/modals';
 import { ClassCsatFields, formatClassCsatHeadline } from '@components/modules/campaigns/class-csat-form';
 import {
+  BookingAttendeeFilter,
   HistoryListSkeleton,
   HistoryReservationCard,
   NextReservationHero,
   UpcomingListSkeleton,
   UpcomingReservationCard,
 } from '@components/modules/my-bookings';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@components/ui';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useAuth, useStudentSession } from '@contexts';
 import { DansshipAPI, MyBooking, type RentalRequest, type RentalSeries } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -39,13 +30,30 @@ import {
 } from '@helpers';
 import { useMyBookings, useMyBookingsHistory, usePromise } from '@hooks';
 
+function initialsFromName(name: string) {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+
+  if (parts.length === 0) {
+    return '';
+  }
+
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+
+  return `${parts[0][0] ?? ''}${parts[parts.length - 1][0] ?? ''}`.toUpperCase();
+}
+
 function BookingsPage() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const familyEnabled = Boolean(user?.managedUsersEnabled) && !user?.isManaged;
   const { response: familyResponse } = usePromise(() => DansshipAPI.family.listMine(), familyEnabled);
   const [attendeeFilter, setAttendeeFilter] = useState('all');
-  const minors = familyResponse?.data?.minors ?? [];
+  const minors = useMemo(
+    () => (familyResponse?.data?.minors ?? []).filter(minor => minor.is_active !== false),
+    [familyResponse?.data?.minors],
+  );
   const {
     bookings: upcomingBookings,
     bookingsResponse: upcomingResponse,
@@ -65,7 +73,7 @@ function BookingsPage() {
     hasMore,
     loadNextPage,
     reFetch: reFetchHistory,
-  } = useMyBookingsHistory();
+  } = useMyBookingsHistory(attendeeFilter === 'all' ? undefined : attendeeFilter);
   const { cancelClass, isCancelingClass } = useMyBookings();
   const { response: eventUpcomingResponse, isLoading: isLoadingEventUpcoming } = usePromise(() =>
     DansshipAPI.eventos.listMyRegistrations({ scope: 'upcoming' }),
@@ -114,6 +122,46 @@ function BookingsPage() {
     (booking: MyBooking) => attendeeFilter === 'all' || booking.user_id === attendeeFilter,
     [attendeeFilter],
   );
+
+  const guardianUpcomingExtras = useMemo(() => {
+    const events = (eventUpcomingResponse?.data ?? []).length;
+    const rentals = rentalRequests.filter(request => isUpcomingRental(request)).length;
+    const series = rentalSeries.filter(item => isUpcomingRentalSeries(item)).length;
+
+    return events + rentals + series;
+  }, [eventUpcomingResponse?.data, rentalRequests, rentalSeries]);
+
+  const attendeeOptions = useMemo(() => {
+    if (!user || minors.length === 0) {
+      return [];
+    }
+
+    const classCount = (userId: string) => upcomingBookings.filter(booking => booking.user_id === userId).length;
+    const selfId = String(user.id);
+    const selfCount = classCount(selfId) + guardianUpcomingExtras;
+    const people = minors.map(minor => ({
+      id: minor.user_id,
+      label: minor.given_name?.trim() || minor.full_name,
+      initials: initialsFromName([minor.given_name, minor.family_name].filter(Boolean).join(' ') || minor.full_name),
+      count: classCount(minor.user_id),
+    }));
+
+    return [
+      {
+        id: 'all',
+        label: t('family:allMembers'),
+        initials: null,
+        count: selfCount + people.reduce((sum, person) => sum + person.count, 0),
+      },
+      {
+        id: selfId,
+        label: t('family:myself'),
+        initials: initialsFromName(user.fullName || user.name),
+        count: selfCount,
+      },
+      ...people,
+    ];
+  }, [guardianUpcomingExtras, minors, t, upcomingBookings, user]);
 
   const upcomingItems = useMemo(() => {
     const classes = upcomingBookings.filter(matchesAttendee).map(classReservation);
@@ -164,7 +212,8 @@ function BookingsPage() {
   const nextReservation = upcomingItems[0] ?? null;
   const furtherUpcoming = upcomingItems.slice(1);
   const historyLoaded = historyReservations.length;
-  const historyTotal = historyClassTotal + extraHistory.length;
+  const includeGuardianHistory = attendeeFilter === 'all' || attendeeFilter === String(user?.id);
+  const historyTotal = historyClassTotal + (includeGuardianHistory ? extraHistory.length : 0);
 
   useEffect(() => {
     if (!hasMore) {
@@ -239,24 +288,8 @@ function BookingsPage() {
     <>
       <Section navbarPadding className='overflow-x-hidden pb-10'>
         <SectionHeading title={t('bookings:myBookingsTitle')} subtitle={t('bookings:myBookingsSubtitle')} />
-        {minors.length > 0 && user ? (
-          <label className='grid max-w-sm gap-1 text-sm'>
-            {t('family:viewBookingsOf')}
-            <Select value={attendeeFilter} onValueChange={setAttendeeFilter}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value='all'>{t('family:everyone')}</SelectItem>
-                <SelectItem value={String(user.id)}>{t('family:myself')}</SelectItem>
-                {minors.map(minor => (
-                  <SelectItem key={minor.user_id} value={minor.user_id}>
-                    {minor.full_name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </label>
+        {attendeeOptions.length > 0 ? (
+          <BookingAttendeeFilter value={attendeeFilter} options={attendeeOptions} onChange={setAttendeeFilter} />
         ) : null}
 
         <section className='mb-8 flex flex-col gap-2.5'>

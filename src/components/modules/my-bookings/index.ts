@@ -1,3 +1,4 @@
+export * from './booking-attendee-filter';
 export * from './history-booking-card';
 export * from './history-reservation-card';
 export * from './my-bookings-skeletons';

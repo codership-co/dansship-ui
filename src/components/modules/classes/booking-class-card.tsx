@@ -12,10 +12,17 @@ import { formatTimeDifference, isOwnInstructedClass, isPastBookingDeadline } fro
 interface BookingClassCardProps {
   bookingClass: PublishedClass;
   hasOverlap: (bookingClass: PublishedClass) => boolean;
+  /** The attendee is chosen in the booking modal, so this card must not block the slot. */
+  canBookForOthers?: boolean;
   onClick: () => void;
 }
 
-export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingClassCardProps) {
+export function BookingClassCard({
+  bookingClass,
+  hasOverlap,
+  canBookForOthers = false,
+  onClick,
+}: BookingClassCardProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const isCancelled = Boolean(bookingClass.is_cancelled);
@@ -24,7 +31,9 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
   const isOwnClass = isOwnInstructedClass(bookingClass, user?.id);
   const isUnavailable = isPast || isFull || isCancelled;
   const isBooked = bookingClass.user_booking_status === 'active';
-  const isBookButtonDisabled = isPast || isCancelled || isBooked || hasOverlap(bookingClass) || isFull || isOwnClass;
+  const showOwnBooking = isBooked && !canBookForOthers;
+  const blockedByOwnOverlap = hasOverlap(bookingClass) && !canBookForOthers;
+  const isBookButtonDisabled = isPast || isCancelled || showOwnBooking || blockedByOwnOverlap || isFull || isOwnClass;
 
   return (
     <section
@@ -101,10 +110,10 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
             </p>
           </section>
         </section>
-        {hasOverlap(bookingClass) && !isBooked && !isOwnClass && (
+        {blockedByOwnOverlap && !showOwnBooking && !isOwnClass && (
           <p className='text-warning-600'>⚠ {t('bookings:timeOverlapWarning')}</p>
         )}
-        {isOwnClass && !isBooked && !isPast && !isCancelled && (
+        {isOwnClass && !showOwnBooking && !isPast && !isCancelled && (
           <p className='text-warning-600'>⚠ {t('bookings:ownClassWarning')}</p>
         )}
       </section>
@@ -123,7 +132,7 @@ export function BookingClassCard({ bookingClass, hasOverlap, onClick }: BookingC
             ? t('bookings:classCancelledMessage')
             : isFull
               ? t('bookings:spotsFull')
-              : isBooked
+              : showOwnBooking
                 ? `${t('bookings:booked')} ✓`
                 : isOwnClass
                   ? t('bookings:ownClassBadge')

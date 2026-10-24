@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 import { useCallablePromise } from '../use-callable-promise';
 
+import { useAuth } from '@contexts';
 import {
   BookClassPayload,
   BookClassResponse,
@@ -19,14 +20,25 @@ function pageIsComplete(page: MyBookingsPage): boolean {
   return page.offset + page.items.length >= page.total;
 }
 
-async function hasActiveBookingForClass(scheduledClassId: string): Promise<boolean | null> {
-  const { ok, data } = await DansshipAPI.bookings.getMyBookings({ scope: 'upcoming', limit: 100 });
+async function hasActiveBookingForClass(scheduledClassId: string, attendeeUserId?: string): Promise<boolean | null> {
+  const { ok, data } = await DansshipAPI.bookings.getMyBookings({
+    scope: 'upcoming',
+    limit: 100,
+    ...(attendeeUserId ? { attendee_user_id: attendeeUserId } : {}),
+  });
 
   if (!ok || !data) {
     return null;
   }
 
-  if (data.items.some(item => item.scheduled_class_id === scheduledClassId && item.status === 'active')) {
+  if (
+    data.items.some(
+      item =>
+        item.scheduled_class_id === scheduledClassId &&
+        item.status === 'active' &&
+        (!attendeeUserId || item.user_id === attendeeUserId),
+    )
+  ) {
     return true;
   }
 
@@ -72,14 +84,22 @@ export const useMyBookings = () => {
     DansshipAPI.bookings.cancelBooking(id),
   );
 
+  const { user } = useAuth();
   const bookClass = useCallback(
     async (payload: BookClassPayload) => {
+      const bookingForOther = Boolean(
+        payload.attendee_user_id && user?.id && payload.attendee_user_id !== String(user.id),
+      );
+
       return withSentrySpan('booking.create', 'ui.action', { class_id: payload.scheduled_class_id }, async () => {
         const { error, data } = await bookClassPromise(payload);
 
         if (error) {
           if (isDansshipTransportError(error)) {
-            const booked = await hasActiveBookingForClass(payload.scheduled_class_id);
+            const booked = await hasActiveBookingForClass(
+              payload.scheduled_class_id,
+              payload.attendee_user_id ?? (user?.id ? String(user.id) : undefined),
+            );
 
             captureUnexpectedException(error, {
               tags: { flow: 'booking.create', class_id: payload.scheduled_class_id },
@@ -101,7 +121,7 @@ export const useMyBookings = () => {
             ) {
               toast.error(t('bookings:classFullDesc'));
             } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_TIME_OVERLAP) {
-              toast.error(t('bookings:timeOverlapDesc'));
+              toast.error(t(bookingForOther ? 'bookings:timeOverlapWarningOther' : 'bookings:timeOverlapDesc'));
             } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_INSTRUCTOR_OWN_CLASS) {
               toast.error(t('bookings:instructorOwnClassDesc'));
             } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_INSTRUCTOR_TEACHING_OVERLAP) {
@@ -160,7 +180,7 @@ export const useMyBookings = () => {
         return { ok: true };
       });
     },
-    [bookClassPromise, t],
+    [bookClassPromise, t, user],
   );
 
   const cancelClass = useCallback(

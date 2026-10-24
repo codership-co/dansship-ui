@@ -34,6 +34,8 @@ interface BookingCalendarProps {
   attendeeName?: string | null;
   attendeeOptions?: Array<{ id: string; label: string }>;
   onAttendeeChange?: (attendeeUserId: string) => void;
+  /** True while a deep-linked child is not confirmed in the family list yet. */
+  attendeePending?: boolean;
 }
 
 export function BookingCalendar({
@@ -48,6 +50,7 @@ export function BookingCalendar({
   attendeeName = null,
   attendeeOptions = [],
   onAttendeeChange,
+  attendeePending = false,
 }: BookingCalendarProps) {
   const { t } = useTranslation();
   const locale = useDateLocale();
@@ -59,11 +62,7 @@ export function BookingCalendar({
 
   const { call, isLoading, error } = useCallablePromise(async (weekMonday: string) => {
     const { startAt, endAt } = getColombiaWeekRangeUtc(weekMonday);
-    const { data: classes } = await DansshipAPI.schedules.getPublishedClassesByRange(
-      startAt,
-      endAt,
-      attendeeUserId ?? undefined,
-    );
+    const { data: classes } = await DansshipAPI.schedules.getPublishedClassesByRange(startAt, endAt);
 
     return {
       classes: classes ?? [],
@@ -183,6 +182,7 @@ export function BookingCalendar({
               <BookingClassCard
                 bookingClass={bookingClass}
                 hasOverlap={bookingClass => hasOverlap(bookingClass, myBookings)}
+                canBookForOthers={attendeeOptions.length > 0}
                 onClick={() => handleClassClick(bookingClass)}
               />
             </section>
@@ -201,6 +201,7 @@ export function BookingCalendar({
         attendeeName={attendeeName}
         attendeeOptions={attendeeOptions}
         onAttendeeChange={onAttendeeChange}
+        attendeePending={attendeePending}
       />
     </section>
   );
