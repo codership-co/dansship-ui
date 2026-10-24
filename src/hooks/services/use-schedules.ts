@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { useCallablePromise } from '../use-callable-promise';
-import { usePromise } from '../use-promise';
+import { RESUME_REVALIDATE, usePromise } from '../use-promise';
 
 import {
   AddClassPayload,
@@ -27,7 +27,7 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
     response: weeks,
     isLoading: isLoadingWeeks,
     reFetch: reFetchWeeks,
-  } = usePromise(() => DansshipAPI.schedulesAdmin.getWeeks());
+  } = usePromise(() => DansshipAPI.schedulesAdmin.getWeeks(), true, [], RESUME_REVALIDATE);
 
   const weekId = useMemo(() => {
     if (!weekStartDate) {
@@ -41,7 +41,7 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
     response: weekDetails,
     isLoading: isLoadingWeekDetails,
     reFetch: reFetchWeekDetails,
-  } = usePromise(() => DansshipAPI.schedulesAdmin.getWeekDetail(weekId), weekId !== '', [weekId]);
+  } = usePromise(() => DansshipAPI.schedulesAdmin.getWeekDetail(weekId), weekId !== '', [weekId], RESUME_REVALIDATE);
 
   const { call: publishWeekPromise, isLoading: isPublishing } = useCallablePromise((targetWeekId: string) =>
     DansshipAPI.schedulesAdmin.publishWeek(targetWeekId),
@@ -75,18 +75,6 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
       await reFetchWeekDetails();
     }
   }, [reFetchWeekDetails, reFetchWeeks, weekId]);
-
-  useEffect(() => {
-    const onVisible = () => {
-      if (document.visibilityState !== 'visible') return;
-
-      void refreshScheduleData();
-    };
-
-    document.addEventListener('visibilitychange', onVisible);
-
-    return () => document.removeEventListener('visibilitychange', onVisible);
-  }, [refreshScheduleData]);
 
   const publishWeek = useCallback(
     async (targetWeekId: string) => {

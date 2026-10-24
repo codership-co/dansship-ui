@@ -1,5 +1,6 @@
 import i18next from 'i18next';
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { Button } from 'polpo/components';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -23,6 +24,7 @@ import {
   type VerifyEmailPayload,
   VerifyEmailResponse,
 } from '@core/api';
+import { beginSessionSettlement, isSessionExpired, resetSessionEpoch } from '@core/api/session-coordinator';
 import { AUTH_SESSION_KEY, PageURLS } from '@core/constants';
 import { type PERMISSION } from '@core/permissions';
 import { addSentryBreadcrumb, clearSentryUser, setSentryUser } from '@core/sentry';
@@ -34,13 +36,26 @@ import {
   resolveBrowserPreferredLanguage,
   resolvePostLoginPath,
 } from '@helpers';
-import { useEventListener } from '@hooks';
+import { useEventListener, usePageResume } from '@hooks';
 import { Error404Page } from '@pages/error/404.page';
 import { UnauthorizedPage } from '@pages/error/unauthorized.page';
 import { UnavailablePage } from '@pages/error/unavailable.page';
 
+export type SessionStatus = 'unknown' | 'authenticated' | 'anonymous' | 'degraded';
+
+type ProfileLoad = { status: 'ok'; user: User } | { status: 'unauthenticated' } | { status: 'unavailable' };
+
+function sameUser(current: User | null, next: User) {
+  return current !== null && JSON.stringify(current) === JSON.stringify(next);
+}
+
+function isUnauthenticated(error: unknown) {
+  return error instanceof DansshipAPIError && error.status === 401 && isSessionExpired();
+}
+
 interface CommonAuthContextState {
   ready: boolean;
+  sessionStatus: SessionStatus;
   pendingPostLoginPath: string | null;
   login: (data: LoginPayload) => Promise<void>;
   googleLogin: (credential: string) => Promise<void>;
@@ -97,15 +112,34 @@ interface AuthProviderProps {
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const { t } = useTranslation();
   const location = useLocation();
-  const [ready, setReady] = useState(false);
+  const [sessionStatus, setSessionStatus] = useState<SessionStatus>('unknown');
   const [user, setUser] = useState<User | null>(null);
   const [pendingPostLoginPath, setPendingPostLoginPath] = useState<string | null>(null);
   const navigate = useNavigate();
+  const userRef = useRef<User | null>(null);
+  const sessionStatusRef = useRef<SessionStatus>('unknown');
+  const profileGeneration = useRef(0);
+  const ready = sessionStatus !== 'unknown';
+
+  const setStatus = useCallback((next: SessionStatus) => {
+    sessionStatusRef.current = next;
+    setSessionStatus(next);
+  }, []);
+
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
+  const forgetUser = useCallback(() => {
+    userRef.current = null;
+    setUser(null);
+    setStatus('anonymous');
+    clearSentryUser();
+  }, [setStatus]);
 
   useEventListener('auth:session-expired' as keyof WindowEventMap, () => {
     clearSessionArtifacts();
-    setUser(null);
-    clearSentryUser();
+    forgetUser();
     addSentryBreadcrumb('auth.session-expired', 'Session expired');
     toast.error(t('auth:sessionExpired'));
 
@@ -116,19 +150,108 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   useEventListener('auth:logout' as keyof WindowEventMap, () => {
     clearSessionArtifacts();
-    setUser(null);
-    clearSentryUser();
+    forgetUser();
   });
 
-  useEffect(() => {
-    if (localStorage.getItem(AUTH_SESSION_KEY) === '1') {
-      getProfile().then(() => {
-        setReady(true);
+  const loadProfile = useCallback(async (): Promise<ProfileLoad> => {
+    const generation = ++profileGeneration.current;
+
+    try {
+      const data = await DansshipAPI.auth.getProfile();
+
+      if (generation !== profileGeneration.current) {
+        return { status: 'ok', user: data };
+      }
+
+      let next = data;
+
+      setUser(current => {
+        next = sameUser(current, data) ? current! : data;
+        userRef.current = next;
+
+        return next;
       });
-    } else {
-      setReady(true);
+      setStatus('authenticated');
+      setSentryUser(next);
+
+      return { status: 'ok', user: next };
+    } catch (error) {
+      if (generation !== profileGeneration.current) {
+        return { status: 'unavailable' };
+      }
+
+      if (isUnauthenticated(error)) {
+        clearSessionArtifacts();
+        forgetUser();
+
+        return { status: 'unauthenticated' };
+      }
+
+      if (!userRef.current) {
+        setStatus('degraded');
+      }
+
+      return { status: 'unavailable' };
     }
-  }, []);
+  }, [forgetUser, setStatus]);
+
+  const getProfile = useCallback(async () => {
+    const result = await loadProfile();
+
+    return result.status === 'ok' ? result.user : undefined;
+  }, [loadProfile]);
+
+  useEffect(() => {
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+
+    const boot = async (attempt: number) => {
+      if (localStorage.getItem(AUTH_SESSION_KEY) !== '1') {
+        if (!cancelled) {
+          setStatus('anonymous');
+        }
+
+        return;
+      }
+
+      const result = await loadProfile();
+
+      if (cancelled || result.status !== 'unavailable' || userRef.current) {
+        return;
+      }
+
+      const delay = Math.min(1000 * 2 ** attempt, 15_000);
+
+      timer = setTimeout(() => {
+        void boot(attempt + 1);
+      }, delay);
+    };
+
+    void boot(0);
+
+    return () => {
+      cancelled = true;
+
+      if (timer) {
+        clearTimeout(timer);
+      }
+    };
+  }, [loadProfile, setStatus]);
+
+  usePageResume(
+    () => {
+      if (localStorage.getItem(AUTH_SESSION_KEY) !== '1') {
+        beginSessionSettlement(async () => undefined);
+
+        return;
+      }
+
+      beginSessionSettlement(async () => {
+        await loadProfile();
+      });
+    },
+    { priority: 'session' },
+  );
 
   const fromPath = useMemo(() => {
     const locationState = location.state as { from?: Location } | null;
@@ -139,19 +262,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     return `${locationState.from.pathname}${locationState.from.search ?? ''}${locationState.from.hash ?? ''}`;
   }, [location]);
-
-  async function getProfile() {
-    try {
-      const data = await DansshipAPI.auth.getProfile();
-      setUser(data);
-      setSentryUser(data);
-
-      return data;
-    } catch {
-      setUser(null);
-      clearSentryUser();
-    }
-  }
 
   useEffect(() => {
     if (!pendingPostLoginPath) {
@@ -164,7 +274,11 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [location.pathname, pendingPostLoginPath]);
 
   async function completeAuthenticatedSession(data: User) {
+    resetSessionEpoch();
     localStorage.setItem(AUTH_SESSION_KEY, '1');
+    userRef.current = data;
+    setUser(data);
+    setStatus('authenticated');
     toast.success(t('auth:loginSuccess'));
 
     const roleHome = await resolvePostLoginPath(data);
@@ -480,6 +594,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       value={{
         ...(user ? { isAuthenticated: true, user } : { isAuthenticated: false, user: null }),
         ready,
+        sessionStatus,
         pendingPostLoginPath,
         login,
         googleLogin,
@@ -589,6 +704,22 @@ interface SecurityGuardOptions {
   requiresNoAuth?: boolean;
 }
 
+function SessionDegradedNotice({ onRetry }: { onRetry: () => void }) {
+  const { t } = useTranslation();
+
+  return (
+    <main className='grid min-h-dvh place-content-center px-6 text-center'>
+      <h1 className='mb-2 text-xl font-bold'>{t('auth:connectionFailed.title')}</h1>
+      <p className='mb-6 text-muted-foreground'>{t('auth:connectionFailed.description')}</p>
+      <div>
+        <Button color='primary' onClick={onRetry}>
+          {t('auth:connectionFailed.retry')}
+        </Button>
+      </div>
+    </main>
+  );
+}
+
 export function SecurityGuard(
   Component: React.ComponentType,
   {
@@ -601,7 +732,7 @@ export function SecurityGuard(
   }: SecurityGuardOptions = {},
 ): React.ComponentType {
   function Guard() {
-    const { isAuthenticated, requireOnboarding, mustChangePassword, ready } = useAuth();
+    const { isAuthenticated, requireOnboarding, mustChangePassword, ready, sessionStatus, getProfile } = useAuth();
     const location = useLocation();
     const validPermissions = usePermissions({ orPermissions, andPermissions });
     const validFeatureFlags = useEnabledFeatureFlag(featureFlags);
@@ -615,6 +746,10 @@ export function SecurityGuard(
 
       if (requiresNoAuth && isAuthenticated) {
         return <AuthenticatedHomeRedirect />;
+      }
+
+      if (requiresAuth && sessionStatus === 'degraded' && !isAuthenticated) {
+        return <SessionDegradedNotice onRetry={() => void getProfile()} />;
       }
 
       if (requiresAuth && !isAuthenticated) {
@@ -663,10 +798,12 @@ export function SecurityGuard(
       // Depend on pathname only so ?tab= / search updates do not remount page trees.
       // eslint-disable-next-line react-hooks/exhaustive-deps -- location used for Navigate state; pathname drives remounts
     }, [
+      getProfile,
       isAuthenticated,
       location.pathname,
       mustChangePassword,
       ready,
+      sessionStatus,
       requireOnboarding,
       validFeatureFlags,
       validPermissions,

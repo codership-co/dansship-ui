@@ -12,7 +12,7 @@ import { WeekSelector } from '@components/modules/schedules/week-selector';
 import { FEATURE_FLAG, SecurityGuard, useAuth, useStudentSession } from '@contexts';
 import { DansshipAPI, type PublishedClass } from '@core/api';
 import { getMonday } from '@helpers';
-import { useDateLocale, usePromise } from '@hooks';
+import { RESUME_REVALIDATE, useDateLocale, usePromise } from '@hooks';
 
 function ClassesPage() {
   const { t } = useTranslation();
@@ -66,6 +66,7 @@ function ClassesPage() {
     },
     ready,
     [isAuthenticated],
+    RESUME_REVALIDATE,
   );
 
   useEffect(() => {

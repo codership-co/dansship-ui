@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useMemo, type ReactNode } from 
 import { useAuth } from './auth-context';
 
 import { DansshipAPI, type ActiveSubscription, type MyBooking, type SubscriptionSummary } from '@core/api';
-import { usePromise } from '@hooks';
+import { RESUME_REVALIDATE, usePromise } from '@hooks';
 
 interface StudentSessionBookingsResponse {
   data?: { items?: Array<MyBooking> } | null;
@@ -30,8 +30,18 @@ export function StudentSessionProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated, requireOnboarding, ready } = useAuth();
   const enabled = Boolean(ready && isAuthenticated && !requireOnboarding);
 
-  const subscriptionsQuery = usePromise(() => DansshipAPI.subscriptions.getMySubscriptions(), enabled);
-  const bookingsQuery = usePromise(() => DansshipAPI.bookings.getMyBookings({ scope: 'upcoming' }), enabled);
+  const subscriptionsQuery = usePromise(
+    () => DansshipAPI.subscriptions.getMySubscriptions(),
+    enabled,
+    [],
+    RESUME_REVALIDATE,
+  );
+  const bookingsQuery = usePromise(
+    () => DansshipAPI.bookings.getMyBookings({ scope: 'upcoming' }),
+    enabled,
+    [],
+    RESUME_REVALIDATE,
+  );
 
   const reFetchSubscriptions = subscriptionsQuery.reFetch;
   const reFetchBookings = bookingsQuery.reFetch;

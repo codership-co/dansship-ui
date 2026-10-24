@@ -12,12 +12,14 @@ import { ErrorBoundary, type FallbackProps } from 'react-error-boundary';
 import { RootLoader } from '@components/loaders/root-loader';
 import { Error404 } from '@components/svg';
 import '@core/i18n';
+import { startPageLifecycle } from '@core/page-lifecycle';
 import { Router } from '@core/router';
 import '@core/styles';
 import { guardViewTransitions, isDynamicImportError, listenForStaleChunkLoads, reloadForStaleChunk } from '@helpers';
 
 guardViewTransitions();
 listenForStaleChunkLoads();
+startPageLifecycle();
 
 function AppErrorFallback({ error }: FallbackProps) {
   const staleChunk = isDynamicImportError(error);

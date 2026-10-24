@@ -28,7 +28,7 @@ import {
   sortReservationsDescending,
   eventReservation,
 } from '@helpers';
-import { useMyBookings, useMyBookingsHistory, usePromise } from '@hooks';
+import { RESUME_REVALIDATE, useMyBookings, useMyBookingsHistory, usePromise } from '@hooks';
 
 function initialsFromName(name: string) {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -61,8 +61,11 @@ function BookingsPage() {
     bookingsError: upcomingError,
     reFetchBookings: reFetchUpcoming,
   } = useStudentSession();
-  const { response: myFeedbackResponse, reFetch: reFetchFeedback } = usePromise(() =>
-    DansshipAPI.classFeedback.listMine(),
+  const { response: myFeedbackResponse, reFetch: reFetchFeedback } = usePromise(
+    () => DansshipAPI.classFeedback.listMine(),
+    true,
+    [],
+    RESUME_REVALIDATE,
   );
   const {
     items: historyItems,
@@ -75,17 +78,29 @@ function BookingsPage() {
     reFetch: reFetchHistory,
   } = useMyBookingsHistory(attendeeFilter === 'all' ? undefined : attendeeFilter);
   const { cancelClass, isCancelingClass } = useMyBookings();
-  const { response: eventUpcomingResponse, isLoading: isLoadingEventUpcoming } = usePromise(() =>
-    DansshipAPI.eventos.listMyRegistrations({ scope: 'upcoming' }),
+  const { response: eventUpcomingResponse, isLoading: isLoadingEventUpcoming } = usePromise(
+    () => DansshipAPI.eventos.listMyRegistrations({ scope: 'upcoming' }),
+    true,
+    [],
+    RESUME_REVALIDATE,
   );
-  const { response: eventHistoryResponse, isLoading: isLoadingEventHistory } = usePromise(() =>
-    DansshipAPI.eventos.listMyRegistrations({ scope: 'history' }),
+  const { response: eventHistoryResponse, isLoading: isLoadingEventHistory } = usePromise(
+    () => DansshipAPI.eventos.listMyRegistrations({ scope: 'history' }),
+    true,
+    [],
+    RESUME_REVALIDATE,
   );
-  const { response: rentalRequestsResponse, isLoading: isLoadingRentalRequests } = usePromise(() =>
-    DansshipAPI.studioRental.getMyRequests(),
+  const { response: rentalRequestsResponse, isLoading: isLoadingRentalRequests } = usePromise(
+    () => DansshipAPI.studioRental.getMyRequests(),
+    true,
+    [],
+    RESUME_REVALIDATE,
   );
-  const { response: rentalSeriesResponse, isLoading: isLoadingRentalSeries } = usePromise(() =>
-    DansshipAPI.studioRental.getMySeries(),
+  const { response: rentalSeriesResponse, isLoading: isLoadingRentalSeries } = usePromise(
+    () => DansshipAPI.studioRental.getMySeries(),
+    true,
+    [],
+    RESUME_REVALIDATE,
   );
   const { response: roomsResponse } = usePromise(() => DansshipAPI.studioRental.getRooms());
   const [bookingToCancel, setBookingToCancel] = useState<MyBooking | null>(null);
