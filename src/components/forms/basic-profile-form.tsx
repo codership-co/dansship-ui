@@ -11,8 +11,22 @@ import { z } from 'zod';
 import { DateField, PhoneField, SelectField, TextField } from '@components/form-fields';
 import { DansshipAPI, PaymentProofContentType, PaymentProofContentTypesList } from '@core/api';
 import { DOCUMENT_TYPE_OPTIONS } from '@core/constants';
+import { toColombiaDateKey } from '@helpers';
 
-function ageInYears(birthDate: Date, today = new Date()) {
+interface AgeRule {
+  minAge: number;
+  guardianBefore: number;
+}
+
+const LEGACY_AGE_RULE: AgeRule = { minAge: 4, guardianBefore: 14 };
+
+function colombiaToday() {
+  const [year, month, day] = toColombiaDateKey(new Date()).split('-').map(Number);
+
+  return new Date(year, month - 1, day);
+}
+
+function ageInYears(birthDate: Date, today = colombiaToday()) {
   let years = today.getFullYear() - birthDate.getFullYear();
   const beforeBirthday =
     today.getMonth() < birthDate.getMonth() ||
@@ -25,21 +39,26 @@ function ageInYears(birthDate: Date, today = new Date()) {
   return years;
 }
 
-function requiresGuardian(birthDate: Date) {
+function requiresGuardian(birthDate: Date, rule: AgeRule) {
   const age = ageInYears(birthDate);
 
-  return age >= 4 && age < 14;
+  return age >= rule.minAge && age < rule.guardianBefore;
 }
 
-export const createBasicProfileSchema = (t: TFunction, requireTermsAcceptance = false) => {
-  const fourYearsAgo = new Date();
-  fourYearsAgo.setFullYear(fourYearsAgo.getFullYear() - 4);
+export const createBasicProfileSchema = (
+  t: TFunction,
+  requireTermsAcceptance = false,
+  rule: AgeRule = LEGACY_AGE_RULE,
+) => {
+  const minimumAgeDate = colombiaToday();
+
+  minimumAgeDate.setFullYear(minimumAgeDate.getFullYear() - rule.minAge);
 
   const fields = z.object({
     full_name: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
     birth_date: z
       .date(t('auth:onboarding.validationRequired'))
-      .max(fourYearsAgo, { message: t('auth:onboarding.validationMinAge4') }),
+      .max(minimumAgeDate, { message: t('auth:onboarding.validationMinAge4', { count: rule.minAge }) }),
     phone_country_code: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
     phone_number: z.string().regex(/^\d{10}$/, { message: t('auth:onboarding.validationPhoneLength') }),
     document_type: z.string().min(1, { message: t('auth:onboarding.validationRequired') }),
@@ -62,7 +81,7 @@ export const createBasicProfileSchema = (t: TFunction, requireTermsAcceptance = 
     : fields;
 
   return baseSchema.superRefine((values, context) => {
-    if (!(values.birth_date instanceof Date) || !requiresGuardian(values.birth_date)) {
+    if (!(values.birth_date instanceof Date) || !requiresGuardian(values.birth_date, rule)) {
       return;
     }
 
@@ -113,7 +132,32 @@ interface OnboardingBasicProfileFormProps {
   submitLabel?: string;
 }
 
-export function BasicProfileForm({
+export function BasicProfileForm(props: OnboardingBasicProfileFormProps) {
+  const [ageRule, setAgeRule] = useState<AgeRule | null>(null);
+
+  useEffect(() => {
+    void DansshipAPI.auth.getAgePolicy().then(result => {
+      if (!result.ok || !result.data) {
+        setAgeRule(LEGACY_AGE_RULE);
+
+        return;
+      }
+
+      setAgeRule({
+        minAge: result.data.own_account_min_age,
+        guardianBefore: result.data.guardian_contact_required_before_age,
+      });
+    });
+  }, []);
+
+  if (!ageRule) {
+    return null;
+  }
+
+  return <BasicProfileFields {...props} ageRule={ageRule} />;
+}
+
+function BasicProfileFields({
   isLoading,
   error,
   onSubmit,
@@ -122,9 +166,10 @@ export function BasicProfileForm({
   termsI18nKey = 'auth:onboarding.terms',
   showPhotoUpload = true,
   submitLabel,
-}: OnboardingBasicProfileFormProps) {
+  ageRule,
+}: OnboardingBasicProfileFormProps & { ageRule: AgeRule }) {
   const { t } = useTranslation();
-  const schema = createBasicProfileSchema(t, requireTermsAcceptance);
+  const schema = createBasicProfileSchema(t, requireTermsAcceptance, ageRule);
   const [profilePhoto, setProfilePhoto] = useState<File>();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
@@ -161,7 +206,7 @@ export function BasicProfileForm({
     return () => subscription.unsubscribe();
   }, [watch]);
 
-  const showGuardian = birthDate instanceof Date && requiresGuardian(birthDate);
+  const showGuardian = birthDate instanceof Date && requiresGuardian(birthDate, ageRule);
 
   const handleInputFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null;

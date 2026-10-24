@@ -9,6 +9,8 @@ export enum ROLE {
 export enum PERMISSION {
   // USERS
   USER_READ = 'read:user',
+  FAMILY_READ = 'read:family',
+  GUARDIANSHIP_MANAGE = 'manage:guardianship',
   USER_MANAGE = 'manage:user',
   USER_CONTEXT_MANAGE = 'manage:user_context',
   USER_REGISTER = 'register:user',

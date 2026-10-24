@@ -30,6 +30,12 @@ interface BookingCalendarProps {
   /** Backend focus day (YYYY-MM-DD) from upcoming-week; used for first-paint day selection. */
   initialFocusDay?: string | null;
   onBookingChange?: () => void | Promise<void>;
+  attendeeUserId?: string | null;
+  attendeeName?: string | null;
+  attendeeOptions?: Array<{ id: string; label: string }>;
+  onAttendeeChange?: (attendeeUserId: string) => void;
+  /** True while a deep-linked child is not confirmed in the family list yet. */
+  attendeePending?: boolean;
 }
 
 export function BookingCalendar({
@@ -40,6 +46,11 @@ export function BookingCalendar({
   initialClasses = null,
   initialFocusDay = null,
   onBookingChange,
+  attendeeUserId = null,
+  attendeeName = null,
+  attendeeOptions = [],
+  onAttendeeChange,
+  attendeePending = false,
 }: BookingCalendarProps) {
   const { t } = useTranslation();
   const locale = useDateLocale();
@@ -171,6 +182,7 @@ export function BookingCalendar({
               <BookingClassCard
                 bookingClass={bookingClass}
                 hasOverlap={bookingClass => hasOverlap(bookingClass, myBookings)}
+                canBookForOthers={attendeeOptions.length > 0}
                 onClick={() => handleClassClick(bookingClass)}
               />
             </section>
@@ -185,6 +197,11 @@ export function BookingCalendar({
         subscriptions={subscriptions}
         isTrialEligible={isTrialEligible}
         onBookingChange={handleBookingChange}
+        attendeeUserId={attendeeUserId}
+        attendeeName={attendeeName}
+        attendeeOptions={attendeeOptions}
+        onAttendeeChange={onAttendeeChange}
+        attendeePending={attendeePending}
       />
     </section>
   );

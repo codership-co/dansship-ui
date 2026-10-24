@@ -11,6 +11,7 @@ export const DEFAULT_ROOM_IMAGE =
   'https://content.arquitecturaydiseno.es/medio/2023/12/06/casa-meritxell-ribe-angli-05_5001cc3f_231206133301_1280x794.jpg';
 
 export const DOCUMENT_TYPE_OPTIONS = [
+  { value: 'RC', label: 'auth:onboarding.documentTypeOptions.RC' },
   { value: 'CC', label: 'auth:onboarding.documentTypeOptions.CC' },
   { value: 'CE', label: 'auth:onboarding.documentTypeOptions.CE' },
   { value: 'PA', label: 'auth:onboarding.documentTypeOptions.PA' },

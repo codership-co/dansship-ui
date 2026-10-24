@@ -19,9 +19,10 @@ import {
   UserWalletTab,
   UserEventsTab,
   UserRegistrationActions,
+  UserFamilyTab,
 } from '@components/modules';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
-import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
+import { FEATURE_FLAG, SecurityGuard, useAuth, useOrPermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions, PERMISSION, ROLE } from '@core/permissions';
@@ -38,9 +39,11 @@ const NOTES_TAB = 'notes';
 const PAYMENT_DOCUMENTS_TAB = 'payment-documents';
 const INSTRUCTOR_CLASSES_TAB = 'instructor-classes';
 const INSTRUCTOR_CSAT_TAB = 'instructor-csat';
+const FAMILY_TAB = 'family';
 
 function UserDetailsPage() {
   const { t } = useTranslation();
+  const { user: actor } = useAuth();
   const { userId = '' } = useParams<{ userId: string }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const { response, isLoading, error, reFetch } = usePromise(() => DansshipAPI.usersAdmin.getById(userId), !!userId);
@@ -60,6 +63,8 @@ function UserDetailsPage() {
   const canProcessPaymentDocuments = useOrPermissions([PERMISSION.INSTRUCTOR_PAYMENT_DOCUMENT_PROCESS]);
   const canManagePayRate = useOrPermissions([PERMISSION.INSTRUCTOR_PAY_RATE_MANAGE]);
   const canReadClassFeedback = useOrPermissions(AdminPermissions.classFeedback);
+  const canReadFamily = useOrPermissions([PERMISSION.FAMILY_READ]);
+  const showFamily = Boolean(actor?.managedUsersEnabled) && canReadFamily;
   const { response: assignmentsResponse } = usePromise(
     () => DansshipAPI.instructorPaymentsAdmin.listUserPaymentAssignments(userId),
     Boolean(userId) && canReadPaymentDocuments,
@@ -86,6 +91,7 @@ function UserDetailsPage() {
     ...(showPaymentDocuments ? [PAYMENT_DOCUMENTS_TAB] : []),
     ...(showInstructorClasses ? [INSTRUCTOR_CLASSES_TAB] : []),
     ...(showInstructorCsat ? [INSTRUCTOR_CSAT_TAB] : []),
+    ...(showFamily ? [FAMILY_TAB] : []),
   ];
   const activeTab = availableTabs.includes(requestedTab) ? requestedTab : PROFILE_TAB;
 
@@ -175,6 +181,7 @@ function UserDetailsPage() {
               {showInstructorCsat ? (
                 <TabsTrigger value={INSTRUCTOR_CSAT_TAB}>{t('admin:users.details.tabs.instructorCsat')}</TabsTrigger>
               ) : null}
+              {showFamily ? <TabsTrigger value={FAMILY_TAB}>{t('admin:users.details.tabs.family')}</TabsTrigger> : null}
             </TabsList>
 
             <TabsContent value={PROFILE_TAB}>
@@ -253,6 +260,12 @@ function UserDetailsPage() {
                 {activeTab === INSTRUCTOR_CSAT_TAB ? (
                   <UserInstructorCsatTab instructorId={user.instructor_profile.id} />
                 ) : null}
+              </TabsContent>
+            ) : null}
+
+            {showFamily ? (
+              <TabsContent value={FAMILY_TAB}>
+                {activeTab === FAMILY_TAB && userId ? <UserFamilyTab userId={userId} /> : null}
               </TabsContent>
             ) : null}
           </Tabs>
