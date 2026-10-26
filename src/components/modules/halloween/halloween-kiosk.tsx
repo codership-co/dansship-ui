@@ -67,7 +67,7 @@ function errorMessage(t: (key: string) => string, error: unknown) {
   return t('halloween:errors.network');
 }
 
-function FitSquare({ children }: { children: ReactNode }) {
+function FitSquare({ children, className }: { children: ReactNode; className?: string }) {
   const frameRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState(0);
 
@@ -98,7 +98,7 @@ function FitSquare({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <div ref={frameRef} className='flex min-h-0 w-full flex-1 items-center justify-center'>
+    <div ref={frameRef} className={`flex min-h-0 min-w-0 w-full flex-1 items-center justify-center ${className ?? ''}`}>
       <div className='relative max-h-full max-w-full' style={size > 0 ? { width: size, height: size } : undefined}>
         {children}
       </div>
@@ -126,11 +126,12 @@ export function HalloweenKiosk() {
   const [pendingResult, setPendingResult] = useState<HalloweenSpinResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isSpinningRequest, setIsSpinningRequest] = useState(false);
+  const [isCheckingStatus, setIsCheckingStatus] = useState(false);
   const [searchGeneration, setSearchGeneration] = useState(0);
 
   const shownResult = phase === 'result' ? (pendingResult ?? knownResult) : knownResult;
   const windowOpen = config?.window_open === true;
-  const canSpin = Boolean(student) && windowOpen && !knownResult && phase === 'idle' && !isSpinningRequest;
+  const canSpin = Boolean(student) && windowOpen && phase === 'idle' && !isSpinningRequest && !isCheckingStatus;
 
   function finishSpin() {
     setPhase(current => (current === 'spinning' ? 'result' : current));
@@ -186,7 +187,10 @@ export function HalloweenKiosk() {
     setKnownResult(null);
     setPendingResult(null);
     setPhase('idle');
+    setIsCheckingStatus(true);
     const status = await DansshipAPI.halloweenAdmin.status(next.id);
+
+    setIsCheckingStatus(false);
 
     if (!status.ok) {
       setError(errorMessage(t, status.error));
@@ -196,12 +200,25 @@ export function HalloweenKiosk() {
 
     if (status.data.spun && status.data.result) {
       setKnownResult(status.data.result);
-      setPhase('result');
     }
+  }
+
+  function playSpin(result: HalloweenSpinResult) {
+    const index = pickWinningSlice(result.outcome, Math.random, wedges);
+
+    setPendingResult(result);
+    setPhase('spinning');
+    setRotation(current => rotationForSlice(index, current, HALLOWEEN_SPIN_TURNS, wedges));
   }
 
   async function spin() {
     if (!student || !canSpin || wedges.length === 0) {
+      return;
+    }
+
+    if (knownResult) {
+      playSpin(knownResult);
+
       return;
     }
 
@@ -217,11 +234,7 @@ export function HalloweenKiosk() {
       return;
     }
 
-    const index = pickWinningSlice(response.data.outcome, Math.random, wedges);
-
-    setPendingResult(response.data);
-    setPhase('spinning');
-    setRotation(current => rotationForSlice(index, current, HALLOWEEN_SPIN_TURNS, wedges));
+    playSpin(response.data);
   }
 
   function reset() {
@@ -230,6 +243,7 @@ export function HalloweenKiosk() {
     setPendingResult(null);
     setPhase('idle');
     setError(null);
+    setIsCheckingStatus(false);
     setSearchGeneration(current => current + 1);
   }
 
@@ -237,46 +251,50 @@ export function HalloweenKiosk() {
     <main className='fixed top-0 left-0 h-dvh w-full overflow-hidden overscroll-none bg-background text-foreground'>
       <HalloweenDecor />
 
-      <div className='relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col items-center gap-3 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))]'>
-        <header className='shrink-0 text-center'>
-          <p className='m-0 font-brand text-2xl leading-none text-highlight'>{t('halloween:kicker')}</p>
-          <h1 className='m-0 mt-1 font-title text-2xl leading-tight text-primary sm:text-3xl'>
-            {t('halloween:title')}
-          </h1>
-          <p className='m-0 mt-1 text-sm text-muted-foreground'>{t('halloween:subtitle')}</p>
-        </header>
+      <div className='relative z-10 mx-auto flex h-full w-full max-w-5xl flex-col items-center gap-3 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))] lg:landscape:max-w-none lg:landscape:flex-row lg:landscape:items-stretch lg:landscape:gap-8 lg:landscape:px-6'>
+        <div className='contents lg:landscape:flex lg:landscape:h-full lg:landscape:w-96 lg:landscape:shrink-0 lg:landscape:flex-col lg:landscape:items-center lg:landscape:justify-center lg:landscape:gap-4'>
+          <header className='order-1 shrink-0 text-center lg:landscape:order-none'>
+            <p className='m-0 font-brand text-2xl leading-none text-highlight'>{t('halloween:kicker')}</p>
+            <h1 className='m-0 mt-1 font-title text-2xl leading-tight text-primary sm:text-3xl'>
+              {t('halloween:title')}
+            </h1>
+            <p className='m-0 mt-1 text-sm text-muted-foreground'>{t('halloween:subtitle')}</p>
+          </header>
 
-        <StudentSearch key={searchGeneration} selected={student} onSelect={next => void onSelect(next)} />
+          <div className='order-2 w-full max-w-md shrink-0 lg:landscape:order-none lg:landscape:max-w-none'>
+            <StudentSearch key={searchGeneration} selected={student} onSelect={next => void onSelect(next)} />
+          </div>
 
-        <FitSquare>
+          <div className='order-4 flex w-full max-w-md shrink-0 flex-col items-center gap-2 lg:landscape:order-none lg:landscape:max-w-none'>
+            {configError ? (
+              <p role='alert' className='m-0 text-sm text-destructive'>
+                {t('halloween:errors.misconfigured')}
+              </p>
+            ) : null}
+            {config && !windowOpen ? (
+              <p className='m-0 text-sm text-muted-foreground'>{t('halloween:windowClosed')}</p>
+            ) : null}
+            {error ? (
+              <p role='alert' className='m-0 text-center text-sm text-destructive'>
+                {error}
+              </p>
+            ) : null}
+
+            <Button
+              color='highlight'
+              size='large'
+              type='button'
+              disabled={!canSpin || isLoading}
+              onClick={() => void spin()}
+            >
+              {t('halloween:spin')}
+            </Button>
+          </div>
+        </div>
+
+        <FitSquare className='order-3 lg:landscape:order-none lg:landscape:h-full lg:landscape:w-auto'>
           {wedges.length > 0 ? <HalloweenWheel wedges={wedges} rotation={rotation} onSpinEnd={finishSpin} /> : null}
         </FitSquare>
-
-        <div className='flex w-full max-w-md shrink-0 flex-col items-center gap-2'>
-          {configError ? (
-            <p role='alert' className='m-0 text-sm text-destructive'>
-              {t('halloween:errors.misconfigured')}
-            </p>
-          ) : null}
-          {config && !windowOpen ? (
-            <p className='m-0 text-sm text-muted-foreground'>{t('halloween:windowClosed')}</p>
-          ) : null}
-          {error ? (
-            <p role='alert' className='m-0 text-center text-sm text-destructive'>
-              {error}
-            </p>
-          ) : null}
-
-          <Button
-            color='highlight'
-            size='large'
-            type='button'
-            disabled={!canSpin || isLoading}
-            onClick={() => void spin()}
-          >
-            {t('halloween:spin')}
-          </Button>
-        </div>
       </div>
 
       <Dialog

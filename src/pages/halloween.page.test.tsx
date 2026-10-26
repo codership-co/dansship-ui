@@ -75,7 +75,7 @@ describe('HalloweenPage', () => {
     expect(screen.getAllByText('gratis')).toHaveLength(2);
   });
 
-  it('disables Girar when the student has already spun', async () => {
+  it('spins the known prize before opening the modal', async () => {
     vi.mocked(DansshipAPI.halloweenAdmin.status).mockResolvedValue(
       ok({
         spun: true,
@@ -95,10 +95,19 @@ describe('HalloweenPage', () => {
     expect(await screen.findByRole('button', { name: /Ana Ruiz/ }, { timeout: 2000 })).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Ana Ruiz/ }));
 
+    expect(screen.queryByRole('heading', { name: '¡Felicitaciones!' })).not.toBeInTheDocument();
+
+    const spin = await screen.findByRole('button', { name: 'Girar' });
+    const wheel = screen.getByTestId('halloween-wheel');
+
+    await waitFor(() => expect(spin).toBeEnabled());
+    fireEvent.click(spin);
+    await waitFor(() => expect(wheel).not.toHaveStyle({ transform: 'rotate(0deg)' }));
+    expect(DansshipAPI.halloweenAdmin.spin).not.toHaveBeenCalled();
+    fireEvent.transitionEnd(wheel, { propertyName: 'transform' });
+
     expect(await screen.findByRole('heading', { name: '¡Felicitaciones!' })).toBeInTheDocument();
     expect(screen.getByText('Entregado a Ana Ruiz')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Girar', hidden: true })).toBeDisabled();
-    expect(DansshipAPI.halloweenAdmin.spin).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', { name: 'Siguiente persona' }));
     expect(screen.getByLabelText('Estudiante')).toHaveValue('');
   });
