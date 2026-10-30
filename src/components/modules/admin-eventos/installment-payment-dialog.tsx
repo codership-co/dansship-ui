@@ -15,7 +15,7 @@ import {
   Input,
   Label,
 } from '@components/ui';
-import { DansshipAPI, DansshipAPIError, INSTALLMENT_PROOF_CONTENT_TYPES, type InstallmentQuoteLine } from '@core/api';
+import { DansshipAPI, DansshipAPIError, INSTALLMENT_PROOF_CONTENT_TYPES } from '@core/api';
 import { formatPrice } from '@helpers';
 import { usePromise } from '@hooks';
 
@@ -24,6 +24,10 @@ interface InstallmentPaymentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onRegistered: () => void;
+}
+
+function sameSequences(left: Array<number>, right: Array<number>) {
+  return left.length === right.length && left.every((value, index) => value === right[index]);
 }
 
 function statusLabel(status: string, t: (key: string) => string) {
@@ -100,21 +104,10 @@ export function InstallmentPaymentDialog({ eventId, open, onOpenChange, onRegist
   }, []);
 
   const lines = quote?.data?.lines ?? [];
+  const options = quote?.data?.payment_options ?? [];
   const canSubmit = Boolean(selectedUserId && proof && selected.length > 0 && !submitting);
 
   const proofAccept = useMemo(() => INSTALLMENT_PROOF_CONTENT_TYPES.join(','), []);
-
-  const toggle = (line: InstallmentQuoteLine) => {
-    if (!line.selectable || submitting) {
-      return;
-    }
-
-    setSelected(current =>
-      current.includes(line.sequence)
-        ? current.filter(sequence => sequence !== line.sequence)
-        : [...current, line.sequence],
-    );
-  };
 
   const chooseProof = (file: File | null) => {
     if (!file) {
@@ -227,29 +220,47 @@ export function InstallmentPaymentDialog({ eventId, open, onOpenChange, onRegist
           </div>
           {quoteLoading ? <SpinnerLoader /> : null}
           {lines.length > 0 ? (
-            <ul className='grid gap-2'>
+            <ul className='grid gap-1 text-sm text-muted-foreground'>
               {lines.map(line => (
                 <li key={line.sequence}>
-                  <label className='flex items-start gap-2 text-sm'>
-                    <input
-                      type='checkbox'
-                      className='mt-1'
-                      checked={selected.includes(line.sequence)}
-                      disabled={!line.selectable || submitting}
-                      onChange={() => toggle(line)}
-                    />
-                    <span>
-                      {t('eventos:admin.installmentQuoteLine', {
-                        sequence: line.sequence,
-                        amount: formatPrice(Number(line.amount), 'COP'),
-                        due: line.due_date,
-                        status: statusLabel(line.status, t),
-                      })}
-                    </span>
-                  </label>
+                  {t('eventos:admin.installmentQuoteLine', {
+                    sequence: line.sequence,
+                    amount: formatPrice(Number(line.amount), 'COP'),
+                    due: line.due_date,
+                    status: statusLabel(line.status, t),
+                  })}
                 </li>
               ))}
             </ul>
+          ) : null}
+          {options.length > 0 ? (
+            <fieldset className='grid gap-2'>
+              {options.map(option => {
+                const checked = sameSequences(selected, option.sequences);
+                const label =
+                  option.sequences.length > 1
+                    ? t('eventos:admin.payTotalOption', {
+                        amount: formatPrice(Number(option.amount), 'COP'),
+                      })
+                    : t('eventos:admin.payInstallmentOption', {
+                        sequence: option.sequences[0],
+                        amount: formatPrice(Number(option.amount), 'COP'),
+                      });
+
+                return (
+                  <label key={option.sequences.join('-')} className='flex items-center gap-2 text-sm'>
+                    <input
+                      type='radio'
+                      name='admin-installment-option'
+                      checked={checked}
+                      disabled={submitting}
+                      onChange={() => setSelected(option.sequences)}
+                    />
+                    <span>{label}</span>
+                  </label>
+                );
+              })}
+            </fieldset>
           ) : null}
           <div className='grid gap-2'>
             <Label htmlFor='installment-proof'>{t('eventos:admin.installmentProof')}</Label>

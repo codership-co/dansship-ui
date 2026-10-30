@@ -190,6 +190,22 @@ export interface AppliedDiscountMapped {
   calculatedAmount: number;
 }
 
+export interface InstallmentChargeOption {
+  sequences: Array<number>;
+  amount: string | number;
+  base_amount: string | number;
+  tax_amount: string | number;
+  amount_to_charge: string | number;
+}
+
+export interface InstallmentChargeOptionMapped {
+  sequences: Array<number>;
+  amount: number;
+  base_amount: number;
+  tax_amount: number;
+  amount_to_charge: number;
+}
+
 export interface PaymentPreviewResponse {
   base_amount: string;
   discount_applied: boolean;
@@ -213,6 +229,7 @@ export interface PaymentPreviewResponse {
   payment_option?: 'full' | 'fifty_fifty';
   deposit_amount?: string | null;
   balance_amount?: string | null;
+  installment_options?: Array<InstallmentChargeOption>;
 }
 
 export interface PaymentPreviewMappedResponse {
@@ -238,4 +255,5 @@ export interface PaymentPreviewMappedResponse {
   payment_option: 'full' | 'fifty_fifty';
   deposit_amount: number | null;
   balance_amount: number | null;
+  installment_options: Array<InstallmentChargeOptionMapped>;
 }

@@ -5,10 +5,10 @@ import { Input, Label } from '@components/ui';
 import { type PriceConditionCatalogItem, type EventPriceTierInput } from '@core/api';
 
 const FALLBACK_CONDITIONS: Array<PriceConditionCatalogItem> = [
-  { condition_type: 'has_active_plan', label: 'Tiene un plan activo', param_schema: {} },
+  { condition_type: 'has_active_plan', label: 'Comunidad Dansship', param_schema: {} },
   {
     condition_type: 'has_active_plan_min_classes',
-    label: 'Plan activo con ≥ N clases',
+    label: 'Comunidad Dansship con un plan de al menos N clases',
     param_schema: { min_classes: { type: 'integer', minimum: 1, required: true } },
   },
 ];

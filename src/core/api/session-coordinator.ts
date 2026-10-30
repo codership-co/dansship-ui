@@ -73,7 +73,11 @@ async function runRefresh(): Promise<RefreshOutcome> {
 
     await response.text().catch(() => undefined);
 
-    if (response.status === 401) {
+    /*
+     * 401 is a dead session. 403 is a session the server will not renew
+     * (a managed account). Other failures stay retryable.
+     */
+    if (response.status === 401 || response.status === 403) {
       dispatchSessionExpired();
 
       return 'expired';

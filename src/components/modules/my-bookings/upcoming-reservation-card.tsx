@@ -1,22 +1,15 @@
 import { format } from 'date-fns';
 import { Button } from 'polpo/components';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { EventInstallmentActions } from './event-installment-actions';
 import { EventSessionLines } from './event-session-lines';
 import { UpcomingBookingCard } from './upcoming-booking-card';
 
-import { CheckoutPaymentProofForm } from '@components/forms/checkout-payment-proof-form';
-import { DansshipAPI, PaymentMethod, type MyBooking } from '@core/api';
+import { type MyBooking } from '@core/api';
 import { PageURLS } from '@core/constants';
-import {
-  formatPrice,
-  getBookingCountdown,
-  rentalStatusI18nKey,
-  reservationDisplayTitle,
-  type ReservationItem,
-} from '@helpers';
+import { getBookingCountdown, rentalStatusI18nKey, reservationDisplayTitle, type ReservationItem } from '@helpers';
 import { useDateLocale } from '@hooks';
 
 interface UpcomingReservationCardProps {
@@ -64,7 +57,6 @@ function relativeLabel(startTime: string, t: (key: string, options?: Record<stri
 export function UpcomingReservationCard({ item, isCancelDisabled, onCancelClass }: UpcomingReservationCardProps) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const [payingSequence, setPayingSequence] = useState<number | null>(null);
 
   if (item.kind === 'class') {
     return <UpcomingBookingCard booking={item.booking} isCancelDisabled={isCancelDisabled} onCancel={onCancelClass} />;
@@ -104,56 +96,9 @@ export function UpcomingReservationCard({ item, isCancelDisabled, onCancelClass 
           </p>
         </div>
         <p className='mt-1 text-[12.5px] leading-[1.4] text-muted-foreground'>{schedule}</p>
-        {item.kind === 'event' && item.registration.installments?.length ? (
-          <ul className='mt-2 grid gap-1'>
-            {item.registration.installments.map(installment => (
-              <li key={installment.sequence} className='flex flex-wrap items-center justify-between gap-2 text-xs'>
-                <span>
-                  {t('bookings:installmentLine', {
-                    sequence: installment.sequence,
-                    amount: formatPrice(Number(installment.amount), 'COP'),
-                    due: installment.due_date,
-                  })}{' '}
-                  · {t(`bookings:installmentStatus.${installment.status}`)}
-                </span>
-                {installment.status === 'pending' || installment.status === 'overdue' ? (
-                  <Button
-                    color='primary'
-                    variant='outlined'
-                    size='small'
-                    type='button'
-                    onClick={() => setPayingSequence(installment.sequence)}
-                  >
-                    {t('bookings:payInstallment')}
-                  </Button>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        ) : null}
+        {item.kind === 'event' ? <EventInstallmentActions registration={item.registration} tone='card' /> : null}
         {item.kind === 'event' ? (
           <EventSessionLines sessions={item.registration.sessions} className='mt-2 grid gap-1 text-xs' />
-        ) : null}
-        {item.kind === 'event' && payingSequence !== null ? (
-          <CheckoutPaymentProofForm
-            paymentMethod={PaymentMethod.TRANSFER}
-            finalPrice={Number(
-              item.registration.installments?.find(row => row.sequence === payingSequence)?.amount ?? 0,
-            )}
-            amountToCharge={Number(
-              item.registration.installments?.find(row => row.sequence === payingSequence)?.amount ?? 0,
-            )}
-            walletAmountApplied={0}
-            onClose={() => setPayingSequence(null)}
-            onBack={() => setPayingSequence(null)}
-            onSubmit={() => setPayingSequence(null)}
-            hideSummary
-            onCreateIntent={async () => {
-              const { data } = await DansshipAPI.eventos.payInstallments(item.registration.id, [payingSequence]);
-
-              return data?.payment_intent_id ?? null;
-            }}
-          />
         ) : null}
         <div className='mt-2 flex min-w-0 flex-wrap items-center justify-between gap-2'>
           <p className='m-0 text-xs font-medium text-muted-foreground'>{status}</p>

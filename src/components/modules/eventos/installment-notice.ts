@@ -103,7 +103,13 @@ export function paymentNotice(input: PaymentNoticeInput, t: Translate): string |
       return null;
     }
 
-    return t('eventos:landing.installmentNotice', { count: dates.length, schedule });
+    const notice = t('eventos:landing.installmentNotice', { count: dates.length, schedule });
+
+    if (dates.length < 2) {
+      return notice;
+    }
+
+    return `${notice} ${t('eventos:landing.installmentChoiceNote')}`;
   }
 
   if (input.kind !== 'combo' && input.hasInstallmentAmounts) {

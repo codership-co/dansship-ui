@@ -73,6 +73,13 @@ export class EventosAPI {
         wallet_amount_applied: toNumber(data.wallet_amount_applied),
         amount_to_charge: toNumber(data.amount_to_charge, toNumber(data.final_price)),
         payment_option: data.payment_option === 'fifty_fifty' ? 'fifty_fifty' : 'full',
+        installment_options: (data.installment_options ?? []).map(option => ({
+          sequences: option.sequences,
+          amount: toNumber(option.amount),
+          base_amount: toNumber(option.base_amount),
+          tax_amount: toNumber(option.tax_amount),
+          amount_to_charge: toNumber(option.amount_to_charge),
+        })),
         deposit_amount:
           data.deposit_amount !== null && data.deposit_amount !== undefined ? toNumber(data.deposit_amount) : null,
         balance_amount:

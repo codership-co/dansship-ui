@@ -42,7 +42,7 @@ describe('paymentNotice', () => {
         t,
       ),
     ).toBe(
-      'Pagas en 2 cuotas: la primera vence el 31 de octubre y la segunda el 27 de noviembre. Una vez confirmada tu inscripción, lo pagado no es reembolsable.',
+      'Pagas en 2 cuotas: la primera vence el 31 de octubre y la segunda el 27 de noviembre. Una vez confirmada tu inscripción, lo pagado no es reembolsable. Puedes pagar la cuota vigente o el total. Si la primera sigue pendiente después de su vencimiento, solo se acepta el total.',
     );
   });
 
@@ -58,7 +58,7 @@ describe('paymentNotice', () => {
         t,
       ),
     ).toBe(
-      'Pagas en 3 cuotas: la primera vence el 31 de octubre, la segunda el 15 de noviembre y la tercera el 27 de noviembre. Una vez confirmada tu inscripción, lo pagado no es reembolsable.',
+      'Pagas en 3 cuotas: la primera vence el 31 de octubre, la segunda el 15 de noviembre y la tercera el 27 de noviembre. Una vez confirmada tu inscripción, lo pagado no es reembolsable. Puedes pagar la cuota vigente o el total. Si la primera sigue pendiente después de su vencimiento, solo se acepta el total.',
     );
   });
 
