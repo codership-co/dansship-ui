@@ -71,6 +71,18 @@ describe('session coordinator', () => {
     window.removeEventListener('auth:session-expired', onExpired);
   });
 
+  it('ends the session when refresh is forbidden', async () => {
+    const events: Array<string> = [];
+    const onExpired = () => events.push('expired');
+
+    window.addEventListener('auth:session-expired', onExpired);
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('', { status: 403 })));
+
+    await expect(refreshSession()).resolves.toBe('expired');
+    expect(events).toEqual(['expired']);
+    window.removeEventListener('auth:session-expired', onExpired);
+  });
+
   it('dispatches session-expired once until the next login', async () => {
     const events: Array<string> = [];
     const onExpired = () => events.push('expired');

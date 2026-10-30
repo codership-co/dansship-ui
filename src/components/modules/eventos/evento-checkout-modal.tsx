@@ -30,6 +30,10 @@ enum CheckoutStep {
   PAY = 'PAY',
 }
 
+function sameSequences(left: Array<number>, right: Array<number>) {
+  return left.length === right.length && left.every((value, index) => value === right[index]);
+}
+
 interface EventoCheckoutModalProps {
   landing: EventLanding;
   accessToken?: string;
@@ -78,6 +82,26 @@ function EventoCheckoutContent({
     [landing.slug, accessToken],
   );
   const preview = previewResponse?.data as PaymentPreviewMappedResponse | undefined;
+  const options = useMemo(() => preview?.installment_options ?? [], [preview]);
+  const [chosenSequences, setChosenSequences] = useState<Array<number> | null>(null);
+
+  useEffect(() => {
+    if (options.length === 0) {
+      setChosenSequences(null);
+
+      return;
+    }
+
+    setChosenSequences(current => {
+      if (current && options.some(option => sameSequences(option.sequences, current))) {
+        return current;
+      }
+
+      const partial = options.find(option => option.sequences.length === 1);
+
+      return (partial ?? options[0]).sequences;
+    });
+  }, [options, preview]);
 
   const { call: lookupPartner } = useCallablePromise((email: string) => DansshipAPI.eventos.lookupPartner(email));
   const [partnerName, setPartnerName] = useState<string | null>(null);
@@ -152,11 +176,15 @@ function EventoCheckoutContent({
     }
 
     try {
+      const selected = options.find(
+        option => chosenSequences !== null && sameSequences(option.sequences, chosenSequences),
+      );
       const { data, ok } = await DansshipAPI.eventos.createPurchase({
         slug: landing.slug,
         payment_method_type: isWalletCovered ? PaymentMethod.WALLET : paymentMethod,
         partner_email: landing.requires_partner ? partnerEmail.trim() : undefined,
         access_token: accessToken,
+        sequences: selected?.sequences,
       });
 
       if (!ok || !data) {
@@ -173,13 +201,26 @@ function EventoCheckoutContent({
         toast.error(t('eventos:checkout.soldOut'));
       } else if (code === DANSSHIP_ERROR_CODE.EVENT_ALREADY_REGISTERED) {
         toast.error(t('eventos:checkout.alreadyRegistered'));
+      } else if (code === DANSSHIP_ERROR_CODE.EVENT_INSTALLMENT_OPTION_INVALID) {
+        toast.error(t('eventos:checkout.optionUnavailable'));
       } else {
         toast.error(t('eventos:checkout.createFailed'));
       }
 
       return null;
     }
-  }, [accessToken, isWalletCovered, landing.requires_partner, landing.slug, partnerEmail, paymentMethod, preview, t]);
+  }, [
+    accessToken,
+    chosenSequences,
+    isWalletCovered,
+    landing.requires_partner,
+    landing.slug,
+    options,
+    partnerEmail,
+    paymentMethod,
+    preview,
+    t,
+  ]);
 
   const applyPaymentPreview = useCallback((method: PaymentMethod) => {
     setPaymentMethod(method);
@@ -197,12 +238,21 @@ function EventoCheckoutContent({
     }
   }, [isWalletCovered, paymentMethod]);
 
+  const selectedOption =
+    options.find(option => chosenSequences !== null && sameSequences(option.sequences, chosenSequences)) ?? options[0];
+  const finalPrice = selectedOption?.amount ?? preview?.final_price ?? 0;
+  const baseAmount = selectedOption?.base_amount ?? preview?.base_amount ?? 0;
+  const taxAmount = selectedOption?.tax_amount ?? preview?.tax_amount ?? 0;
+  const amountToCharge = selectedOption?.amount_to_charge ?? preview?.amount_to_charge ?? 0;
   const hasPlanPrice =
     preview?.discount_type === 'has_active_plan' || preview?.discount_type === 'has_active_plan_min_classes';
   const isPair = landing.kind === 'combo' || landing.requires_partner;
-  const priceLabel = hasPlanPrice
-    ? t(isPair ? 'eventos:checkout.yourPricePlanPair' : 'eventos:checkout.yourPricePlan')
-    : t('eventos:checkout.yourPrice');
+  const priceLabel =
+    preview?.discount_type === 'has_active_plan_min_classes'
+      ? t(isPair ? 'eventos:checkout.yourPricePlanSizePair' : 'eventos:checkout.yourPricePlanSize')
+      : hasPlanPrice
+        ? t(isPair ? 'eventos:checkout.yourPricePlanPair' : 'eventos:checkout.yourPricePlan')
+        : t('eventos:checkout.yourPrice');
   const notice = paymentNotice(
     {
       kind: landing.kind,
@@ -266,11 +316,48 @@ function EventoCheckoutContent({
           </p>
         </div>
       ) : null}
+      {options.length > 1 ? (
+        <fieldset className='grid gap-2'>
+          <legend className='text-sm font-semibold'>{t('eventos:checkout.payChoice')}</legend>
+          {options.map(option => {
+            const checked = chosenSequences !== null && sameSequences(option.sequences, chosenSequences);
+            const label =
+              option.sequences.length > 1
+                ? t('eventos:checkout.payTotal')
+                : t('eventos:checkout.payInstallment', {
+                    ordinal: t(`eventos:landing.installmentOrdinal.${option.sequences[0]}`),
+                  });
+
+            return (
+              <label
+                key={option.sequences.join('-')}
+                className={cn(
+                  'flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-4 py-3',
+                  checked ? 'border-primary bg-secondary' : 'border-transparent bg-secondary/45',
+                )}
+              >
+                <span className='flex items-center gap-2 text-sm font-semibold'>
+                  <input
+                    type='radio'
+                    name='installment-choice'
+                    checked={checked}
+                    onChange={() => setChosenSequences(option.sequences)}
+                  />
+                  {label}
+                </span>
+                <span className='font-title text-lg leading-none font-bold text-primary'>
+                  {formatPrice(option.amount, 'COP')}
+                </span>
+              </label>
+            );
+          })}
+        </fieldset>
+      ) : null}
       {preview ? (
         <div className='flex items-center justify-between gap-4 rounded-xl bg-secondary px-4 py-3.5'>
           <span className='text-sm font-semibold'>{priceLabel}</span>
           <span className='font-title text-2xl leading-none font-bold text-primary'>
-            {formatPrice(preview.final_price, 'COP')}
+            {formatPrice(finalPrice, 'COP')}
           </span>
         </div>
       ) : null}
@@ -308,11 +395,11 @@ function EventoCheckoutContent({
       <div>
         <div className='mb-2 flex items-center justify-between gap-2'>
           <span className='min-w-0 break-words text-gray-500'>{t('subscriptions:subtotal')}</span>
-          <span className='shrink-0'>{formatPrice(preview.base_amount, 'COP')}</span>
+          <span className='shrink-0'>{formatPrice(baseAmount, 'COP')}</span>
         </div>
         <div className='mb-2 flex items-center justify-between gap-2'>
           <span className='min-w-0 break-words text-gray-500'>{t('subscriptions:iva')}</span>
-          <span className='shrink-0'>{formatPrice(preview.tax_amount, 'COP')}</span>
+          <span className='shrink-0'>{formatPrice(taxAmount, 'COP')}</span>
         </div>
         {preview.wallet_amount_applied > 0 ? (
           <div className='mb-2 flex items-center justify-between gap-2'>
@@ -322,7 +409,7 @@ function EventoCheckoutContent({
         ) : null}
         <div className='mt-4 flex items-center justify-between gap-2 border-t pt-4 text-lg font-bold'>
           <span className='min-w-0 break-words'>{t('subscriptions:totalDue')}</span>
-          <span className='shrink-0'>{formatPrice(preview.amount_to_charge, 'COP')}</span>
+          <span className='shrink-0'>{formatPrice(amountToCharge, 'COP')}</span>
         </div>
       </div>
       {!isWalletCovered ? (
@@ -339,8 +426,8 @@ function EventoCheckoutContent({
       <CheckoutPaymentProofForm
         hideSummary
         paymentMethod={paymentMethod ?? (isWalletCovered ? PaymentMethod.WALLET : PaymentMethod.TRANSFER)}
-        finalPrice={preview.final_price}
-        amountToCharge={preview.amount_to_charge}
+        finalPrice={finalPrice}
+        amountToCharge={amountToCharge}
         walletAmountApplied={preview.wallet_amount_applied}
         onClose={onClose}
         onBack={() => setStep(CheckoutStep.REVIEW)}

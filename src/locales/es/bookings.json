@@ -15,6 +15,7 @@
   "viewEvent": "Ver evento",
   "viewPayment": "Ver pago",
   "payInstallment": "Pagar cuota",
+  "payTotal": "Pagar el total",
   "installmentLine": "Cuota {{sequence}} · {{amount}} · vence {{due}}",
   "sessionLine": "{{when}}{{place}}",
   "sessionCancelled": "Cancelada",

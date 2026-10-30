@@ -4,6 +4,7 @@ import { type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { EventInstallmentActions } from './event-installment-actions';
 import { EventSessionLines } from './event-session-lines';
 import { NextClassHero } from './next-class-hero';
 
@@ -147,10 +148,13 @@ export function NextReservationHero({ item, isCancelDisabled, onCancelClass }: N
             : (registration.instructor_name ?? null)
         }
         notes={
-          <EventSessionLines
-            sessions={registration.sessions}
-            className='grid gap-1 text-[12.5px] leading-[1.3] text-primary-foreground'
-          />
+          <>
+            <EventSessionLines
+              sessions={registration.sessions}
+              className='grid gap-1 text-[12.5px] leading-[1.3] text-primary-foreground'
+            />
+            <EventInstallmentActions registration={registration} tone='hero' />
+          </>
         }
         actions={
           <>

@@ -38,11 +38,17 @@ export interface InstallmentQuoteLine {
   selectable: boolean;
 }
 
+export interface InstallmentPaymentOption {
+  sequences: Array<number>;
+  amount: string | number;
+}
+
 export interface InstallmentQuote {
   registered: boolean;
   registration_id: string | null;
   lines: Array<InstallmentQuoteLine>;
   default_sequences: Array<number>;
+  payment_options?: Array<InstallmentPaymentOption>;
 }
 
 export interface ManualInstallmentConfirmPayload {
@@ -297,6 +303,7 @@ export interface EventPurchaseCreatePayload {
   payment_method_type: 'transfer' | 'card' | 'wallet';
   partner_email?: string | null;
   access_token?: string | null;
+  sequences?: Array<number> | null;
 }
 
 export interface EventPurchaseResponse {
@@ -458,6 +465,7 @@ export interface MyEventRegistration {
   payment_status: string | null;
   external_location?: string | null;
   installments?: Array<RegistrationInstallment> | null;
+  installment_payment_options?: Array<InstallmentPaymentOption>;
   sessions?: Array<RegistrationSession>;
   created_at: string;
 }
