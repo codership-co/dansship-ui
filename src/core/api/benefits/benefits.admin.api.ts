@@ -6,6 +6,8 @@ import type {
   BenefitGrant,
   BenefitWindow,
   ListBenefitGrantsParams,
+  SetTwoForOneWeekPayload,
+  TwoForOneWeek,
   UpdateBenefitWindowPayload,
 } from './benefits.models';
 
@@ -32,6 +34,28 @@ export class BenefitsAdminAPI {
       path: `/admin/benefits/windows/${id}`,
       method: 'PATCH',
       data: payload,
+    });
+  }
+
+  async listTwoForOneWeeks() {
+    return this.httpClient.callNoError<Array<TwoForOneWeek>>({
+      path: '/admin/benefits/two-for-one-weeks',
+      method: 'GET',
+    });
+  }
+
+  async setTwoForOneWeek(weekId: string, payload: SetTwoForOneWeekPayload) {
+    return this.httpClient.callNoError<TwoForOneWeek, SetTwoForOneWeekPayload>({
+      path: `/admin/benefits/two-for-one-weeks/${weekId}`,
+      method: 'PUT',
+      data: payload,
+    });
+  }
+
+  async clearTwoForOneWeek(weekId: string) {
+    return this.httpClient.callNoError<TwoForOneWeek>({
+      path: `/admin/benefits/two-for-one-weeks/${weekId}`,
+      method: 'DELETE',
     });
   }
 }

@@ -61,11 +61,11 @@ async function bookingNoLongerActive(bookingId: string): Promise<boolean | null>
 
 const companionErrorToastKey = (errorCode: string | undefined) => {
   switch (errorCode) {
-    case DANSSHIP_ERROR_CODE.JUEVES_2X1_COMPANION_NOT_FOUND:
+    case DANSSHIP_ERROR_CODE.TWO_FOR_ONE_COMPANION_NOT_FOUND:
       return 'bookings:companionNotFound';
-    case DANSSHIP_ERROR_CODE.JUEVES_2X1_SELF_REFERENCE:
+    case DANSSHIP_ERROR_CODE.TWO_FOR_ONE_SELF_REFERENCE:
       return 'bookings:companionSelfReference';
-    case DANSSHIP_ERROR_CODE.JUEVES_2X1_NOT_ELIGIBLE:
+    case DANSSHIP_ERROR_CODE.TWO_FOR_ONE_NOT_ELIGIBLE:
       return 'bookings:companionNotEligible';
     case DANSSHIP_ERROR_CODE.BOOKING_CLASS_FULL:
     case DANSSHIP_ERROR_CODE.CLASS_FULL:
@@ -137,9 +137,9 @@ export const useMyBookings = () => {
             } else if (error_code === DANSSHIP_ERROR_CODE.BOOKING_LATE_JOIN_CLOSED) {
               toast.error(t('bookings:lateJoinClosedDesc'));
             } else if (
-              error_code === DANSSHIP_ERROR_CODE.JUEVES_2X1_COMPANION_NOT_FOUND ||
-              error_code === DANSSHIP_ERROR_CODE.JUEVES_2X1_SELF_REFERENCE ||
-              error_code === DANSSHIP_ERROR_CODE.JUEVES_2X1_NOT_ELIGIBLE
+              error_code === DANSSHIP_ERROR_CODE.TWO_FOR_ONE_COMPANION_NOT_FOUND ||
+              error_code === DANSSHIP_ERROR_CODE.TWO_FOR_ONE_SELF_REFERENCE ||
+              error_code === DANSSHIP_ERROR_CODE.TWO_FOR_ONE_NOT_ELIGIBLE
             ) {
               toast.error(t(companionErrorToastKey(error_code)));
             } else {

@@ -20,4 +20,5 @@ export * from './use-products';
 export * from './use-payment-intents';
 export * from './use-campaigns';
 export * from './use-benefit-windows';
+export * from './use-two-for-one-weeks';
 export * from './use-halloween-wheel';

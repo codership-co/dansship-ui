@@ -73,9 +73,9 @@ export function BookingClassCard({
             ? `${t('bookings:spotsFull')}`
             : `${bookingClass.enrolled_count} / ${bookingClass.capacity}`}
       </p>
-      {bookingClass.jueves_2x1_eligible ? (
+      {bookingClass.two_for_one_eligible ? (
         <p className='absolute block font-bold top-0 left-0 m-4 py-1 px-4 bg-primary text-white rounded-2xl'>
-          {t('bookings:thursday2x1Badge')}
+          {t('bookings:twoForOneBadge')}
         </p>
       ) : null}
 

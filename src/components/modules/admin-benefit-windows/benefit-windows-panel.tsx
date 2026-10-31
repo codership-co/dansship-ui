@@ -7,6 +7,8 @@ import { SpinnerLoader } from '@components/loaders';
 import { Input, Label, Switch, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { useBenefitWindows } from '@hooks';
 
+const TWO_FOR_ONE_CODES = new Set(['TWO_FOR_ONE', 'JUEVES_2X1']);
+
 interface DateDraft {
   starts_on: string;
   ends_on: string;
@@ -19,6 +21,7 @@ export function BenefitWindowsPanel() {
 
   useEffect(() => {
     setDrafts(previous => {
+      let changed = false;
       const next = { ...previous };
 
       for (const window of windows) {
@@ -27,10 +30,11 @@ export function BenefitWindowsPanel() {
             starts_on: window.starts_on ?? '',
             ends_on: window.ends_on ?? '',
           };
+          changed = true;
         }
       }
 
-      return next;
+      return changed ? next : previous;
     });
   }, [windows]);
 
@@ -83,11 +87,13 @@ export function BenefitWindowsPanel() {
               starts_on: window.starts_on ?? '',
               ends_on: window.ends_on ?? '',
             };
+            const weekly = TWO_FOR_ONE_CODES.has(window.code);
+            const title = weekly ? t('admin:inventory.promotionsPanel.twoForOneName') : window.name;
 
             return (
               <TableRow key={window.id}>
                 <TableCell>
-                  <div className='font-medium text-gray-900'>{window.name}</div>
+                  <div className='font-medium text-gray-900'>{title}</div>
                   <div className='text-xs text-gray-500'>{window.code}</div>
                 </TableCell>
                 <TableCell>
@@ -95,7 +101,7 @@ export function BenefitWindowsPanel() {
                     <Switch
                       checked={window.is_active}
                       disabled={isSaving}
-                      aria-label={window.name}
+                      aria-label={title}
                       onCheckedChange={checked => {
                         void updateWindow(window.id, { is_active: checked });
                       }}
@@ -105,43 +111,53 @@ export function BenefitWindowsPanel() {
                     </Label>
                   </div>
                 </TableCell>
-                <TableCell>
-                  <Input
-                    type='date'
-                    value={draft.starts_on}
-                    aria-label={t('admin:inventory.promotionsPanel.from')}
-                    onChange={event =>
-                      setDrafts(previous => ({
-                        ...previous,
-                        [window.id]: { ...draft, starts_on: event.target.value },
-                      }))
-                    }
-                  />
-                </TableCell>
-                <TableCell>
-                  <Input
-                    type='date'
-                    value={draft.ends_on}
-                    aria-label={t('admin:inventory.promotionsPanel.until')}
-                    onChange={event =>
-                      setDrafts(previous => ({
-                        ...previous,
-                        [window.id]: { ...draft, ends_on: event.target.value },
-                      }))
-                    }
-                  />
-                </TableCell>
-                <TableCell>
-                  <Button
-                    color='primary'
-                    variant='solid'
-                    type='button'
-                    disabled={isSaving}
-                    onClick={() => void saveDates(window.id)}
-                  >
-                    {t('admin:inventory.promotionsPanel.save')}
-                  </Button>
-                </TableCell>
+                {weekly ? (
+                  <>
+                    <TableCell>{t('admin:inventory.promotionsPanel.definedPerWeek')}</TableCell>
+                    <TableCell>{t('admin:inventory.promotionsPanel.definedPerWeek')}</TableCell>
+                    <TableCell />
+                  </>
+                ) : (
+                  <>
+                    <TableCell>
+                      <Input
+                        type='date'
+                        value={draft.starts_on}
+                        aria-label={t('admin:inventory.promotionsPanel.from')}
+                        onChange={event =>
+                          setDrafts(previous => ({
+                            ...previous,
+                            [window.id]: { ...draft, starts_on: event.target.value },
+                          }))
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        type='date'
+                        value={draft.ends_on}
+                        aria-label={t('admin:inventory.promotionsPanel.until')}
+                        onChange={event =>
+                          setDrafts(previous => ({
+                            ...previous,
+                            [window.id]: { ...draft, ends_on: event.target.value },
+                          }))
+                        }
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        color='primary'
+                        variant='solid'
+                        type='button'
+                        disabled={isSaving}
+                        onClick={() => void saveDates(window.id)}
+                      >
+                        {t('admin:inventory.promotionsPanel.save')}
+                      </Button>
+                    </TableCell>
+                  </>
+                )}
               </TableRow>
             );
           })}

@@ -137,14 +137,14 @@
   "rated": "Calificada",
   "rateSuccess": "Gracias por tu calificación.",
   "rateFailed": "No se pudo enviar la calificación. Inténtalo de nuevo.",
-  "thursday2x1Badge": "Jueves 2x1",
-  "thursday2x1Note": "Jueves 2x1 — trae a alguien gratis. Se reservan los dos cupos o ninguno. La persona debe tener cuenta Dansship y no gasta créditos.",
+  "twoForOneBadge": "2x1",
+  "twoForOneNote": "Puedes traer a alguien gratis.",
   "companionEmail": "Correo de tu acompañante (opcional)",
-  "companionEmailHelper": "Debe tener una cuenta Dansship. Si no está registrada, no se reserva ninguna de las dos.",
+  "companionEmailHelper": "Debe tener cuenta Dansship.",
   "companionSelfReference": "No puedes nombrarte a ti misma como acompañante.",
   "companionNotFound": "No encontramos una cuenta con ese correo. La persona debe registrarse primero.",
   "companionSuccess": "También reservamos el cupo gratis de tu acompañante.",
   "companionClassFull": "No hay cupo para las dos personas. No se reservó la clase.",
-  "companionNotEligible": "Esta clase no aplica para Jueves 2x1. No se reservó ninguna clase.",
+  "companionNotEligible": "Esta clase no aplica para 2x1. No se reservó ninguna clase.",
   "companionFailed": "No pudimos completar la reserva 2x1. No se reservó ninguna clase."
 }
