@@ -19,7 +19,35 @@
       "optionalHint": "Vacío = sin límite",
       "invalidRange": "La fecha de fin debe ser igual o posterior al inicio.",
       "saveSuccess": "Promoción actualizada.",
-      "saveFailed": "No se pudo actualizar la promoción."
+      "saveFailed": "No se pudo actualizar la promoción.",
+      "twoForOneName": "2x1",
+      "definedPerWeek": "Se define por semana",
+      "weeks": {
+        "hint": "Elige un día de cada semana. El 2x1 solo se ofrece si la promoción está activa.",
+        "empty": "No hay semanas próximas.",
+        "day": "Día 2x1",
+        "none": "Sin día",
+        "clear": "Quitar",
+        "locked": "Esta semana ya tiene reservas y no se puede cambiar",
+        "confirmSetTitle": "Definir el día 2x1",
+        "confirmSetDescription": "Esta semana el 2x1 será el {{date}}.",
+        "confirmClearTitle": "Quitar el día 2x1",
+        "confirmClearDescription": "Esta semana no tendrá 2x1.",
+        "confirm": "Confirmar",
+        "cancel": "Cancelar",
+        "saved": "Día 2x1 actualizado.",
+        "cleared": "Día 2x1 quitado.",
+        "saveFailed": "No se pudo guardar el día 2x1.",
+        "notFound": "No encontramos esa semana.",
+        "outsideWeek": "La fecha no pertenece a esa semana.",
+        "inPast": "No puedes elegir un día que ya pasó.",
+        "weekLocked": "Esta semana ya tiene reservas y no se puede cambiar.",
+        "status": {
+          "draft": "Borrador",
+          "published": "Publicada",
+          "archived": "Archivada"
+        }
+      }
     }
   },
   "paymentAssignments": {

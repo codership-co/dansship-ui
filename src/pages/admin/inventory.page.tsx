@@ -3,7 +3,14 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
 import { SectionHeading } from '@components/containers';
-import { BenefitWindowsPanel, ClassesTab, DoorCodePanel, PlansTab, RoomsTab } from '@components/modules';
+import {
+  BenefitWindowsPanel,
+  ClassesTab,
+  DoorCodePanel,
+  PlansTab,
+  RoomsTab,
+  TwoForOneWeeksPanel,
+} from '@components/modules';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
 import { PageURLS } from '@core/constants';
@@ -103,6 +110,7 @@ function AdminInventoryPage() {
         {canManageBenefitWindows ? (
           <TabsContent value='promotions' className='bg-white p-6 rounded-lg shadow-sm border border-gray-100'>
             <BenefitWindowsPanel />
+            <TwoForOneWeeksPanel />
           </TabsContent>
         ) : null}
 

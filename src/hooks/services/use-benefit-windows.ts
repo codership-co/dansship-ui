@@ -5,7 +5,9 @@ import { toast } from 'sonner';
 import { useCallablePromise } from '../use-callable-promise';
 import { usePromise } from '../use-promise';
 
-import { DansshipAPI, type UpdateBenefitWindowPayload } from '@core/api';
+import { DansshipAPI, type BenefitWindow, type UpdateBenefitWindowPayload } from '@core/api';
+
+const EMPTY_WINDOWS: Array<BenefitWindow> = [];
 
 export const useBenefitWindows = () => {
   const { t } = useTranslation();
@@ -31,7 +33,7 @@ export const useBenefitWindows = () => {
   );
 
   return {
-    windows: response?.data ?? [],
+    windows: response?.data ?? EMPTY_WINDOWS,
     isLoading,
     isSaving,
     updateWindow,

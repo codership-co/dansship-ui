@@ -18,7 +18,7 @@ export interface Booking {
   plan_name?: string | null;
   is_cancellable?: boolean;
   is_instructor_benefit?: boolean;
-  is_jueves_2x1?: boolean;
+  is_two_for_one?: boolean;
   attendee_name?: string | null;
   booked_by_user_id?: string | null;
 
@@ -101,7 +101,7 @@ export interface PublishedClass extends ScheduledClass {
   user_booking_id?: string | null;
   user_booking_is_cancellable?: boolean | null;
   user_booking_would_restore_credit?: boolean | null;
-  jueves_2x1_eligible?: boolean;
+  two_for_one_eligible?: boolean;
 }
 
 export interface MarkAttendancePayload {

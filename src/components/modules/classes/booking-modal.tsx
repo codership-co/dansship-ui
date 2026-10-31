@@ -274,9 +274,9 @@ export function BookingModal({
     });
 
     if (!result.ok) {
-      if (result.errorCode === DANSSHIP_ERROR_CODE.JUEVES_2X1_COMPANION_NOT_FOUND) {
+      if (result.errorCode === DANSSHIP_ERROR_CODE.TWO_FOR_ONE_COMPANION_NOT_FOUND) {
         setCompanionFieldError(t('bookings:companionNotFound'));
-      } else if (result.errorCode === DANSSHIP_ERROR_CODE.JUEVES_2X1_SELF_REFERENCE) {
+      } else if (result.errorCode === DANSSHIP_ERROR_CODE.TWO_FOR_ONE_SELF_REFERENCE) {
         setCompanionFieldError(t('bookings:companionSelfReference'));
       }
 
@@ -348,7 +348,7 @@ export function BookingModal({
   const paidPlanCoversClass = hasPaidPlanCoveringClass(resolvedSubscriptions, selectedClass.start_time);
   const showThursday2x1Note = Boolean(
     subscriptionsReady &&
-    selectedClass.jueves_2x1_eligible &&
+    selectedClass.two_for_one_eligible &&
     paidPlanCoversClass &&
     !isBooked &&
     !isPast &&
@@ -492,12 +492,6 @@ export function BookingModal({
               </label>
             )}
 
-            {showThursday2x1Note && (
-              <label className='bg-primary/5 p-3 rounded text-primary border border-primary/20'>
-                {t('bookings:thursday2x1Note')}
-              </label>
-            )}
-
             {hasTimeOverlap && !isBooked && !isOwnClass && (
               <label className='bg-warning-50 p-3 rounded text-warning-800 border border-warning-200'>
                 {bookingForOther ? t('bookings:timeOverlapWarningOther') : t('bookings:timeOverlapWarning')}
@@ -533,14 +527,19 @@ export function BookingModal({
 
             <section className='flex flex-col gap-2'>
               {showCompanionField ? (
-                <EmailField
-                  control={companionForm.control}
-                  name='companion_email'
-                  label={t('bookings:companionEmail')}
-                  helperText={t('bookings:companionEmailHelper')}
-                  errorMessage={companionFieldError ?? undefined}
-                  disabled={isLoading}
-                />
+                <>
+                  <p className='m-0 rounded border border-primary/20 bg-primary/5 p-3 text-primary'>
+                    {t('bookings:twoForOneNote')}
+                  </p>
+                  <EmailField
+                    control={companionForm.control}
+                    name='companion_email'
+                    label={t('bookings:companionEmail')}
+                    helperText={t('bookings:companionEmailHelper')}
+                    errorMessage={companionFieldError ?? undefined}
+                    disabled={isLoading}
+                  />
+                </>
               ) : null}
               {isCancelled ? (
                 <label className='bg-gray-50 p-3 rounded text-gray-700 border border-gray-200 text-center'>

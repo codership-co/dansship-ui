@@ -35,7 +35,7 @@ function StudentName({ classId, student }: { classId: string; student: RosterStu
   const { t } = useTranslation();
   const canViewProfile = useOrPermissions(InstructorPermissions.studentProfile);
   const name = studentDisplayName(student);
-  const tag = student.is_jueves_2x1 ? (
+  const tag = student.is_two_for_one ? (
     <Badge variant='outlineTertiary' size='small'>
       {t('instructor:roster.twoForOneTag')}
     </Badge>

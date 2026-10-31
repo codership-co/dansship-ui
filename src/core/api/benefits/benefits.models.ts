@@ -39,3 +39,18 @@ export interface UpdateBenefitWindowPayload {
   starts_on?: string | null;
   ends_on?: string | null;
 }
+
+export type TwoForOneWeekStatus = 'draft' | 'published' | 'archived';
+
+export interface TwoForOneWeek {
+  id: string;
+  week_start_date: string;
+  week_end_date: string;
+  status: TwoForOneWeekStatus;
+  promo_date: string | null;
+  locked: boolean;
+}
+
+export interface SetTwoForOneWeekPayload {
+  promo_date: string;
+}

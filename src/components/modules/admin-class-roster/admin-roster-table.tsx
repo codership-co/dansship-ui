@@ -120,7 +120,7 @@ export function AdminRosterTable({
                 <TableCell>
                   <span className='inline-flex items-center gap-2'>
                     {rosterStudentName(student)}
-                    {student.is_jueves_2x1 ? (
+                    {student.is_two_for_one ? (
                       <Badge variant='outlineTertiary' size='small'>
                         {t('admin:roster.twoForOneTag')}
                       </Badge>
