@@ -8,6 +8,7 @@ const t = (key: string, options?: Record<string, unknown>) => i18n.t(key, option
 
 const singlePayment = 'La inscripción a este evento es de pago único y no reembolsable, una vez confirmada.';
 const comboPayment = 'La inscripción al combo es de pago único y no reembolsable, una vez confirmada.';
+const checkoutInstallments = 'Una vez confirmada tu inscripción, lo pagado no es reembolsable.';
 const checkoutPayment =
   'Esta compra es de pago único y no reembolsable. No hay opción de cancelar una vez confirmado el pago.';
 
@@ -46,14 +47,23 @@ describe('paymentNotice', () => {
     );
   });
 
-  it('updates the count and dates when the schedule changes', () => {
+  it('shows the short checkout notice when the event has installments', () => {
+    const base = { kind: 'event', hasInstallmentAmounts: true, surface: 'checkout' } as const;
+
+    expect(paymentNotice({ ...base, installmentDueDates: ['2026-10-31', '2026-11-27'] }, t)).toBe(checkoutInstallments);
+    expect(paymentNotice({ ...base, installmentDueDates: ['2026-10-31', '2026-11-15', '2026-11-27'] }, t)).toBe(
+      checkoutInstallments,
+    );
+  });
+
+  it('updates the count and dates when the landing schedule changes', () => {
     expect(
       paymentNotice(
         {
           kind: 'event',
           installmentDueDates: ['2026-10-31', '2026-11-15', '2026-11-27'],
           hasInstallmentAmounts: true,
-          surface: 'checkout',
+          surface: 'landing',
         },
         t,
       ),

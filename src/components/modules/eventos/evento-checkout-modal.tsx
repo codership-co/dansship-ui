@@ -1,16 +1,16 @@
 import { ActionModal, Button } from 'polpo/components';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { LuCreditCard, LuInfo, LuList } from 'react-icons/lu';
+import { useCallback, useEffect, useId, useMemo, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
+import { LuCalendar, LuChevronDown, LuCreditCard, LuInfo, LuList, LuMapPin, LuUser } from 'react-icons/lu';
 import { useLocation, useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
-import { landingHasInstallmentAmounts, paymentNotice } from './installment-notice';
+import { checkoutEventDate, type CheckoutEventDate } from './checkout-event-date';
+import { dueLabel, landingHasInstallmentAmounts, paymentNotice } from './installment-notice';
 
 import { CheckoutPaymentProofForm } from '@components/forms/checkout-payment-proof-form';
 import { FormStepperLayout } from '@components/layouts/form-stepper-layout';
-import { PaymentMethodSelector } from '@components/modules/payments/payment-method-selector';
-import { Checkbox, Input, Label } from '@components/ui';
+import { Badge, Checkbox, Input, Label } from '@components/ui';
 import { useAuth, useOrPermissions } from '@contexts';
 import {
   DANSSHIP_ERROR_CODE,
@@ -34,6 +34,180 @@ function sameSequences(left: Array<number>, right: Array<number>) {
   return left.length === right.length && left.every((value, index) => value === right[index]);
 }
 
+const PANE_BODY = 'px-4 pt-4 pb-6 sm:px-8 md:pt-12 md:pr-8 md:pl-12';
+const PANE_FOOTER = 'px-4 sm:px-8 md:py-4 md:pr-8 md:pl-12';
+const TOTAL_SCOPES = ['recital', 'taller', 'clase_especial'];
+
+interface TicketEvent {
+  name: string;
+  typeLabel: string;
+  date: CheckoutEventDate | null;
+  dateLabel: string;
+  place: string;
+  instructor: string;
+}
+
+function EventTicket({ event }: { event: TicketEvent }) {
+  const { t } = useTranslation();
+
+  return (
+    <section className='flex gap-3.5 rounded-2xl bg-secondary-100 p-3.5'>
+      {event.date ? (
+        <div
+          aria-hidden
+          className='grid w-15 shrink-0 content-center justify-items-center gap-1 rounded-xl bg-primary py-2 text-primary-foreground md:w-19'
+        >
+          <span className='text-[11px] leading-none font-semibold tracking-[0.12em]'>{event.date.weekday}</span>
+          <span className='font-title text-[26px] leading-none font-bold md:text-[32px]'>{event.date.day}</span>
+          <span className='text-[11px] leading-none font-semibold tracking-[0.12em]'>{event.date.month}</span>
+        </div>
+      ) : null}
+      <div className='grid min-w-0 content-center gap-2'>
+        <div className='grid justify-items-start gap-1.5'>
+          <Badge variant='outline' size='small'>
+            {event.typeLabel}
+          </Badge>
+          <p className='m-0 font-title text-lg leading-tight font-bold'>{event.name}</p>
+        </div>
+        <ul className='m-0 grid list-none gap-1 p-0 text-sm'>
+          <li className='flex items-start gap-2'>
+            <LuCalendar className='mt-0.5 size-4 shrink-0 text-primary' aria-hidden />
+            <span>
+              <span className='sr-only'>{t('eventos:checkout.dateSr')} </span>
+              {event.date?.longLabel ?? event.dateLabel}
+            </span>
+          </li>
+          {event.place ? (
+            <li className='flex items-start gap-2'>
+              <LuMapPin className='mt-0.5 size-4 shrink-0 text-primary' aria-hidden />
+              <span>
+                <span className='sr-only'>{t('eventos:checkout.placeSr')} </span>
+                {event.place}
+              </span>
+            </li>
+          ) : null}
+          {event.instructor ? (
+            <li className='flex items-start gap-2'>
+              <LuUser className='mt-0.5 size-4 shrink-0 text-primary' aria-hidden />
+              <span className='text-muted-foreground'>
+                <Trans
+                  i18nKey='eventos:checkout.professor'
+                  values={{ name: event.instructor }}
+                  components={{ strong: <span className='font-semibold text-foreground' /> }}
+                />
+              </span>
+            </li>
+          ) : null}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function InstallmentOptionCard({
+  title,
+  subtitle,
+  amount,
+  selected,
+  onSelect,
+}: {
+  title: string;
+  subtitle: string | null;
+  amount: string;
+  selected: boolean;
+  onSelect: () => void;
+}) {
+  return (
+    <button
+      type='button'
+      role='radio'
+      aria-checked={selected}
+      onClick={onSelect}
+      className={cn(
+        'flex w-full flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border-[1.5px] px-4 py-3.5 text-left outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-primary/50',
+        selected ? 'border-primary bg-primary/5 ring-[3px] ring-primary/15' : 'border-border bg-white',
+      )}
+    >
+      <span
+        aria-hidden
+        className={cn(
+          'grid size-5 shrink-0 place-content-center rounded-full border-2',
+          selected ? 'border-primary' : 'border-muted-foreground',
+        )}
+      >
+        {selected ? <span className='size-2.5 rounded-full bg-primary' /> : null}
+      </span>
+      <span className='grid min-w-0 flex-1 gap-0.5'>
+        <span className='font-semibold'>{title}</span>
+        {subtitle ? <span className='text-sm text-muted-foreground'>{subtitle}</span> : null}
+      </span>
+      <span className={cn('font-title text-[21px] leading-none font-bold', selected && 'text-primary')}>{amount}</span>
+    </button>
+  );
+}
+
+function CollapsibleTotal({
+  subtitle,
+  amount,
+  baseAmount,
+  taxAmount,
+  walletAmountApplied,
+}: {
+  subtitle: string;
+  amount: number;
+  baseAmount: number;
+  taxAmount: number;
+  walletAmountApplied: number;
+}) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const panelId = useId();
+
+  return (
+    <div className='rounded-2xl bg-secondary px-4 py-3.5'>
+      <button
+        type='button'
+        aria-expanded={open}
+        aria-controls={panelId}
+        aria-label={`${t('eventos:checkout.totalToPay')}. ${t('eventos:checkout.toggleBreakdown')}`}
+        onClick={() => setOpen(current => !current)}
+        className='flex w-full items-center justify-between gap-4 rounded-lg text-left outline-none focus-visible:ring-[3px] focus-visible:ring-primary/50'
+      >
+        <span className='grid gap-1'>
+          <span className='flex items-center gap-2 font-semibold'>
+            {t('eventos:checkout.totalToPay')}
+            <span aria-hidden className='grid size-6 place-content-center rounded-full bg-primary/10 text-primary'>
+              <LuChevronDown className={cn('size-4 transition-transform', open && 'rotate-180')} />
+            </span>
+          </span>
+          <span className='text-[12.5px] text-secondary-900'>{subtitle}</span>
+        </span>
+        <span className='font-title text-[28px] leading-none font-bold text-primary'>{formatPrice(amount, 'COP')}</span>
+      </button>
+      <div id={panelId} hidden={!open} className='mt-3 grid gap-2 border-t border-border pt-3 text-sm'>
+        <div className='flex items-center justify-between gap-2'>
+          <span className='min-w-0 break-words text-muted-foreground'>{t('subscriptions:subtotal')}</span>
+          <span className='shrink-0'>{formatPrice(baseAmount, 'COP')}</span>
+        </div>
+        <div className='flex items-center justify-between gap-2'>
+          <span className='min-w-0 break-words text-muted-foreground'>{t('subscriptions:iva')}</span>
+          <span className='shrink-0'>{formatPrice(taxAmount, 'COP')}</span>
+        </div>
+        {walletAmountApplied > 0 ? (
+          <div className='flex items-center justify-between gap-2 text-primary'>
+            <span className='min-w-0 break-words'>{t('subscriptions:walletApplied')}</span>
+            <span className='shrink-0'>-{formatPrice(walletAmountApplied, 'COP')}</span>
+          </div>
+        ) : null}
+        <div className='flex items-center justify-between gap-2 font-bold'>
+          <span className='min-w-0 break-words'>{t('subscriptions:totalDue')}</span>
+          <span className='shrink-0'>{formatPrice(amount, 'COP')}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 interface EventoCheckoutModalProps {
   landing: EventLanding;
   accessToken?: string;
@@ -45,6 +219,7 @@ export function EventoCheckoutModal({ landing, accessToken, isOpen, onClose }: E
   return (
     <ActionModal
       closeOnClickOutside={false}
+      windowOffset={0}
       backCard
       lineOnTop
       icon={LuCreditCard}
@@ -145,24 +320,28 @@ function EventoCheckoutContent({
 
   const isWalletCovered = Boolean(preview && preview.amount_to_charge === 0 && preview.wallet_amount_applied > 0);
   const partnerValid = !landing.requires_partner || Boolean(partnerName);
-  const events = useMemo(
+  const events = useMemo<Array<TicketEvent>>(
     () =>
       landing.kind === 'combo'
         ? landing.components.map(component => ({
             name: component.name,
-            date: component.date_label,
-            room: component.room_label,
+            typeLabel: t('eventos:landing.comboBadge'),
+            date: checkoutEventDate(component.starts_at),
+            dateLabel: component.date_label,
+            place: component.room_label,
             instructor: component.instructor_label,
           }))
         : [
             {
               name: landing.name,
-              date: [landing.date_label, landing.room_name || landing.external_location].filter(Boolean).join(' · '),
-              room: landing.room_name || landing.external_location || '',
+              typeLabel: landing.type_label ?? t('eventos:types.taller'),
+              date: checkoutEventDate(landing.starts_at),
+              dateLabel: landing.date_label ?? '',
+              place: landing.room_name || landing.external_location || '',
               instructor: landing.instructor?.name ?? '',
             },
           ],
-    [landing],
+    [landing, t],
   );
 
   const handleLogin = () => {
@@ -222,10 +401,6 @@ function EventoCheckoutContent({
     t,
   ]);
 
-  const applyPaymentPreview = useCallback((method: PaymentMethod) => {
-    setPaymentMethod(method);
-  }, []);
-
   useEffect(() => {
     if (isWalletCovered) {
       setPaymentMethod(PaymentMethod.WALLET);
@@ -262,117 +437,133 @@ function EventoCheckoutContent({
     },
     t,
   );
+  const dueDates = landing.installment_due_dates ?? [];
+  const totalInstallments = dueDates.length;
+  const totalOption = options.find(option => option.sequences.length > 1);
+  const hasInstallments = totalOption !== undefined;
+  const firstInstallmentExpired = hasInstallments && !options.some(option => option.sequences.length === 1);
+  const isPartialPayment = selectedOption !== undefined && selectedOption.sequences.length === 1;
+  const nextDueDate = isPartialPayment ? dueLabel(dueDates[selectedOption.sequences[0]] ?? '', t) : null;
+  const scopeKey = landing.kind === 'combo' ? 'combo' : TOTAL_SCOPES.includes(landing.type ?? '') ? landing.type : null;
+  let priceSubLine: string | null;
+
+  if (hasInstallments) {
+    priceSubLine =
+      isPartialPayment && nextDueDate
+        ? t('eventos:checkout.balanceNote', {
+            amount: formatPrice(totalOption.amount - selectedOption.amount, 'COP'),
+            date: nextDueDate,
+            scope: t(`eventos:checkout.totalScope.${scopeKey ?? 'default'}`),
+            total: formatPrice(totalOption.amount, 'COP'),
+          })
+        : hasPlanPrice
+          ? t('eventos:checkout.communityRate')
+          : null;
+  } else {
+    priceSubLine = hasPlanPrice ? t('eventos:checkout.communityRateSingle') : t('eventos:checkout.singlePayment');
+  }
+
+  const choiceHeadingId = useId();
+  const footerClassName = cn(
+    'sticky bottom-0 mt-auto flex gap-2 border-t border-border bg-white pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:justify-end',
+    PANE_FOOTER,
+  );
 
   const reviewForm = (
-    <div className='grid content-start gap-4'>
-      {events.map(event => (
-        <div key={event.name} className='grid gap-5 rounded-2xl bg-secondary/45 px-5 py-5'>
-          <div className='grid gap-1'>
-            <p className='m-0 text-[10px] font-semibold tracking-[0.08em] uppercase text-muted-foreground'>
-              {landing.kind === 'combo'
-                ? t('eventos:landing.comboBadge')
-                : (landing.type_label ?? t('eventos:types.taller'))}
+    <div className='flex min-h-full shrink-0 flex-col'>
+      <div className={cn('flex flex-1 flex-col gap-4', PANE_BODY)}>
+        {events.map(event => (
+          <EventTicket key={event.name} event={event} />
+        ))}
+        {landing.requires_partner ? (
+          <div className='grid gap-2'>
+            <Label htmlFor='partner-email'>{t('eventos:checkout.partnerEmail')}</Label>
+            <Input
+              id='partner-email'
+              type='email'
+              value={partnerEmail}
+              onChange={event => setPartnerEmail(event.target.value)}
+            />
+            <p
+              className={cn(
+                'm-0 text-sm',
+                partnerError === 'PARTNER_NOT_FOUND' || partnerError === 'PARTNER_SELF_REFERENCE'
+                  ? 'text-destructive'
+                  : 'text-muted-foreground',
+              )}
+            >
+              {partnerName
+                ? t('eventos:checkout.partnerValid', { name: partnerName })
+                : partnerError === 'PARTNER_SELF_REFERENCE'
+                  ? t('eventos:checkout.partnerSelf')
+                  : partnerError === 'PARTNER_NOT_FOUND'
+                    ? t('eventos:checkout.partnerNotFound')
+                    : t('eventos:checkout.partnerIdle')}
             </p>
-            <p className='m-0 text-[15px] font-semibold'>{event.name}</p>
           </div>
-          <div className='grid gap-1'>
-            <p className='m-0 text-[10px] font-semibold tracking-[0.08em] uppercase text-muted-foreground'>
-              {t('eventos:checkout.dateAndRoom')}
+        ) : null}
+        {hasInstallments ? (
+          <div className='grid gap-2'>
+            <p id={choiceHeadingId} className='m-0 font-semibold'>
+              {firstInstallmentExpired ? t('eventos:checkout.yourPayment') : t('eventos:checkout.payChoiceHeading')}
             </p>
-            <p className='m-0 text-[15px] font-semibold'>{event.date}</p>
-          </div>
-          <div className='grid gap-1'>
-            <p className='m-0 text-[10px] font-semibold tracking-[0.08em] uppercase text-muted-foreground'>
-              {t('eventos:checkout.instructor')}
-            </p>
-            <p className='m-0 text-[15px] font-semibold'>{event.instructor}</p>
-          </div>
-        </div>
-      ))}
-      {landing.requires_partner ? (
-        <div className='grid gap-2'>
-          <Label htmlFor='partner-email'>{t('eventos:checkout.partnerEmail')}</Label>
-          <Input
-            id='partner-email'
-            type='email'
-            value={partnerEmail}
-            onChange={event => setPartnerEmail(event.target.value)}
-          />
-          <p
-            className={cn(
-              'm-0 text-sm',
-              partnerError === 'PARTNER_NOT_FOUND' || partnerError === 'PARTNER_SELF_REFERENCE'
-                ? 'text-destructive'
-                : 'text-muted-foreground',
-            )}
-          >
-            {partnerName
-              ? t('eventos:checkout.partnerValid', { name: partnerName })
-              : partnerError === 'PARTNER_SELF_REFERENCE'
-                ? t('eventos:checkout.partnerSelf')
-                : partnerError === 'PARTNER_NOT_FOUND'
-                  ? t('eventos:checkout.partnerNotFound')
-                  : t('eventos:checkout.partnerIdle')}
-          </p>
-        </div>
-      ) : null}
-      {options.length > 1 ? (
-        <fieldset className='grid gap-2'>
-          <legend className='text-sm font-semibold'>{t('eventos:checkout.payChoice')}</legend>
-          {options.map(option => {
-            const checked = chosenSequences !== null && sameSequences(option.sequences, chosenSequences);
-            const label =
-              option.sequences.length > 1
-                ? t('eventos:checkout.payTotal')
-                : t('eventos:checkout.payInstallment', {
-                    ordinal: t(`eventos:landing.installmentOrdinal.${option.sequences[0]}`),
-                  });
+            <div role='radiogroup' aria-labelledby={choiceHeadingId} className='grid gap-2'>
+              {options.map(option => {
+                const isPartial = option.sequences.length === 1;
+                const due = isPartial ? dueLabel(dueDates[option.sequences[0] - 1] ?? '', t) : null;
 
-            return (
-              <label
-                key={option.sequences.join('-')}
-                className={cn(
-                  'flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-4 py-3',
-                  checked ? 'border-primary bg-secondary' : 'border-transparent bg-secondary/45',
-                )}
-              >
-                <span className='flex items-center gap-2 text-sm font-semibold'>
-                  <input
-                    type='radio'
-                    name='installment-choice'
-                    checked={checked}
-                    onChange={() => setChosenSequences(option.sequences)}
+                return (
+                  <InstallmentOptionCard
+                    key={option.sequences.join('-')}
+                    title={
+                      isPartial
+                        ? t('eventos:checkout.installmentOf', { n: option.sequences[0], total: totalInstallments })
+                        : t('eventos:checkout.payTotalTitle')
+                    }
+                    subtitle={
+                      isPartial
+                        ? due
+                          ? t('eventos:checkout.dueOn', { date: due })
+                          : null
+                        : t('eventos:checkout.coversInstallments', { count: option.sequences.length })
+                    }
+                    amount={formatPrice(option.amount, 'COP')}
+                    selected={chosenSequences !== null && sameSequences(option.sequences, chosenSequences)}
+                    onSelect={() => setChosenSequences(option.sequences)}
                   />
-                  {label}
-                </span>
-                <span className='font-title text-lg leading-none font-bold text-primary'>
-                  {formatPrice(option.amount, 'COP')}
-                </span>
-              </label>
-            );
-          })}
-        </fieldset>
-      ) : null}
-      {preview ? (
-        <div className='flex items-center justify-between gap-4 rounded-xl bg-secondary px-4 py-3.5'>
-          <span className='text-sm font-semibold'>{priceLabel}</span>
-          <span className='font-title text-2xl leading-none font-bold text-primary'>
-            {formatPrice(finalPrice, 'COP')}
-          </span>
-        </div>
-      ) : null}
-      {notice ? (
-        <div className='flex items-start gap-2.5 text-muted-foreground'>
-          <LuInfo className='mt-0.5 size-4 shrink-0' aria-hidden />
-          <p className='m-0 text-[12.5px] leading-relaxed font-medium'>{notice}</p>
-        </div>
-      ) : null}
-      <div className='flex flex-wrap justify-end gap-2'>
-        <Button type='button' color='primary' variant='outlined' onClick={onClose}>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+        {preview ? (
+          <>
+            <div aria-hidden className='flex-1 md:hidden' />
+            <div className='flex items-center justify-between gap-4 rounded-2xl bg-secondary px-4 py-3.5'>
+              <div className='grid min-w-0 gap-1'>
+                <span className='font-semibold'>{hasInstallments ? t('eventos:checkout.payToday') : priceLabel}</span>
+                {priceSubLine ? <span className='text-[12.5px] text-secondary-900'>{priceSubLine}</span> : null}
+              </div>
+              <span className='font-title text-[28px] leading-none font-bold text-primary'>
+                {formatPrice(finalPrice, 'COP')}
+              </span>
+            </div>
+            <div aria-hidden className='flex-1 md:hidden' />
+          </>
+        ) : null}
+        {notice ? (
+          <div className='flex items-start gap-2.5 text-muted-foreground'>
+            <LuInfo className='mt-0.5 size-4 shrink-0' aria-hidden />
+            <p className='m-0 text-[12.5px] leading-relaxed font-medium'>{notice}</p>
+          </div>
+        ) : null}
+      </div>
+      <div className={footerClassName}>
+        <Button type='button' color='primary' variant='outlined' className='flex-1 md:flex-none' onClick={onClose}>
           {t('eventos:checkout.cancel')}
         </Button>
         {!isAuthenticated ? (
-          <Button type='button' color='primary' variant='solid' onClick={handleLogin}>
+          <Button type='button' color='primary' variant='solid' className='flex-1 md:flex-none' onClick={handleLogin}>
             {t('eventos:checkout.loginToReserve')}
           </Button>
         ) : (
@@ -380,6 +571,7 @@ function EventoCheckoutContent({
             type='button'
             color='primary'
             variant='solid'
+            className='flex-1 md:flex-none'
             disabled={!partnerValid || !preview}
             onClick={() => setStep(CheckoutStep.PAY)}
           >
@@ -390,45 +582,49 @@ function EventoCheckoutContent({
     </div>
   );
 
+  const installmentSummary = isPartialPayment
+    ? t('eventos:checkout.installmentOf', { n: selectedOption.sequences[0], total: totalInstallments })
+    : hasInstallments
+      ? t('eventos:checkout.payTotalTitle')
+      : null;
+  const vatSummary = t('eventos:checkout.vatIncluded', { amount: formatPrice(taxAmount, 'COP') });
+
   const payForm = preview ? (
-    <div className='grid content-start gap-4'>
-      <div>
-        <div className='mb-2 flex items-center justify-between gap-2'>
-          <span className='min-w-0 break-words text-gray-500'>{t('subscriptions:subtotal')}</span>
-          <span className='shrink-0'>{formatPrice(baseAmount, 'COP')}</span>
-        </div>
-        <div className='mb-2 flex items-center justify-between gap-2'>
-          <span className='min-w-0 break-words text-gray-500'>{t('subscriptions:iva')}</span>
-          <span className='shrink-0'>{formatPrice(taxAmount, 'COP')}</span>
-        </div>
-        {preview.wallet_amount_applied > 0 ? (
-          <div className='mb-2 flex items-center justify-between gap-2'>
-            <span className='min-w-0 break-words text-primary'>{t('subscriptions:walletApplied')}</span>
-            <span className='shrink-0 text-primary'>-{formatPrice(preview.wallet_amount_applied, 'COP')}</span>
-          </div>
-        ) : null}
-        <div className='mt-4 flex items-center justify-between gap-2 border-t pt-4 text-lg font-bold'>
-          <span className='min-w-0 break-words'>{t('subscriptions:totalDue')}</span>
-          <span className='shrink-0'>{formatPrice(amountToCharge, 'COP')}</span>
-        </div>
-      </div>
-      {!isWalletCovered ? (
-        <PaymentMethodSelector
-          value={paymentMethod}
-          onChange={applyPaymentPreview}
-          methods={[PaymentMethod.TRANSFER]}
-        />
-      ) : null}
-      <label className='flex items-start gap-3 text-sm'>
-        <Checkbox checked={accepted} onCheckedChange={value => setAccepted(value === true)} />
-        <span>{t('eventos:checkout.nonRefundableCheckbox')}</span>
-      </label>
+    <div className='flex min-h-full shrink-0 flex-col'>
       <CheckoutPaymentProofForm
+        variant='event'
         hideSummary
         paymentMethod={paymentMethod ?? (isWalletCovered ? PaymentMethod.WALLET : PaymentMethod.TRANSFER)}
         finalPrice={finalPrice}
         amountToCharge={amountToCharge}
         walletAmountApplied={preview.wallet_amount_applied}
+        confirmLabel={t('eventos:checkout.confirmPay')}
+        canConfirm={accepted}
+        bodyClassName={cn('flex-1', PANE_BODY)}
+        footerClassName={PANE_FOOTER}
+        topSlot={
+          <CollapsibleTotal
+            subtitle={installmentSummary ? `${installmentSummary} · ${vatSummary}` : vatSummary}
+            amount={amountToCharge}
+            baseAmount={baseAmount}
+            taxAmount={taxAmount}
+            walletAmountApplied={preview.wallet_amount_applied}
+          />
+        }
+        acceptance={
+          <section className='grid gap-2'>
+            <p className='m-0 text-[15px] font-semibold'>{t('eventos:checkout.beforeConfirm')}</p>
+            <label
+              className={cn(
+                'flex cursor-pointer items-start gap-3 rounded-xl border-[1.5px] px-4 py-3.5',
+                accepted ? 'border-primary bg-primary/5' : 'border-border bg-white',
+              )}
+            >
+              <Checkbox className='mt-0.5' checked={accepted} onCheckedChange={value => setAccepted(value === true)} />
+              <span>{t('eventos:checkout.acceptFinal')}</span>
+            </label>
+          </section>
+        }
         onClose={onClose}
         onBack={() => setStep(CheckoutStep.REVIEW)}
         onCreateIntent={async () => {
@@ -471,7 +667,7 @@ function EventoCheckoutContent({
   ];
 
   return (
-    <section className='m-auto h-auto max-w-[100dvw] w-dvw overflow-x-clip border-0 bg-transparent p-0 shadow-none sm:w-[96dvw] sm:max-w-[96dvw] xl:max-w-7xl'>
+    <section className='m-auto h-auto w-full max-w-full overflow-x-clip border-0 bg-transparent p-0 shadow-none sm:w-[96dvw] sm:max-w-[96dvw] xl:max-w-7xl'>
       <FormStepperLayout
         className={cn(
           'm-auto min-w-0 overflow-x-clip overflow-y-auto rounded-none sm:rounded-xl',
@@ -481,6 +677,8 @@ function EventoCheckoutContent({
         )}
         steps={steps}
         currentStep={step}
+        hideStepHeading
+        compactMobileStrip
       />
     </section>
   );

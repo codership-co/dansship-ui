@@ -1,4 +1,6 @@
+import { Button, ClickToCopy } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
+import { LuCopy } from 'react-icons/lu';
 
 /*
  * const NEQUI_QR_PLACEHOLDER = '/assets/images/payments/nequi-qr.png';
@@ -8,9 +10,51 @@ const BREB_QR_PLACEHOLDER = '/assets/images/payments/breb-qr.png';
 const BREB_KEY = '@boldds3507';
 // const BANK_ACCOUNT_NUMBER = '1700-1510-7618';
 
-export function TransferPaymentInstructions({ qrUrl }: { qrUrl?: string | null }) {
+interface TransferPaymentInstructionsProps {
+  qrUrl?: string | null;
+  variant?: 'default' | 'event';
+}
+
+export function TransferPaymentInstructions({ qrUrl, variant = 'default' }: TransferPaymentInstructionsProps) {
   const { t } = useTranslation();
   const imageSrc = qrUrl || BREB_QR_PLACEHOLDER;
+
+  if (variant === 'event') {
+    return (
+      <section className='grid min-w-0 justify-items-center gap-3 rounded-2xl bg-primary/5 p-5 text-center'>
+        <p className='m-0 text-[15px] font-semibold'>{t('eventos:checkout.payWithBreb')}</p>
+        <div className='max-w-full rounded-xl border border-primary/20 bg-white p-2'>
+          <img
+            src={imageSrc}
+            alt={t('payments:instructions.transfer.brebQrTitle')}
+            className='aspect-square w-60 max-w-full object-contain sm:w-72'
+          />
+        </div>
+        <p className='m-0 text-sm text-muted-foreground'>{t('eventos:checkout.scanHelp')}</p>
+        {!qrUrl ? (
+          <div className='grid justify-items-center gap-1.5'>
+            <span className='font-title text-[22px] leading-none font-bold text-primary'>{BREB_KEY}</span>
+            <ClickToCopy
+              value={BREB_KEY}
+              tooltipText={t('eventos:checkout.copyKey')}
+              tooltipCopiedText={t('eventos:checkout.keyCopied')}
+            >
+              <Button
+                type='button'
+                color='primary'
+                variant='outlined'
+                size='small'
+                className='flex items-center gap-1.5'
+              >
+                <LuCopy aria-hidden />
+                {t('eventos:checkout.copyKey')}
+              </Button>
+            </ClickToCopy>
+          </div>
+        ) : null}
+      </section>
+    );
+  }
 
   return (
     <section className='rounded-md border border-primary/20 bg-primary/5 p-4 text-sm text-gray-700'>
