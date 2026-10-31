@@ -1,7 +1,7 @@
 import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 
-import { cn, formatPrice } from '@helpers';
+import { cn, formatPrice, partialFixedCoverage } from '@helpers';
 
 import type { PaymentDocument, PaymentMonthSummary } from '@core/api';
 
@@ -140,6 +140,22 @@ function MonthBlock({
       }),
       amount: formatPrice(document.total_amount, 'COP'),
     });
+  const coverageLine = (document: PaymentDocument) => {
+    const coverage = partialFixedCoverage(document);
+
+    if (!coverage) return null;
+
+    return t('profile:paymentDocuments.prorationLine', {
+      startDay: coverage.startDay,
+      endDay: coverage.endDay,
+      month: t(`profile:paymentDocuments.months.${coverage.month}`).toLocaleLowerCase('es-CO'),
+      year: coverage.year,
+      daysCovered: coverage.daysCovered,
+      daysInMonth: coverage.daysInMonth,
+    });
+  };
+  const mixedLabel = (document: PaymentDocument) =>
+    document.payment_type === 'mixed' ? t('profile:paymentDocuments.paymentTypes.mixed') : null;
 
   return (
     <div className='border-b border-border last:border-b-0 md:border-b-2'>
@@ -171,6 +187,12 @@ function MonthBlock({
             return (
               <div key={document.id} className={cn('py-2', index > 0 && 'mt-1 border-t border-border pt-3')}>
                 <p className='text-[13px] font-semibold break-words'>{accountLine(document, index)}</p>
+                {mixedLabel(document) ? (
+                  <p className='mt-0.5 text-xs text-muted-foreground'>{mixedLabel(document)}</p>
+                ) : null}
+                {coverageLine(document) ? (
+                  <p className='mt-0.5 text-xs text-muted-foreground'>{coverageLine(document)}</p>
+                ) : null}
                 {note ? <p className='mt-0.5 text-xs text-muted-foreground'>{note}</p> : null}
                 <div className='mt-2'>
                   <DocumentActions
@@ -230,6 +252,10 @@ function MonthBlock({
                 )}
               >
                 <span className='text-[13px] font-semibold break-words'>{accountLine(document, index)}</span>
+                {mixedLabel(document) ? <p className='text-xs text-muted-foreground'>{mixedLabel(document)}</p> : null}
+                {coverageLine(document) ? (
+                  <p className='text-xs text-muted-foreground'>{coverageLine(document)}</p>
+                ) : null}
                 {note ? <p className='text-xs text-muted-foreground'>{note}</p> : null}
               </div>
             );

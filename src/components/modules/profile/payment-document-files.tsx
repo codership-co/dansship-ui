@@ -139,7 +139,7 @@ export function PaymentDocumentFiles({
   onView,
 }: PaymentDocumentFilesProps) {
   const { t } = useTranslation();
-  const showSocialSecurity = profile.payment_type === 'fixed_amount';
+  const showSocialSecurity = profile.social_security_applicable || profile.has_social_security;
   const cards: Array<{
     kind: PaymentDocumentKind;
     label: string;

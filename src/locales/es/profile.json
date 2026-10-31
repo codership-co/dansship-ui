@@ -59,6 +59,10 @@
     "documentsLoaded": "{{count}} de {{total}} documentos cargados",
     "newAccount": "Nueva cuenta",
     "accountLine": "Cuenta {{index}} · {{status}} · {{amount}}",
+    "paymentTypes": {
+      "mixed": "Fijo y por horas"
+    },
+    "prorationLine": "Período cubierto: del {{startDay}} al {{endDay}} de {{month}} de {{year}} ({{daysCovered}} de {{daysInMonth}} días).",
     "closedMonthGenerate": "Puedes generar la cuenta de cobro de este mes, ya cerrado.",
     "voidedNote": "Anulado: {{reason}}",
     "bankFieldsTitle": "Datos de la cuenta bancaria",

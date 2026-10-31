@@ -348,6 +348,10 @@
         "viewBankCertificate": "Ver certificado bancario",
         "viewSignature": "Ver firma",
         "viewSocialSecurity": "Ver planilla de seguridad social",
+        "paymentTypes": {
+          "mixed": "Fijo y por horas"
+        },
+        "prorationLine": "Período cubierto: del {{startDay}} al {{endDay}} de {{month}} de {{year}} ({{daysCovered}} de {{daysInMonth}} días).",
         "bankName": "Banco",
         "accountType": "Tipo de cuenta",
         "accountTypeSavings": "Ahorros",
