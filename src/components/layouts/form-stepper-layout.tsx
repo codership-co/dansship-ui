@@ -21,6 +21,8 @@ interface FormStepperLayoutProps<T extends React.Key> {
   className?: string;
   onStepSelect?: (step: T) => void;
   canNavigateToStep?: (step: T) => boolean;
+  hideStepHeading?: boolean;
+  compactMobileStrip?: boolean;
 }
 
 export const FormStepperLayout = <T extends React.Key>({
@@ -30,6 +32,8 @@ export const FormStepperLayout = <T extends React.Key>({
   className,
   onStepSelect,
   canNavigateToStep,
+  hideStepHeading = false,
+  compactMobileStrip = false,
 }: FormStepperLayoutProps<T>) => {
   const { t } = useTranslation();
   const rootGridRef = useRef<HTMLElement>(null);
@@ -57,6 +61,7 @@ export const FormStepperLayout = <T extends React.Key>({
         <section className='grid min-w-0 grid-flow-col content-start justify-start gap-6 bg-gradient-onboarding px-6 py-6 select-none sm:px-8 md:grid-flow-row md:gap-8 md:py-16 md:pl-8 md:pr-12'>
           {steps.map(({ title, step, Icon }, index) => {
             const isNavigable = Boolean(onStepSelect && canNavigateToStep?.(step) && index !== stepIndex);
+            const showMobileText = compactMobileStrip && index === stepIndex;
 
             return (
               <section
@@ -76,26 +81,35 @@ export const FormStepperLayout = <T extends React.Key>({
                 }
                 className={cn(
                   'grid content-start md:content-center md:grid-cols-[auto_1fr] md:gap-4',
+                  showMobileText && 'grid-cols-[auto_1fr] gap-3',
                   index < stepIndex && 'text-active-600',
-                  index === stepIndex && 'text-tertiary',
-                  index > stepIndex && 'text-gray-400',
+                  index === stepIndex && 'text-tertiary-800',
+                  index > stepIndex && 'text-muted-foreground',
                   isNavigable && 'cursor-pointer hover:opacity-80',
                 )}
               >
                 {index < stepIndex && <LuCircleCheck className='size-6 md:size-8 md:mt-4' />}
                 {index === stepIndex && <Icon className='size-6 md:size-8 md:mt-4 animate-pulse' />}
                 {index > stepIndex && <Icon className='size-6 md:size-8 md:mt-4' />}
-                <section className='relative hidden xs:block'>
-                  <small className='hidden md:block text-gray-400 m-0'>{t('common:step', { step: index + 1 })}</small>
-                  <p className='hidden md:block m-0 font-bold'>{title}</p>
-                  <small className='hidden sm:block md:hidden font-bold m-0 mt-2'>{title}</small>
+                <section className={cn('relative', showMobileText ? 'block' : 'hidden xs:block')}>
+                  <small className={cn('text-gray-400 m-0', showMobileText ? 'block' : 'hidden md:block')}>
+                    {t('common:step', { step: index + 1 })}
+                  </small>
+                  <p className={cn('m-0 font-bold', showMobileText ? 'block' : 'hidden md:block')}>{title}</p>
+                  {compactMobileStrip ? null : (
+                    <small className='hidden sm:block md:hidden font-bold m-0 mt-2'>{title}</small>
+                  )}
                   {index < stepIndex && (
                     <Badge variant='outlineActive' size='small' className='hidden md:block'>
                       {t('common:complete')}
                     </Badge>
                   )}
                   {index === stepIndex && (
-                    <Badge variant='outlineTertiary' size='small' className='hidden md:block'>
+                    <Badge
+                      variant='outlineTertiary'
+                      size='small'
+                      className={showMobileText ? 'block w-fit' : 'hidden md:block'}
+                    >
                       {t('common:inProgress')}
                     </Badge>
                   )}
@@ -115,16 +129,21 @@ export const FormStepperLayout = <T extends React.Key>({
         </section>
         <section
           ref={formPaneRef}
-          className='grid h-full min-w-0 grid-rows-[auto_1fr] overflow-x-clip overflow-y-auto px-6 py-6 sm:px-8 md:py-16 md:pr-8 md:pl-12'
+          className={cn(
+            'h-full min-w-0 overflow-x-clip overflow-y-auto',
+            hideStepHeading ? 'flex flex-col' : 'grid grid-rows-[auto_1fr] px-6 py-6 sm:px-8 md:py-16 md:pr-8 md:pl-12',
+          )}
         >
-          <section className='mb-10'>
-            <div className='flex items-start gap-2'>
-              <div>
-                <h4 className='m-0 text-primary'>{steps[stepIndex].title}</h4>
-                <label>{steps[stepIndex].subtitle}</label>
+          {hideStepHeading ? null : (
+            <section className='mb-10'>
+              <div className='flex items-start gap-2'>
+                <div>
+                  <h4 className='m-0 text-primary'>{steps[stepIndex].title}</h4>
+                  <label>{steps[stepIndex].subtitle}</label>
+                </div>
               </div>
-            </div>
-          </section>
+            </section>
+          )}
           {steps[stepIndex].form}
         </section>
       </section>

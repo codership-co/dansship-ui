@@ -108,6 +108,7 @@ export interface LandingComponentCard {
   name: string;
   image_url: string | null;
   date_label: string;
+  starts_at?: string | null;
   instructor_label: string;
   room_label: string;
 }
