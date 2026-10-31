@@ -18,7 +18,7 @@ import {
   type PaymentDocumentKind,
 } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { formatPrice } from '@helpers';
+import { formatPrice, partialFixedCoverage } from '@helpers';
 import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
 
 function openUrl(url: string | undefined) {
@@ -226,7 +226,7 @@ export function UserPaymentDocumentsTab({
           >
             {t('admin:users.details.paymentDocuments.viewSignature')}
           </Button>
-          {profile?.payment_type === 'fixed_amount' || profile?.has_social_security ? (
+          {profile?.social_security_applicable || profile?.has_social_security ? (
             <Button
               color='primary'
               variant='outlined'
@@ -361,11 +361,31 @@ export function UserPaymentDocumentsTab({
                 const isPayable = document.id === data?.payable_document_id;
                 const canVoidThis = canVoid && VOIDABLE_STATUSES.has(document.status);
                 const canPayThis = canProcess && document.status === 'confirmed';
+                const coverage = partialFixedCoverage(document);
 
                 return (
                   <TableRow key={document.id} className={isPayable ? 'bg-primary/5' : undefined}>
                     <TableCell>
                       {t(`admin:users.details.paymentDocuments.months.${document.period_month}`)} {document.period_year}
+                      {document.payment_type === 'mixed' ? (
+                        <p className='mt-1 text-xs text-muted-foreground'>
+                          {t('admin:users.details.paymentDocuments.paymentTypes.mixed')}
+                        </p>
+                      ) : null}
+                      {coverage ? (
+                        <p className='mt-1 text-xs text-muted-foreground'>
+                          {t('admin:users.details.paymentDocuments.prorationLine', {
+                            startDay: coverage.startDay,
+                            endDay: coverage.endDay,
+                            month: t(`admin:users.details.paymentDocuments.months.${coverage.month}`).toLocaleLowerCase(
+                              'es-CO',
+                            ),
+                            year: coverage.year,
+                            daysCovered: coverage.daysCovered,
+                            daysInMonth: coverage.daysInMonth,
+                          })}
+                        </p>
+                      ) : null}
                       {isPayable ? (
                         <span className='ml-2 text-xs font-medium text-primary'>
                           {t('admin:users.details.paymentDocuments.payable')}

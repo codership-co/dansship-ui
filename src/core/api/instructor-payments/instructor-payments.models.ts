@@ -30,6 +30,7 @@ export interface PaymentProfile {
   has_bank_certificate: boolean;
   has_signature: boolean;
   has_social_security: boolean;
+  social_security_applicable: boolean;
   bank_name: string | null;
   account_type: BankAccountType | string | null;
   account_number: string | null;
@@ -55,6 +56,27 @@ export interface PaymentDocumentLineItem {
   hours: number;
 }
 
+export interface PaymentCalculationComponent {
+  payment_type: string;
+  assignment_id?: string;
+  assignment_start_date?: string;
+  assignment_end_date?: string | null;
+  covered_start?: string;
+  covered_end?: string;
+  monthly_amount?: string;
+  hourly_rate?: string;
+  days_covered?: number;
+  days_in_month?: number;
+  hours?: string;
+  subtotal?: string;
+}
+
+export interface PaymentCalculationSnapshot {
+  version?: number;
+  days_in_month?: number;
+  components?: Array<PaymentCalculationComponent>;
+}
+
 export interface PaymentDocument {
   id: string;
   user_id: string;
@@ -75,6 +97,7 @@ export interface PaymentDocument {
   account_number_snapshot: string;
   line_items: Array<PaymentDocumentLineItem>;
   amount_in_words_snapshot: string;
+  calculation_snapshot?: PaymentCalculationSnapshot | null;
   confirmed_at?: string | null;
   confirmed_by_user_id?: string | null;
   disputed_at?: string | null;

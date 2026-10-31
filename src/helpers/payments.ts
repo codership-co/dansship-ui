@@ -42,3 +42,41 @@ export function paymentPurchaseLabel(intent: {
 
   return purchaseTypeLabel(intent.purchase_type);
 }
+
+export interface PartialFixedCoverage {
+  startDay: number;
+  endDay: number;
+  month: number;
+  year: string;
+  daysCovered: number;
+  daysInMonth: number;
+}
+
+export function partialFixedCoverage(document: {
+  calculation_snapshot?: {
+    components?: Array<{
+      payment_type?: string;
+      covered_start?: string;
+      covered_end?: string;
+      days_covered?: number;
+      days_in_month?: number;
+    }>;
+  } | null;
+}): PartialFixedCoverage | null {
+  const fixed = document.calculation_snapshot?.components?.find(item => item.payment_type === 'fixed_amount');
+
+  if (!fixed?.covered_start || !fixed.covered_end) return null;
+
+  if (typeof fixed.days_covered !== 'number' || typeof fixed.days_in_month !== 'number') return null;
+
+  if (Number(fixed.days_covered) >= Number(fixed.days_in_month)) return null;
+
+  return {
+    startDay: Number(fixed.covered_start.slice(8, 10)),
+    endDay: Number(fixed.covered_end.slice(8, 10)),
+    month: Number(fixed.covered_start.slice(5, 7)),
+    year: fixed.covered_start.slice(0, 4),
+    daysCovered: Number(fixed.days_covered),
+    daysInMonth: Number(fixed.days_in_month),
+  };
+}
