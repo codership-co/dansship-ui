@@ -31,7 +31,7 @@ function calendarDate(isoDate: string): Date | null {
   return date;
 }
 
-function dueLabel(isoDate: string, t: Translate): string | null {
+export function dueLabel(isoDate: string, t: Translate): string | null {
   const date = calendarDate(isoDate);
 
   if (!date) {
@@ -97,6 +97,10 @@ export function paymentNotice(input: PaymentNoticeInput, t: Translate): string |
   const dates = (input.installmentDueDates ?? []).filter(date => date.length > 0);
 
   if (dates.length > 0) {
+    if (input.surface === 'checkout') {
+      return t('eventos:checkout.installmentNotice');
+    }
+
     const schedule = scheduleClause(dates, t);
 
     if (!schedule) {

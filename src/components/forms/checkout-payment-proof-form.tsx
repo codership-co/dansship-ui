@@ -1,13 +1,14 @@
 import { format } from 'date-fns';
 import { Button } from 'polpo/components';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LuArrowLeft } from 'react-icons/lu';
+import { LuArrowLeft, LuUpload } from 'react-icons/lu';
 import { MdOutlinePayments } from 'react-icons/md';
 import { toast } from 'sonner';
 
 import { CheckoutFormValues } from '@components/forms/checkout-review-plan-form';
 import { TransferPaymentInstructions } from '@components/modules/payments/transfer-payment-instructions';
+import { Badge } from '@components/ui';
 import {
   type CreatePaymentIntentPayload,
   DansshipAPI,
@@ -37,6 +38,13 @@ interface CheckoutPaymentProofFormProps {
   currency?: string;
   onCreateIntent?: () => Promise<string | null>;
   paymentQrUrl?: string | null;
+  variant?: 'default' | 'event';
+  confirmLabel?: string;
+  canConfirm?: boolean;
+  topSlot?: ReactNode;
+  acceptance?: ReactNode;
+  bodyClassName?: string;
+  footerClassName?: string;
 }
 
 export function CheckoutPaymentProofForm({
@@ -55,6 +63,13 @@ export function CheckoutPaymentProofForm({
   currency,
   onCreateIntent,
   paymentQrUrl,
+  variant = 'default',
+  confirmLabel,
+  canConfirm = true,
+  topSlot,
+  acceptance,
+  bodyClassName,
+  footerClassName,
 }: CheckoutPaymentProofFormProps) {
   const { t } = useTranslation();
   const { call: createIntent, isLoading: isCreating } = useCallablePromise((payload: CreatePaymentIntentPayload) =>
@@ -298,6 +313,110 @@ export function CheckoutPaymentProofForm({
     setSelectedProofFile(file);
     event.currentTarget.value = '';
   };
+
+  if (variant === 'event') {
+    const proofLabel = selectedProofFile ? t('payments:replaceProof') : t('payments:uploadProof');
+
+    return (
+      <>
+        <section className={cn('grid content-start gap-4', bodyClassName)} data-sentry-mask>
+          {topSlot}
+          <div className={cn('grid items-start gap-4', requiresProof && 'lg:grid-cols-2')}>
+            {requiresProof ? <TransferPaymentInstructions variant='event' qrUrl={paymentQrUrl} /> : null}
+            <div className='grid content-start gap-5'>
+              {requiresProof ? (
+                <section className='grid gap-2' data-sentry-block>
+                  <p className='m-0 text-[15px] font-semibold'>{t('eventos:checkout.yourProof')}</p>
+                  <label
+                    className={cn(
+                      'relative flex min-h-17 cursor-pointer items-center gap-3 rounded-xl border-[1.5px] px-3.5 py-2 has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-primary/50',
+                      selectedProofFile
+                        ? 'border-border bg-white'
+                        : 'border-dashed border-muted-foreground bg-background',
+                    )}
+                  >
+                    {selectedProofFile && imageUrl ? (
+                      <img
+                        src={imageUrl}
+                        alt={t('payments:proofPreviewAlt')}
+                        className='size-13 shrink-0 rounded-lg border border-border object-cover'
+                      />
+                    ) : (
+                      <span className='grid size-10 shrink-0 place-content-center rounded-full bg-secondary text-primary'>
+                        <LuUpload className='size-5' aria-hidden />
+                      </span>
+                    )}
+                    <span className='grid min-w-0 flex-1 justify-items-start gap-0.5'>
+                      {selectedProofFile ? (
+                        <>
+                          <span className='w-full truncate font-semibold'>{selectedProofFile.name}</span>
+                          <Badge variant='outlineActive' size='small'>
+                            {t('eventos:checkout.proofLoaded')}
+                          </Badge>
+                        </>
+                      ) : (
+                        <>
+                          <span className='font-semibold'>{t('eventos:checkout.pickImage')}</span>
+                          <span className='text-sm text-muted-foreground'>{t('eventos:checkout.proofFormats')}</span>
+                        </>
+                      )}
+                    </span>
+                    <Button
+                      type='button'
+                      color='primary'
+                      variant={selectedProofFile ? 'outlined' : 'solid'}
+                      size='small'
+                      tabIndex={-1}
+                      aria-hidden
+                      className='pointer-events-none shrink-0'
+                    >
+                      {selectedProofFile ? t('eventos:checkout.replace') : t('eventos:checkout.upload')}
+                    </Button>
+                    <input
+                      type='file'
+                      aria-label={proofLabel}
+                      className='absolute inset-0 size-full cursor-pointer opacity-0'
+                      accept={PaymentProofContentTypesList.join(',')}
+                      onChange={handleInputFileUpload}
+                    />
+                  </label>
+                </section>
+              ) : null}
+              {acceptance}
+            </div>
+          </div>
+        </section>
+        <div
+          className={cn(
+            'sticky bottom-0 mt-auto flex gap-2 border-t border-border bg-white pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 md:justify-end',
+            footerClassName,
+          )}
+        >
+          <Button
+            type='button'
+            color='primary'
+            variant='outlined'
+            className='flex flex-1 items-center md:flex-none'
+            onClick={onBack}
+          >
+            <LuArrowLeft />
+            {t('common:back')}
+          </Button>
+          <Button
+            type='button'
+            color='primary'
+            variant='solid'
+            isLoading={isBusy}
+            disabled={(requiresProof && !selectedProofFile) || !canConfirm}
+            onClick={() => onConfirm()}
+            className='flex-1 md:flex-none'
+          >
+            {isBusy ? t('subscriptions:processing') : (confirmLabel ?? t('payments:confirmPurchase'))}
+          </Button>
+        </div>
+      </>
+    );
+  }
 
   return (
     <div className='grid grid-rows-[1fr_auto] h-full' data-sentry-mask>
