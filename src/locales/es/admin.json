@@ -621,8 +621,11 @@
       "paid": "Pagado",
       "pending": "Pendiente de pago",
       "count": "Cuentas en la lista",
-      "documents_one": "{{count}} cuenta",
-      "documents_other": "{{count}} cuentas"
+      "paidDocuments_one": "{{count}} cuenta pagada",
+      "paidDocuments_other": "{{count}} cuentas pagadas",
+      "pendingDocuments_one": "{{count}} cuenta confirmada",
+      "pendingDocuments_other": "{{count}} cuentas confirmadas",
+      "countDetail": "con los filtros actuales"
     },
     "table": {
       "person": "Persona",
