@@ -124,6 +124,8 @@ export const PageURLS = {
     agendaConflicts: '/admin/agenda/conflicts',
     inventory: '/admin/inventory',
     paymentAssignments: '/admin/payment-assignments',
+    payroll: '/admin/payroll',
+    payrollAssignments: '/admin/payroll?tab=assignments',
     scheduleBuilder: '/admin/schedule-builder',
     reports: '/admin/reports',
     bookings: '/admin/bookings',

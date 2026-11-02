@@ -236,3 +236,44 @@ export function normalizePaymentAssignmentList(data: PaymentAssignmentListRespon
     items: (data.items ?? []).map(normalizePaymentAssignment),
   };
 }
+
+export type PayrollDateField = 'issued' | 'paid';
+
+export interface PayrollQuery {
+  q?: string;
+  status?: PaymentDocumentStatus;
+  date_field: PayrollDateField;
+  from?: string;
+  to?: string;
+}
+
+export interface PayrollDocument {
+  id: string;
+  user_id: string;
+  full_name: string;
+  email: string | null;
+  payment_type: PaymentType | 'mixed' | string;
+  period_year: number;
+  period_month: number;
+  status: PaymentDocumentStatus | string;
+  total_amount: number;
+  paid_amount: number | null;
+  issued_at: string;
+  paid_at: string | null;
+  has_receipt: boolean;
+}
+
+export interface PayrollDocumentsPage {
+  items: Array<PayrollDocument>;
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface PayrollSummary {
+  paid_amount: number;
+  paid_count: number;
+  pending_amount: number;
+  pending_count: number;
+  total_count: number;
+}

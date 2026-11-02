@@ -574,5 +574,82 @@
     "confirmDescription": "Se establecerá el código {{code}} y se notificará a todas las personas con reservas próximas. Esta acción afecta el acceso físico a la academia.",
     "rotateSuccess": "Código actualizado. Se notificó a {{count}} persona(s).",
     "rotateFailed": "No se pudo actualizar el código de la puerta."
+  },
+  "payroll": {
+    "title": "Nómina",
+    "subtitle": "Pagos a instructores y líderes de área: cuánto, cuándo y con qué soportes.",
+    "tabs": {
+      "payments": "Pagos",
+      "assignments": "Vinculación de pago"
+    },
+    "assignmentsSubtitle": "Configura el monto de pago para cada colaborador.",
+    "filters": {
+      "title": "Filtros",
+      "person": "Persona",
+      "personPlaceholder": "Nombre o correo",
+      "status": "Estado",
+      "allStatuses": "Todos",
+      "dateBy": "Fecha por",
+      "from": "Desde",
+      "to": "Hasta",
+      "pickDate": "Elegir fecha",
+      "reset": "Restablecer filtros",
+      "paidRangeHint": "Con rango sobre la fecha de pago solo aparecen las cuentas ya pagadas.",
+      "dateFields": {
+        "issued": "Fecha de emisión",
+        "paid": "Fecha de pago"
+      },
+      "summaryDate": {
+        "issued": "Emisión",
+        "paid": "Pago"
+      },
+      "toggle": "Mostrar u ocultar filtros"
+    },
+    "status": {
+      "issued": "Por confirmar",
+      "confirmed": "Pendiente de pago",
+      "disputed": "En desacuerdo",
+      "paid": "Pagada",
+      "voided": "Anulada"
+    },
+    "paymentTypes": {
+      "hourly_classes": "Por horas",
+      "fixed_amount": "Monto fijo",
+      "mixed": "Mixto"
+    },
+    "summary": {
+      "paid": "Pagado",
+      "pending": "Pendiente de pago",
+      "count": "Cuentas en la lista",
+      "documents_one": "{{count}} cuenta",
+      "documents_other": "{{count}} cuentas"
+    },
+    "table": {
+      "person": "Persona",
+      "period": "Periodo",
+      "amount": "Valor cuenta",
+      "paidAmount": "Valor pagado",
+      "paidAt": "Fecha de pago",
+      "status": "Estado",
+      "documents": "Documentos"
+    },
+    "issuedOn": "Emitida {{date}}",
+    "downloads": {
+      "invoice": "Cuenta de cobro",
+      "receipt": "Comprobante de pago",
+      "openFailed": "No se pudo abrir el archivo."
+    },
+    "export": {
+      "button": "Descargar CSV",
+      "success": "La descarga de la nómina está lista.",
+      "failed": "No se pudo descargar la nómina."
+    },
+    "empty": "No hay cuentas con estos filtros.",
+    "loadFailed": "No se pudo cargar la nómina.",
+    "pagination": {
+      "previous": "Anterior",
+      "next": "Siguiente",
+      "page": "Página {{page}} de {{pages}}"
+    }
   }
 }
