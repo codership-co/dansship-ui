@@ -12,6 +12,7 @@ import { PERMISSION } from '@core/permissions';
 
 const PAYMENTS_TAB = 'payments';
 const ASSIGNMENTS_TAB = 'assignments';
+const ACTIVE_TAB = 'data-[state=active]:bg-primary/20 data-[state=active]:text-primary';
 
 function PayrollPage() {
   const { t } = useTranslation();
@@ -42,9 +43,15 @@ function PayrollPage() {
         }
       >
         <TabsList className='mb-4 h-auto max-w-full flex-nowrap justify-start gap-1 overflow-x-auto border border-gray-200 bg-white p-1 shadow-sm [&_[data-slot=tabs-trigger]]:flex-none'>
-          {canReadPayroll ? <TabsTrigger value={PAYMENTS_TAB}>{t('admin:payroll.tabs.payments')}</TabsTrigger> : null}
+          {canReadPayroll ? (
+            <TabsTrigger value={PAYMENTS_TAB} className={ACTIVE_TAB}>
+              {t('admin:payroll.tabs.payments')}
+            </TabsTrigger>
+          ) : null}
           {canManagePayRate ? (
-            <TabsTrigger value={ASSIGNMENTS_TAB}>{t('admin:payroll.tabs.assignments')}</TabsTrigger>
+            <TabsTrigger value={ASSIGNMENTS_TAB} className={ACTIVE_TAB}>
+              {t('admin:payroll.tabs.assignments')}
+            </TabsTrigger>
           ) : null}
         </TabsList>
 

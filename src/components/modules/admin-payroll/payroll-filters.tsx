@@ -102,7 +102,7 @@ export function PayrollFilters({ values, onChange, onExport, canExport, isExport
   ].join(' · ');
 
   return (
-    <Card className='gap-4 p-4'>
+    <Card className='gap-4 border-border bg-background-paper p-4'>
       <div className='flex flex-col gap-3 @3xl:flex-row @3xl:items-center @3xl:justify-between'>
         <button
           type='button'
@@ -111,9 +111,13 @@ export function PayrollFilters({ values, onChange, onExport, canExport, isExport
           aria-label={t('admin:payroll.filters.toggle')}
           onClick={() => setIsOpen(open => !open)}
         >
-          <LuChevronDown className={`size-5 shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
-          <span className='font-semibold'>{t('admin:payroll.filters.title')}</span>
-          <span className='min-w-0 truncate text-sm text-muted-foreground'>{summary}</span>
+          <LuChevronDown
+            className={`size-5 shrink-0 text-primary transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          />
+          <span className='grid min-w-0'>
+            <span className='font-semibold'>{t('admin:payroll.filters.title')}</span>
+            <span className='truncate text-sm text-muted-foreground'>{summary}</span>
+          </span>
         </button>
         <Button
           color='primary'

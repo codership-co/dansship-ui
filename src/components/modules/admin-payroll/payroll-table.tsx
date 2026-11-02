@@ -54,7 +54,7 @@ function PersonCell({ document }: { document: PayrollDocument }) {
       <span className='font-medium'>{document.full_name}</span>
       {document.email ? (
         <Link
-          className='truncate text-sm text-primary underline-offset-2 hover:underline'
+          className='truncate text-sm underline underline-offset-2 hover:text-primary'
           to={`${PageURLS.admin.userDetails(document.user_id)}?tab=payment-documents`}
         >
           {document.email}
@@ -119,7 +119,7 @@ export function PayrollTable({ documents, onDownload }: PayrollRowsProps) {
   const format = usePayrollFormatters();
 
   return (
-    <div className='hidden @3xl:block'>
+    <div className='hidden overflow-hidden rounded-xl border border-border bg-background-paper @3xl:block'>
       <Table>
         <TableHeader>
           <TableRow>
@@ -172,7 +172,7 @@ export function PayrollCards({ documents, onDownload }: PayrollRowsProps) {
   return (
     <div className='grid gap-3 @3xl:hidden'>
       {documents.map(document => (
-        <Card key={document.id} className='gap-3 p-4'>
+        <Card key={document.id} className='gap-3 border-border bg-background-paper p-4'>
           <div className='flex items-start justify-between gap-3'>
             <PersonCell document={document} />
             <StatusBadge status={document.status} />
