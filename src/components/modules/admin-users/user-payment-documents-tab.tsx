@@ -183,7 +183,9 @@ export function UserPaymentDocumentsTab({
       ? t('admin:users.details.paymentDocuments.accountTypeChecking')
       : profile?.account_type === 'savings'
         ? t('admin:users.details.paymentDocuments.accountTypeSavings')
-        : (profile?.account_type ?? '—');
+        : profile?.account_type === 'bre_b'
+          ? t('admin:users.details.paymentDocuments.accountTypeBreB')
+          : (profile?.account_type ?? '—');
 
   return (
     <section className='grid gap-6'>
@@ -238,17 +240,31 @@ export function UserPaymentDocumentsTab({
             </Button>
           ) : null}
         </div>
-        <dl className='grid gap-2 text-sm sm:grid-cols-3'>
-          <div>
-            <dt className='text-muted-foreground'>{t('admin:users.details.paymentDocuments.bankName')}</dt>
-            <dd>{profile?.bank_name || '—'}</dd>
-          </div>
+        <dl
+          className={
+            profile?.account_type === 'bre_b'
+              ? 'grid gap-2 text-sm sm:grid-cols-2'
+              : 'grid gap-2 text-sm sm:grid-cols-3'
+          }
+        >
+          {profile?.account_type === 'bre_b' ? null : (
+            <div>
+              <dt className='text-muted-foreground'>{t('admin:users.details.paymentDocuments.bankName')}</dt>
+              <dd>{profile?.bank_name || '—'}</dd>
+            </div>
+          )}
           <div>
             <dt className='text-muted-foreground'>{t('admin:users.details.paymentDocuments.accountType')}</dt>
             <dd>{accountTypeLabel}</dd>
           </div>
           <div>
-            <dt className='text-muted-foreground'>{t('admin:users.details.paymentDocuments.accountNumber')}</dt>
+            <dt className='text-muted-foreground'>
+              {t(
+                profile?.account_type === 'bre_b'
+                  ? 'admin:users.details.paymentDocuments.llave'
+                  : 'admin:users.details.paymentDocuments.accountNumber',
+              )}
+            </dt>
             <dd>{profile?.account_number || '—'}</dd>
           </div>
         </dl>
