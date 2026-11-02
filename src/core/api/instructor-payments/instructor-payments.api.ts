@@ -11,6 +11,9 @@ import {
   type PaymentDocumentListResponse,
   type PaymentProfile,
   type PaymentProfileUpdatePayload,
+  type PayrollDocumentsPage,
+  type PayrollQuery,
+  type PayrollSummary,
   type CreatePaymentAssignmentPayload,
   type PaymentAssignment,
   type PaymentAssignmentListResponse,
@@ -253,5 +256,79 @@ export class InstructorPaymentsAdminAPI {
       },
       normalizePaymentAssignment,
     );
+  }
+
+  private payrollParams(query: PayrollQuery) {
+    const params: Record<string, string> = { date_field: query.date_field };
+
+    if (query.q) params.q = query.q;
+
+    if (query.status) params.status = query.status;
+
+    if (query.from) params.from = query.from;
+
+    if (query.to) params.to = query.to;
+
+    return params;
+  }
+
+  async listPayrollDocuments(query: PayrollQuery, page: number, pageSize: number) {
+    return this.httpClient.callNoError<PayrollDocumentsPage>({
+      path: '/admin/payroll/documents',
+      method: 'GET',
+      params: {
+        ...this.payrollParams(query),
+        page: String(page),
+        page_size: String(pageSize),
+      },
+    });
+  }
+
+  async getPayrollSummary(query: PayrollQuery) {
+    return this.httpClient.callNoError<PayrollSummary>({
+      path: '/admin/payroll/summary',
+      method: 'GET',
+      params: this.payrollParams(query),
+    });
+  }
+
+  async getPayrollDocumentViewUrl(documentId: string) {
+    return this.httpClient.callNoError<ProofViewUrlResponse>({
+      path: `/admin/payroll/documents/${documentId}/view-url`,
+      method: 'GET',
+    });
+  }
+
+  async getPayrollReceiptViewUrl(documentId: string) {
+    return this.httpClient.callNoError<ProofViewUrlResponse>({
+      path: `/admin/payroll/documents/${documentId}/receipt/view-url`,
+      method: 'GET',
+    });
+  }
+
+  async exportPayrollCsv(query: PayrollQuery) {
+    // Raw fetch: this download skips DansshipHttpClient, so it does not refresh a 401 or abort on resume.
+    const search = new URLSearchParams(this.payrollParams(query));
+    const response = await fetch(`${import.meta.env.VITE_DANSSHIP_API_URL}/admin/payroll/export.csv?${search}`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: { accept: 'text/csv' },
+    });
+
+    if (!response.ok) {
+      throw new Error('Payroll export failed');
+    }
+
+    const filename = /filename="([^"]+)"/.exec(response.headers.get('content-disposition') ?? '')?.[1] ?? 'nomina.csv';
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
   }
 }

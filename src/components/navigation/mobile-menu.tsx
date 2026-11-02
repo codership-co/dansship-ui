@@ -104,9 +104,9 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       icon: MdOutlineInventory,
     },
     {
-      to: PageURLS.admin.paymentAssignments,
-      label: t('nav:adminMenu.paymentAssignments'),
-      orPermissions: [PERMISSION.INSTRUCTOR_PAY_RATE_MANAGE],
+      to: PageURLS.admin.payroll,
+      label: t('nav:adminMenu.payroll'),
+      orPermissions: [PERMISSION.PAYROLL_READ, PERMISSION.INSTRUCTOR_PAY_RATE_MANAGE],
       featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
       icon: LuLink,
     },

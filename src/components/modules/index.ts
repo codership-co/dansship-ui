@@ -24,3 +24,4 @@ export * from './payments';
 export * from './my-bookings';
 export * from './studio-rental';
 export * from './eventos';
+export * from './admin-payroll';

@@ -190,7 +190,7 @@ export function UserPaymentDocumentsTab({
       {canManagePayRate ? (
         <div className='grid gap-2 rounded-md border bg-white/50 p-4 text-sm'>
           <p>{t('admin:users.details.paymentDocuments.fixedRatePointer')}</p>
-          <Link className='font-semibold text-primary' to={PageURLS.admin.paymentAssignments}>
+          <Link className='font-semibold text-primary' to={PageURLS.admin.payrollAssignments}>
             {t('admin:users.details.paymentDocuments.fixedRateLink')}
           </Link>
         </div>
