@@ -356,7 +356,9 @@
         "accountType": "Tipo de cuenta",
         "accountTypeSavings": "Ahorros",
         "accountTypeChecking": "Corriente",
+        "accountTypeBreB": "Llave",
         "accountNumber": "Número de cuenta",
+        "llave": "Llave",
         "empty": "Este usuario aún no tiene cuentas de cobro.",
         "payable": "Lista para pagar",
         "status": {

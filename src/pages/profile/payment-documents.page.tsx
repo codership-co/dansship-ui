@@ -82,9 +82,10 @@ function PaymentDocumentsPage() {
       });
     },
   );
+  const isBreB = accountType === 'bre_b';
   const { call: saveBankFields, isLoading: isSavingBank } = useCallablePromise(() =>
     DansshipAPI.instructorPayments.updatePaymentProfile({
-      bank_name: bankName,
+      bank_name: accountType === 'bre_b' ? '' : bankName,
       account_type: accountType || null,
       account_number: accountNumber,
     }),
@@ -280,11 +281,7 @@ function PaymentDocumentsPage() {
               }}
             >
               <h4 className='text-sm font-semibold'>{t('profile:paymentDocuments.bankFieldsTitle')}</h4>
-              <div className='grid gap-4 sm:grid-cols-3'>
-                <div className='grid gap-1.5'>
-                  <Label htmlFor='bank-name'>{t('profile:paymentDocuments.bankName')}</Label>
-                  <Input id='bank-name' value={bankName} onChange={event => setBankName(event.target.value)} required />
-                </div>
+              <div className={isBreB ? 'grid gap-4 sm:grid-cols-2' : 'grid gap-4 sm:grid-cols-3'}>
                 <div className='grid gap-1.5'>
                   <Label htmlFor='account-type'>{t('profile:paymentDocuments.accountType')}</Label>
                   <select
@@ -297,10 +294,24 @@ function PaymentDocumentsPage() {
                     <option value=''>{t('profile:paymentDocuments.accountTypePlaceholder')}</option>
                     <option value='savings'>{t('profile:paymentDocuments.accountTypeSavings')}</option>
                     <option value='checking'>{t('profile:paymentDocuments.accountTypeChecking')}</option>
+                    <option value='bre_b'>{t('profile:paymentDocuments.accountTypeBreB')}</option>
                   </select>
                 </div>
+                {isBreB ? null : (
+                  <div className='grid gap-1.5'>
+                    <Label htmlFor='bank-name'>{t('profile:paymentDocuments.bankName')}</Label>
+                    <Input
+                      id='bank-name'
+                      value={bankName}
+                      onChange={event => setBankName(event.target.value)}
+                      required
+                    />
+                  </div>
+                )}
                 <div className='grid gap-1.5'>
-                  <Label htmlFor='account-number'>{t('profile:paymentDocuments.accountNumber')}</Label>
+                  <Label htmlFor='account-number'>
+                    {t(isBreB ? 'profile:paymentDocuments.llave' : 'profile:paymentDocuments.accountNumber')}
+                  </Label>
                   <Input
                     id='account-number'
                     value={accountNumber}

@@ -1,4 +1,4 @@
-export type BankAccountType = 'savings' | 'checking';
+export type BankAccountType = 'savings' | 'checking' | 'bre_b';
 
 export type PaymentType = 'hourly_classes' | 'fixed_amount';
 
