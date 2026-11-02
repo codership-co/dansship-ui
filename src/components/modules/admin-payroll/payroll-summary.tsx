@@ -35,14 +35,14 @@ export function PayrollSummary({ summary }: { summary: PayrollSummaryData | unde
       <Tile
         label={t('admin:payroll.summary.paid')}
         value={formatPrice(summary?.paid_amount ?? 0, 'COP')}
-        detail={t('admin:payroll.summary.documents', {
+        detail={t('admin:payroll.summary.paidDocuments', {
           count: summary?.paid_count ?? 0,
         })}
       />
       <Tile
         label={t('admin:payroll.summary.pending')}
         value={formatPrice(summary?.pending_amount ?? 0, 'COP')}
-        detail={t('admin:payroll.summary.documents', {
+        detail={t('admin:payroll.summary.pendingDocuments', {
           count: summary?.pending_count ?? 0,
         })}
       />
