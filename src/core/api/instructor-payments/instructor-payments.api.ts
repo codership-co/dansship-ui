@@ -10,7 +10,9 @@ import {
   type PaymentDocumentKind,
   type PaymentDocumentListResponse,
   type PaymentProfile,
+  type PaymentProfileFileKind,
   type PaymentProfileUpdatePayload,
+  type SocialSecurityPeriodStatus,
   type PayrollDocumentsPage,
   type PayrollAdjustment,
   type PayrollAdjustmentQuery,
@@ -61,7 +63,7 @@ export class InstructorPaymentsAPI {
     });
   }
 
-  private async getUploadUrl(kind: PaymentDocumentKind, contentType: string) {
+  private async getUploadUrl(kind: PaymentProfileFileKind, contentType: string) {
     return this.httpClient.callNoError<PresignedUrlResponse, { content_type: string }>({
       path: `/instructors/payment-profile/${kind}/upload-url`,
       method: 'POST',
@@ -69,7 +71,7 @@ export class InstructorPaymentsAPI {
     });
   }
 
-  async uploadPaymentDocument(kind: PaymentDocumentKind, file: File) {
+  async uploadPaymentDocument(kind: PaymentProfileFileKind, file: File) {
     const allowed = kind === 'signature' ? SignatureContentTypes : PaymentDocumentContentTypes;
 
     if (!allowed.includes(file.type as PaymentDocumentContentType)) {
@@ -87,9 +89,46 @@ export class InstructorPaymentsAPI {
     );
   }
 
-  async getFileViewUrl(kind: PaymentDocumentKind) {
+  async getFileViewUrl(kind: PaymentProfileFileKind) {
     return this.httpClient.callNoError<ProofViewUrlResponse>({
       path: `/instructors/payment-profile/${kind}/view-url`,
+      method: 'GET',
+    });
+  }
+
+  private async getSocialSecurityUploadUrl(year: number, month: number, contentType: string) {
+    return this.httpClient.callNoError<PresignedUrlResponse, { content_type: string }>({
+      path: `/instructors/payment-profile/social-security/${year}/${month}/upload-url`,
+      method: 'POST',
+      data: { content_type: contentType },
+    });
+  }
+
+  async uploadSocialSecurityProof(year: number, month: number, file: File) {
+    if (!PaymentDocumentContentTypes.includes(file.type as PaymentDocumentContentType)) {
+      throw new Error('Invalid payment document content type');
+    }
+
+    const fileKey = await uploadFileWithPresignedRetry(
+      file,
+      async () => {
+        const { data } = await this.getSocialSecurityUploadUrl(year, month, file.type);
+
+        return data;
+      },
+      async key => key,
+    );
+
+    return this.httpClient.callNoError<SocialSecurityPeriodStatus, { file_key: string }>({
+      path: `/instructors/payment-profile/social-security/${year}/${month}`,
+      method: 'PUT',
+      data: { file_key: fileKey },
+    });
+  }
+
+  async getSocialSecurityProofViewUrl(year: number, month: number) {
+    return this.httpClient.callNoError<ProofViewUrlResponse>({
+      path: `/instructors/payment-profile/social-security/${year}/${month}/view-url`,
       method: 'GET',
     });
   }
@@ -160,6 +199,21 @@ export class InstructorPaymentsAdminAPI {
   async getFileViewUrl(userId: string, kind: PaymentDocumentKind) {
     return this.httpClient.callNoError<ProofViewUrlResponse>({
       path: `/admin/users/${userId}/payment-profile/${kind}/view-url`,
+      method: 'GET',
+    });
+  }
+
+  async setSocialSecurityRequirement(userId: string, year: number, month: number, required: boolean) {
+    return this.httpClient.callNoError<SocialSecurityPeriodStatus, { required: boolean }>({
+      path: `/admin/users/${userId}/social-security-requirements/${year}/${month}`,
+      method: 'PUT',
+      data: { required },
+    });
+  }
+
+  async getSocialSecurityProofViewUrl(userId: string, year: number, month: number) {
+    return this.httpClient.callNoError<ProofViewUrlResponse>({
+      path: `/admin/users/${userId}/social-security-proofs/${year}/${month}/view-url`,
       method: 'GET',
     });
   }

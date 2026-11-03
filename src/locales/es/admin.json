@@ -347,7 +347,25 @@
         "viewRut": "Ver RUT",
         "viewBankCertificate": "Ver certificado bancario",
         "viewSignature": "Ver firma",
-        "viewSocialSecurity": "Ver planilla de seguridad social",
+        "viewSocialSecurity": "Ver planilla de seguridad social (archivo anterior)",
+        "socialSecurity": {
+          "title": "Planilla de seguridad social por periodo",
+          "hint": "Pide la planilla de un mes solo a quien la necesite. Mientras no la pidas, no se exige para generar la cuenta de cobro.",
+          "month": "Mes",
+          "year": "Año",
+          "ask": "Pedir planilla",
+          "askAgain": "Pedir de nuevo",
+          "withdraw": "Dejar de pedir",
+          "view": "Ver archivo",
+          "empty": "No se ha pedido la planilla de ningún periodo.",
+          "saveSuccess": "Se actualizó la solicitud de la planilla.",
+          "saveFailed": "No se pudo actualizar la solicitud.",
+          "status": {
+            "pending": "Pendiente",
+            "uploaded": "Cargada",
+            "withdrawn": "Ya no se pide"
+          }
+        },
         "paymentTypes": {
           "mixed": "Fijo y por horas"
         },

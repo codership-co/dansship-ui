@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
 
+import { SocialSecurityPeriodsSection } from './social-security-periods-section';
+
 import { OptionalFileUpload } from '@components/forms';
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
@@ -233,12 +235,12 @@ export function UserPaymentDocumentsTab({
           >
             {t('admin:users.details.paymentDocuments.viewSignature')}
           </Button>
-          {profile?.social_security_applicable || profile?.has_social_security ? (
+          {profile?.has_social_security ? (
             <Button
               color='primary'
               variant='outlined'
               type='button'
-              disabled={!profile?.has_social_security || isOpeningFile}
+              disabled={isOpeningFile}
               onClick={() => void handleOpenFile('social-security')}
             >
               {t('admin:users.details.paymentDocuments.viewSocialSecurity')}
@@ -274,6 +276,13 @@ export function UserPaymentDocumentsTab({
           </div>
         </dl>
       </div>
+
+      <SocialSecurityPeriodsSection
+        userId={userId}
+        periods={data?.social_security_periods ?? []}
+        canManage={canManagePayRate}
+        onChanged={() => void reFetch()}
+      />
 
       {voidTarget ? (
         <div className='grid gap-3 rounded-md border border-alert/30 bg-white/50 p-4'>

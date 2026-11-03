@@ -4,6 +4,9 @@ export type PaymentType = 'hourly_classes' | 'fixed_amount';
 
 export type PaymentDocumentKind = 'rut' | 'bank-certificate' | 'signature' | 'social-security';
 
+/** Kinds uploaded once on the profile; the social security proof is uploaded per period. */
+export type PaymentProfileFileKind = Exclude<PaymentDocumentKind, 'social-security'>;
+
 export type PaymentDocumentStatus = 'issued' | 'confirmed' | 'disputed' | 'paid' | 'voided';
 
 export type PaymentMonthStatus = 'issued' | 'confirmed' | 'disputed' | 'paid' | 'available' | 'blocked' | 'in_progress';
@@ -30,7 +33,6 @@ export interface PaymentProfile {
   has_bank_certificate: boolean;
   has_signature: boolean;
   has_social_security: boolean;
-  social_security_applicable: boolean;
   bank_name: string | null;
   account_type: BankAccountType | string | null;
   account_number: string | null;
@@ -43,7 +45,6 @@ export interface PaymentProfileUpdatePayload {
   rut_file_key?: string | null;
   bank_certificate_file_key?: string | null;
   signature_file_key?: string | null;
-  social_security_file_key?: string | null;
   bank_name?: string | null;
   account_type?: BankAccountType | null;
   account_number?: string | null;
@@ -128,11 +129,21 @@ export interface PaymentDocument {
   created_at: string;
 }
 
+export interface SocialSecurityPeriodStatus {
+  year: number;
+  month: number;
+  required: boolean;
+  uploaded: boolean;
+  proof_year: number;
+  proof_month: number;
+}
+
 export interface PaymentMonthSummary {
   year: number;
   month: number;
   status: PaymentMonthStatus;
   missing_requirements: Array<string>;
+  social_security: SocialSecurityPeriodStatus | null;
   issued_document: PaymentDocument | null;
   documents: Array<PaymentDocument>;
   can_generate: boolean;
@@ -152,6 +163,7 @@ export interface AdminPaymentDocumentsResponse {
   profile: PaymentProfile;
   documents: Array<PaymentDocument>;
   payable_document_id: string | null;
+  social_security_periods: Array<SocialSecurityPeriodStatus>;
 }
 
 function toNumber(value: string | number | null | undefined): number {
@@ -201,6 +213,7 @@ export function normalizePaymentDocumentList(data: PaymentDocumentListResponse):
     months: (data.months ?? []).map(month => ({
       ...month,
       missing_requirements: month.missing_requirements ?? [],
+      social_security: month.social_security ?? null,
       issued_document: month.issued_document ? normalizeDocument(month.issued_document) : null,
       documents: (month.documents ?? []).map(normalizeDocument),
       can_generate: month.can_generate ?? false,
@@ -212,6 +225,7 @@ export function normalizeAdminPaymentDocuments(data: AdminPaymentDocumentsRespon
   return {
     ...data,
     documents: (data.documents ?? []).map(normalizeDocument),
+    social_security_periods: data.social_security_periods ?? [],
   };
 }
 
