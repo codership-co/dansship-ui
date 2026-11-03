@@ -27,7 +27,7 @@ function openUrl(url: string | undefined) {
   window.open(url, '_blank', 'noopener,noreferrer');
 }
 
-const VOIDABLE_STATUSES = new Set(['issued', 'disputed']);
+const VOIDABLE_STATUSES = new Set(['issued', 'confirmed', 'disputed']);
 
 function isDocumentNotConfirmed(error: unknown) {
   return (
