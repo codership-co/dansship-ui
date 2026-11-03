@@ -193,7 +193,9 @@ function MonthBlock({
                 {coverageLine(document) ? (
                   <p className='mt-0.5 text-xs text-muted-foreground'>{coverageLine(document)}</p>
                 ) : null}
-                {note ? <p className='mt-0.5 text-xs text-muted-foreground'>{note}</p> : null}
+                <div className='mt-0.5 grid gap-0.5'>
+                  {note ? <p className='m-0 text-xs leading-snug text-muted-foreground'>{note}</p> : null}
+                </div>
                 <div className='mt-2'>
                   <DocumentActions
                     document={document}
@@ -233,11 +235,13 @@ function MonthBlock({
       <div className='hidden md:grid md:grid-cols-[140px_110px_minmax(0,1fr)_230px]'>
         <div className='px-4 py-4 font-semibold'>{periodLabel}</div>
         <div className='px-4 py-4 text-[13px] font-semibold'>{totalLabel}</div>
-        <div className='min-w-0 px-4 py-4'>
+        <div className='min-w-0 py-4 md:col-span-2'>
           {emptyStatus ? (
-            <div className='flex flex-col gap-1 py-1'>
-              <span className='text-[13px] font-semibold'>{emptyStatus}</span>
-              {missingNote ? <p className='text-xs text-muted-foreground'>{missingNote}</p> : null}
+            <div className='grid grid-cols-[minmax(0,1fr)_230px]'>
+              <div className='flex flex-col gap-1 px-4 py-1'>
+                <span className='text-[13px] font-semibold'>{emptyStatus}</span>
+                {missingNote ? <p className='text-xs text-muted-foreground'>{missingNote}</p> : null}
+              </div>
             </div>
           ) : null}
           {documents.map((document, index) => {
@@ -247,45 +251,45 @@ function MonthBlock({
               <div
                 key={document.id}
                 className={cn(
-                  'flex min-h-[38px] flex-col justify-center gap-0.5 py-2',
+                  'grid min-h-[38px] grid-cols-[minmax(0,1fr)_230px] items-center',
                   index < documents.length - 1 && 'border-b border-border',
                 )}
               >
-                <span className='text-[13px] font-semibold break-words'>{accountLine(document, index)}</span>
-                {mixedLabel(document) ? <p className='text-xs text-muted-foreground'>{mixedLabel(document)}</p> : null}
-                {coverageLine(document) ? (
-                  <p className='text-xs text-muted-foreground'>{coverageLine(document)}</p>
-                ) : null}
-                {note ? <p className='text-xs text-muted-foreground'>{note}</p> : null}
+                <div className='flex min-w-0 flex-col justify-center gap-0.5 px-4 py-2'>
+                  <span className='text-[13px] font-semibold break-words'>{accountLine(document, index)}</span>
+                  {mixedLabel(document) ? (
+                    <p className='text-xs text-muted-foreground'>{mixedLabel(document)}</p>
+                  ) : null}
+                  {coverageLine(document) ? (
+                    <p className='text-xs text-muted-foreground'>{coverageLine(document)}</p>
+                  ) : null}
+                  <div className='grid gap-0.5'>
+                    {note ? <p className='m-0 text-xs leading-snug text-muted-foreground'>{note}</p> : null}
+                  </div>
+                </div>
+                <div className='flex min-w-0 items-center justify-end px-4 py-2'>
+                  <DocumentActions
+                    document={document}
+                    alignEnd
+                    isConfirming={isConfirming}
+                    isOpeningDocument={isOpeningDocument}
+                    onConfirm={onConfirm}
+                    onDispute={onDispute}
+                    onDownload={onDownload}
+                  />
+                </div>
               </div>
             );
           })}
-          {canGenerate ? <p className='pt-2.5 text-xs text-muted-foreground'>{generateNote}</p> : null}
-        </div>
-        <div className='min-w-0 px-4 py-4'>
-          <div className='flex flex-col items-end'>
-            {emptyStatus ? <div className='py-1' /> : null}
-            {documents.map((document, index) => (
-              <div
-                key={document.id}
-                className={cn(
-                  'flex min-h-[38px] w-full items-center justify-end py-2',
-                  index < documents.length - 1 && 'border-b border-border',
-                )}
-              >
-                <DocumentActions
-                  document={document}
-                  alignEnd
-                  isConfirming={isConfirming}
-                  isOpeningDocument={isOpeningDocument}
-                  onConfirm={onConfirm}
-                  onDispute={onDispute}
-                  onDownload={onDownload}
-                />
-              </div>
-            ))}
-            {canGenerate ? (
-              <div className='flex w-full justify-end pt-2.5'>
+          {canGenerate ? (
+            <div
+              className={cn(
+                'grid grid-cols-[minmax(0,1fr)_230px] items-center py-2',
+                documents.length > 0 && 'border-t border-border',
+              )}
+            >
+              <p className='px-4 text-xs text-muted-foreground'>{generateNote}</p>
+              <div className='flex justify-end px-4'>
                 <Button
                   color='primary'
                   variant='solid'
@@ -297,8 +301,8 @@ function MonthBlock({
                   {t('profile:paymentDocuments.generate')}
                 </Button>
               </div>
-            ) : null}
-          </div>
+            </div>
+          ) : null}
         </div>
       </div>
     </div>

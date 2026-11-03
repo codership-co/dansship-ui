@@ -2,6 +2,8 @@ import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
+import { formatMonthLabel } from './adjustment-months';
+import { PayrollBreakdownDialog } from './payroll-breakdown-dialog';
 import { PayrollFilters, getDefaultPayrollFilters, type PayrollFilterValues } from './payroll-filters';
 import { PayrollPagination } from './payroll-pagination';
 import { PayrollSummary } from './payroll-summary';
@@ -9,8 +11,8 @@ import { PayrollCards, PayrollTable, type PayrollDownloadKind } from './payroll-
 
 import { SectionEmpty } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
-import { DansshipAPI, type PayrollQuery } from '@core/api';
-import { useCallablePromise, usePromise } from '@hooks';
+import { DansshipAPI, type PayrollDocument, type PayrollQuery } from '@core/api';
+import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
 
 const PAGE_SIZE = 20;
 
@@ -29,6 +31,8 @@ export function PayrollLedger() {
   const [filters, setFilters] = useState<PayrollFilterValues>(() => getDefaultPayrollFilters());
   const [page, setPage] = useState(1);
   const [isExporting, setIsExporting] = useState(false);
+  const [breakdown, setBreakdown] = useState<PayrollDocument | null>(null);
+  const locale = useDateLocale();
   const query = useMemo(() => toQuery(filters), [filters]);
   const queryKey = JSON.stringify(query);
 
@@ -101,11 +105,16 @@ export function PayrollLedger() {
         <SectionEmpty message={t('admin:payroll.empty')} />
       ) : (
         <>
-          <PayrollTable documents={documents} onDownload={handleDownload} />
-          <PayrollCards documents={documents} onDownload={handleDownload} />
+          <PayrollTable documents={documents} onDownload={handleDownload} onShowBreakdown={setBreakdown} />
+          <PayrollCards documents={documents} onDownload={handleDownload} onShowBreakdown={setBreakdown} />
           <PayrollPagination page={page} pageSize={PAGE_SIZE} total={total} onPageChange={setPage} />
         </>
       )}
+      <PayrollBreakdownDialog
+        document={breakdown}
+        period={breakdown ? formatMonthLabel(breakdown.period_year, breakdown.period_month, locale) : ''}
+        onClose={() => setBreakdown(null)}
+      />
     </div>
   );
 }

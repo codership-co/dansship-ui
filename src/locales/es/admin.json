@@ -381,7 +381,7 @@
         "payFailed": "No se pudo registrar el pago.",
         "payNotConfirmed": "Esta cuenta ya no está confirmada. Si ya fue pagada, no hace falta registrarla de nuevo.",
         "fixedRatePointer": "El tipo y el monto de pago se administran en Vinculación de Pago.",
-        "fixedRateLink": "Abrir Vinculación de Pago",
+        "fixedRateLink": "Abrir Nómina",
         "void": "Anular",
         "voidTitle": "Anular cuenta de cobro",
         "voidHint": "Vas a anular la cuenta de {{month}} {{year}}. El instructor podrá generar una nueva.",
@@ -413,7 +413,8 @@
           "10": "Octubre",
           "11": "Noviembre",
           "12": "Diciembre"
-        }
+        },
+        "receiptNotRequired": "El neto de esta cuenta es $0: no se requiere comprobante de pago."
       },
       "assignedClasses": "Clases asignadas (próximas)",
       "taughtClasses": "Clases dictadas (pasadas)",
@@ -582,7 +583,8 @@
     "subtitle": "Pagos a instructores y líderes de área: cuánto, cuándo y con qué soportes.",
     "tabs": {
       "payments": "Pagos",
-      "assignments": "Vinculación de pago"
+      "assignments": "Vinculación de pago",
+      "adjustments": "Adicionales y anticipos"
     },
     "assignmentsSubtitle": "Configura el monto de pago para cada colaborador.",
     "filters": {
@@ -636,7 +638,9 @@
       "paidAmount": "Valor pagado",
       "paidAt": "Fecha de pago",
       "status": "Estado",
-      "documents": "Documentos"
+      "documents": "Documentos",
+      "serviceSummary": "Servicio {{service}} − anticipos {{advances}}",
+      "viewBreakdown": "Ver desglose"
     },
     "issuedOn": "Emitida {{date}}",
     "downloads": {
@@ -655,6 +659,119 @@
       "previous": "Anterior",
       "next": "Siguiente",
       "page": "Página {{page}} de {{pages}}"
+    },
+    "adjustmentsSubtitle": "Pagos extra y adelantos que se reflejan en la siguiente cuenta de cobro.",
+    "breakdown": {
+      "title": "Detalle de la cuenta",
+      "service": "Valor del servicio",
+      "advances": "Anticipos descontados",
+      "net": "Neto a pagar",
+      "overflow": "El anticipo superaba el valor del servicio: quedan {{amount}} por descontar en la siguiente cuenta de cobro. El neto nunca es negativo.",
+      "close": "Cerrar"
+    },
+    "adjustments": {
+      "newExtra": "Nuevo adicional",
+      "newAdvance": "Nuevo anticipo",
+      "filters": {
+        "title": "Filtros",
+        "toggle": "Mostrar u ocultar filtros",
+        "person": "Persona",
+        "personPlaceholder": "Nombre o correo",
+        "type": "Tipo",
+        "allTypes": "Todos",
+        "status": "Estado",
+        "allStatuses": "Todos",
+        "month": "Mes",
+        "pickMonth": "Todos los meses",
+        "reset": "Restablecer filtros"
+      },
+      "types": {
+        "extra": "Adicional",
+        "advance": "Anticipo"
+      },
+      "status": {
+        "pending": "Pendiente",
+        "applied": "Aplicado"
+      },
+      "summary": {
+        "extras": "Adicionales pendientes",
+        "advances": "Anticipos por descontar",
+        "extrasCount_one": "{{count}} pendiente",
+        "extrasCount_other": "{{count}} pendientes",
+        "advancesCount_one": "{{count}} con saldo",
+        "advancesCount_other": "{{count}} con saldo"
+      },
+      "table": {
+        "person": "Persona",
+        "type": "Tipo",
+        "concept": "Concepto o nota",
+        "month": "Mes",
+        "amount": "Monto",
+        "paymentDate": "Fecha de pago",
+        "discounted": "Descontado y saldo",
+        "status": "Estado",
+        "document": "Documento",
+        "actions": "Acciones"
+      },
+      "event": "Evento: {{name}}",
+      "passesTo": "Pasa a la cuenta de {{month}}",
+      "discountedLine": "Descontado {{amount}}",
+      "balanceLine": "Saldo {{amount}}",
+      "document": "Cuenta de cobro",
+      "delete": {
+        "extraTitle": "Eliminar adicional",
+        "advanceTitle": "Eliminar anticipo",
+        "extraMessage": "¿Eliminar el adicional de {{name}} por {{amount}}? Esta acción no se puede deshacer.",
+        "advanceMessage": "¿Eliminar el anticipo de {{name}} por {{amount}}? Esta acción no se puede deshacer.",
+        "confirm": "Eliminar",
+        "success": "Eliminado.",
+        "failed": "No se pudo eliminar."
+      },
+      "empty": "No hay adicionales ni anticipos con estos filtros.",
+      "emptyFirst": "Aún no hay adicionales ni anticipos. Crea el primero con los botones de arriba.",
+      "loadFailed": "No pudimos cargar los adicionales y anticipos",
+      "retry": "Reintentar",
+      "openFailed": "No se pudo abrir el archivo.",
+      "dialog": {
+        "extraTitle": "Nuevo adicional",
+        "extraEditTitle": "Editar adicional",
+        "extraDescription": "Pago extra por un mes. Aparece como línea propia en su cuenta de cobro.",
+        "advanceTitle": "Nuevo anticipo",
+        "advanceEditTitle": "Editar anticipo",
+        "advanceDescription": "Adelanto de dinero a un colaborador.",
+        "advanceHelp": "Se descontará automáticamente de la siguiente cuenta de cobro.",
+        "person": "Persona",
+        "personPlaceholder": "Nombre o correo",
+        "searching": "Buscando...",
+        "noPeople": "No hay personas con esa búsqueda.",
+        "changePerson": "Cambiar",
+        "month": "Mes al que aplica",
+        "concept": "Concepto",
+        "amount": "Monto (COP)",
+        "event": "Evento relacionado (opcional)",
+        "noEvent": "Ninguno",
+        "paymentDate": "Fecha de pago",
+        "note": "Nota (opcional)",
+        "cancel": "Cancelar",
+        "save": "Guardar",
+        "saveChanges": "Guardar cambios",
+        "saveSuccess": "Guardado.",
+        "saveFailed": "No se pudo guardar."
+      },
+      "validation": {
+        "person": "Elige una persona.",
+        "month": "Elige el mes.",
+        "concept": "Escribe el concepto.",
+        "amount": "El monto debe ser mayor a cero.",
+        "paymentDate": "Elige la fecha de pago."
+      },
+      "warnings": {
+        "noAssignment": "{{name}} no tiene una Vinculación de Pago activa en {{month}}, así que no se puede cargar.",
+        "openAssignments": "Abrir Vinculación de pago",
+        "monthHasDocument": "Ese mes ya tiene cuenta de cobro: este adicional se incluirá en la siguiente."
+      },
+      "actionEdit": "Editar",
+      "actionDelete": "Eliminar"
     }
   }
 }

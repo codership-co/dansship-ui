@@ -8,7 +8,17 @@ import { Section, SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
 import { PaymentDocumentFiles, PaymentMonthsList } from '@components/modules/profile';
-import { Input, Label, Textarea } from '@components/ui';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  Label,
+  Textarea,
+} from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useAuth } from '@contexts';
 import {
   DANSSHIP_ERROR_CODE,
@@ -212,6 +222,11 @@ function PaymentDocumentsPage() {
     }
   };
 
+  const closeDispute = () => {
+    setDisputeTargetId(null);
+    setDisputeReason('');
+  };
+
   const handleDispute = async () => {
     if (!disputeTargetId || !disputeReason.trim()) return;
 
@@ -353,10 +368,12 @@ function PaymentDocumentsPage() {
         </>
       )}
 
-      {disputeTargetId ? (
-        <div className='grid gap-3 rounded-md border border-alert/30 bg-white/50 p-4'>
-          <h3 className='text-sm font-semibold'>{t('profile:paymentDocuments.disputeTitle')}</h3>
-          <p className='text-sm text-muted-foreground'>{t('profile:paymentDocuments.disputeHint')}</p>
+      <Dialog open={Boolean(disputeTargetId)} onOpenChange={open => (open ? undefined : closeDispute())}>
+        <DialogContent className='max-h-[calc(100dvh-2rem)] overflow-y-auto sm:max-w-lg'>
+          <DialogHeader>
+            <DialogTitle>{t('profile:paymentDocuments.disputeTitle')}</DialogTitle>
+            <DialogDescription>{t('profile:paymentDocuments.disputeHint')}</DialogDescription>
+          </DialogHeader>
           <div className='grid gap-1.5'>
             <Label htmlFor='dispute-reason'>{t('profile:paymentDocuments.disputeReason')}</Label>
             <Textarea
@@ -367,16 +384,8 @@ function PaymentDocumentsPage() {
               rows={3}
             />
           </div>
-          <div className='flex justify-end gap-2'>
-            <Button
-              color='primary'
-              variant='outlined'
-              type='button'
-              onClick={() => {
-                setDisputeTargetId(null);
-                setDisputeReason('');
-              }}
-            >
+          <DialogFooter>
+            <Button color='primary' variant='outlined' type='button' onClick={closeDispute}>
               {t('common:cancel')}
             </Button>
             <Button
@@ -388,9 +397,9 @@ function PaymentDocumentsPage() {
             >
               {t('profile:paymentDocuments.disputeContinue')}
             </Button>
-          </div>
-        </div>
-      ) : null}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <ConfirmDialog
         open={Boolean(confirmTargetId)}
@@ -414,6 +423,7 @@ function PaymentDocumentsPage() {
         cancelLabel={t('common:cancel')}
         confirmVariant='destructive'
         isLoading={isDisputing}
+        elevated
       />
     </Section>
   );

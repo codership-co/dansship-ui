@@ -147,4 +147,49 @@ describe('PaymentDocumentsPage bank fields', () => {
       });
     });
   });
+
+  it('opens the dispute reason in a dialog and sends it after the confirmation', async () => {
+    const issued = {
+      id: 'doc-1',
+      status: 'issued',
+      payment_type: 'hourly_classes',
+      period_year: 2026,
+      period_month: 7,
+      total_amount: 50000,
+      void_reason: null,
+      dispute_reason: null,
+      line_items: [],
+    };
+
+    vi.spyOn(DansshipAPI.instructorPayments, 'listPaymentDocuments').mockResolvedValue(
+      ok({
+        profile: profile(),
+        months: [
+          {
+            year: 2026,
+            month: 7,
+            status: 'issued',
+            missing_requirements: [],
+            issued_document: issued,
+            documents: [issued],
+            can_generate: false,
+          },
+        ],
+      }) as never,
+    );
+    const dispute = vi
+      .spyOn(DansshipAPI.instructorPayments, 'disputePaymentDocument')
+      .mockResolvedValue(ok(issued) as never);
+    renderPage();
+
+    fireEvent.click((await screen.findAllByText('No estoy de acuerdo'))[0]);
+
+    expect(await screen.findByRole('dialog')).toBeTruthy();
+
+    fireEvent.change(screen.getByLabelText('Motivo'), { target: { value: 'Faltan horas' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Continuar' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Marcar en disputa' }));
+
+    await waitFor(() => expect(dispute).toHaveBeenCalledWith('doc-1', 'Faltan horas'));
+  });
 });

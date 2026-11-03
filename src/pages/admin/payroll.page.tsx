@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
 
 import { AdminPageLayout } from '@components/layouts';
-import { PaymentAssignmentsPanel, PayrollLedger } from '@components/modules';
+import { PaymentAssignmentsPanel, PayrollAdjustmentsPanel, PayrollLedger } from '@components/modules';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useOrPermissions } from '@contexts';
 import { PageURLS } from '@core/constants';
@@ -12,6 +12,7 @@ import { PERMISSION } from '@core/permissions';
 
 const PAYMENTS_TAB = 'payments';
 const ASSIGNMENTS_TAB = 'assignments';
+const ADJUSTMENTS_TAB = 'adjustments';
 const ACTIVE_TAB = 'data-[state=active]:bg-primary/20 data-[state=active]:text-primary';
 
 function PayrollPage() {
@@ -19,13 +20,19 @@ function PayrollPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const canReadPayroll = useOrPermissions([PERMISSION.PAYROLL_READ]);
   const canManagePayRate = useOrPermissions([PERMISSION.INSTRUCTOR_PAY_RATE_MANAGE]);
+  const canManageAdjustments = useOrPermissions([PERMISSION.PAYROLL_ADJUSTMENTS_MANAGE]);
   const [openCreate, setOpenCreate] = useState<(() => void) | null>(null);
   const registerCreate = useCallback((open: () => void) => {
     setOpenCreate(() => open);
   }, []);
 
-  const availableTabs = [...(canReadPayroll ? [PAYMENTS_TAB] : []), ...(canManagePayRate ? [ASSIGNMENTS_TAB] : [])];
-  const requestedTab = searchParams.get('tab') === ASSIGNMENTS_TAB ? ASSIGNMENTS_TAB : PAYMENTS_TAB;
+  const availableTabs = [
+    ...(canReadPayroll ? [PAYMENTS_TAB] : []),
+    ...(canManagePayRate ? [ASSIGNMENTS_TAB] : []),
+    ...(canManageAdjustments ? [ADJUSTMENTS_TAB] : []),
+  ];
+  const tabParam = searchParams.get('tab');
+  const requestedTab = tabParam === ASSIGNMENTS_TAB || tabParam === ADJUSTMENTS_TAB ? tabParam : PAYMENTS_TAB;
   const activeTab = availableTabs.includes(requestedTab) ? requestedTab : (availableTabs[0] ?? PAYMENTS_TAB);
 
   return (
@@ -51,6 +58,11 @@ function PayrollPage() {
           {canManagePayRate ? (
             <TabsTrigger value={ASSIGNMENTS_TAB} className={ACTIVE_TAB}>
               {t('admin:payroll.tabs.assignments')}
+            </TabsTrigger>
+          ) : null}
+          {canManageAdjustments ? (
+            <TabsTrigger value={ADJUSTMENTS_TAB} className={ACTIVE_TAB}>
+              {t('admin:payroll.tabs.adjustments')}
             </TabsTrigger>
           ) : null}
         </TabsList>
@@ -80,6 +92,16 @@ function PayrollPage() {
             ) : null}
           </TabsContent>
         ) : null}
+
+        {canManageAdjustments ? (
+          <TabsContent value={ADJUSTMENTS_TAB}>
+            {activeTab === ADJUSTMENTS_TAB ? (
+              <PayrollAdjustmentsPanel
+                onOpenAssignments={() => setSearchParams({ tab: ASSIGNMENTS_TAB }, { replace: true })}
+              />
+            ) : null}
+          </TabsContent>
+        ) : null}
       </Tabs>
     </AdminPageLayout>
   );
@@ -87,7 +109,11 @@ function PayrollPage() {
 
 export const SecureAdminPayrollPage = SecurityGuard(PayrollPage, {
   featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
-  orPermissions: [PERMISSION.PAYROLL_READ, PERMISSION.INSTRUCTOR_PAY_RATE_MANAGE],
+  orPermissions: [
+    PERMISSION.PAYROLL_READ,
+    PERMISSION.INSTRUCTOR_PAY_RATE_MANAGE,
+    PERMISSION.PAYROLL_ADJUSTMENTS_MANAGE,
+  ],
   requiresAuth: true,
   redirect: PageURLS.auth.login,
 });

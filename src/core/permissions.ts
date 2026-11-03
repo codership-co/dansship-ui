@@ -54,6 +54,7 @@ export enum PERMISSION {
   INSTRUCTOR_PAYMENT_DOCUMENT_PROCESS = 'process:instructor_payment_document',
   INSTRUCTOR_PAY_RATE_MANAGE = 'manage:instructor_pay_rate',
   PAYROLL_READ = 'read:payroll',
+  PAYROLL_ADJUSTMENTS_MANAGE = 'manage:payroll_adjustments',
 
   // ORDER
   ORDER_CREATE = 'create:order',

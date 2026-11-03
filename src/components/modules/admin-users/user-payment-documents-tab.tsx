@@ -70,11 +70,14 @@ export function UserPaymentDocumentsTab({
   const { call: voidDocument, isLoading: isVoiding } = useCallablePromise((documentId: string, reason: string) =>
     DansshipAPI.instructorPaymentsAdmin.voidDocument(userId, documentId, reason),
   );
-  const { call: payDocument, isLoading: isPaying } = useCallablePromise(async (documentId: string, file: File) => {
-    const fileKey = await DansshipAPI.instructorPaymentsAdmin.uploadReceipt(userId, documentId, file);
+  const { call: payDocument, isLoading: isPaying } = useCallablePromise(
+    async (documentId: string, file: File | null) => {
+      // A cuenta that nets to 0 has nothing to prove: the server accepts it without a receipt.
+      const fileKey = file ? await DansshipAPI.instructorPaymentsAdmin.uploadReceipt(userId, documentId, file) : '';
 
-    return DansshipAPI.instructorPaymentsAdmin.payDocument(userId, documentId, fileKey);
-  });
+      return DansshipAPI.instructorPaymentsAdmin.payDocument(userId, documentId, fileKey);
+    },
+  );
 
   const [voidTarget, setVoidTarget] = useState<PaymentDocument | null>(null);
   const [voidReason, setVoidReason] = useState('');
@@ -149,8 +152,10 @@ export function UserPaymentDocumentsTab({
     toast.error(t('admin:users.details.paymentDocuments.payFailed'));
   };
 
+  const payTargetNetsZero = payTarget !== null && payTarget.total_amount === 0;
+
   const handlePay = async () => {
-    if (!payTarget || !receiptFile) return;
+    if (!payTarget || (!receiptFile && !payTargetNetsZero)) return;
 
     try {
       const { ok, error } = await payDocument(payTarget.id, receiptFile);
@@ -192,7 +197,7 @@ export function UserPaymentDocumentsTab({
       {canManagePayRate ? (
         <div className='grid gap-2 rounded-md border bg-white/50 p-4 text-sm'>
           <p>{t('admin:users.details.paymentDocuments.fixedRatePointer')}</p>
-          <Link className='font-semibold text-primary' to={PageURLS.admin.payrollAssignments}>
+          <Link className='font-semibold text-primary' to={PageURLS.admin.payroll}>
             {t('admin:users.details.paymentDocuments.fixedRateLink')}
           </Link>
         </div>
@@ -323,13 +328,19 @@ export function UserPaymentDocumentsTab({
               year: payTarget.period_year,
             })}
           </p>
-          <OptionalFileUpload
-            label={t('admin:users.details.paymentDocuments.receipt')}
-            helperText={t('admin:users.details.paymentDocuments.receiptHint')}
-            acceptedTypes={PaymentDocumentContentTypes}
-            isUploading={isPaying}
-            onChange={file => setReceiptFile(file)}
-          />
+          {payTargetNetsZero ? (
+            <p className='text-sm text-muted-foreground'>
+              {t('admin:users.details.paymentDocuments.receiptNotRequired')}
+            </p>
+          ) : (
+            <OptionalFileUpload
+              label={t('admin:users.details.paymentDocuments.receipt')}
+              helperText={t('admin:users.details.paymentDocuments.receiptHint')}
+              acceptedTypes={PaymentDocumentContentTypes}
+              isUploading={isPaying}
+              onChange={file => setReceiptFile(file)}
+            />
+          )}
           <div className='flex justify-end gap-2'>
             <Button
               color='primary'
@@ -346,7 +357,7 @@ export function UserPaymentDocumentsTab({
               color='primary'
               variant='solid'
               type='button'
-              disabled={!receiptFile || isPaying}
+              disabled={(!receiptFile && !payTargetNetsZero) || isPaying}
               onClick={() => void handlePay()}
             >
               {t('admin:users.details.paymentDocuments.pay')}
