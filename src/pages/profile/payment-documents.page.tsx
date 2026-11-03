@@ -25,8 +25,8 @@ import {
   DansshipAPI,
   DansshipAPIError,
   type BankAccountType,
-  type PaymentDocumentKind,
   type PaymentMonthSummary,
+  type PaymentProfileFileKind,
 } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { useCallablePromise, usePromise } from '@hooks';
@@ -76,16 +76,10 @@ function PaymentDocumentsPage() {
   }, [profile, bankInitialized]);
 
   const { call: uploadAndSave, isLoading: isUploading } = useCallablePromise(
-    async (kind: PaymentDocumentKind, file: File) => {
+    async (kind: PaymentProfileFileKind, file: File) => {
       const fileKey = await DansshipAPI.instructorPayments.uploadPaymentDocument(kind, file);
       const field =
-        kind === 'rut'
-          ? 'rut_file_key'
-          : kind === 'signature'
-            ? 'signature_file_key'
-            : kind === 'social-security'
-              ? 'social_security_file_key'
-              : 'bank_certificate_file_key';
+        kind === 'rut' ? 'rut_file_key' : kind === 'signature' ? 'signature_file_key' : 'bank_certificate_file_key';
 
       return DansshipAPI.instructorPayments.updatePaymentProfile({
         [field]: fileKey,
@@ -103,8 +97,15 @@ function PaymentDocumentsPage() {
   const { call: generateDocument, isLoading: isGenerating } = useCallablePromise((year: number, month: number) =>
     DansshipAPI.instructorPayments.generatePaymentDocument({ year, month }),
   );
-  const { call: getFileViewUrl, isLoading: isOpeningFile } = useCallablePromise((kind: PaymentDocumentKind) =>
+  const { call: getFileViewUrl, isLoading: isOpeningFile } = useCallablePromise((kind: PaymentProfileFileKind) =>
     DansshipAPI.instructorPayments.getFileViewUrl(kind),
+  );
+  const { call: uploadProof, isLoading: isUploadingProof } = useCallablePromise(
+    (month: PaymentMonthSummary, file: File) =>
+      DansshipAPI.instructorPayments.uploadSocialSecurityProof(month.year, month.month, file),
+  );
+  const { call: getProofViewUrl, isLoading: isOpeningProof } = useCallablePromise((month: PaymentMonthSummary) =>
+    DansshipAPI.instructorPayments.getSocialSecurityProofViewUrl(month.year, month.month),
   );
   const { call: getDocumentViewUrl, isLoading: isOpeningDocument } = useCallablePromise((documentId: string) =>
     DansshipAPI.instructorPayments.getDocumentViewUrl(documentId),
@@ -121,7 +122,7 @@ function PaymentDocumentsPage() {
   const [disputeReason, setDisputeReason] = useState('');
   const [disputeConfirmOpen, setDisputeConfirmOpen] = useState(false);
 
-  const handleUpload = async (kind: PaymentDocumentKind, file: File | null) => {
+  const handleUpload = async (kind: PaymentProfileFileKind, file: File | null) => {
     if (!file) return;
 
     try {
@@ -178,8 +179,37 @@ function PaymentDocumentsPage() {
     }
   };
 
-  const handleOpenFile = async (kind: PaymentDocumentKind) => {
+  const handleOpenFile = async (kind: PaymentProfileFileKind) => {
     const { ok, data } = await getFileViewUrl(kind);
+
+    if (!ok || !data?.view_url) {
+      toast.error(t('profile:paymentDocuments.viewFailed'));
+
+      return;
+    }
+
+    openUrl(data.view_url);
+  };
+
+  const handleUploadProof = async (month: PaymentMonthSummary, file: File) => {
+    try {
+      const { ok } = await uploadProof(month, file);
+
+      if (!ok) {
+        toast.error(t('profile:paymentDocuments.uploadFailed'));
+
+        return;
+      }
+
+      toast.success(t('profile:paymentDocuments.uploadSuccess'));
+      void reFetch();
+    } catch {
+      toast.error(t('profile:paymentDocuments.uploadFailed'));
+    }
+  };
+
+  const handleOpenProof = async (month: PaymentMonthSummary) => {
+    const { ok, data } = await getProofViewUrl(month);
 
     if (!ok || !data?.view_url) {
       toast.error(t('profile:paymentDocuments.viewFailed'));
@@ -362,6 +392,10 @@ function PaymentDocumentsPage() {
                   setDisputeReason('');
                 }}
                 onDownload={documentId => void handleOpenDocument(documentId)}
+                isUploadingProof={isUploadingProof}
+                isOpeningProof={isOpeningProof}
+                onUploadProof={(month, file) => void handleUploadProof(month, file)}
+                onViewProof={month => void handleOpenProof(month)}
               />
             )}
           </section>

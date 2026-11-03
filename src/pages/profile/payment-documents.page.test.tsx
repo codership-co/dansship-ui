@@ -29,7 +29,6 @@ function profile(overrides: Partial<PaymentProfile> = {}): PaymentProfile {
     has_bank_certificate: true,
     has_signature: true,
     has_social_security: false,
-    social_security_applicable: false,
     bank_name: 'Bancolombia',
     account_type: 'savings',
     account_number: '0011223344',
@@ -96,7 +95,9 @@ describe('PaymentDocumentsPage bank fields', () => {
     mockProfile(profile());
     renderPage();
 
-    fireEvent.change(await screen.findByLabelText('Tipo de cuenta'), { target: { value: 'bre_b' } });
+    fireEvent.change(await screen.findByLabelText('Tipo de cuenta'), {
+      target: { value: 'bre_b' },
+    });
 
     expect(screen.queryByLabelText('Banco')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Número de cuenta')).not.toBeInTheDocument();
@@ -104,7 +105,13 @@ describe('PaymentDocumentsPage bank fields', () => {
   });
 
   it('shows the Llave layout straight away for a saved bre_b profile', async () => {
-    mockProfile(profile({ account_type: 'bre_b', bank_name: null, account_number: '3001234567' }));
+    mockProfile(
+      profile({
+        account_type: 'bre_b',
+        bank_name: null,
+        account_number: '3001234567',
+      }),
+    );
     renderPage();
 
     await waitFor(() =>
@@ -114,7 +121,13 @@ describe('PaymentDocumentsPage bank fields', () => {
   });
 
   it('saves bre_b with an empty bank name and the llave as account number', async () => {
-    mockProfile(profile({ account_type: 'bre_b', bank_name: 'Bancolombia', account_number: '' }));
+    mockProfile(
+      profile({
+        account_type: 'bre_b',
+        bank_name: 'Bancolombia',
+        account_number: '',
+      }),
+    );
     renderPage();
 
     const llave = await screen.findByLabelText('Llave (cédula, celular, correo o código)');
@@ -146,6 +159,90 @@ describe('PaymentDocumentsPage bank fields', () => {
         account_number: '0011223344',
       });
     });
+  });
+
+  it('never lists the planilla among the profile documents', async () => {
+    mockProfile(profile({ payment_type: 'fixed_amount', has_social_security: true }));
+    renderPage();
+
+    await screen.findByText('Guardar datos bancarios');
+
+    expect(screen.queryByText(/Planilla de seguridad social/)).not.toBeInTheDocument();
+  });
+
+  it('shows the planilla slot only for the month the team asked it for', async () => {
+    const summary = (month: number, social_security: unknown) => ({
+      year: 2026,
+      month,
+      status: 'available',
+      missing_requirements: [],
+      social_security,
+      issued_document: null,
+      documents: [],
+      can_generate: true,
+    });
+
+    vi.spyOn(DansshipAPI.instructorPayments, 'listPaymentDocuments').mockResolvedValue(
+      ok({
+        profile: profile(),
+        months: [
+          summary(8, null),
+          summary(7, {
+            year: 2026,
+            month: 7,
+            required: true,
+            uploaded: false,
+            proof_year: 2026,
+            proof_month: 7,
+          }),
+        ],
+      }) as never,
+    );
+    renderPage();
+
+    expect(await screen.findByText('Planilla de seguridad social de Julio 2026')).toBeInTheDocument();
+    expect(screen.queryByText('Planilla de seguridad social de Agosto 2026')).not.toBeInTheDocument();
+  });
+
+  it('uploads the planilla of the month through the period endpoint', async () => {
+    const upload = vi
+      .spyOn(DansshipAPI.instructorPayments, 'uploadSocialSecurityProof')
+      .mockResolvedValue(ok({}) as never);
+
+    vi.spyOn(DansshipAPI.instructorPayments, 'listPaymentDocuments').mockResolvedValue(
+      ok({
+        profile: profile(),
+        months: [
+          {
+            year: 2026,
+            month: 7,
+            status: 'blocked',
+            missing_requirements: ['social_security'],
+            social_security: {
+              year: 2026,
+              month: 7,
+              required: true,
+              uploaded: false,
+              proof_year: 2026,
+              proof_month: 7,
+            },
+            issued_document: null,
+            documents: [],
+            can_generate: false,
+          },
+        ],
+      }) as never,
+    );
+    const { container } = renderPage();
+
+    await screen.findByText('Planilla de seguridad social de Julio 2026');
+
+    const file = new File(['x'], 'planilla.pdf', { type: 'application/pdf' });
+    const inputs = container.querySelectorAll('input[type=file]');
+
+    fireEvent.change(inputs[inputs.length - 1], { target: { files: [file] } });
+
+    await waitFor(() => expect(upload).toHaveBeenCalledWith(2026, 7, file));
   });
 
   it('opens the dispute reason in a dialog and sends it after the confirmation', async () => {
@@ -186,7 +283,9 @@ describe('PaymentDocumentsPage bank fields', () => {
 
     expect(await screen.findByRole('dialog')).toBeTruthy();
 
-    fireEvent.change(screen.getByLabelText('Motivo'), { target: { value: 'Faltan horas' } });
+    fireEvent.change(screen.getByLabelText('Motivo'), {
+      target: { value: 'Faltan horas' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Continuar' }));
     fireEvent.click(await screen.findByRole('button', { name: 'Marcar en disputa' }));
 

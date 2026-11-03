@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { LuEye, LuUpload } from 'react-icons/lu';
 import { toast } from 'sonner';
 
-import type { PaymentDocumentKind, PaymentProfile } from '@core/api';
+import type { PaymentProfile, PaymentProfileFileKind } from '@core/api';
 
-type PaymentFileCardProps = {
+export type PaymentFileCardProps = {
   label: string;
   hint: string;
   uploaded: boolean;
@@ -18,7 +18,7 @@ type PaymentFileCardProps = {
   onView?: () => void;
 };
 
-function PaymentFileCard({
+export function PaymentFileCard({
   label,
   hint,
   uploaded,
@@ -127,8 +127,8 @@ type PaymentDocumentFilesProps = {
   profile: PaymentProfile;
   isUploading: boolean;
   isOpeningFile: boolean;
-  onUpload: (kind: PaymentDocumentKind, file: File) => void;
-  onView: (kind: PaymentDocumentKind) => void;
+  onUpload: (kind: PaymentProfileFileKind, file: File) => void;
+  onView: (kind: PaymentProfileFileKind) => void;
 };
 
 export function PaymentDocumentFiles({
@@ -139,9 +139,8 @@ export function PaymentDocumentFiles({
   onView,
 }: PaymentDocumentFilesProps) {
   const { t } = useTranslation();
-  const showSocialSecurity = profile.social_security_applicable || profile.has_social_security;
   const cards: Array<{
-    kind: PaymentDocumentKind;
+    kind: PaymentProfileFileKind;
     label: string;
     hint: string;
     uploaded: boolean;
@@ -173,17 +172,6 @@ export function PaymentDocumentFiles({
       acceptedTypes: ['image/jpeg', 'image/png', 'image/webp'],
     },
   ];
-
-  if (showSocialSecurity) {
-    cards.push({
-      kind: 'social-security',
-      label: t('profile:paymentDocuments.socialSecurity'),
-      hint: t('profile:paymentDocuments.socialSecurityHint'),
-      uploaded: profile.has_social_security,
-      accept: 'application/pdf,image/jpeg,image/png,image/webp',
-      acceptedTypes: ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'],
-    });
-  }
 
   const uploadedCount = cards.filter(card => card.uploaded).length;
 

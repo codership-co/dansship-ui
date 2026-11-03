@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { PaymentMonthsList } from './payment-months-list';
@@ -25,6 +25,7 @@ function month(documents: Array<PaymentDocument>, overrides: Partial<PaymentMont
     month: 7,
     status: 'paid',
     missing_requirements: [],
+    social_security: null,
     issued_document: documents[0] ?? null,
     documents,
     can_generate: false,
@@ -58,6 +59,10 @@ const actions = {
   onConfirm: vi.fn(),
   onDispute: vi.fn(),
   onDownload: vi.fn(),
+  isUploadingProof: false,
+  isOpeningProof: false,
+  onUploadProof: vi.fn(),
+  onViewProof: vi.fn(),
 };
 
 describe('PaymentMonthsList month total', () => {
@@ -66,7 +71,11 @@ describe('PaymentMonthsList month total', () => {
   });
 
   it('keeps a voided account visible and leaves it out of the month total', () => {
-    const issued = document({ id: 'issued', status: 'issued', total_amount: 80000 });
+    const issued = document({
+      id: 'issued',
+      status: 'issued',
+      total_amount: 80000,
+    });
     const voided = document({
       id: 'voided',
       status: 'voided',
@@ -145,5 +154,88 @@ describe('PaymentMonthsList month total', () => {
 
     expect(screen.queryByText('Fijo y por horas')).not.toBeInTheDocument();
     expect(screen.queryByText(/Período cubierto/)).not.toBeInTheDocument();
+  });
+});
+
+describe('PaymentMonthsList social security proof', () => {
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  const proof = {
+    year: 2026,
+    month: 7,
+    required: true,
+    uploaded: false,
+    proof_year: 2026,
+    proof_month: 7,
+  };
+
+  it('shows nothing about the planilla when the team did not ask for it', () => {
+    render(<PaymentMonthsList months={[month([], { status: 'available' })]} {...actions} />);
+
+    expect(screen.queryByText(/Planilla de seguridad social/)).not.toBeInTheDocument();
+  });
+
+  it('shows nothing once the request was withdrawn', () => {
+    render(
+      <PaymentMonthsList
+        months={[
+          month([], {
+            status: 'available',
+            social_security: { ...proof, required: false },
+          }),
+        ]}
+        {...actions}
+      />,
+    );
+
+    expect(screen.queryByText(/Planilla de seguridad social/)).not.toBeInTheDocument();
+  });
+
+  it('asks for the planilla of the month and uploads the chosen file', () => {
+    const summary = month([], {
+      status: 'blocked',
+      social_security: proof,
+      missing_requirements: ['social_security'],
+    });
+    const { container } = render(<PaymentMonthsList months={[summary]} {...actions} />);
+
+    expect(screen.getByText('Planilla de seguridad social de Julio 2026')).toBeInTheDocument();
+
+    const file = new File(['x'], 'planilla.pdf', { type: 'application/pdf' });
+
+    fireEvent.change(container.querySelector('input[type=file]') as HTMLInputElement, { target: { files: [file] } });
+
+    expect(actions.onUploadProof).toHaveBeenCalledWith(summary, file);
+  });
+
+  it('labels the planilla with the month it covers, not the billed one', () => {
+    render(
+      <PaymentMonthsList
+        months={[
+          month([], {
+            status: 'blocked',
+            social_security: { ...proof, proof_month: 6 },
+          }),
+        ]}
+        {...actions}
+      />,
+    );
+
+    expect(screen.getByText('Planilla de seguridad social de Junio 2026')).toBeInTheDocument();
+  });
+
+  it('lets the person open an uploaded planilla', () => {
+    const summary = month([], {
+      status: 'available',
+      social_security: { ...proof, uploaded: true },
+    });
+
+    render(<PaymentMonthsList months={[summary]} {...actions} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Ver archivo' }));
+
+    expect(actions.onViewProof).toHaveBeenCalledWith(summary);
   });
 });
