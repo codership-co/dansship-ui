@@ -19,6 +19,9 @@ function payrollDocument(overrides: Partial<PayrollDocument>): PayrollDocument {
     period_month: 10,
     status: 'issued',
     total_amount: 100000,
+    service_value: 100000,
+    advances_discounted: 0,
+    advance_remainder: 0,
     paid_amount: null,
     issued_at: '2026-10-31T15:00:00Z',
     paid_at: null,
@@ -27,11 +30,11 @@ function payrollDocument(overrides: Partial<PayrollDocument>): PayrollDocument {
   };
 }
 
-function renderTable(documents: Array<PayrollDocument>, onDownload = vi.fn()) {
+function renderTable(documents: Array<PayrollDocument>, onDownload = vi.fn(), onShowBreakdown = vi.fn()) {
   render(
     <MemoryRouter>
-      <PayrollTable documents={documents} onDownload={onDownload} />
-      <PayrollCards documents={documents} onDownload={onDownload} />
+      <PayrollTable documents={documents} onDownload={onDownload} onShowBreakdown={onShowBreakdown} />
+      <PayrollCards documents={documents} onDownload={onDownload} onShowBreakdown={onShowBreakdown} />
     </MemoryRouter>,
   );
 
@@ -81,5 +84,25 @@ describe('payroll rows', () => {
 
     // One receipt button per layout (table + cards) for the single eligible document.
     expect(screen.getAllByText('Comprobante de pago')).toHaveLength(2);
+  });
+
+  it('keeps documents without advances exactly as before (no breakdown line)', () => {
+    renderTable([payrollDocument({})]);
+
+    expect(screen.queryByText('Ver desglose')).toBeNull();
+    expect(screen.queryByText(/anticipos/)).toBeNull();
+  });
+
+  it('shows the net with the service minus advances line and opens the breakdown', () => {
+    const onShowBreakdown = vi.fn();
+    const document = payrollDocument({ total_amount: 70000, service_value: 100000, advances_discounted: 30000 });
+
+    renderTable([document], vi.fn(), onShowBreakdown);
+
+    expect(screen.getAllByText(/Servicio .*100\.000.* − anticipos .*30\.000/).length).toBe(2);
+
+    fireEvent.click(screen.getAllByText('Ver desglose')[0]);
+
+    expect(onShowBreakdown).toHaveBeenCalledWith(document);
   });
 });

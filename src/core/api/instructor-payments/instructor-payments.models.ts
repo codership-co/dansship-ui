@@ -77,6 +77,21 @@ export interface PaymentCalculationSnapshot {
   components?: Array<PaymentCalculationComponent>;
 }
 
+export interface PaymentDocumentBreakdown {
+  service_value: number;
+  advances_discounted: number;
+  advance_remainder: number;
+  net: number;
+  extras: Array<{
+    concept: string;
+    period_year: number;
+    period_month: number;
+    amount: number;
+    event_name: string | null;
+  }>;
+  advances: Array<{ payment_date: string; note: string | null; amount: number }>;
+}
+
 export interface PaymentDocument {
   id: string;
   user_id: string;
@@ -98,6 +113,7 @@ export interface PaymentDocument {
   line_items: Array<PaymentDocumentLineItem>;
   amount_in_words_snapshot: string;
   calculation_snapshot?: PaymentCalculationSnapshot | null;
+  breakdown?: PaymentDocumentBreakdown | null;
   confirmed_at?: string | null;
   confirmed_by_user_id?: string | null;
   disputed_at?: string | null;
@@ -152,9 +168,23 @@ function toNullableNumber(value: string | number | null | undefined): number | n
   return toNumber(value);
 }
 
+function normalizeBreakdown(breakdown: PaymentDocumentBreakdown | null | undefined): PaymentDocumentBreakdown | null {
+  if (!breakdown) return null;
+
+  return {
+    service_value: toNumber(breakdown.service_value),
+    advances_discounted: toNumber(breakdown.advances_discounted),
+    advance_remainder: toNumber(breakdown.advance_remainder),
+    net: toNumber(breakdown.net),
+    extras: (breakdown.extras ?? []).map(extra => ({ ...extra, amount: toNumber(extra.amount) })),
+    advances: (breakdown.advances ?? []).map(advance => ({ ...advance, amount: toNumber(advance.amount) })),
+  };
+}
+
 function normalizeDocument(document: PaymentDocument): PaymentDocument {
   return {
     ...document,
+    breakdown: normalizeBreakdown(document.breakdown),
     hourly_rate_snapshot: toNullableNumber(document.hourly_rate_snapshot as unknown as string),
     total_hours: toNumber(document.total_hours as unknown as string),
     total_amount: toNumber(document.total_amount as unknown as string),
@@ -257,6 +287,9 @@ export interface PayrollDocument {
   period_month: number;
   status: PaymentDocumentStatus | string;
   total_amount: number;
+  service_value: number;
+  advances_discounted: number;
+  advance_remainder: number;
   paid_amount: number | null;
   issued_at: string;
   paid_at: string | null;
@@ -270,10 +303,128 @@ export interface PayrollDocumentsPage {
   page_size: number;
 }
 
+export function normalizePayrollDocumentsPage(data: PayrollDocumentsPage): PayrollDocumentsPage {
+  return {
+    ...data,
+    items: (data.items ?? []).map(item => ({
+      ...item,
+      total_amount: toNumber(item.total_amount),
+      service_value: toNumber(item.service_value),
+      advances_discounted: toNumber(item.advances_discounted),
+      advance_remainder: toNumber(item.advance_remainder),
+      paid_amount: toNullableNumber(item.paid_amount),
+    })),
+  };
+}
+
 export interface PayrollSummary {
   paid_amount: number;
   paid_count: number;
   pending_amount: number;
   pending_count: number;
   total_count: number;
+}
+
+export type PayrollAdjustmentType = 'extra' | 'advance';
+
+export type PayrollAdjustmentStatus = 'pending' | 'applied';
+
+export interface PayrollAdjustmentQuery {
+  q?: string;
+  type?: PayrollAdjustmentType;
+  status?: PayrollAdjustmentStatus;
+  /** YYYY-MM */
+  month?: string;
+}
+
+export interface PayrollAdjustment {
+  id: string;
+  type: PayrollAdjustmentType;
+  user_id: string;
+  full_name: string;
+  email: string | null;
+  concept: string | null;
+  note: string | null;
+  event_id: string | null;
+  event_name: string | null;
+  period_year: number | null;
+  period_month: number | null;
+  passes_to_year: number | null;
+  passes_to_month: number | null;
+  payment_date: string | null;
+  amount: number;
+  discounted: number;
+  balance: number;
+  status: PayrollAdjustmentStatus;
+  document_id: string | null;
+  can_edit: boolean;
+  created_at: string;
+}
+
+export interface PayrollAdjustmentsSummary {
+  pending_extras_amount: number;
+  pending_extras_count: number;
+  advances_balance_amount: number;
+  advances_balance_count: number;
+}
+
+export interface PayrollAdjustmentsPage {
+  items: Array<PayrollAdjustment>;
+  total: number;
+  page: number;
+  page_size: number;
+  summary: PayrollAdjustmentsSummary;
+}
+
+export interface AdjustmentEligibility {
+  has_active_assignment: boolean;
+  month_has_document: boolean;
+}
+
+export interface AdjustmentEventOption {
+  id: string;
+  name: string;
+}
+
+export interface ExtraPayload {
+  period_year: number;
+  period_month: number;
+  concept: string;
+  amount: number;
+  event_id: string | null;
+}
+
+export interface CreateExtraPayload extends ExtraPayload {
+  user_id: string;
+}
+
+export interface AdvancePayload {
+  amount: number;
+  payment_date: string;
+  note: string | null;
+}
+
+export interface CreateAdvancePayload extends AdvancePayload {
+  user_id: string;
+}
+
+export function normalizePayrollAdjustment(item: PayrollAdjustment): PayrollAdjustment {
+  return {
+    ...item,
+    amount: toNumber(item.amount),
+    discounted: toNumber(item.discounted),
+    balance: toNumber(item.balance),
+  };
+}
+
+export function normalizePayrollAdjustmentsPage(data: PayrollAdjustmentsPage): PayrollAdjustmentsPage {
+  return {
+    ...data,
+    items: (data.items ?? []).map(normalizePayrollAdjustment),
+    summary: {
+      ...data.summary,
+      pending_extras_amount: toNumber(data.summary?.pending_extras_amount),
+      advances_balance_amount: toNumber(data.summary?.advances_balance_amount),
+    },
+  };
 }

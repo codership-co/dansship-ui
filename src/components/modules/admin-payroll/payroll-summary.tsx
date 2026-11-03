@@ -7,7 +7,7 @@ import type { PayrollSummary as PayrollSummaryData } from '@core/api';
 
 const CARD = 'border-border bg-background-paper';
 
-function Tile({
+export function Tile({
   label,
   value,
   detail,

@@ -12,6 +12,15 @@ import {
   type PaymentProfile,
   type PaymentProfileUpdatePayload,
   type PayrollDocumentsPage,
+  type PayrollAdjustment,
+  type PayrollAdjustmentQuery,
+  type PayrollAdjustmentsPage,
+  type AdjustmentEligibility,
+  type AdjustmentEventOption,
+  type CreateExtraPayload,
+  type ExtraPayload,
+  type CreateAdvancePayload,
+  type AdvancePayload,
   type PayrollQuery,
   type PayrollSummary,
   type CreatePaymentAssignmentPayload,
@@ -25,6 +34,9 @@ import {
   normalizePaymentAssignment,
   normalizePaymentAssignmentList,
   normalizePaymentDocumentList,
+  normalizePayrollAdjustment,
+  normalizePayrollAdjustmentsPage,
+  normalizePayrollDocumentsPage,
 } from './instructor-payments.models';
 
 import { DansshipAPIError } from '@core/api';
@@ -273,15 +285,18 @@ export class InstructorPaymentsAdminAPI {
   }
 
   async listPayrollDocuments(query: PayrollQuery, page: number, pageSize: number) {
-    return this.httpClient.callNoError<PayrollDocumentsPage>({
-      path: '/admin/payroll/documents',
-      method: 'GET',
-      params: {
-        ...this.payrollParams(query),
-        page: String(page),
-        page_size: String(pageSize),
+    return this.httpClient.callNoError<PayrollDocumentsPage>(
+      {
+        path: '/admin/payroll/documents',
+        method: 'GET',
+        params: {
+          ...this.payrollParams(query),
+          page: String(page),
+          page_size: String(pageSize),
+        },
       },
-    });
+      normalizePayrollDocumentsPage,
+    );
   }
 
   async getPayrollSummary(query: PayrollQuery) {
@@ -303,6 +318,87 @@ export class InstructorPaymentsAdminAPI {
     return this.httpClient.callNoError<ProofViewUrlResponse>({
       path: `/admin/payroll/documents/${documentId}/receipt/view-url`,
       method: 'GET',
+    });
+  }
+
+  async listPayrollAdjustments(query: PayrollAdjustmentQuery, page: number, pageSize: number) {
+    const params: Record<string, string> = { page: String(page), page_size: String(pageSize) };
+
+    if (query.q) params.q = query.q;
+
+    if (query.type) params.type = query.type;
+
+    if (query.status) params.status = query.status;
+
+    if (query.month) params.month = query.month;
+
+    return this.httpClient.callNoError<PayrollAdjustmentsPage>(
+      { path: '/admin/payroll/adjustments', method: 'GET', params },
+      normalizePayrollAdjustmentsPage,
+    );
+  }
+
+  async getAdjustmentEligibility(userId: string, year: number, month: number) {
+    return this.httpClient.callNoError<AdjustmentEligibility>({
+      path: '/admin/payroll/adjustments/eligibility',
+      method: 'GET',
+      params: { user_id: userId, year: String(year), month: String(month) },
+    });
+  }
+
+  async listAdjustmentEventOptions() {
+    return this.httpClient.callNoError<Array<AdjustmentEventOption>>({
+      path: '/admin/payroll/adjustments/event-options',
+      method: 'GET',
+    });
+  }
+
+  async getAdjustmentDocumentViewUrl(documentId: string) {
+    return this.httpClient.callNoError<ProofViewUrlResponse>({
+      path: `/admin/payroll/adjustments/documents/${documentId}/view-url`,
+      method: 'GET',
+    });
+  }
+
+  async createExtra(payload: CreateExtraPayload) {
+    return this.httpClient.callNoError<PayrollAdjustment, CreateExtraPayload>(
+      { path: '/admin/payroll/adjustments/extras', method: 'POST', data: payload },
+      normalizePayrollAdjustment,
+    );
+  }
+
+  async updateExtra(adjustmentId: string, payload: ExtraPayload) {
+    return this.httpClient.callNoError<PayrollAdjustment, ExtraPayload>(
+      { path: `/admin/payroll/adjustments/extras/${adjustmentId}`, method: 'PATCH', data: payload },
+      normalizePayrollAdjustment,
+    );
+  }
+
+  async deleteExtra(adjustmentId: string) {
+    return this.httpClient.callNoError({
+      path: `/admin/payroll/adjustments/extras/${adjustmentId}`,
+      method: 'DELETE',
+    });
+  }
+
+  async createAdvance(payload: CreateAdvancePayload) {
+    return this.httpClient.callNoError<PayrollAdjustment, CreateAdvancePayload>(
+      { path: '/admin/payroll/adjustments/advances', method: 'POST', data: payload },
+      normalizePayrollAdjustment,
+    );
+  }
+
+  async updateAdvance(adjustmentId: string, payload: AdvancePayload) {
+    return this.httpClient.callNoError<PayrollAdjustment, AdvancePayload>(
+      { path: `/admin/payroll/adjustments/advances/${adjustmentId}`, method: 'PATCH', data: payload },
+      normalizePayrollAdjustment,
+    );
+  }
+
+  async deleteAdvance(adjustmentId: string) {
+    return this.httpClient.callNoError({
+      path: `/admin/payroll/adjustments/advances/${adjustmentId}`,
+      method: 'DELETE',
     });
   }
 

@@ -26,6 +26,7 @@ const STATUS_VARIANT: Record<string, NonNullable<ComponentProps<typeof Badge>['v
 interface PayrollRowsProps {
   documents: Array<PayrollDocument>;
   onDownload: (documentId: string, kind: PayrollDownloadKind) => void;
+  onShowBreakdown?: (document: PayrollDocument) => void;
 }
 
 function usePayrollFormatters() {
@@ -61,6 +62,42 @@ function PersonCell({ document }: { document: PayrollDocument }) {
         </Link>
       ) : null}
       <span className='text-xs text-muted-foreground'>{format.paymentType(document.payment_type)}</span>
+    </div>
+  );
+}
+
+function AmountCell({
+  document,
+  onShowBreakdown,
+}: {
+  document: PayrollDocument;
+  onShowBreakdown: PayrollRowsProps['onShowBreakdown'];
+}) {
+  const { t } = useTranslation();
+
+  if (!(document.advances_discounted > 0)) return <>{formatPrice(document.total_amount, 'COP')}</>;
+
+  return (
+    <div className='grid gap-0.5'>
+      <span>{formatPrice(document.total_amount, 'COP')}</span>
+      <span className='text-xs text-muted-foreground'>
+        {t('admin:payroll.table.serviceSummary', {
+          service: formatPrice(document.service_value, 'COP'),
+          advances: formatPrice(document.advances_discounted, 'COP'),
+        })}
+      </span>
+      {onShowBreakdown ? (
+        <Button
+          color='primary'
+          variant='text'
+          size='small'
+          type='button'
+          className='justify-self-start'
+          onClick={() => onShowBreakdown(document)}
+        >
+          {t('admin:payroll.table.viewBreakdown')}
+        </Button>
+      ) : null}
     </div>
   );
 }
@@ -114,7 +151,7 @@ function Downloads({
   );
 }
 
-export function PayrollTable({ documents, onDownload }: PayrollRowsProps) {
+export function PayrollTable({ documents, onDownload, onShowBreakdown }: PayrollRowsProps) {
   const { t } = useTranslation();
   const format = usePayrollFormatters();
 
@@ -148,7 +185,9 @@ export function PayrollTable({ documents, onDownload }: PayrollRowsProps) {
                   </span>
                 </div>
               </TableCell>
-              <TableCell>{formatPrice(document.total_amount, 'COP')}</TableCell>
+              <TableCell>
+                <AmountCell document={document} onShowBreakdown={onShowBreakdown} />
+              </TableCell>
               <TableCell>{document.paid_amount === null ? '—' : formatPrice(document.paid_amount, 'COP')}</TableCell>
               <TableCell>{document.paid_at ? format.day(document.paid_at) : '—'}</TableCell>
               <TableCell>
@@ -165,7 +204,7 @@ export function PayrollTable({ documents, onDownload }: PayrollRowsProps) {
   );
 }
 
-export function PayrollCards({ documents, onDownload }: PayrollRowsProps) {
+export function PayrollCards({ documents, onDownload, onShowBreakdown }: PayrollRowsProps) {
   const { t } = useTranslation();
   const format = usePayrollFormatters();
 
@@ -189,7 +228,7 @@ export function PayrollCards({ documents, onDownload }: PayrollRowsProps) {
             </div>
             <div className='grid gap-0.5'>
               <span className='text-muted-foreground'>{t('admin:payroll.table.amount')}</span>
-              <span>{formatPrice(document.total_amount, 'COP')}</span>
+              <AmountCell document={document} onShowBreakdown={onShowBreakdown} />
             </div>
             <div className='grid gap-0.5'>
               <span className='text-muted-foreground'>{t('admin:payroll.table.paidAmount')}</span>
