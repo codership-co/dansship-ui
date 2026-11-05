@@ -160,7 +160,8 @@
       "confirmPurchase": "Confirmar compra",
       "purchaseFailed": "No se pudo registrar la compra.",
       "purchaseDone": "La compra quedó registrada.",
-      "backToUser": "Volver al usuario"
+      "backToUser": "Volver al usuario",
+      "assist": "Dar atención"
     },
     "details": {
       "title": "Detalle de Usuario",
@@ -340,7 +341,8 @@
         "platforms": {
           "whatsapp": "WhatsApp",
           "instagram": "Instagram"
-        }
+        },
+        "fromContacts": "desde contactos"
       },
       "paymentDocuments": {
         "filesTitle": "Documentos y datos bancarios",

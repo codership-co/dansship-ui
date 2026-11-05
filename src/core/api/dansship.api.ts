@@ -1,3 +1,4 @@
+import { AssistedAdminAPI } from './assisted/assisted.admin.api';
 import { AuthAPI } from './auth/auth.api';
 import { BenefitsAdminAPI } from './benefits/benefits.admin.api';
 import { BillingAdminAPI } from './billing/billing.admin.api';
@@ -55,6 +56,7 @@ export class DansshipAPI {
     },
   });
 
+  static assistedAdmin = new AssistedAdminAPI(this.httpClient);
   static auth = new AuthAPI(this.httpClient);
   static benefitsAdmin = new BenefitsAdminAPI(this.httpClient);
   static billingAdmin = new BillingAdminAPI(this.httpClient);

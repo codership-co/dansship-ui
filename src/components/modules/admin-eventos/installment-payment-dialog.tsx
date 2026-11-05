@@ -24,6 +24,8 @@ interface InstallmentPaymentDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onRegistered: () => void;
+  /** Registers for this person without showing the user search (assisted attention). */
+  presetUser?: { id: string; email: string };
 }
 
 function sameSequences(left: Array<number>, right: Array<number>) {
@@ -34,7 +36,13 @@ function statusLabel(status: string, t: (key: string) => string) {
   return t(`bookings:installmentStatus.${status}`);
 }
 
-export function InstallmentPaymentDialog({ eventId, open, onOpenChange, onRegistered }: InstallmentPaymentDialogProps) {
+export function InstallmentPaymentDialog({
+  eventId,
+  open,
+  onOpenChange,
+  onRegistered,
+  presetUser,
+}: InstallmentPaymentDialogProps) {
   const { t } = useTranslation();
   const [emailInput, setEmailInput] = useState('');
   const [emailQuery, setEmailQuery] = useState('');
@@ -66,6 +74,13 @@ export function InstallmentPaymentDialog({ eventId, open, onOpenChange, onRegist
 
     setIdempotencyKey(crypto.randomUUID());
   }, [open]);
+
+  useEffect(() => {
+    if (open && presetUser) {
+      setSelectedUserId(presetUser.id);
+      setSelectedUserEmail(presetUser.email);
+    }
+  }, [open, presetUser]);
 
   useEffect(() => {
     if (!open) {
@@ -174,50 +189,54 @@ export function InstallmentPaymentDialog({ eventId, open, onOpenChange, onRegist
           <DialogDescription>{t('eventos:admin.registerInstallmentPaymentHint')}</DialogDescription>
         </DialogHeader>
         <div className='grid gap-4'>
-          <div className='grid gap-2' ref={dropdownRef}>
-            <Label htmlFor='installment-user'>{t('eventos:admin.installmentUser')}</Label>
-            <div className='relative'>
-              <LuSearch className='pointer-events-none absolute top-2.5 left-2.5 h-4 w-4 text-muted-foreground' />
-              <Input
-                id='installment-user'
-                className='pl-8'
-                value={emailInput}
-                disabled={submitting}
-                placeholder={t('eventos:admin.installmentUserPlaceholder')}
-                onChange={event => {
-                  setEmailInput(event.target.value);
-                  setSelectedUserId('');
-                  setSelectedUserEmail('');
-                  setDropdownOpen(true);
-                }}
-                onFocus={() => setDropdownOpen(true)}
-              />
-              {dropdownOpen && emailQuery.length >= 3 && !selectedUserId ? (
-                <div className='absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-md border bg-white shadow'>
-                  {usersLoading ? (
-                    <SpinnerLoader />
-                  ) : (
-                    (users?.data ?? []).map(user => (
-                      <button
-                        key={user.id}
-                        type='button'
-                        className='block w-full px-3 py-2 text-left text-sm hover:bg-muted'
-                        onClick={() => {
-                          setSelectedUserId(user.id);
-                          setSelectedUserEmail(user.email);
-                          setEmailInput(user.email);
-                          setDropdownOpen(false);
-                        }}
-                      >
-                        {user.email}
-                      </button>
-                    ))
-                  )}
-                </div>
-              ) : null}
+          {presetUser ? (
+            <p className='m-0 text-sm text-muted-foreground'>{presetUser.email}</p>
+          ) : (
+            <div className='grid gap-2' ref={dropdownRef}>
+              <Label htmlFor='installment-user'>{t('eventos:admin.installmentUser')}</Label>
+              <div className='relative'>
+                <LuSearch className='pointer-events-none absolute top-2.5 left-2.5 h-4 w-4 text-muted-foreground' />
+                <Input
+                  id='installment-user'
+                  className='pl-8'
+                  value={emailInput}
+                  disabled={submitting}
+                  placeholder={t('eventos:admin.installmentUserPlaceholder')}
+                  onChange={event => {
+                    setEmailInput(event.target.value);
+                    setSelectedUserId('');
+                    setSelectedUserEmail('');
+                    setDropdownOpen(true);
+                  }}
+                  onFocus={() => setDropdownOpen(true)}
+                />
+                {dropdownOpen && emailQuery.length >= 3 && !selectedUserId ? (
+                  <div className='absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-md border bg-white shadow'>
+                    {usersLoading ? (
+                      <SpinnerLoader />
+                    ) : (
+                      (users?.data ?? []).map(user => (
+                        <button
+                          key={user.id}
+                          type='button'
+                          className='block w-full px-3 py-2 text-left text-sm hover:bg-muted'
+                          onClick={() => {
+                            setSelectedUserId(user.id);
+                            setSelectedUserEmail(user.email);
+                            setEmailInput(user.email);
+                            setDropdownOpen(false);
+                          }}
+                        >
+                          {user.email}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                ) : null}
+              </div>
+              {selectedUserEmail ? <p className='m-0 text-xs text-muted-foreground'>{selectedUserEmail}</p> : null}
             </div>
-            {selectedUserEmail ? <p className='m-0 text-xs text-muted-foreground'>{selectedUserEmail}</p> : null}
-          </div>
+          )}
           {quoteLoading ? <SpinnerLoader /> : null}
           {lines.length > 0 ? (
             <ul className='grid gap-1 text-sm text-muted-foreground'>

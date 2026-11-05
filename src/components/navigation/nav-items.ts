@@ -11,7 +11,13 @@ import {
 
 import { FEATURE_FLAG } from '@contexts';
 import { PageURLS } from '@core/constants';
-import { AdminInventoryPagePermissions, AdminPermissions, InstructorPermissions, PERMISSION } from '@core/permissions';
+import {
+  AdminInventoryPagePermissions,
+  AdminPermissions,
+  AssistedPagePermissions,
+  InstructorPermissions,
+  PERMISSION,
+} from '@core/permissions';
 
 import type { IconType } from 'react-icons';
 
@@ -40,6 +46,7 @@ export function getAdminMenuPermissions(): Array<PERMISSION> {
     ...AdminInventoryPagePermissions,
     PERMISSION.INSTRUCTOR_PAY_RATE_MANAGE,
     ...AdminPermissions.bookings,
+    ...AssistedPagePermissions,
     ...AdminPermissions.payments,
     ...AdminPermissions.merch,
     ...AdminPermissions.merchPos,

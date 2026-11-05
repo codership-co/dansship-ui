@@ -137,7 +137,7 @@ export function AdminRegisterUser() {
         )}
         <div className='flex flex-wrap gap-2'>
           {canBuyPlan ? (
-            <Link to={PageURLS.admin.userPlanPurchase(created.user_id)}>
+            <Link to={PageURLS.admin.assistedFor(created.user_id, 'plan')}>
               <Button color='primary' variant='solid'>
                 {t('admin:users.registration.buyPlan')}
               </Button>

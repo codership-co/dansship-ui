@@ -1,0 +1,280 @@
+{
+  "page": {
+    "title": "Atención asistida",
+    "subtitle": "Haz por una persona lo que no pudo hacer sola: crear su cuenta, comprar un plan, reservar, registrar su asistencia o inscribirla a un evento."
+  },
+  "tabs": {
+    "account": "Cuenta",
+    "plan": "Plan",
+    "class": "Clase",
+    "event": "Evento",
+    "benefits": "Beneficios",
+    "contacts": "Contactos"
+  },
+  "common": {
+    "loading": "Cargando…",
+    "cancel": "Cancelar"
+  },
+  "picker": {
+    "label": "Persona",
+    "placeholder": "Busca por nombre o correo",
+    "searching": "Buscando…",
+    "noResults": "Sin resultados",
+    "view360": "Ver Vista 360",
+    "change": "Cambiar",
+    "unknownName": "Persona seleccionada"
+  },
+  "account": {
+    "subtabs": {
+      "create": "Crear cuenta",
+      "data": "Datos",
+      "links": "Enlaces",
+      "merge": "Fusionar"
+    }
+  },
+  "data": {
+    "help": "Corrige el nombre, el correo y el celular. El resto lo edita la persona en su perfil.",
+    "fullName": "Nombre completo",
+    "email": "Correo",
+    "countryCode": "Indicativo",
+    "phone": "Celular",
+    "reason": "Motivo del cambio de correo",
+    "emailPendingNote": "El correo nuevo queda pendiente de confirmar: la persona sigue entrando con el anterior hasta que use el enlace que le enviamos.",
+    "save": "Guardar cambios",
+    "saved": "Datos actualizados.",
+    "savedPending": "Guardado. Falta que la persona confirme {{email}}.",
+    "duplicateEmail": "Ese correo ya pertenece a otra cuenta, no se guardó.",
+    "duplicatePhone": "Ese celular ya pertenece a otra cuenta, no se guardó.",
+    "goToMerge": "Ir a Fusionar"
+  },
+  "links": {
+    "help": "Copia o reenvía los enlaces que el correo no entregó. Cada enlace nuevo deja sin efecto el anterior.",
+    "kinds": {
+      "email_verification": "Confirmación de correo",
+      "instructor_invitation": "Invitación como profesor"
+    },
+    "notApplicable": {
+      "LINK_EMAIL_ALREADY_VERIFIED": "El correo ya está confirmado.",
+      "LINK_NO_PENDING_INVITATION": "No hay una invitación pendiente.",
+      "generic": "No aplica para esta cuenta."
+    },
+    "activeUntil": "Enlace activo hasta {{date}}",
+    "noActive": "No hay un enlace activo",
+    "copy": "Copiar enlace",
+    "resend": "Reenviar por correo",
+    "generateNew": "Generar uno nuevo",
+    "generate": "Generar enlace",
+    "copied": "Enlace copiado.",
+    "sent": "Enviado a {{email}}.",
+    "invalidatesPrevious": "Este enlace solo se muestra ahora. El anterior dejó de funcionar."
+  },
+  "merge": {
+    "help": "Une una cuenta duplicada con la cuenta que se conserva. La duplicada se cierra.",
+    "keep": "Cuenta que se conserva",
+    "duplicate": "Cuenta duplicada (se cierra)",
+    "swap": "Intercambiar cuentas",
+    "blocked": "No se pueden fusionar estas cuentas:",
+    "willHappen": "Qué va a pasar",
+    "rule": {
+      "keepContact": "Los datos de contacto de la cuenta que se conserva no cambian; los de la duplicada quedan solo en la auditoría.",
+      "bothPlans": "Si ambas tienen un plan vigente, se conservan los dos.",
+      "walletSums": "Los saldos de la billetera se suman."
+    },
+    "moves": "Se mueven {{count}} registros de {{what}}",
+    "tables": {
+      "bookings": "reservas y asistencias",
+      "subscriptions": "planes",
+      "wallet_ledger_entries": "movimientos de billetera",
+      "payment_intents": "pagos",
+      "event_registrations": "inscripciones a eventos",
+      "event_purchases": "compras de eventos",
+      "benefit_grants": "beneficios",
+      "user_notes": "notas"
+    },
+    "blocks": {
+      "MERGE_BLOCKED_SAME_ACCOUNT": "Es la misma cuenta.",
+      "MERGE_BLOCKED_ALREADY_MERGED": "La cuenta duplicada ya fue fusionada.",
+      "MERGE_BLOCKED_PRIMARY_INACTIVE": "La cuenta que se conserva está inactiva.",
+      "MERGE_BLOCKED_ROLE": "Una de las cuentas tiene rol de instructor, líder o administrador",
+      "MERGE_BLOCKED_MANAGED_MINOR": "Una de las cuentas es de una persona menor administrada.",
+      "MERGE_BLOCKED_PENDING_PAYMENT": "Hay pagos pendientes de aprobación.",
+      "MERGE_BLOCKED_PROTECTED_DATA": "Tiene datos de instructor, nómina o familia",
+      "MERGE_BLOCKED_SAME_CLASS_BOOKING": "Ambas cuentas tienen reserva en la misma clase.",
+      "MERGE_BLOCKED_SAME_EVENT": "Ambas cuentas están inscritas al mismo evento."
+    },
+    "reason": "Motivo",
+    "irreversible": "Entiendo que esto no se puede deshacer.",
+    "action": "Fusionar cuentas",
+    "confirmTitle": "¿Fusionar cuentas?",
+    "confirmDescription": "La cuenta de {{duplicate}} se cierra y todo pasa a la cuenta de {{kept}}. No se puede deshacer.",
+    "done": "Cuentas fusionadas."
+  },
+  "event": {
+    "help": "Inscribe a la persona a un evento cuyo pago ya hizo: sube el comprobante, elige el concepto y aprueba el pago.",
+    "choose": "Evento",
+    "placeholder": "Elige un evento",
+    "approveAndEnroll": "Aprobar pago e inscribir",
+    "registered": "Pago aprobado e inscripción creada."
+  },
+  "class": {
+    "date": "Fecha",
+    "noClasses": "No hay clases ese día.",
+    "held": "Ya ocurrió",
+    "book": "Reservar",
+    "registerAttendance": "Registrar asistencia",
+    "confirmBooking": "Confirmar reserva",
+    "confirmAttendance": "Confirmar asistencia",
+    "summary": "{{person}} · {{className}} · {{date}} · {{time}}",
+    "planWillBeUsed": "Se usará el plan vigente más específico para esta clase y se descontará un crédito.",
+    "noCreditUsed": "No se descuenta ningún crédito.",
+    "gift": "Regalar la clase (cortesía)",
+    "giftReason": "Motivo (obligatorio)",
+    "reasonOptional": "Motivo (opcional)",
+    "goesWithCompanion": "Va con acompañante",
+    "cameWithCompanion": "Vino con acompañante",
+    "bookingDone": "Reserva creada.",
+    "attendanceDone": "Asistencia registrada.",
+    "companionFailed": "La reserva quedó hecha, pero no se pudo agregar al acompañante: {{reason}}",
+    "bookingsOf": "Reservas de {{name}}",
+    "noUpcoming": "No tiene reservas próximas.",
+    "origin": {
+      "plan": "Con plan",
+      "first_free_class": "Primera clase gratis",
+      "gift": "Cortesía",
+      "two_for_one": "2x1"
+    },
+    "addCompanion": "Agregar acompañante",
+    "addCompanionTitle": "Agregar acompañante 2x1",
+    "addCompanionHelp": "La reserva gratuita del acompañante queda enlazada a la clase {{className}}.",
+    "addCompanionAction": "Agregar",
+    "companionAdded": "Acompañante agregado.",
+    "cancelAction": "Cancelar reserva",
+    "cancelTitle": "Cancelar reserva",
+    "cancelReason": "Motivo (obligatorio)",
+    "cancelCascades": "Esta reserva tiene acompañante 2x1: su reserva también se cancela.",
+    "returnCredit": "Devolver el crédito al plan",
+    "cancelDone": "Reserva cancelada."
+  },
+  "companion": {
+    "existing": "Persona con cuenta",
+    "new": "Persona nueva",
+    "search": "Acompañante",
+    "simpleHelp": "Se crea una cuenta simple con estos datos; no necesita plan.",
+    "fullName": "Nombre completo",
+    "email": "Correo",
+    "phone": "Celular",
+    "terms": "La persona acepta los términos y la política de tratamiento de datos."
+  },
+  "contacts": {
+    "title": "Contactos",
+    "help": "Personas que escribieron por algún medio y todavía no tienen cuenta o no volvieron. No son cuentas: no reciben correos ni cuentan como comunidad.",
+    "privacyNotice": "Guarda solo los datos necesarios y avisa a la persona cómo se usará su información.",
+    "new": "Nuevo contacto",
+    "newTitle": "Nuevo contacto",
+    "name": "Nombre (opcional)",
+    "channel": "Canal",
+    "contact": "Contacto",
+    "contactPlaceholder": "Celular, @usuario o correo",
+    "inquiry": "¿Qué preguntó?",
+    "save": "Guardar",
+    "created": "Contacto guardado.",
+    "all": "Todos",
+    "empty": "No hay contactos.",
+    "noName": "Sin nombre",
+    "status": "Estado",
+    "statuses": {
+      "new": "Nuevo",
+      "following": "En seguimiento",
+      "converted": "Se convirtió",
+      "not_interested": "No está interesada"
+    },
+    "channels": {
+      "whatsapp": "WhatsApp",
+      "instagram": "Instagram",
+      "facebook": "Facebook",
+      "other": "Otro"
+    },
+    "hasAccount": "Ya tiene cuenta: {{name}}",
+    "viewUser": "Ver usuario",
+    "suggestLink": "Vincular a esta cuenta",
+    "viewNotes": "Ver notas ({{count}})",
+    "addNote": "Agregar nota",
+    "saveNote": "Guardar nota",
+    "unknownAuthor": "Alguien del equipo",
+    "linkUser": "Vincular usuario",
+    "linkTitle": "Vincular usuario",
+    "linkHelp": "El contacto pasa a «Se convirtió» y sus {{count}} notas pasan a las notas del usuario. No se puede deshacer.",
+    "linkAction": "Vincular",
+    "linked": "Contacto vinculado.",
+    "notesMoved": "Las {{count}} notas pasaron a las notas del usuario."
+  },
+  "benefits": {
+    "help": "Otorga un beneficio que solo esa persona puede usar.",
+    "kind": "Beneficio",
+    "kinds": {
+      "free_class": "Clase gratis",
+      "percentage_discount": "Descuento porcentual",
+      "fixed_discount": "Descuento de valor fijo"
+    },
+    "percentage": "Porcentaje (1 a 100)",
+    "amount": "Valor en pesos",
+    "validDays": "Vigencia en días",
+    "reason": "Motivo (obligatorio)",
+    "grant": "Otorgar beneficio",
+    "granted": "Beneficio otorgado.",
+    "listTitle": "Beneficios de {{name}}",
+    "empty": "No tiene beneficios.",
+    "expires": "vence el {{date}}",
+    "status": {
+      "available": "Disponible",
+      "consumed": "Usado",
+      "expired": "Vencido",
+      "reverted": "Revocado"
+    },
+    "source": {
+      "admin": "Otorgado por la academia",
+      "system": "Del sistema"
+    },
+    "revoke": "Revocar",
+    "revokeTitle": "Revocar beneficio",
+    "revoked": "Beneficio revocado."
+  },
+  "errors": {
+    "generic": "No se pudo completar la acción.",
+    "PERMISSION_DENIED": "No tienes permiso para esta acción.",
+    "BOOKING_CLASS_GROUP_NOT_COVERED": "El plan no cubre esta clase.",
+    "BOOKING_SUBSCRIPTION_NOT_STARTED": "El plan todavía no empieza.",
+    "BOOKING_SUBSCRIPTION_EXPIRED": "El plan vence antes de esta clase.",
+    "BOOKING_SUBSCRIPTION_NOT_ELIGIBLE": "No tiene un plan con clases disponibles. Puedes regalar la clase.",
+    "BOOKING_TIME_OVERLAP": "Ya tiene otra reserva a esa hora.",
+    "BOOKING_INSTRUCTOR_OWN_CLASS": "Un profesor no puede reservar su propia clase.",
+    "BOOKING_INSTRUCTOR_TEACHING_OVERLAP": "El profesor da otra clase a esa hora.",
+    "BOOKING_LATE_JOIN_CLOSED": "Ya pasó el tiempo para reservar esta clase.",
+    "BOOKING_CLASS_FULL": "La clase está llena.",
+    "CLASS_FULL": "La clase está llena.",
+    "BOOKING_NOT_CANCELLABLE": "La reserva no se puede cancelar.",
+    "GIFT_REASON_REQUIRED": "El motivo es obligatorio para regalar una clase.",
+    "GIFT_USER_HAS_PLAN": "Una clase futura solo se regala a quien no tiene un plan vigente.",
+    "GIFT_NO_COMPANION": "Una clase regalada no lleva acompañante.",
+    "TWO_FOR_ONE_NOT_ELIGIBLE": "Esta clase no es 2x1.",
+    "TWO_FOR_ONE_SELF_REFERENCE": "El acompañante debe ser otra persona.",
+    "TWO_FOR_ONE_COMPANION_ALREADY_ADDED": "Esta reserva ya tiene acompañante.",
+    "TWO_FOR_ONE_BOOKING_NOT_ACTIVE": "La reserva no está activa.",
+    "TWO_FOR_ONE_COMPANION_NOT_FOUND": "No encontramos al acompañante.",
+    "SIMPLE_REGISTRATION_IDENTITY_CONFLICT": "El correo y el celular pertenecen a cuentas distintas.",
+    "SIMPLE_REGISTRATION_TERMS_REQUIRED": "Hay que aceptar los términos.",
+    "SIMPLE_REGISTRATION_PHONE_INVALID": "El celular no es válido.",
+    "ACCOUNT_DATA_REASON_REQUIRED": "El motivo es obligatorio para cambiar el correo.",
+    "ACCOUNT_DATA_NO_CHANGES": "No hay cambios para guardar.",
+    "LINK_EMAIL_ALREADY_VERIFIED": "El correo ya está confirmado.",
+    "LINK_NO_PENDING_INVITATION": "No hay una invitación pendiente.",
+    "MERGE_REASON_REQUIRED": "El motivo es obligatorio.",
+    "MERGE_CONFIRMATION_REQUIRED": "Confirma que entiendes que no se puede deshacer.",
+    "CONTACT_LEAD_ALREADY_LINKED": "Este contacto ya está vinculado a un usuario.",
+    "CONTACT_LEAD_USER_NOT_FOUND": "No encontramos a ese usuario.",
+    "BENEFIT_REASON_REQUIRED": "El motivo es obligatorio.",
+    "BENEFIT_VALUE_INVALID": "El valor del beneficio no es válido.",
+    "BENEFIT_NOT_REVOCABLE": "Este beneficio ya no se puede revocar.",
+    "BENEFIT_FREE_CLASS_PLAN_MISSING": "Falta configurar la clase gratis en el sistema."
+  }
+}

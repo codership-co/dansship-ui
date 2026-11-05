@@ -91,7 +91,7 @@ export function UserList() {
 
         <div className='flex flex-wrap items-center gap-3'>
           {canRegister ? (
-            <Link to={PageURLS.admin.userCreate}>
+            <Link to={`${PageURLS.admin.assisted}?tab=account&sub=create`}>
               <Button color='primary' variant='solid'>
                 {t('admin:users.create')}
               </Button>
