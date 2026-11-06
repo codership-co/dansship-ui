@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { apiErrorCode } from './assisted-errors';
+import { AssistedPanel } from './assisted-panel';
 import { PersonPicker } from './person-picker';
 
 import { SelectField, TextField, TextareaField } from '@components/form-fields';
@@ -81,7 +82,7 @@ function NewLeadDialog({ onOpenChange, onCreated }: { onOpenChange: (open: boole
 
   return (
     <Dialog open onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-lg'>
         <DialogHeader>
           <DialogTitle>{t('contacts.newTitle')}</DialogTitle>
           <DialogDescription>{t('contacts.privacyNotice')}</DialogDescription>
@@ -159,7 +160,7 @@ function LinkUserDialog({
 
   return (
     <Dialog open onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-lg'>
         <DialogHeader>
           <DialogTitle>{t('contacts.linkTitle')}</DialogTitle>
           <DialogDescription>{t('contacts.linkHelp', { count: lead.notes_count })}</DialogDescription>
@@ -218,7 +219,7 @@ function StatusPill({ lead, disabled, onChanged }: { lead: ContactLead; disabled
       <SelectTrigger
         size='sm'
         aria-label={t('contacts.status')}
-        className='h-7 w-auto min-w-36 rounded-full border-border bg-background px-3 text-xs'
+        className='h-7 w-auto min-w-36 rounded-full border-border bg-white px-3 text-xs'
       >
         <SelectValue />
       </SelectTrigger>
@@ -263,18 +264,18 @@ function LeadRow({ lead, canManage, onChanged }: { lead: ContactLead; canManage:
   };
 
   return (
-    <li className='grid gap-3 p-4'>
+    <li className='grid gap-2 p-4'>
       <div className='flex flex-wrap items-center gap-3'>
         <span className='font-semibold'>{lead.name || t('contacts.noName')}</span>
         <StatusPill lead={lead} disabled={!canManage} onChanged={onChanged} />
       </div>
-      <p className='text-sm text-muted-foreground'>
+      <p className='m-0 text-sm text-muted-foreground'>
         {t(`contacts.channels.${lead.channel}`)} · {lead.contact} ·{' '}
         {format(parseISO(lead.contacted_at), 'd MMM', { locale })}
       </p>
-      {lead.inquiry ? <p className='text-sm'>{lead.inquiry}</p> : null}
+      {lead.inquiry ? <p className='m-0 text-sm'>{lead.inquiry}</p> : null}
       {isLinked && lead.linked_user ? (
-        <p className='text-sm'>
+        <p className='m-0 text-sm'>
           {t('contacts.hasAccount', { name: lead.linked_user.full_name })}
           {canOpen360 ? (
             <>
@@ -290,7 +291,7 @@ function LeadRow({ lead, canManage, onChanged }: { lead: ContactLead; canManage:
         </p>
       ) : null}
       {!isLinked && suggestion ? (
-        <div className='flex flex-wrap items-center gap-2 rounded-md bg-muted p-2 text-sm'>
+        <div className='flex flex-wrap items-center gap-2 rounded-md bg-gray-100 p-2 text-sm'>
           <span>{t('contacts.hasAccount', { name: suggestion.full_name })}</span>
           {canOpen360 ? (
             <Link className='font-medium text-primary underline' to={PageURLS.admin.userDetails(suggestion.user_id)}>
@@ -317,7 +318,7 @@ function LeadRow({ lead, canManage, onChanged }: { lead: ContactLead; canManage:
       ) : null}
       <div className='flex flex-wrap items-start gap-x-6 gap-y-2'>
         {lead.notes_moved_to_user ? (
-          <p className='text-sm text-muted-foreground'>{t('contacts.notesMoved', { count: lead.notes_count })}</p>
+          <p className='m-0 text-sm text-muted-foreground'>{t('contacts.notesMoved', { count: lead.notes_count })}</p>
         ) : (
           <details className='group w-full'>
             <summary className='cursor-pointer text-sm font-semibold text-primary'>
@@ -332,11 +333,11 @@ function LeadRow({ lead, canManage, onChanged }: { lead: ContactLead; canManage:
                       locale,
                     })}
                   </span>
-                  <p className='text-sm'>{item.body}</p>
+                  <p className='m-0 text-sm'>{item.body}</p>
                 </div>
               ))}
               {canManage ? (
-                <div className={cn('grid gap-2 border-t pt-3')}>
+                <div className={cn('grid gap-2 border-t border-border pt-3')}>
                   <Label htmlFor={`note-${lead.id}`}>{t('contacts.addNote')}</Label>
                   <Textarea id={`note-${lead.id}`} value={note} onChange={event => setNote(event.target.value)} />
                   <div>
@@ -391,10 +392,10 @@ export function ContactsTab() {
   const leads = response?.data?.leads ?? [];
 
   return (
-    <div className='grid gap-4'>
+    <AssistedPanel>
       <div className='grid gap-1'>
         <h2 className='text-lg font-semibold'>{t('contacts.title')}</h2>
-        <p className='text-sm text-muted-foreground'>{t('contacts.help')}</p>
+        <p className='m-0 text-sm text-muted-foreground'>{t('contacts.help')}</p>
       </div>
       {canManage ? (
         <div>
@@ -418,14 +419,14 @@ export function ContactsTab() {
           />
         ))}
       </div>
-      {leads.length === 0 ? <p className='text-sm text-muted-foreground'>{t('contacts.empty')}</p> : null}
-      <ul className='divide-y rounded-md border'>
+      {leads.length === 0 ? <p className='m-0 text-sm text-muted-foreground'>{t('contacts.empty')}</p> : null}
+      <ul className='divide-y divide-border rounded-xl border border-border'>
         {leads.map(lead => (
           <LeadRow key={lead.id} lead={lead} canManage={canManage} onChanged={() => void reFetch()} />
         ))}
       </ul>
       {isNewOpen ? <NewLeadDialog onOpenChange={setIsNewOpen} onCreated={() => void reFetch()} /> : null}
-    </div>
+    </AssistedPanel>
   );
 }
 
@@ -437,7 +438,7 @@ function FilterChip({ active, label, onClick }: { active: boolean; label: string
       onClick={onClick}
       className={cn(
         'rounded-full border px-3 py-1 text-xs',
-        active ? 'border-primary bg-primary/10 font-medium text-primary' : 'border-border hover:bg-muted',
+        active ? 'border-primary bg-primary/10 font-medium text-primary' : 'border-border hover:bg-gray-100',
       )}
     >
       {label}

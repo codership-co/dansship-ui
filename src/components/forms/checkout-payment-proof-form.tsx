@@ -1,6 +1,6 @@
 import { format } from 'date-fns';
 import { Button } from 'polpo/components';
-import { ChangeEvent, ReactNode, useState } from 'react';
+import { ChangeEvent, DragEvent, ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuArrowLeft, LuUpload } from 'react-icons/lu';
 import { MdOutlinePayments } from 'react-icons/md';
@@ -14,13 +14,31 @@ import {
   DansshipAPI,
   openBoldEmbeddedCheckout,
   PaymentMethod,
-  PaymentProofContentType,
   PaymentProofContentTypesList,
   PublicPlan,
 } from '@core/api';
 import { addSentryBreadcrumb, captureUnexpectedException, withSentrySpan } from '@core/sentry';
 import { cn, formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
+
+const PDF_CONTENT_TYPE = 'application/pdf';
+
+const CONTENT_TYPE_BY_EXTENSION: Record<string, string> = {
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+  pdf: PDF_CONTENT_TYPE,
+};
+
+/** Some systems report no type for a file the extension makes obvious; trust the extension then. */
+function resolveContentType(file: File) {
+  if (file.type && file.type !== 'application/octet-stream') {
+    return file.type;
+  }
+
+  return CONTENT_TYPE_BY_EXTENSION[file.name.split('.').pop()?.toLowerCase() ?? ''] ?? file.type;
+}
 
 interface CheckoutPaymentProofFormProps {
   plan?: PublicPlan;
@@ -30,14 +48,21 @@ interface CheckoutPaymentProofFormProps {
   walletAmountApplied: number;
   originalPrice?: number;
   onClose: () => void;
-  onBack: () => void;
+  /** Hides the back button when the form is not a step of a longer flow. */
+  onBack?: () => void;
   checkoutData?: CheckoutFormValues;
   onSubmit: (intentId: string) => void;
   summaryTitle?: string;
   hideSummary?: boolean;
   currency?: string;
   onCreateIntent?: () => Promise<string | null>;
+  /** Replaces the student proof upload, e.g. the admin endpoint when paying on someone's behalf. */
+  uploadProofForIntent?: (intentId: string, file: File) => Promise<unknown>;
+  /** Replaces the whole intent + proof flow: the caller registers the payment from the chosen proof. */
+  onConfirmWithProof?: (file: File) => Promise<unknown>;
   paymentQrUrl?: string | null;
+  /** Admins also attach the PDF receipts people share; the student checkout stays images only. */
+  allowPdfProof?: boolean;
   variant?: 'default' | 'event';
   confirmLabel?: string;
   canConfirm?: boolean;
@@ -62,7 +87,10 @@ export function CheckoutPaymentProofForm({
   hideSummary = false,
   currency,
   onCreateIntent,
+  uploadProofForIntent,
+  onConfirmWithProof,
   paymentQrUrl,
+  allowPdfProof = false,
   variant = 'default',
   confirmLabel,
   canConfirm = true,
@@ -92,15 +120,37 @@ export function CheckoutPaymentProofForm({
     isCreating || isCreatingBoldCheckout || isUploadingProof || isCreatingLinked || isCreatingLinkedBoldCheckout;
   const [selectedProofFile, setSelectedProofFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [proofError, setProofError] = useState<string | null>(null);
+  const proofInputRef = useRef<HTMLInputElement>(null);
   const displayTitle = summaryTitle ?? plan?.name ?? '';
   const displayCurrency = currency ?? plan?.currency ?? 'COP';
   const isQuarterlyCheckout = Boolean(checkoutData?.is_quarterly) && checkoutData?.purchase_mode !== 'duo';
   const quarterlyClassCount = (plan?.classes_included ?? 0) * 3;
   const showOriginalPrice = originalPrice !== undefined && originalPrice > finalPrice;
 
+  const proofContentTypes: Array<string> = allowPdfProof
+    ? [...PaymentProofContentTypesList, PDF_CONTENT_TYPE]
+    : PaymentProofContentTypesList;
+
   const onConfirm = async () => {
     if (requiresProof && !selectedProofFile) {
       toast.error(t('payments:proofRequiredTitle'));
+
+      return;
+    }
+
+    if (onConfirmWithProof) {
+      if (!selectedProofFile) {
+        return;
+      }
+
+      setIsCreatingLinked(true);
+
+      try {
+        await onConfirmWithProof(selectedProofFile);
+      } finally {
+        setIsCreatingLinked(false);
+      }
 
       return;
     }
@@ -155,7 +205,7 @@ export function CheckoutPaymentProofForm({
         if (requiresProof && selectedProofFile) {
           try {
             await withSentrySpan('checkout.proofUpload', 'ui.action', { intent_id: intentId }, () =>
-              uploadProof(intentId, selectedProofFile),
+              (uploadProofForIntent ?? uploadProof)(intentId, selectedProofFile),
             );
           } catch (uploadError) {
             toast.error(t('payments:proofUploadFailedCheckout'));
@@ -295,23 +345,42 @@ export function CheckoutPaymentProofForm({
     onSubmit(intent.id);
   };
 
-  const handleInputFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0] ?? null;
+  const acceptProofFile = (file: File) => {
+    const contentType = resolveContentType(file);
 
-    if (!file) return;
-
-    const isValidType = Object.values(PaymentProofContentType).includes(file.type as PaymentProofContentType);
-
-    if (!isValidType) {
+    if (!proofContentTypes.includes(contentType)) {
+      setProofError(file.name);
       toast.error(t('payments:proofInvalidTypeTitle'));
-      event.currentTarget.value = '';
 
       return;
     }
 
-    setImageUrl(URL.createObjectURL(file));
-    setSelectedProofFile(file);
-    event.currentTarget.value = '';
+    setProofError(null);
+    setImageUrl(contentType.startsWith('image/') ? URL.createObjectURL(file) : null);
+    setSelectedProofFile(file.type === contentType ? file : new File([file], file.name, { type: contentType }));
+  };
+
+  const handleInputFileUpload = (event: ChangeEvent<HTMLInputElement>) => {
+    const input = event.currentTarget;
+    const file = input.files?.[0] ?? null;
+
+    if (file) {
+      acceptProofFile(file);
+    }
+
+    // Lets the same file be chosen again after replacing it.
+    input.value = '';
+  };
+
+  const openProofPicker = () => proofInputRef.current?.click();
+
+  const handleProofDrop = (event: DragEvent<HTMLElement>) => {
+    event.preventDefault();
+    const file = event.dataTransfer.files?.[0];
+
+    if (file) {
+      acceptProofFile(file);
+    }
   };
 
   if (variant === 'event') {
@@ -327,9 +396,12 @@ export function CheckoutPaymentProofForm({
               {requiresProof ? (
                 <section className='grid gap-2' data-sentry-block>
                   <p className='m-0 text-[15px] font-semibold'>{t('eventos:checkout.yourProof')}</p>
-                  <label
+                  <div
+                    onClick={openProofPicker}
+                    onDragOver={event => event.preventDefault()}
+                    onDrop={handleProofDrop}
                     className={cn(
-                      'relative flex min-h-17 cursor-pointer items-center gap-3 rounded-xl border-[1.5px] px-3.5 py-2 has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-primary/50',
+                      'relative flex min-h-17 cursor-pointer items-center gap-3 rounded-xl border-[1.5px] px-3.5 py-2',
                       selectedProofFile
                         ? 'border-border bg-white'
                         : 'border-dashed border-muted-foreground bg-background',
@@ -357,7 +429,11 @@ export function CheckoutPaymentProofForm({
                       ) : (
                         <>
                           <span className='font-semibold'>{t('eventos:checkout.pickImage')}</span>
-                          <span className='text-sm text-muted-foreground'>{t('eventos:checkout.proofFormats')}</span>
+                          <span className='text-sm text-muted-foreground'>
+                            {t(
+                              allowPdfProof ? 'eventos:checkout.proofFormatsWithPdf' : 'eventos:checkout.proofFormats',
+                            )}
+                          </span>
                         </>
                       )}
                     </span>
@@ -366,20 +442,33 @@ export function CheckoutPaymentProofForm({
                       color='primary'
                       variant={selectedProofFile ? 'outlined' : 'solid'}
                       size='small'
-                      tabIndex={-1}
-                      aria-hidden
-                      className='pointer-events-none shrink-0'
+                      className='shrink-0'
+                      onClick={event => {
+                        event.stopPropagation();
+                        openProofPicker();
+                      }}
                     >
                       {selectedProofFile ? t('eventos:checkout.replace') : t('eventos:checkout.upload')}
                     </Button>
-                    <input
-                      type='file'
-                      aria-label={proofLabel}
-                      className='absolute inset-0 size-full cursor-pointer opacity-0'
-                      accept={PaymentProofContentTypesList.join(',')}
-                      onChange={handleInputFileUpload}
-                    />
-                  </label>
+                  </div>
+                  <input
+                    ref={proofInputRef}
+                    type='file'
+                    hidden
+                    aria-label={proofLabel}
+                    accept={proofContentTypes.join(',')}
+                    onChange={handleInputFileUpload}
+                  />
+                  {proofError ? (
+                    <p role='alert' className='m-0 text-sm text-alert-600'>
+                      {t('eventos:checkout.proofRejected', {
+                        name: proofError,
+                        formats: t(
+                          allowPdfProof ? 'eventos:checkout.proofFormatsWithPdf' : 'eventos:checkout.proofFormats',
+                        ),
+                      })}
+                    </p>
+                  ) : null}
                 </section>
               ) : null}
               {acceptance}
@@ -392,16 +481,18 @@ export function CheckoutPaymentProofForm({
             footerClassName,
           )}
         >
-          <Button
-            type='button'
-            color='primary'
-            variant='outlined'
-            className='flex flex-1 items-center md:flex-none'
-            onClick={onBack}
-          >
-            <LuArrowLeft />
-            {t('common:back')}
-          </Button>
+          {onBack ? (
+            <Button
+              type='button'
+              color='primary'
+              variant='outlined'
+              className='flex flex-1 items-center md:flex-none'
+              onClick={onBack}
+            >
+              <LuArrowLeft />
+              {t('common:back')}
+            </Button>
+          ) : null}
           <Button
             type='button'
             color='primary'

@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router';
 import { toast } from 'sonner';
 
 import { apiErrorCode } from './assisted-errors';
+import { AssistedPanel } from './assisted-panel';
 import { PersonPicker } from './person-picker';
 import { useSelectedPerson } from './use-selected-person';
 
@@ -108,7 +109,7 @@ export function AccountMergeTab() {
   const canMerge = Boolean(kept && duplicate && preview && !isBlocked && reason.trim() && irreversible);
 
   return (
-    <div className='grid gap-6'>
+    <AssistedPanel className='gap-6'>
       <p className='text-sm text-muted-foreground'>{t('merge.help')}</p>
       <div className='grid gap-6 md:grid-cols-2'>
         <PersonPicker person={kept} onSelect={selectKept} label={t('merge.keep')} />
@@ -135,7 +136,7 @@ export function AccountMergeTab() {
             </ul>
           </div>
         ) : (
-          <div className='grid gap-2 rounded-md border p-3 text-sm'>
+          <div className='grid gap-2 rounded-xl border border-border p-3 text-sm'>
             <p className='font-medium'>{t('merge.willHappen')}</p>
             <ul className='list-disc pl-5'>
               <li>{t('merge.rule.keepContact')}</li>
@@ -190,6 +191,6 @@ export function AccountMergeTab() {
         cancelLabel={t('common.cancel')}
         confirmVariant='destructive'
       />
-    </div>
+    </AssistedPanel>
   );
 }

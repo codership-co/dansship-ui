@@ -3,15 +3,17 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuInfo } from 'react-icons/lu';
 import { Link, useLocation, useNavigate } from 'react-router';
+import { toast } from 'sonner';
 
 import { EventoCheckoutModal } from './evento-checkout-modal';
 import { landingHasInstallmentAmounts, paymentNotice } from './installment-notice';
 import { sessionSummaryText } from './session-summary';
+import { SimpleRegistrationDialog, type SimpleRegistrationOutcome } from './simple-registration-dialog';
 
 import { SpinnerLoader } from '@components/loaders';
 import { Badge } from '@components/ui';
 import { useAuth, useOrPermissions } from '@contexts';
-import { DansshipAPI, type EventLanding } from '@core/api';
+import { DansshipAPI, DansshipAPIError, type EventLanding, type SimplePersonInput } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions } from '@core/permissions';
 import { consumePendingEventoCheckoutIntent, formatPrice, setPendingEventoCheckoutIntent } from '@helpers';
@@ -158,11 +160,12 @@ export function EventoLanding({
   accessToken?: string;
 }) {
   const { t } = useTranslation();
-  const { isAuthenticated, ready } = useAuth();
+  const { isAuthenticated, ready, startSession } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const canPreview = useOrPermissions(AdminPermissions.eventos);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [simpleOpen, setSimpleOpen] = useState(false);
   const useAdminPreview = preview && canPreview;
   const canFetch = Boolean(accessToken || slug) && (!preview || (ready && canPreview));
 
@@ -214,19 +217,50 @@ export function EventoLanding({
     return <p className='text-muted-foreground'>{t('eventos:landing.notFound')}</p>;
   }
 
+  const goToLogin = (path: string = PageURLS.auth.login) => {
+    setPendingEventoCheckoutIntent(landing.slug);
+    navigate(path, { state: { from: location } });
+  };
+
   const startCheckout = () => {
     if (landing.sold_out || landing.already_registered) {
       return;
     }
 
+    if (!isAuthenticated && landing.simple_registration_enabled) {
+      setSimpleOpen(true);
+
+      return;
+    }
+
     if (!isAuthenticated) {
-      setPendingEventoCheckoutIntent(landing.slug);
-      navigate(PageURLS.auth.login, { state: { from: location } });
+      goToLogin();
 
       return;
     }
 
     setCheckoutOpen(true);
+  };
+
+  const registerSimply = async (person: SimplePersonInput): Promise<SimpleRegistrationOutcome> => {
+    const { ok, error } = await DansshipAPI.eventos.simpleRegister(landing.slug, person);
+
+    if (ok) {
+      await startSession();
+      setCheckoutOpen(true);
+
+      return 'created';
+    }
+
+    const code = error instanceof DansshipAPIError ? error.body.error_code : '';
+
+    if (code === 'SIMPLE_REGISTRATION_ACCOUNT_EXISTS' || code === 'SIMPLE_REGISTRATION_IDENTITY_CONFLICT') {
+      return 'exists';
+    }
+
+    toast.error(t('eventos:simpleRegistration.failed'));
+
+    return 'failed';
   };
 
   const ctaDisabled = landing.sold_out || landing.already_registered;
@@ -290,6 +324,38 @@ export function EventoLanding({
           {ctaLabel}
         </Button>
       </div>
+      {landing.simple_registration_enabled ? (
+        <SimpleRegistrationDialog
+          open={simpleOpen}
+          onOpenChange={setSimpleOpen}
+          title={t('eventos:simpleRegistration.title')}
+          description={t('eventos:simpleRegistration.description')}
+          submitLabel={t('eventos:simpleRegistration.continue')}
+          termsLabel={t('eventos:simpleRegistration.terms')}
+          placeholders
+          onSubmit={registerSimply}
+          existsNotice={
+            <div className='grid gap-2 rounded-md border border-warning-600 bg-warning-50 p-3 text-sm'>
+              <p className='m-0 font-semibold'>{t('eventos:simpleRegistration.exists')}</p>
+              <p className='m-0'>{t('eventos:simpleRegistration.existsHint')}</p>
+              <div className='flex flex-wrap gap-2'>
+                <Button type='button' color='primary' variant='solid' size='small' onClick={() => goToLogin()}>
+                  {t('eventos:simpleRegistration.login')}
+                </Button>
+                <Button
+                  type='button'
+                  color='primary'
+                  variant='text'
+                  size='small'
+                  onClick={() => goToLogin(PageURLS.auth.forgotPassword)}
+                >
+                  {t('eventos:simpleRegistration.forgot')}
+                </Button>
+              </div>
+            </div>
+          }
+        />
+      ) : null}
       <EventoCheckoutModal
         landing={landing}
         accessToken={accessToken}

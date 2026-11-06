@@ -47,9 +47,13 @@ export function AssistedPage() {
         )
       }
     >
-      <TabsList className='h-auto max-w-full flex-wrap justify-start gap-1 border bg-background p-1 shadow-sm'>
+      <TabsList className='h-auto max-w-full flex-wrap justify-start gap-1 border border-border bg-white p-1 shadow-sm'>
         {visible.map(tab => (
-          <TabsTrigger key={tab} value={tab} className='flex-none'>
+          <TabsTrigger
+            key={tab}
+            value={tab}
+            className='flex-none px-4 data-[state=active]:bg-accent data-[state=active]:text-primary'
+          >
             {t(`tabs.${tab}`)}
           </TabsTrigger>
         ))}

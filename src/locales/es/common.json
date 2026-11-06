@@ -78,5 +78,13 @@
     "uploading": "Subiendo...",
     "invalidType": "Tipo de archivo no válido. Usa JPG, PNG o WEBP.",
     "previewAlt": "Vista previa del archivo"
+  },
+  "simplePerson": {
+    "fullName": "Nombre completo",
+    "fullNamePlaceholder": "Tu nombre y apellido",
+    "email": "Correo",
+    "emailPlaceholder": "tucorreo@correo.com",
+    "phone": "Celular",
+    "phonePlaceholder": "300 000 0000"
   }
 }

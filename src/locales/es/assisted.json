@@ -66,7 +66,15 @@
     "generate": "Generar enlace",
     "copied": "Enlace copiado.",
     "sent": "Enviado a {{email}}.",
-    "invalidatesPrevious": "Este enlace solo se muestra ahora. El anterior dejó de funcionar."
+    "invalidatesPrevious": "Este enlace solo se muestra ahora. El anterior dejó de funcionar.",
+    "status": {
+      "active": "Pendiente",
+      "inactive": "Sin enlace activo"
+    },
+    "keyNote": {
+      "title": "Trátalo como una llave",
+      "body": "Quien tenga el enlace puede usarlo: envíalo solo a la persona. Cada copia, reenvío y generación queda en la auditoría, y generar uno nuevo invalida el anterior. La invitación como profesor se crea desde Instructores; aquí solo se copia o reenvía."
+    }
   },
   "merge": {
     "help": "Une una cuenta duplicada con la cuenta que se conserva. La duplicada se cierra.",
@@ -114,7 +122,29 @@
     "choose": "Evento",
     "placeholder": "Elige un evento",
     "approveAndEnroll": "Aprobar pago e inscribir",
-    "registered": "Pago aprobado e inscripción creada."
+    "registered": "Pago aprobado e inscripción creada.",
+    "concept": "Pago que registra",
+    "conceptPlaceholder": "Elige el pago",
+    "summary": {
+      "event": "Evento",
+      "date": "Fecha",
+      "amount": "Valor del pago"
+    },
+    "paidOn": "Fecha de pago",
+    "note": "Nota",
+    "optional": "(opcional)",
+    "notePlaceholder": "Ej. Pagó el 1 nov y no pudo registrarse",
+    "createPerson": "¿No tiene cuenta? Crearla con registro simple",
+    "createPersonTitle": "Crear cuenta con registro simple",
+    "createPersonHelp": "Se crea una cuenta liviana sin contraseña con estos tres datos. La persona entra con «Olvidé mi contraseña».",
+    "createPersonSubmit": "Crear y seleccionar",
+    "createPersonTerms": "La persona acepta los términos y la política de tratamiento de datos.",
+    "createPersonExisting": "Esa persona ya tenía una cuenta: la seleccionamos.",
+    "createPersonFailed": "No se pudo crear la cuenta.",
+    "noOptions": {
+      "pair": "Los eventos en pareja todavía no se pueden registrar desde aquí: el precio es por pareja.",
+      "generic": "No se pudo calcular el pago de este evento para la persona. Intenta de nuevo o elige otro evento."
+    }
   },
   "class": {
     "date": "Fecha",
@@ -160,9 +190,6 @@
     "new": "Persona nueva",
     "search": "Acompañante",
     "simpleHelp": "Se crea una cuenta simple con estos datos; no necesita plan.",
-    "fullName": "Nombre completo",
-    "email": "Correo",
-    "phone": "Celular",
     "terms": "La persona acepta los términos y la política de tratamiento de datos."
   },
   "contacts": {

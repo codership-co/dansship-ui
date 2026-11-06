@@ -20,6 +20,39 @@ import type { AdminRegisterUserResponse } from '@core/api/users/users.models';
 
 type Step = 'email' | 'profile' | 'health' | 'preferences' | 'done';
 
+const STEPS = ['email', 'profile', 'health', 'preferences'] as const;
+
+function RegisterSteps({ current }: { current: (typeof STEPS)[number] }) {
+  const { t } = useTranslation('admin');
+
+  return (
+    <ol className='mb-6 flex flex-wrap gap-2'>
+      {STEPS.map((step, index) => {
+        const isCurrent = step === current;
+
+        return (
+          <li
+            key={step}
+            aria-current={isCurrent ? 'step' : undefined}
+            className={`flex items-center gap-2 rounded-full border px-4 py-2 text-sm ${
+              isCurrent ? 'border-primary text-primary' : 'border-border text-foreground/60'
+            }`}
+          >
+            <span
+              className={`grid size-6 place-items-center rounded-full text-xs font-medium ${
+                isCurrent ? 'bg-primary text-primary-foreground' : 'bg-gray-200'
+              }`}
+            >
+              {index + 1}
+            </span>
+            {t(`users.registration.steps.${step}`)}
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
 export function AdminRegisterUser() {
   const { t } = useTranslation();
   const canBuyPlan = useOrPermissions(AdminPermissions.planPurchaseRegistration);
@@ -155,26 +188,29 @@ export function AdminRegisterUser() {
 
   if (step === 'email') {
     return (
-      <form className='grid max-w-xl gap-4' onSubmit={event => void lookupEmail(event)}>
-        <div className='grid gap-2'>
-          <Label htmlFor='register-email'>{t('admin:users.registration.email')}</Label>
-          <Input
-            id='register-email'
-            type='email'
-            required
-            value={email}
-            onChange={event => setEmail(event.target.value)}
-          />
-        </div>
-        <div className='grid gap-2'>
-          <Label htmlFor='register-email-confirmation'>{t('admin:users.registration.emailConfirmation')}</Label>
-          <Input
-            id='register-email-confirmation'
-            type='email'
-            required
-            value={emailConfirmation}
-            onChange={event => setEmailConfirmation(event.target.value)}
-          />
+      <form className='grid gap-4' onSubmit={event => void lookupEmail(event)}>
+        <RegisterSteps current='email' />
+        <div className='grid gap-4 md:grid-cols-2'>
+          <div className='grid gap-2'>
+            <Label htmlFor='register-email'>{t('admin:users.registration.email')}</Label>
+            <Input
+              id='register-email'
+              type='email'
+              required
+              value={email}
+              onChange={event => setEmail(event.target.value)}
+            />
+          </div>
+          <div className='grid gap-2'>
+            <Label htmlFor='register-email-confirmation'>{t('admin:users.registration.emailConfirmation')}</Label>
+            <Input
+              id='register-email-confirmation'
+              type='email'
+              required
+              value={emailConfirmation}
+              onChange={event => setEmailConfirmation(event.target.value)}
+            />
+          </div>
         </div>
         {notice ? <p className='text-sm'>{notice}</p> : null}
         {existingUserId ? (
@@ -185,16 +221,19 @@ export function AdminRegisterUser() {
           </Link>
         ) : null}
         {error ? <p className='text-sm text-alert-600'>{error}</p> : null}
-        <Button color='primary' variant='solid' type='submit' disabled={isLoading}>
-          {t('admin:users.registration.continue')}
-        </Button>
+        <div className='flex justify-end'>
+          <Button color='primary' variant='solid' type='submit' disabled={isLoading || !email || !emailConfirmation}>
+            {t('admin:users.registration.continue')}
+          </Button>
+        </div>
       </form>
     );
   }
 
   if (step === 'profile') {
     return (
-      <div className='max-w-3xl'>
+      <div>
+        <RegisterSteps current='profile' />
         {notice ? <p className='mb-4 text-sm'>{notice}</p> : null}
         <BasicProfileForm
           isLoading={false}
@@ -215,7 +254,8 @@ export function AdminRegisterUser() {
 
   if (step === 'health') {
     return (
-      <div className='max-w-3xl'>
+      <div>
+        <RegisterSteps current='health' />
         <HealthProfileForm
           isLoading={false}
           error={null}
@@ -234,7 +274,8 @@ export function AdminRegisterUser() {
   }
 
   return (
-    <div className='max-w-3xl'>
+    <div>
+      <RegisterSteps current='preferences' />
       <PreferencesProfileForm
         isLoading={isLoading}
         error={error}

@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router';
 import { AccountDataTab } from './account-data-tab';
 import { AccountLinksTab } from './account-links-tab';
 import { AccountMergeTab } from './account-merge-tab';
+import { AssistedPanel } from './assisted-panel';
 import { ACCOUNT_SUBTAB, ACCOUNT_SUBTAB_PERMISSIONS, type AccountSubtab, isAccountSubtab } from './assisted-tabs';
 
 import { AdminRegisterUser } from '@components/modules/admin-users/admin-register-user';
@@ -54,16 +55,22 @@ export function AccountTab() {
         )
       }
     >
-      <TabsList variant='line' className='h-auto max-w-full flex-wrap justify-start'>
+      <TabsList variant='line' className='h-auto w-full flex-wrap justify-start border-b border-border'>
         {visible.map(subtab => (
-          <TabsTrigger key={subtab} value={subtab}>
+          <TabsTrigger
+            key={subtab}
+            value={subtab}
+            className='px-4 data-[state=active]:text-primary data-[state=active]:after:bg-primary'
+          >
             {t(`account.subtabs.${subtab}`)}
           </TabsTrigger>
         ))}
       </TabsList>
       {canCreate ? (
         <TabsContent value={ACCOUNT_SUBTAB.create}>
-          <AdminRegisterUser />
+          <AssistedPanel>
+            <AdminRegisterUser />
+          </AssistedPanel>
         </TabsContent>
       ) : null}
       {canData ? (

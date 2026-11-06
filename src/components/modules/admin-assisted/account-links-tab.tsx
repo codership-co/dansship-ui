@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { apiErrorCode } from './assisted-errors';
 import { PersonGate } from './person-gate';
 
-import { Card, CardContent, Input } from '@components/ui';
+import { Badge, Input } from '@components/ui';
 import { useOrPermissions } from '@contexts';
 import { type AccountLinkKind, type AccountLinkStatus, DansshipAPI } from '@core/api';
 import { PERMISSION } from '@core/permissions';
@@ -46,80 +46,53 @@ function LinkRow({ userId, status, onChanged }: { userId: string; status: Accoun
   };
 
   return (
-    <Card>
-      <CardContent className='grid gap-3 py-4'>
-        <div className='flex flex-wrap items-center justify-between gap-2'>
-          <div>
-            <p className='font-medium'>{t(`links.kinds.${status.kind}`)}</p>
-            <p className='text-sm text-muted-foreground'>
-              {!status.applicable
-                ? t(`links.notApplicable.${status.reason_code}`, {
-                    defaultValue: t('links.notApplicable.generic'),
-                  })
-                : status.active && status.expires_at
-                  ? t('links.activeUntil', {
-                      date: format(parseISO(status.expires_at), 'PPp', {
-                        locale,
-                      }),
-                    })
-                  : t('links.noActive')}
-              {status.token_masked ? ` · ${status.token_masked}` : ''}
-            </p>
-          </div>
-          {status.applicable ? (
-            <div className='flex flex-wrap gap-2'>
-              {status.active ? (
-                <>
-                  <Button
-                    color='primary'
-                    variant='outlined'
-                    size='small'
-                    disabled={isLoading}
-                    onClick={() => void run('copy')}
-                  >
-                    {t('links.copy')}
-                  </Button>
-                  <Button
-                    color='primary'
-                    variant='outlined'
-                    size='small'
-                    disabled={isLoading}
-                    onClick={() => void run('email')}
-                  >
-                    {t('links.resend')}
-                  </Button>
-                  <Button
-                    color='primary'
-                    variant='text'
-                    size='small'
-                    disabled={isLoading}
-                    onClick={() => void run('copy')}
-                  >
-                    {t('links.generateNew')}
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  color='primary'
-                  variant='solid'
-                  size='small'
-                  disabled={isLoading}
-                  onClick={() => void run('copy')}
-                >
-                  {t('links.generate')}
-                </Button>
-              )}
-            </div>
-          ) : null}
+    <div className='grid gap-3 p-4'>
+      <div className='flex flex-wrap items-center gap-2'>
+        <p className='font-semibold'>{t(`links.kinds.${status.kind}`)}</p>
+        <Badge variant={status.active ? 'outline' : 'outlineNeutral'} size='regular'>
+          {t(status.active ? 'links.status.active' : 'links.status.inactive')}
+        </Badge>
+      </div>
+      <p className='text-sm text-muted-foreground'>
+        {!status.applicable
+          ? t(`links.notApplicable.${status.reason_code}`, {
+              defaultValue: t('links.notApplicable.generic'),
+            })
+          : status.active && status.expires_at
+            ? t('links.activeUntil', {
+                date: format(parseISO(status.expires_at), 'PPp', { locale }),
+              })
+            : t('links.noActive')}
+        {status.token_masked ? ` · ${status.token_masked}` : ''}
+      </p>
+      {status.applicable ? (
+        <div className='flex flex-wrap items-center gap-2'>
+          {status.active ? (
+            <>
+              <Button color='primary' variant='solid' disabled={isLoading} onClick={() => void run('copy')}>
+                {t('links.copy')}
+              </Button>
+              <Button color='primary' variant='outlined' disabled={isLoading} onClick={() => void run('email')}>
+                {t('links.resend')}
+              </Button>
+              <Button color='primary' variant='text' disabled={isLoading} onClick={() => void run('copy')}>
+                {t('links.generateNew')}
+              </Button>
+            </>
+          ) : (
+            <Button color='primary' variant='solid' disabled={isLoading} onClick={() => void run('copy')}>
+              {t('links.generate')}
+            </Button>
+          )}
         </div>
-        {shownLink ? (
-          <div className='grid gap-1'>
-            <Input readOnly value={shownLink} onFocus={event => event.target.select()} />
-            <p className='text-xs text-muted-foreground'>{t('links.invalidatesPrevious')}</p>
-          </div>
-        ) : null}
-      </CardContent>
-    </Card>
+      ) : null}
+      {shownLink ? (
+        <div className='grid gap-1'>
+          <Input readOnly value={shownLink} onFocus={event => event.target.select()} />
+          <p className='text-xs text-muted-foreground'>{t('links.invalidatesPrevious')}</p>
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -136,11 +109,17 @@ function LinksList({ userId }: { userId: string }) {
   }
 
   return (
-    <div className='grid gap-3'>
+    <div className='grid gap-4'>
       <p className='text-sm text-muted-foreground'>{t('links.help')}</p>
-      {statuses.map(status => (
-        <LinkRow key={status.kind} userId={userId} status={status} onChanged={() => void reFetch()} />
-      ))}
+      <div className='divide-y divide-border overflow-hidden rounded-xl border border-border'>
+        {statuses.map(status => (
+          <LinkRow key={status.kind} userId={userId} status={status} onChanged={() => void reFetch()} />
+        ))}
+      </div>
+      <div className='rounded-xl border border-border bg-gray-100 p-4'>
+        <p className='font-semibold'>{t('links.keyNote.title')}</p>
+        <p className='text-sm text-muted-foreground'>{t('links.keyNote.body')}</p>
+      </div>
     </div>
   );
 }

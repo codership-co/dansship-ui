@@ -94,7 +94,7 @@ function RevokeDialog({
 
   return (
     <Dialog open onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-lg'>
         <DialogHeader>
           <DialogTitle>{t('benefits.revokeTitle')}</DialogTitle>
           <DialogDescription>{grant.name}</DialogDescription>
@@ -211,7 +211,10 @@ function BenefitsPanel({ person }: { person: PersonSearchResult }) {
         {grants.length === 0 ? <p className='text-sm text-muted-foreground'>{t('benefits.empty')}</p> : null}
         <ul className='grid gap-2'>
           {grants.map(item => (
-            <li key={item.id} className='flex flex-wrap items-center justify-between gap-2 rounded-md border p-3'>
+            <li
+              key={item.id}
+              className='flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border p-3'
+            >
               <div className='grid gap-1'>
                 <span className='font-medium'>
                   {item.name} · {describe(item)}

@@ -24,6 +24,8 @@ import type {
   MergePreview,
   MergeResult,
   PersonSearchResult,
+  SimpleAccountResult,
+  SimplePersonInput,
 } from './assisted.models';
 
 export class AssistedAdminAPI {
@@ -34,6 +36,14 @@ export class AssistedAdminAPI {
       path: '/admin/assisted/people/search',
       method: 'GET',
       params: { q },
+    });
+  }
+
+  async registerSimpleAccount(payload: SimplePersonInput) {
+    return this.httpClient.callNoError<SimpleAccountResult, SimplePersonInput>({
+      path: '/admin/assisted/simple-accounts',
+      method: 'POST',
+      data: payload,
     });
   }
 

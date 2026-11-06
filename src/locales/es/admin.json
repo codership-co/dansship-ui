@@ -119,7 +119,13 @@
       "title": "Crear usuario",
       "subtitle": "Registra a una persona que está en el estudio y entrega la contraseña temporal una sola vez.",
       "email": "Correo",
-      "emailConfirmation": "Confirma el correo",
+      "emailConfirmation": "Confirmar correo",
+      "steps": {
+        "email": "Correo",
+        "profile": "Datos",
+        "health": "Salud",
+        "preferences": "Preferencias"
+      },
       "continue": "Continuar",
       "emailMismatch": "Los correos no coinciden.",
       "alreadyRegistered": "Esa persona ya tiene una cuenta.",
@@ -253,6 +259,7 @@
         "grantedAt": "Otorgado",
         "evento": "Evento",
         "origin": "Origen",
+        "bookingPayment": "Pago",
         "ticketPrice": "Precio del ticket"
       },
       "reimburse": "Reembolsar",
@@ -490,7 +497,8 @@
         "revokeSuccess": "Se quitó el rol {{role}}.",
         "revokeFailed": "No se pudo quitar el rol.",
         "loadFailed": "No se pudieron cargar los roles."
-      }
+      },
+      "giftNote": "Sin crédito del plan. Dada por {{name}}: {{reason}}"
     }
   },
   "roster": {

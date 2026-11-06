@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { LuSearch } from 'react-icons/lu';
 import { Link } from 'react-router';
 
-import { Card, CardContent, Input, Label } from '@components/ui';
+import { Input, Label } from '@components/ui';
 import { useOrPermissions } from '@contexts';
 import { DansshipAPI, type PersonSearchResult } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -57,13 +57,14 @@ export function PersonPicker({ person, onSelect, search, label }: PersonPickerPr
 
   if (person) {
     return (
-      <Card>
-        <CardContent className='flex flex-wrap items-center justify-between gap-3 py-4'>
+      <div className='grid gap-3'>
+        <p className='text-label font-medium'>{label ?? t('picker.label')}</p>
+        <div className='flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-gray-100 p-4'>
           <div className='min-w-0'>
-            <p className='truncate font-medium'>{person.full_name || t('picker.unknownName')}</p>
+            <p className='truncate font-semibold'>{person.full_name || t('picker.unknownName')}</p>
             {person.email ? <p className='truncate text-sm text-muted-foreground'>{person.email}</p> : null}
           </div>
-          <div className='flex flex-wrap gap-2'>
+          <div className='flex flex-wrap items-center gap-2'>
             {canOpen360 ? (
               <Link to={PageURLS.admin.userDetails(person.id)}>
                 <Button color='primary' variant='outlined' size='small'>
@@ -75,8 +76,8 @@ export function PersonPicker({ person, onSelect, search, label }: PersonPickerPr
               {t('picker.change')}
             </Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
@@ -85,11 +86,11 @@ export function PersonPicker({ person, onSelect, search, label }: PersonPickerPr
   return (
     <div ref={containerRef} className='relative grid gap-2'>
       <Label htmlFor='assisted-person-search'>{label ?? t('picker.label')}</Label>
-      <div className='relative'>
-        <LuSearch className='pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground' />
+      <div className='flex items-center gap-3 rounded-2xl bg-gray-200/50 px-5 focus-within:bg-white focus-within:ring-[3px] focus-within:ring-primary/50'>
+        <LuSearch className='pointer-events-none size-4 shrink-0 text-muted-foreground' aria-hidden />
         <Input
           id='assisted-person-search'
-          className='pl-9'
+          className='rounded-none bg-transparent px-0 shadow-none focus:bg-transparent focus-visible:ring-0'
           placeholder={t('picker.placeholder')}
           value={input}
           autoComplete='off'
@@ -101,7 +102,7 @@ export function PersonPicker({ person, onSelect, search, label }: PersonPickerPr
         />
       </div>
       {isOpen && query.length >= MIN_QUERY_LENGTH ? (
-        <ul className='absolute top-full right-0 left-0 z-20 mt-1 max-h-64 overflow-y-auto rounded-md border bg-background shadow-md'>
+        <ul className='absolute top-full right-0 left-0 z-20 mt-1 max-h-64 overflow-y-auto rounded-md border border-border bg-white shadow-md'>
           {isLoading ? <li className='px-3 py-2 text-sm text-muted-foreground'>{t('picker.searching')}</li> : null}
           {!isLoading && results.length === 0 ? (
             <li className='px-3 py-2 text-sm text-muted-foreground'>{t('picker.noResults')}</li>
@@ -110,7 +111,7 @@ export function PersonPicker({ person, onSelect, search, label }: PersonPickerPr
             <li key={result.id}>
               <button
                 type='button'
-                className='w-full px-3 py-2 text-left text-sm hover:bg-muted'
+                className='w-full px-3 py-2 text-left text-sm hover:bg-gray-100'
                 onClick={() => {
                   onSelect(result);
                   setInput('');

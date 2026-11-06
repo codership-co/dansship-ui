@@ -93,7 +93,7 @@ export function BookingConfirmDialog({
 
   return (
     <Dialog open onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-lg'>
         <DialogHeader>
           <DialogTitle>{t(isHeld ? 'class.confirmAttendance' : 'class.confirmBooking')}</DialogTitle>
           <DialogDescription>
@@ -105,8 +105,10 @@ export function BookingConfirmDialog({
             })}
           </DialogDescription>
         </DialogHeader>
-        <div className='grid gap-4'>
-          <p className='text-sm text-muted-foreground'>{gift ? t('class.noCreditUsed') : t('class.planWillBeUsed')}</p>
+        <div className='grid gap-3'>
+          <p className='m-0 text-sm text-muted-foreground'>
+            {gift ? t('class.noCreditUsed') : t('class.planWillBeUsed')}
+          </p>
           {canGift ? (
             <div className='flex items-start gap-2'>
               <Checkbox

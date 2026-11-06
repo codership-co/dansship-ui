@@ -4,11 +4,13 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
 
+import { CheckoutPaymentProofForm } from '@components/forms/checkout-payment-proof-form';
 import { AdminPaymentPricingBreakdown } from '@components/modules/admin-payments/admin-payment-pricing-breakdown';
-import { TransferPaymentInstructions } from '@components/modules/payments/transfer-payment-instructions';
-import { Input, Label } from '@components/ui';
+import { CollapsibleTotal } from '@components/modules/payments/collapsible-total';
+import { Checkbox, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
 import { DansshipAPI, PaymentMethod, PaymentStatus } from '@core/api';
 import { PageURLS } from '@core/constants';
+import { formatPrice } from '@helpers';
 import { usePromise } from '@hooks';
 
 import type { PaymentIntent } from '@core/api/payments/payments.models';
@@ -63,9 +65,7 @@ export function AdminPlanPurchase({ userId }: AdminPlanPurchaseProps) {
   const [discountCode, setDiscountCode] = useState('');
   const [referralCode, setReferralCode] = useState('');
   const [preview, setPreview] = useState<InPersonPlanPreview | null>(null);
-  const [proof, setProof] = useState<File | null>(null);
   const [idempotencyKey] = useState(() => crypto.randomUUID());
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [subscriptionId, setSubscriptionId] = useState<string | null>(null);
 
   const payload = {
@@ -90,41 +90,32 @@ export function AdminPlanPurchase({ userId }: AdminPlanPurchaseProps) {
     setPreview(response.data);
   };
 
-  const confirmPurchase = async () => {
-    if (!planId || !proof || !preview?.is_valid) {
+  const createDraft = async () => {
+    const draft = await DansshipAPI.usersAdmin.createPlanPurchase(userId, {
+      ...payload,
+      idempotency_key: idempotencyKey,
+    });
+
+    if (!draft.ok || !draft.data) {
+      toast.error(t('admin:users.registration.purchaseFailed'));
+
+      return null;
+    }
+
+    return draft.data.id;
+  };
+
+  const confirmPurchase = async (intentId: string) => {
+    const confirmed = await DansshipAPI.usersAdmin.confirmPlanPurchase(userId, intentId);
+
+    if (!confirmed.ok || !confirmed.data?.subscription_id) {
+      toast.error(t('admin:users.registration.purchaseFailed'));
+
       return;
     }
 
-    setIsSubmitting(true);
-
-    try {
-      const draft = await DansshipAPI.usersAdmin.createPlanPurchase(userId, {
-        ...payload,
-        idempotency_key: idempotencyKey,
-      });
-
-      if (!draft.ok || !draft.data) {
-        toast.error(t('admin:users.registration.purchaseFailed'));
-
-        return;
-      }
-
-      await DansshipAPI.paymentsAdmin.uploadAdminProof(draft.data.id, proof);
-      const confirmed = await DansshipAPI.usersAdmin.confirmPlanPurchase(userId, draft.data.id);
-
-      if (!confirmed.ok || !confirmed.data?.subscription_id) {
-        toast.error(t('admin:users.registration.purchaseFailed'));
-
-        return;
-      }
-
-      setSubscriptionId(confirmed.data.subscription_id);
-      toast.success(t('admin:users.registration.purchaseDone'));
-    } catch {
-      toast.error(t('admin:users.registration.purchaseFailed'));
-    } finally {
-      setIsSubmitting(false);
-    }
+    setSubscriptionId(confirmed.data.subscription_id);
+    toast.success(t('admin:users.registration.purchaseDone'));
   };
 
   if (subscriptionId) {
@@ -140,41 +131,86 @@ export function AdminPlanPurchase({ userId }: AdminPlanPurchaseProps) {
     );
   }
 
+  if (preview?.is_valid) {
+    const amountToCharge = asNumber(preview.amount_to_charge);
+    const walletAmountApplied = asNumber(preview.wallet_amount_applied);
+    const hasDiscount = asNumber(preview.original_price) > asNumber(preview.final_price);
+
+    return (
+      <div className='flex flex-col'>
+        <CheckoutPaymentProofForm
+          variant='event'
+          allowPdfProof
+          hideSummary
+          paymentMethod={PaymentMethod.TRANSFER}
+          finalPrice={asNumber(preview.final_price)}
+          amountToCharge={amountToCharge}
+          walletAmountApplied={walletAmountApplied}
+          confirmLabel={t('eventos:checkout.confirmPay')}
+          topSlot={
+            <div className='grid gap-4'>
+              <CollapsibleTotal
+                subtitle={t('eventos:checkout.vatIncluded', {
+                  amount: formatPrice(asNumber(preview.tax_amount), 'COP'),
+                })}
+                amount={amountToCharge}
+                baseAmount={asNumber(preview.base_amount)}
+                taxAmount={asNumber(preview.tax_amount)}
+                walletAmountApplied={walletAmountApplied}
+              />
+              {hasDiscount ? <AdminPaymentPricingBreakdown intent={previewIntent(userId, planId, preview)} /> : null}
+            </div>
+          }
+          onClose={() => undefined}
+          onBack={() => setPreview(null)}
+          onCreateIntent={createDraft}
+          uploadProofForIntent={(intentId, file) => DansshipAPI.paymentsAdmin.uploadAdminProof(intentId, file)}
+          onSubmit={intentId => void confirmPurchase(intentId)}
+        />
+      </div>
+    );
+  }
+
+  const resetPreview = () => setPreview(null);
+
   return (
     <section className='grid max-w-3xl gap-6'>
       <form className='grid gap-4' onSubmit={event => void calculate(event)}>
         <div className='grid gap-2'>
           <Label htmlFor='plan-purchase-plan'>{t('admin:users.registration.plan')}</Label>
-          <select
-            id='plan-purchase-plan'
-            className='h-9 rounded-md border px-3'
-            required
+          <Select
             value={planId}
-            onChange={event => {
-              setPlanId(event.target.value);
-              setPreview(null);
+            onValueChange={value => {
+              setPlanId(value);
+              resetPreview();
             }}
           >
-            <option value='' />
-            {plans.map(plan => (
-              <option key={plan.id} value={plan.id}>
-                {plan.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger id='plan-purchase-plan'>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {plans.map(plan => (
+                <SelectItem key={plan.id} value={plan.id}>
+                  {plan.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        <label className='flex items-center gap-2 text-sm'>
-          <input
-            type='checkbox'
+        <div className='flex items-center gap-2'>
+          <Checkbox
+            id='plan-purchase-quarterly'
             checked={isQuarterly}
-            onChange={event => {
-              setIsQuarterly(event.target.checked);
-              setPreview(null);
+            onCheckedChange={value => {
+              setIsQuarterly(value === true);
+              resetPreview();
             }}
           />
-          {t('admin:users.registration.quarterly')}
-        </label>
-        <div className='grid gap-2 sm:grid-cols-2'>
+          <Label htmlFor='plan-purchase-quarterly' className='m-0 font-normal'>
+            {t('admin:users.registration.quarterly')}
+          </Label>
+        </div>
+        <div className='grid gap-4 sm:grid-cols-2'>
           <div className='grid gap-2'>
             <Label htmlFor='plan-purchase-discount'>{t('admin:users.registration.discountCode')}</Label>
             <Input
@@ -192,37 +228,13 @@ export function AdminPlanPurchase({ userId }: AdminPlanPurchaseProps) {
             />
           </div>
         </div>
-        <Button color='primary' variant='solid' type='submit' disabled={!planId}>
-          {t('admin:users.registration.preview')}
-        </Button>
-      </form>
-
-      {preview && !preview.is_valid ? <p className='text-sm text-alert-600'>{preview.rejection_reason}</p> : null}
-
-      {preview?.is_valid ? (
-        <div className='grid gap-4'>
-          <AdminPaymentPricingBreakdown intent={previewIntent(userId, planId, preview)} />
-          <TransferPaymentInstructions />
-          <div className='grid gap-2'>
-            <Label htmlFor='plan-purchase-proof'>{t('admin:users.registration.proof')}</Label>
-            <Input
-              id='plan-purchase-proof'
-              type='file'
-              accept='image/jpeg,image/png,image/webp'
-              onChange={event => setProof(event.target.files?.[0] ?? null)}
-            />
-          </div>
-          <Button
-            color='primary'
-            variant='solid'
-            type='button'
-            disabled={!proof || isSubmitting}
-            onClick={() => void confirmPurchase()}
-          >
-            {t('admin:users.registration.confirmPurchase')}
+        {preview && !preview.is_valid ? <p className='text-sm text-alert-600'>{preview.rejection_reason}</p> : null}
+        <div className='flex justify-end'>
+          <Button color='primary' variant='solid' type='submit' disabled={!planId}>
+            {t('admin:users.registration.preview')}
           </Button>
         </div>
-      ) : null}
+      </form>
     </section>
   );
 }

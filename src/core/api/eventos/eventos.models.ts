@@ -41,6 +41,8 @@ export interface InstallmentQuoteLine {
 export interface InstallmentPaymentOption {
   sequences: Array<number>;
   amount: string | number;
+  base_amount: string | number;
+  tax_amount: string | number;
 }
 
 export interface InstallmentQuote {
@@ -56,6 +58,9 @@ export interface ManualInstallmentConfirmPayload {
   sequences: Array<number>;
   proof_key: string;
   idempotency_key: string;
+  /** ISO date the person actually paid, when it differs from today. */
+  paid_on?: string;
+  note?: string;
 }
 
 export interface ManualInstallmentPaymentResult {
@@ -129,6 +134,7 @@ export interface EventLanding {
   description: string | null;
   image_url: string | null;
   requires_partner: boolean;
+  simple_registration_enabled?: boolean;
   starts_at?: string | null;
   ends_at?: string | null;
   room_name?: string | null;
@@ -164,6 +170,7 @@ export interface AdminEventListItem {
   type_label?: string | null;
   holding_registrations: number;
   capacity: number | null;
+  simple_registration_enabled?: boolean;
 }
 
 export interface EventAdmin {
@@ -180,6 +187,7 @@ export interface EventAdmin {
   image_url: string | null;
   slug: string;
   requires_partner: boolean;
+  simple_registration_enabled?: boolean;
   is_collaboration: boolean;
   collaborator_user_id: string | null;
   collaborator_email: string | null;
@@ -244,6 +252,7 @@ export interface EventCreatePayload {
   instructor_id: string;
   capacity: number;
   requires_partner: boolean;
+  simple_registration_enabled?: boolean;
   is_collaboration?: boolean;
   collaborator_email?: string | null;
   collaborator_participation_percentage?: number | string;
@@ -262,6 +271,7 @@ export interface EventUpdatePayload {
   instructor_id?: string;
   capacity?: number;
   requires_partner?: boolean;
+  simple_registration_enabled?: boolean;
   is_collaboration?: boolean;
   collaborator_email?: string | null;
   clear_collaborator?: boolean;

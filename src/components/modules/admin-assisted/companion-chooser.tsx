@@ -1,26 +1,21 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from 'polpo/components';
 import { useEffect, useState } from 'react';
-import { Controller, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { z } from 'zod';
 
 import { PersonPicker } from './person-picker';
 
-import { Checkbox, TextField } from '@components/form-fields';
+import {
+  SIMPLE_PERSON_DEFAULTS,
+  SimplePersonFields,
+  type SimplePersonValues,
+  simplePersonSchema,
+} from '@components/forms/simple-person-fields';
 import { useOrPermissions } from '@contexts';
 import { PERMISSION } from '@core/permissions';
 
 import type { CompanionInput, PersonSearchResult } from '@core/api';
-
-const schema = z.object({
-  full_name: z.string().trim().min(1),
-  email: z.string().trim().email(),
-  phone_number: z.string().trim().min(7),
-  terms_accepted: z.literal(true),
-});
-
-type FormValues = z.infer<typeof schema>;
 
 interface CompanionChooserProps {
   onChange: (companion: CompanionInput | null) => void;
@@ -34,15 +29,10 @@ export function CompanionChooser({ onChange, excludeUserId }: CompanionChooserPr
   const canRegister = useOrPermissions([PERMISSION.SIMPLE_ACCOUNT_REGISTER]);
   const [mode, setMode] = useState<'existing' | 'new'>('existing');
   const [person, setPerson] = useState<PersonSearchResult | null>(null);
-  const { control, watch } = useForm<FormValues>({
-    resolver: zodResolver(schema),
+  const { control, watch } = useForm<SimplePersonValues>({
+    resolver: zodResolver(simplePersonSchema),
     mode: 'onChange',
-    defaultValues: {
-      full_name: '',
-      email: '',
-      phone_number: '',
-      terms_accepted: false as unknown as true,
-    },
+    defaultValues: SIMPLE_PERSON_DEFAULTS,
   });
 
   useEffect(() => {
@@ -57,7 +47,7 @@ export function CompanionChooser({ onChange, excludeUserId }: CompanionChooserPr
     }
 
     const subscription = watch(values => {
-      const parsed = schema.safeParse(values);
+      const parsed = simplePersonSchema.safeParse(values);
 
       onChange(
         parsed.success
@@ -78,7 +68,7 @@ export function CompanionChooser({ onChange, excludeUserId }: CompanionChooserPr
   }, [mode, watch]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
-    <div className='grid gap-3 rounded-md border p-3'>
+    <div className='grid gap-3 rounded-xl border border-border p-3'>
       {canRegister ? (
         <div className='flex gap-2'>
           <Button
@@ -106,22 +96,7 @@ export function CompanionChooser({ onChange, excludeUserId }: CompanionChooserPr
       ) : (
         <div className='grid gap-3'>
           <p className='text-sm text-muted-foreground'>{t('companion.simpleHelp')}</p>
-          <TextField control={control} name='full_name' label={t('companion.fullName')} />
-          <TextField control={control} name='email' type='email' label={t('companion.email')} />
-          <TextField control={control} name='phone_number' type='tel' label={t('companion.phone')} />
-          <Controller
-            control={control}
-            name='terms_accepted'
-            render={({ field }) => (
-              <Checkbox
-                id='companion-terms'
-                name='terms_accepted'
-                label={t('companion.terms')}
-                checked={field.value === true}
-                onChange={event => field.onChange(event.target.checked)}
-              />
-            )}
-          />
+          <SimplePersonFields control={control} idPrefix='companion' termsLabel={t('companion.terms')} />
         </div>
       )}
     </div>

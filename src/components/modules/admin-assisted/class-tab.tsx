@@ -7,7 +7,7 @@ import { BookingConfirmDialog } from './booking-confirm-dialog';
 import { PersonGate } from './person-gate';
 import { UpcomingBookings } from './upcoming-bookings';
 
-import { Badge, Input, Label } from '@components/ui';
+import { Badge, DatePicker, Label } from '@components/ui';
 import { DansshipAPI, type PersonSearchResult, type PublishedClass } from '@core/api';
 import { getColombiaWeekRangeUtc, getMonday } from '@helpers';
 import { useDateLocale, usePromise } from '@hooks';
@@ -45,7 +45,13 @@ function ClassPanel({ person }: { person: PersonSearchResult }) {
       <section className='grid gap-3'>
         <div className='grid max-w-xs gap-2'>
           <Label htmlFor='assisted-class-day'>{t('class.date')}</Label>
-          <Input id='assisted-class-day' type='date' value={day} onChange={event => setDay(event.target.value)} />
+          <DatePicker
+            boundary='local'
+            date={parseISO(day)}
+            dateFormat='EEE d MMM yyyy'
+            placeholder={t('class.date')}
+            onDateChange={date => date && setDay(format(date, 'yyyy-MM-dd'))}
+          />
         </div>
         {isLoading ? <p className='text-sm text-muted-foreground'>{t('common.loading')}</p> : null}
         {!isLoading && classes.length === 0 ? (
@@ -56,7 +62,10 @@ function ClassPanel({ person }: { person: PersonSearchResult }) {
             const isHeld = new Date(item.start_time) <= new Date();
 
             return (
-              <li key={item.id} className='flex flex-wrap items-center justify-between gap-2 rounded-md border p-3'>
+              <li
+                key={item.id}
+                className='flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border p-3'
+              >
                 <div className='grid gap-1'>
                   <span className='font-medium'>{item.class_definition?.name}</span>
                   <span className='text-sm text-muted-foreground'>

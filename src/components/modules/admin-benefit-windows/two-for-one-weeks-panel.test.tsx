@@ -78,6 +78,8 @@ function lockedError(): DansshipAPIError {
 
 describe('2x1 promotions', () => {
   beforeEach(() => {
+    // Days before today are disabled, so the fixtures' week (Nov 2-8) needs a fixed "today".
+    vi.useFakeTimers({ toFake: ['Date'], now: new Date('2026-11-02T15:00:00-05:00') });
     Element.prototype.scrollIntoView = () => undefined;
     vi.spyOn(DansshipAPI.benefitsAdmin, 'listWindows').mockResolvedValue({
       ok: true,
@@ -92,6 +94,7 @@ describe('2x1 promotions', () => {
   afterEach(() => {
     cleanup();
     vi.restoreAllMocks();
+    vi.useRealTimers();
   });
 
   it('shows a switch and no date fields for the 2x1 window', async () => {

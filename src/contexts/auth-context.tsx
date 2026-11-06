@@ -69,6 +69,8 @@ interface CommonAuthContextState {
   verifyEmail: (data: VerifyEmailPayload) => Promise<VerifyEmailResponse | undefined>;
   resendVerification: (data: ResendVerificationPayload) => Promise<RegisterResponse | undefined>;
   getProfile: () => Promise<User | undefined>;
+  /** Adopts a session the API opened outside the login form (e.g. a simple registration). */
+  startSession: () => Promise<User | undefined>;
   logout: () => Promise<void>;
   requireOnboarding: boolean;
   mustChangePassword: boolean;
@@ -200,6 +202,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     return result.status === 'ok' ? result.user : undefined;
   }, [loadProfile]);
+
+  const startSession = useCallback(async () => {
+    localStorage.setItem(AUTH_SESSION_KEY, '1');
+
+    return getProfile();
+  }, [getProfile]);
 
   useEffect(() => {
     let cancelled = false;
@@ -601,6 +609,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         linkGoogle,
         setPassword,
         getProfile,
+        startSession,
         signUp,
         updateProfile,
         uploadProfilePhoto,

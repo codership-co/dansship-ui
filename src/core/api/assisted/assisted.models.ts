@@ -14,6 +14,15 @@ export interface SimplePersonInput {
   terms_accepted: boolean;
 }
 
+export interface SimpleAccountResult {
+  user_id: string;
+  full_name: string;
+  email: string;
+  phone_number: string | null;
+  /** False when the email or phone already belonged to an account. */
+  created: boolean;
+}
+
 export interface CompanionInput {
   user_id?: string;
   new_person?: SimplePersonInput;
