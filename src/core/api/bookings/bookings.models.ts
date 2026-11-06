@@ -111,4 +111,6 @@ export interface PublishedClass extends ScheduledClass {
 
 export interface MarkAttendancePayload {
   status: 'attended' | 'no_show';
+  /** Kept in the booking audit log; admin corrections only. */
+  reason?: string;
 }

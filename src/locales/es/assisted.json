@@ -183,7 +183,19 @@
     "cancelReason": "Motivo (obligatorio)",
     "cancelCascades": "Esta reserva tiene acompañante 2x1: su reserva también se cancela.",
     "returnCredit": "Devolver el crédito al plan",
-    "cancelDone": "Reserva cancelada."
+    "cancelDone": "Reserva cancelada.",
+    "status": {
+      "reserved": "Ya reservada",
+      "attended": "Asistió",
+      "noShow": "No asistió",
+      "overlap": "Ya tiene una clase a esa hora"
+    },
+    "markAttendance": "Marcar asistencia",
+    "markAttendanceTitle": "Marcar asistencia",
+    "correctAttendance": "Corregir asistencia",
+    "correctAttendanceTitle": "Corregir asistencia",
+    "correctAttendanceReason": "Motivo de la corrección (obligatorio)",
+    "attendanceMarked": "Asistencia registrada."
   },
   "companion": {
     "existing": "Persona con cuenta",

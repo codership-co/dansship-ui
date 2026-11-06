@@ -3,12 +3,14 @@ import { Button } from 'polpo/components';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { AttendanceDialog } from './attendance-dialog';
 import { BookingConfirmDialog } from './booking-confirm-dialog';
+import { type ClassAvailability, classAvailability } from './class-availability';
 import { PersonGate } from './person-gate';
 import { UpcomingBookings } from './upcoming-bookings';
 
 import { Badge, DatePicker, Label } from '@components/ui';
-import { DansshipAPI, type PersonSearchResult, type PublishedClass } from '@core/api';
+import { DansshipAPI, type MyBooking, type PersonSearchResult, type PublishedClass } from '@core/api';
 import { getColombiaWeekRangeUtc, getMonday } from '@helpers';
 import { useDateLocale, usePromise } from '@hooks';
 
@@ -20,11 +22,86 @@ function todayInBogota() {
   return BOGOTA_DAY.format(new Date());
 }
 
+function AvailabilityBadge({ availability }: { availability: ClassAvailability }) {
+  const { t } = useTranslation('assisted');
+
+  switch (availability.kind) {
+    case 'reserved':
+      return (
+        <Badge variant='outlineActive' size='small'>
+          {t('class.status.reserved')}
+        </Badge>
+      );
+    case 'attended':
+      return (
+        <Badge variant='outlineActive' size='small'>
+          {t('class.status.attended')}
+        </Badge>
+      );
+    case 'noShow':
+      return (
+        <Badge variant='outlineWarning' size='small'>
+          {t('class.status.noShow')}
+        </Badge>
+      );
+    case 'overlap':
+      return (
+        <Badge variant='outlineWarning' size='small'>
+          {t('class.status.overlap')}
+        </Badge>
+      );
+    default:
+      return null;
+  }
+}
+
+interface ClassActionProps {
+  availability: ClassAvailability;
+  isHeld: boolean;
+  onBook: () => void;
+  onAdjust: (booking: MyBooking, isCorrection: boolean) => void;
+}
+
+/** The one thing the admin can still do for the person on this class, if anything. */
+function ClassAction({ availability, isHeld, onBook, onAdjust }: ClassActionProps) {
+  const { t } = useTranslation('assisted');
+
+  switch (availability.kind) {
+    case 'free':
+      return (
+        <Button color='primary' variant='solid' size='small' onClick={onBook}>
+          {t(isHeld ? 'class.registerAttendance' : 'class.book')}
+        </Button>
+      );
+    case 'markAttendance':
+      return (
+        <Button color='primary' variant='solid' size='small' onClick={() => onAdjust(availability.booking, false)}>
+          {t('class.markAttendance')}
+        </Button>
+      );
+    case 'noShow':
+      return (
+        <Button color='primary' variant='outlined' size='small' onClick={() => onAdjust(availability.booking, true)}>
+          {t('class.correctAttendance')}
+        </Button>
+      );
+    case 'overlap':
+      return (
+        <Button color='primary' variant='solid' size='small' disabled>
+          {t(isHeld ? 'class.registerAttendance' : 'class.book')}
+        </Button>
+      );
+    default:
+      return null;
+  }
+}
+
 function ClassPanel({ person }: { person: PersonSearchResult }) {
   const { t } = useTranslation('assisted');
   const locale = useDateLocale();
   const [day, setDay] = useState(todayInBogota);
   const [selected, setSelected] = useState<PublishedClass | null>(null);
+  const [adjusting, setAdjusting] = useState<{ booking: MyBooking; isCorrection: boolean } | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
   const { startAt, endAt } = getColombiaWeekRangeUtc(getMonday(new Date(`${day}T12:00:00`)));
   const { response, isLoading } = usePromise(
@@ -32,6 +109,11 @@ function ClassPanel({ person }: { person: PersonSearchResult }) {
     Boolean(day),
     [startAt, endAt],
   );
+  const { response: bookingsResponse } = usePromise(() => DansshipAPI.bookingsAdmin.listUserBookings(person.id), true, [
+    person.id,
+    refreshKey,
+  ]);
+  const bookings = useMemo(() => (bookingsResponse?.ok ? (bookingsResponse.data ?? []) : []), [bookingsResponse]);
   const classes = useMemo(
     () =>
       (response?.ok ? response.data : [])
@@ -60,6 +142,7 @@ function ClassPanel({ person }: { person: PersonSearchResult }) {
         <ul className='grid gap-2'>
           {classes.map(item => {
             const isHeld = new Date(item.start_time) <= new Date();
+            const availability = classAvailability(item, bookings);
 
             return (
               <li
@@ -83,17 +166,29 @@ function ClassPanel({ person }: { person: PersonSearchResult }) {
                         {t('class.held')}
                       </Badge>
                     ) : null}
+                    <AvailabilityBadge availability={availability} />
                   </div>
                 </div>
-                <Button color='primary' variant='solid' size='small' onClick={() => setSelected(item)}>
-                  {t(isHeld ? 'class.registerAttendance' : 'class.book')}
-                </Button>
+                <ClassAction
+                  availability={availability}
+                  isHeld={isHeld}
+                  onBook={() => setSelected(item)}
+                  onAdjust={(booking, isCorrection) => setAdjusting({ booking, isCorrection })}
+                />
               </li>
             );
           })}
         </ul>
       </section>
       <UpcomingBookings userId={person.id} personName={person.full_name} refreshKey={refreshKey} />
+      {adjusting ? (
+        <AttendanceDialog
+          booking={adjusting.booking}
+          isCorrection={adjusting.isCorrection}
+          onOpenChange={open => !open && setAdjusting(null)}
+          onDone={() => setRefreshKey(value => value + 1)}
+        />
+      ) : null}
       {selected ? (
         <BookingConfirmDialog
           person={person}
