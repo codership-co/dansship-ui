@@ -65,7 +65,7 @@ export function AdminPaymentList({
     response: payments,
     isLoading,
     reFetch,
-  } = usePromise(() => DansshipAPI.paymentsAdmin.getAdminPayments(filters));
+  } = usePromise(() => DansshipAPI.paymentsAdmin.getAdminPayments(filters), true, [filters]);
   const items = payments?.data?.items ?? [];
   const total = payments?.data?.total ?? 0;
 
@@ -87,7 +87,8 @@ export function AdminPaymentList({
     [reFetch, reviewPaymentPromise, t],
   );
 
-  if (isLoading) {
+  // Only block the whole card on the first load, so the filter select stays mounted while refetching.
+  if (isLoading && !payments) {
     return (
       <Card>
         <div className='flex justify-center p-8'>
