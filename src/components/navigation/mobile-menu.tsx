@@ -27,7 +27,12 @@ import { Isotype, Logotype } from '@components/svg';
 import { FEATURE_FLAG, useAuth, useOrPermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { AdminInventoryPagePermissions, AdminPermissions, PERMISSION } from '@core/permissions';
+import {
+  AdminInventoryPagePermissions,
+  AdminPermissions,
+  AssistedPagePermissions,
+  PERMISSION,
+} from '@core/permissions';
 import { usePromise } from '@hooks';
 
 interface MobileMenuProps {
@@ -111,9 +116,9 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
       icon: LuLink,
     },
     {
-      to: PageURLS.admin.bookings,
-      label: t('nav:adminMenu.manualBookings'),
-      orPermissions: AdminPermissions.bookings,
+      to: PageURLS.admin.assisted,
+      label: t('nav:adminMenu.assisted'),
+      orPermissions: AssistedPagePermissions,
       featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
       icon: TbManualGearbox,
     },

@@ -8,6 +8,7 @@ export interface UserNote {
   created_by_full_name: string | null;
   created_by_email: string | null;
   created_at: string;
+  from_contact_lead?: boolean;
 }
 
 export interface UserNotesResponse {

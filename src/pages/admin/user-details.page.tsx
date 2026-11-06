@@ -102,12 +102,7 @@ function UserDetailsPage() {
       actions={
         user ? (
           <div className='flex flex-wrap items-center justify-end gap-2'>
-            <UserRegistrationActions
-              userId={userId}
-              email={user.email}
-              isEmailVerified={user.is_email_verified}
-              mustChangePassword={Boolean(user.must_change_password)}
-            />
+            <UserRegistrationActions userId={userId} />
             <UserDetailsActions
               userId={userId}
               userEmail={user.email}

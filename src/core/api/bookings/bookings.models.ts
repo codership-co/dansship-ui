@@ -19,6 +19,11 @@ export interface Booking {
   is_cancellable?: boolean;
   is_instructor_benefit?: boolean;
   is_two_for_one?: boolean;
+  /** How the class was paid. */
+  booking_origin?: 'plan' | 'first_free_class' | 'gift' | 'two_for_one' | null;
+  /** Only in the admin listing. */
+  gift_reason?: string | null;
+  gifted_by_name?: string | null;
   attendee_name?: string | null;
   booked_by_user_id?: string | null;
 

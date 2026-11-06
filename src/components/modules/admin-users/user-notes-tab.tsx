@@ -87,6 +87,7 @@ export function UserNotesTab({ userId }: { userId: string }) {
                   t('admin:users.details.notesAndChannels.unknownAuthor')}
                 {' · '}
                 {format(parseISO(note.created_at), 'd MMM yyyy HH:mm', { locale })}
+                {note.from_contact_lead ? ` · ${t('admin:users.details.notesAndChannels.fromContacts')}` : ''}
               </p>
             </li>
           ))}

@@ -16,6 +16,13 @@ export enum PERMISSION {
   USER_REGISTER = 'register:user',
   PLAN_PURCHASE_REGISTER = 'register:plan_purchase',
   EVENT_INSTALLMENT_PAYMENT_REGISTER = 'register:event_installment_payment',
+  USER_CONTACT_CORRECT = 'correct:user_contact',
+  ACCOUNT_LINKS_MANAGE = 'manage:account_links',
+  USER_ACCOUNTS_MERGE = 'merge:user_accounts',
+  CLASS_GIFT = 'gift:class',
+  SIMPLE_ACCOUNT_REGISTER = 'register:simple_account',
+  CONTACT_LEAD_READ = 'read:contact_lead',
+  CONTACT_LEAD_MANAGE = 'manage:contact_lead',
 
   // ATTENDANCE
   ATTENDANCE_MARK = 'mark:attendance',
@@ -46,6 +53,7 @@ export enum PERMISSION {
 
   // INSTRUCTOR
   INSTRUCTOR_LIST = 'list:instructor',
+  INSTRUCTOR_INVITE = 'invite:instructor',
 
   // INSTRUCTOR PAYMENT DOCUMENTS
   OWN_PAYMENT_DOCUMENT_MANAGE = 'manage:own_payment_document',
@@ -128,6 +136,7 @@ export enum PERMISSION {
   // BENEFIT
   BENEFIT_READ = 'read:benefit',
   BENEFIT_MANAGE = 'manage:benefit',
+  BENEFIT_GRANT = 'grant:benefit',
   HALLOWEEN_WHEEL_MANAGE = 'manage:halloween_wheel',
 
   // CAMPAIGN
@@ -161,6 +170,19 @@ export const StudentPermissions = {
   subscription: [PERMISSION.SUBSCRIPTION_READ, PERMISSION.SUBSCRIPTION_PURCHASE],
   studioRental: [PERMISSION.STUDIO_RENTAL_READ, PERMISSION.STUDIO_RENTAL_CREATE],
   eventos: [PERMISSION.EVENT_PURCHASE],
+};
+
+/** One permission per tab of Atención asistida (and per Cuenta sub-tab). */
+export const AssistedPermissions = {
+  accountCreate: [PERMISSION.USER_REGISTER],
+  accountData: [PERMISSION.USER_CONTACT_CORRECT],
+  accountLinks: [PERMISSION.ACCOUNT_LINKS_MANAGE],
+  accountMerge: [PERMISSION.USER_ACCOUNTS_MERGE],
+  plan: [PERMISSION.PLAN_PURCHASE_REGISTER],
+  class: [PERMISSION.BOOKING_MANAGE],
+  event: [PERMISSION.EVENT_INSTALLMENT_PAYMENT_REGISTER],
+  contacts: [PERMISSION.CONTACT_LEAD_READ],
+  benefits: [PERMISSION.BENEFIT_GRANT],
 };
 
 export const AdminPermissions = {
@@ -208,4 +230,17 @@ export const AdminInventoryPagePermissions = [
   ...AdminPermissions.inventory,
   ...AdminPermissions.doorCode,
   ...AdminPermissions.benefitWindows,
+];
+
+/** Page + menu access for Atención asistida: any tab permission opens it. */
+export const AssistedPagePermissions = [
+  ...AssistedPermissions.accountCreate,
+  ...AssistedPermissions.accountData,
+  ...AssistedPermissions.accountLinks,
+  ...AssistedPermissions.accountMerge,
+  ...AssistedPermissions.plan,
+  ...AssistedPermissions.class,
+  ...AssistedPermissions.event,
+  ...AssistedPermissions.contacts,
+  ...AssistedPermissions.benefits,
 ];

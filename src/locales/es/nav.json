@@ -31,7 +31,6 @@
     "scheduleBuilder": "Gestor de Horarios",
     "inventoryBilling": "Inventario y Facturación",
     "payroll": "Nómina",
-    "manualBookings": "Reservas Manuales",
     "figures": "Figuras",
     "payments": "Pagos",
     "merchProducts": "Productos Merch",
@@ -40,6 +39,7 @@
     "users": "Usuarios",
     "studioRental": "Renta de Estudio",
     "campaigns": "Campañas",
-    "eventos": "Eventos"
+    "eventos": "Eventos",
+    "assisted": "Atención asistida"
   }
 }

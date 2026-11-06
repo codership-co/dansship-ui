@@ -6,11 +6,40 @@ import { toast } from 'sonner';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
+import { Badge, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { DansshipAPI, type MyBooking } from '@core/api';
 import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
 
 const canReimburse = (booking: MyBooking) => booking.status === 'cancelled' && booking.credit_restored === false;
+
+/** How the class was paid: the plan it drew a credit from, or the courtesy with who gave it and why. */
+function BookingOrigin({ booking }: { booking: MyBooking }) {
+  const { t } = useTranslation();
+  const origin = booking.booking_origin;
+
+  if (!origin) {
+    return <>-</>;
+  }
+
+  return (
+    <div className='grid justify-items-start gap-1'>
+      <Badge variant={origin === 'gift' ? 'outlineTertiary' : 'outline'} size='small'>
+        {t(`assisted:class.origin.${origin}`)}
+      </Badge>
+      {origin === 'plan' && booking.plan_name ? (
+        <span className='text-xs text-muted-foreground'>{booking.plan_name}</span>
+      ) : null}
+      {origin === 'gift' ? (
+        <span className='text-xs text-muted-foreground'>
+          {t('admin:users.details.giftNote', {
+            name: booking.gifted_by_name ?? '-',
+            reason: booking.gift_reason ?? '-',
+          })}
+        </span>
+      ) : null}
+    </div>
+  );
+}
 
 export function UserBookingsTab({ userId }: { userId: string }) {
   const { t } = useTranslation();
@@ -63,6 +92,7 @@ export function UserBookingsTab({ userId }: { userId: string }) {
               <TableHead>{t('admin:users.details.columns.class')}</TableHead>
               <TableHead>{t('common:status')}</TableHead>
               <TableHead>{t('admin:users.details.columns.startTime')}</TableHead>
+              <TableHead>{t('admin:users.details.columns.bookingPayment')}</TableHead>
               <TableHead>{t('admin:users.details.columns.room')}</TableHead>
               <TableHead>{t('admin:users.details.columns.cancelledAt')}</TableHead>
               <TableHead>{t('admin:users.details.columns.reimbursed')}</TableHead>
@@ -78,6 +108,9 @@ export function UserBookingsTab({ userId }: { userId: string }) {
                   {booking.scheduled_class?.start_time
                     ? format(parseISO(booking.scheduled_class.start_time), 'MMM d, yyyy HH:mm', { locale })
                     : '-'}
+                </TableCell>
+                <TableCell>
+                  <BookingOrigin booking={booking} />
                 </TableCell>
                 <TableCell>{booking.scheduled_class?.room?.name ?? '-'}</TableCell>
                 <TableCell>

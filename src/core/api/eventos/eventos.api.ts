@@ -24,6 +24,7 @@ import type {
   MyEventRegistrationScope,
   EventAdmin,
 } from './eventos.models';
+import type { SimplePersonInput } from '../assisted/assisted.models';
 
 export class EventosAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
@@ -39,6 +40,14 @@ export class EventosAPI {
     return this.httpClient.callNoError<EventLanding>({
       path: `/events/by-slug/${slug}`,
       method: 'GET',
+    });
+  }
+
+  async simpleRegister(slug: string, payload: SimplePersonInput) {
+    return this.httpClient.callNoError<{ user_id: string }, SimplePersonInput>({
+      path: `/events/by-slug/${slug}/simple-registration`,
+      method: 'POST',
+      data: payload,
     });
   }
 

@@ -124,7 +124,9 @@
     "proofLoaded": "Comprobante cargado",
     "beforeConfirm": "Antes de confirmar",
     "acceptFinal": "Entiendo que esta compra es final y no reembolsable.",
-    "toggleBreakdown": "Ver desglose del total"
+    "toggleBreakdown": "Ver desglose del total",
+    "proofFormatsWithPdf": "JPG, PNG, WebP o PDF",
+    "proofRejected": "«{{name}}» no se puede usar como comprobante. Formatos permitidos: {{formats}}."
   },
   "types": {
     "taller": "Taller",
@@ -281,7 +283,10 @@
     "inviteSearch": "Invitar por nombre o correo",
     "searchPeople": "Buscar",
     "removeInvite": "Quitar",
-    "noRoom": "Sin salón"
+    "noRoom": "Sin salón",
+    "simpleRegistration": "Registro simple",
+    "simpleRegistrationHint": "Quien no tiene sesión se inscribe con nombre, correo y celular, sin crear contraseña.",
+    "payFullOption": "Pago completo · {{amount}}"
   },
   "managed": {
     "nav": "Eventos que gestionas",
@@ -337,5 +342,16 @@
     "qr": "QR de pago",
     "qrSaved": "QR actualizado.",
     "qrFailed": "No se pudo subir el QR."
+  },
+  "simpleRegistration": {
+    "title": "Inscríbete al evento",
+    "description": "Solo necesitamos tres datos. No tienes que crear una contraseña para pagar.",
+    "continue": "Continuar al pago",
+    "terms": "Acepto los Términos y Condiciones y la Política de tratamiento de datos.",
+    "exists": "Ya tienes una cuenta con este correo o celular.",
+    "existsHint": "Inicia sesión para inscribirte con tu cuenta.",
+    "login": "Iniciar sesión",
+    "forgot": "Olvidé mi contraseña",
+    "failed": "No se pudo crear la cuenta. Intenta de nuevo."
   }
 }

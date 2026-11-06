@@ -90,6 +90,7 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
   const [installmentDrafts, setInstallmentDrafts] = useState(installmentDraftsFrom(event));
   const [instructorId, setInstructorId] = useState(event?.instructor_id ?? '');
   const [requiresPartner, setRequiresPartner] = useState(event?.requires_partner ?? false);
+  const [simpleRegistration, setSimpleRegistration] = useState(event?.simple_registration_enabled ?? false);
   const [isCollaboration, setIsCollaboration] = useState(event?.is_collaboration ?? false);
   const [collaboratorEmail, setCollaboratorEmail] = useState(event?.collaborator_email ?? '');
   const [collaboratorName, setCollaboratorName] = useState<string | null>(event?.collaborator_display_name ?? null);
@@ -211,6 +212,7 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
           instructor_id: instructorId,
           capacity: Number(capacity),
           requires_partner: false,
+          simple_registration_enabled: simpleRegistration,
           is_collaboration: false,
           ...(event
             ? {}
@@ -229,6 +231,7 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
           instructor_id: instructorId,
           capacity: Number(capacity),
           requires_partner: requiresPartner,
+          simple_registration_enabled: simpleRegistration,
           is_collaboration: isCollaboration,
           collaborator_email: isCollaboration && collaboratorEmail.trim() ? collaboratorEmail.trim() : null,
           clear_collaborator: isCollaboration && !collaboratorEmail.trim(),
@@ -576,6 +579,16 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
           </CardContent>
         </Card>
       )}
+
+      <Card>
+        <CardContent className='flex items-center justify-between gap-4 pt-6'>
+          <span className='grid gap-1'>
+            <span>{t('eventos:admin.simpleRegistration')}</span>
+            <span className='text-sm text-muted-foreground'>{t('eventos:admin.simpleRegistrationHint')}</span>
+          </span>
+          <Switch checked={simpleRegistration} onCheckedChange={checked => setSimpleRegistration(checked)} />
+        </CardContent>
+      </Card>
 
       {eventType === 'recital' ? null : (
         <Card>
