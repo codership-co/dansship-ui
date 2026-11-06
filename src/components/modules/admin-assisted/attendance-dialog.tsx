@@ -13,11 +13,11 @@ import {
   Label,
   Textarea,
 } from '@components/ui';
-import { DansshipAPI, type MyBooking } from '@core/api';
+import { type AssistedBookingItem, DansshipAPI } from '@core/api';
 import { useCallablePromise } from '@hooks';
 
 interface AttendanceDialogProps {
-  booking: MyBooking;
+  booking: AssistedBookingItem;
   /** The booking was marked absent: the correction needs a reason. */
   isCorrection: boolean;
   onOpenChange: (open: boolean) => void;
@@ -55,7 +55,7 @@ export function AttendanceDialog({ booking, isCorrection, onOpenChange, onDone }
       <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-lg'>
         <DialogHeader>
           <DialogTitle>{t(isCorrection ? 'class.correctAttendanceTitle' : 'class.markAttendanceTitle')}</DialogTitle>
-          <DialogDescription>{booking.scheduled_class?.class_definition?.name}</DialogDescription>
+          <DialogDescription>{booking.class_name}</DialogDescription>
         </DialogHeader>
         <div className='grid gap-2'>
           <Label htmlFor='attendance-reason'>

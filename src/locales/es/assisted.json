@@ -165,8 +165,6 @@
     "bookingDone": "Reserva creada.",
     "attendanceDone": "Asistencia registrada.",
     "companionFailed": "La reserva quedó hecha, pero no se pudo agregar al acompañante: {{reason}}",
-    "bookingsOf": "Reservas de {{name}}",
-    "noUpcoming": "No tiene reservas próximas.",
     "origin": {
       "plan": "Con plan",
       "first_free_class": "Primera clase gratis",
@@ -188,14 +186,24 @@
       "reserved": "Ya reservada",
       "attended": "Asistió",
       "noShow": "No asistió",
-      "overlap": "Ya tiene una clase a esa hora"
+      "overlap": "Ya tiene una clase a esa hora",
+      "cancelled": "Cancelada"
     },
     "markAttendance": "Marcar asistencia",
     "markAttendanceTitle": "Marcar asistencia",
     "correctAttendance": "Corregir asistencia",
     "correctAttendanceTitle": "Corregir asistencia",
     "correctAttendanceReason": "Motivo de la corrección (obligatorio)",
-    "attendanceMarked": "Asistencia registrada."
+    "attendanceMarked": "Asistencia registrada.",
+    "creditWillReturn": "La persona recupera la clase en su plan.",
+    "creditWillStay": "La clase queda descontada del plan.",
+    "reimburse": "Reembolsar",
+    "reimburseTitle": "Reembolsar clase",
+    "reimburseReason": "Motivo (obligatorio)",
+    "reimburseHeldHelp": "El plan recupera la clase. La asistencia queda como está.",
+    "reimburseCancelledHelp": "La reserva ya estaba cancelada: el plan recupera la clase.",
+    "reimburseDone": "Clase reembolsada.",
+    "creditReturned": "Crédito devuelto"
   },
   "companion": {
     "existing": "Persona con cuenta",

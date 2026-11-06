@@ -13,6 +13,7 @@ import type {
   AssistedBookingResult,
   AssistedCancelPayload,
   AssistedCancelResult,
+  AssistedReimbursePayload,
   BenefitGrantItem,
   BenefitGrantPayload,
   CompanionInput,
@@ -47,10 +48,20 @@ export class AssistedAdminAPI {
     });
   }
 
-  async listUpcomingBookings(userId: string) {
+  /** Every booking of the person on one calendar day (YYYY-MM-DD, Bogotá), any status. */
+  async listBookingsForDay(userId: string, day: string) {
     return this.httpClient.callNoError<Array<AssistedBookingItem>>({
       path: `/admin/assisted/users/${userId}/bookings`,
       method: 'GET',
+      params: { day },
+    });
+  }
+
+  async reimburseBooking(bookingId: string, payload: AssistedReimbursePayload) {
+    return this.httpClient.callNoError<{ booking_id: string; credit_restored: boolean }, AssistedReimbursePayload>({
+      path: `/admin/assisted/bookings/${bookingId}/reimburse`,
+      method: 'POST',
+      data: payload,
     });
   }
 
