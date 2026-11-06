@@ -1,4 +1,3 @@
-import { format, parseISO } from 'date-fns';
 import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -8,8 +7,6 @@ import { apiErrorCode } from './assisted-errors';
 import { CompanionChooser } from './companion-chooser';
 
 import {
-  Badge,
-  Checkbox,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -17,14 +14,15 @@ import {
   DialogHeader,
   DialogTitle,
   Label,
+  Switch,
   Textarea,
 } from '@components/ui';
 import { useOrPermissions } from '@contexts';
 import { type AssistedBookingItem, type CompanionInput, DansshipAPI } from '@core/api';
 import { PERMISSION } from '@core/permissions';
-import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
+import { useCallablePromise } from '@hooks';
 
-function CancelDialog({
+export function CancelBookingDialog({
   booking,
   onOpenChange,
   onDone,
@@ -36,7 +34,9 @@ function CancelDialog({
   const { t } = useTranslation('assisted');
   const canRefund = useOrPermissions([PERMISSION.CLASS_CREDIT_REFUND]);
   const [reason, setReason] = useState('');
-  const [returnCredit, setReturnCredit] = useState(false);
+  const canReturnCredit = booking.can_return_credit && canRefund;
+  // A plan booking cancelled by the academy gets its class back unless the admin says otherwise.
+  const [returnCredit, setReturnCredit] = useState(canReturnCredit);
   const { call: cancel, isLoading } = useCallablePromise(
     (payload: Parameters<typeof DansshipAPI.assistedAdmin.cancelBooking>[1]) =>
       DansshipAPI.assistedAdmin.cancelBooking(booking.id, payload),
@@ -45,7 +45,7 @@ function CancelDialog({
   const submit = async () => {
     const { ok, error } = await cancel({
       reason: reason.trim(),
-      return_credit: returnCredit,
+      return_credit: canReturnCredit && returnCredit,
     });
 
     if (!ok) {
@@ -76,16 +76,15 @@ function CancelDialog({
             <Label htmlFor='cancel-reason'>{t('class.cancelReason')}</Label>
             <Textarea id='cancel-reason' value={reason} onChange={event => setReason(event.target.value)} />
           </div>
-          {booking.can_return_credit && canRefund ? (
-            <div className='flex items-start gap-2'>
-              <Checkbox
-                id='cancel-return-credit'
-                checked={returnCredit}
-                onCheckedChange={value => setReturnCredit(value === true)}
-              />
-              <Label htmlFor='cancel-return-credit' className='font-normal'>
-                {t('class.returnCredit')}
+          {canReturnCredit ? (
+            <div className='flex items-start justify-between gap-4 rounded-xl border border-border p-3'>
+              <Label htmlFor='cancel-return-credit' className='m-0 grid gap-1 font-normal'>
+                <span className='font-medium'>{t('class.returnCredit')}</span>
+                <span className='text-sm text-muted-foreground'>
+                  {t(returnCredit ? 'class.creditWillReturn' : 'class.creditWillStay')}
+                </span>
               </Label>
+              <Switch id='cancel-return-credit' checked={returnCredit} onCheckedChange={setReturnCredit} />
             </div>
           ) : null}
         </div>
@@ -108,7 +107,7 @@ function CancelDialog({
   );
 }
 
-function AddCompanionDialog({
+export function AddCompanionDialog({
   booking,
   userId,
   onOpenChange,
@@ -178,76 +177,66 @@ function AddCompanionDialog({
   );
 }
 
-export function UpcomingBookings({
-  userId,
-  personName,
-  refreshKey,
-}: {
-  userId: string;
-  personName: string;
-  refreshKey: number;
-}) {
+interface ReimburseDialogProps {
+  booking: AssistedBookingItem;
+  onOpenChange: (open: boolean) => void;
+  onDone: () => void;
+}
+
+/** Gives the plan its class back after a cancellation, or for a class already held. */
+export function ReimburseDialog({ booking, onOpenChange, onDone }: ReimburseDialogProps) {
   const { t } = useTranslation('assisted');
-  const locale = useDateLocale();
-  const canCancel = useOrPermissions([PERMISSION.BOOKING_CANCEL]);
-  const { response, reFetch } = usePromise(() => DansshipAPI.assistedAdmin.listUpcomingBookings(userId), true, [
-    userId,
-    refreshKey,
-  ]);
-  const [cancelling, setCancelling] = useState<AssistedBookingItem | null>(null);
-  const [addingTo, setAddingTo] = useState<AssistedBookingItem | null>(null);
-  const bookings = response?.data ?? [];
+  const [reason, setReason] = useState('');
+  const isHeld = booking.status === 'attended' || booking.status === 'no_show';
+  const { call: reimburse, isLoading } = useCallablePromise((reasonText: string) =>
+    DansshipAPI.assistedAdmin.reimburseBooking(booking.id, { reason: reasonText.trim() }),
+  );
+
+  const submit = async () => {
+    const { ok, error } = await reimburse(reason);
+
+    if (!ok) {
+      toast.error(t(`errors.${apiErrorCode(error)}`, { defaultValue: t('errors.generic') }));
+
+      return;
+    }
+
+    toast.success(t('class.reimburseDone'));
+    onDone();
+    onOpenChange(false);
+  };
 
   return (
-    <section className='grid gap-3'>
-      <h2 className='text-lg font-semibold'>{t('class.bookingsOf', { name: personName })}</h2>
-      {bookings.length === 0 ? <p className='text-sm text-muted-foreground'>{t('class.noUpcoming')}</p> : null}
-      <ul className='grid gap-2'>
-        {bookings.map(booking => (
-          <li
-            key={booking.id}
-            className='flex flex-wrap items-center justify-between gap-2 rounded-xl border border-border p-3'
+    <Dialog open onOpenChange={onOpenChange}>
+      <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-lg'>
+        <DialogHeader>
+          <DialogTitle>{t('class.reimburseTitle')}</DialogTitle>
+          <DialogDescription>{booking.class_name}</DialogDescription>
+        </DialogHeader>
+        <div className='grid gap-4'>
+          <p className='m-0 text-sm text-muted-foreground'>
+            {t(isHeld ? 'class.reimburseHeldHelp' : 'class.reimburseCancelledHelp')}
+          </p>
+          <div className='grid gap-2'>
+            <Label htmlFor='reimburse-reason'>{t('class.reimburseReason')}</Label>
+            <Textarea id='reimburse-reason' value={reason} onChange={event => setReason(event.target.value)} />
+          </div>
+        </div>
+        <DialogFooter>
+          <Button color='primary' variant='outlined' type='button' onClick={() => onOpenChange(false)}>
+            {t('common.cancel')}
+          </Button>
+          <Button
+            color='primary'
+            variant='solid'
+            type='button'
+            disabled={!reason.trim() || isLoading}
+            onClick={() => void submit()}
           >
-            <div className='grid gap-1'>
-              <span className='font-medium'>{booking.class_name}</span>
-              <span className='text-sm text-muted-foreground'>
-                {format(parseISO(booking.start_time), 'PPPp', { locale })}
-              </span>
-              <Badge variant='outline' size='small'>
-                {t(`class.origin.${booking.origin}`)}
-              </Badge>
-            </div>
-            <div className='flex flex-wrap gap-2'>
-              {booking.origin === 'plan' && !booking.is_companion && !booking.has_companion ? (
-                <Button color='primary' variant='outlined' size='small' onClick={() => setAddingTo(booking)}>
-                  {t('class.addCompanion')}
-                </Button>
-              ) : null}
-              {canCancel ? (
-                <Button color='alert' variant='text' size='small' onClick={() => setCancelling(booking)}>
-                  {t('class.cancelAction')}
-                </Button>
-              ) : null}
-            </div>
-          </li>
-        ))}
-      </ul>
-      {cancelling ? (
-        <CancelDialog
-          booking={cancelling}
-          onOpenChange={open => !open && setCancelling(null)}
-          onDone={() => void reFetch()}
-        />
-      ) : null}
-      {addingTo ? (
-        <AddCompanionDialog
-          booking={addingTo}
-          userId={userId}
-          onOpenChange={open => !open && setAddingTo(null)}
-          onDone={() => void reFetch()}
-        />
-      ) : null}
-      <span className='sr-only'>{personName}</span>
-    </section>
+            {t('class.reimburse')}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

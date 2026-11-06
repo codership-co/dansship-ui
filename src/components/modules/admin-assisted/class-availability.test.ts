@@ -2,26 +2,35 @@ import { describe, expect, it } from 'vitest';
 
 import { classAvailability } from './class-availability';
 
-import type { BookingStatus, MyBooking, PublishedClass } from '@core/api';
+import type { AssistedBookingItem } from '@core/api';
 
 const NOW = new Date('2026-11-06T12:00:00Z');
 
-const klass = (id: string, start: string, end: string) => ({ id, start_time: start, end_time: end }) as PublishedClass;
+const slot = (id: string, start: string, end: string) => ({ id, start_time: start, end_time: end });
 
-const booking = (classId: string, status: BookingStatus, start: string, end: string) =>
+const booking = (
+  classId: string,
+  status: AssistedBookingItem['status'],
+  start: string,
+  end: string,
+  extra: Partial<AssistedBookingItem> = {},
+) =>
   ({
     id: `booking-${classId}`,
-    status,
     scheduled_class_id: classId,
-    scheduled_class: { id: classId, start_time: start, end_time: end },
-  }) as MyBooking;
+    status,
+    start_time: start,
+    end_time: end,
+    can_reimburse: false,
+    ...extra,
+  }) as AssistedBookingItem;
 
-const FUTURE = klass('future', '2026-11-10T18:00:00Z', '2026-11-10T19:00:00Z');
-const HELD = klass('held', '2026-11-05T18:00:00Z', '2026-11-05T19:00:00Z');
+const FUTURE = slot('future', '2026-11-10T18:00:00Z', '2026-11-10T19:00:00Z');
+const HELD = slot('held', '2026-11-05T18:00:00Z', '2026-11-05T19:00:00Z');
 
 describe('classAvailability', () => {
   it('is free when the person has nothing', () => {
-    expect(classAvailability(FUTURE, [], NOW).kind).toBe('free');
+    expect(classAvailability(FUTURE, [], NOW)).toEqual({ kind: 'free', cancelled: undefined });
   });
 
   it('flags a booking on a class that has not happened as reserved', () => {
@@ -45,10 +54,12 @@ describe('classAvailability', () => {
     );
   });
 
-  it('ignores a cancelled booking', () => {
-    const cancelled = booking('future', 'cancelled', FUTURE.start_time, FUTURE.end_time);
+  it('lets the class be booked again after a cancellation and offers the pending reimbursement', () => {
+    const cancelled = booking('future', 'cancelled', FUTURE.start_time, FUTURE.end_time, { can_reimburse: true });
+    const settled = booking('future', 'cancelled', FUTURE.start_time, FUTURE.end_time, { can_reimburse: false });
 
-    expect(classAvailability(FUTURE, [cancelled], NOW).kind).toBe('free');
+    expect(classAvailability(FUTURE, [cancelled], NOW)).toEqual({ kind: 'free', cancelled });
+    expect(classAvailability(FUTURE, [settled], NOW)).toEqual({ kind: 'free', cancelled: undefined });
   });
 
   it('blocks a class that overlaps another booking but not one that only touches it', () => {

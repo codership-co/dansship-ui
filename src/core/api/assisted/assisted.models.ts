@@ -53,6 +53,18 @@ export interface AssistedBookingItem {
   has_companion: boolean;
   is_companion: boolean;
   can_return_credit: boolean;
+  /** Day view only. */
+  status: 'active' | 'attended' | 'no_show' | 'cancelled';
+  end_time: string | null;
+  credit_restored: boolean | null;
+  /** A plan booking cancelled or already held whose credit is still used. */
+  can_reimburse: boolean;
+  /** "Add 2x1 companion" would be accepted for this booking. */
+  can_add_companion: boolean;
+}
+
+export interface AssistedReimbursePayload {
+  reason: string;
 }
 
 export interface AssistedCancelPayload {
