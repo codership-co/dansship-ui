@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
 
+import { getTrialStudentContact } from './student-reports.helpers';
+
 import { SpinnerLoader } from '@components/loaders';
 import { ReportDateRange } from '@components/modules/admin-reports/report-date-range';
 import {
@@ -89,6 +91,24 @@ export function StudentReports() {
   const usage = usageData?.data;
   const trialWithoutPlan = trialWithoutPlanData?.data?.items ?? [];
   const pendingDuo = pendingDuoData?.data?.items ?? [];
+
+  function renderTrialContact(row: Parameters<typeof getTrialStudentContact>[0]) {
+    const contact = getTrialStudentContact(row);
+
+    switch (contact.kind) {
+      case 'own':
+        return contact.email;
+      case 'guardian':
+        return contact.name
+          ? t('reports:students.guardianContact', { name: contact.name, email: contact.email })
+          : t('reports:students.guardianContactNoName', { email: contact.email });
+      case 'managed-no-contact':
+        return t('reports:students.managedWithoutContact');
+      default:
+        return t('reports:students.noEmail');
+    }
+  }
+
   const activeList = activeListData?.data?.items ?? [];
 
   async function exportActiveStudents() {
@@ -141,7 +161,7 @@ export function StudentReports() {
                     pendingDuo.map(row => (
                       <TableRow key={row.assignment_id}>
                         <TableCell className='font-medium'>{row.buyer_name}</TableCell>
-                        <TableCell>{row.buyer_email}</TableCell>
+                        <TableCell>{row.buyer_email ?? t('reports:students.noEmail')}</TableCell>
                         <TableCell>{row.partner_email}</TableCell>
                         <TableCell>
                           {format(new Date(row.purchased_at), 'MMM d, yyyy', { locale: dateLocale })}
@@ -184,7 +204,7 @@ export function StudentReports() {
                     trialWithoutPlan.map(row => (
                       <TableRow key={row.user_id}>
                         <TableCell className='font-medium'>{row.student_name}</TableCell>
-                        <TableCell>{row.email}</TableCell>
+                        <TableCell>{renderTrialContact(row)}</TableCell>
                         <TableCell>
                           {format(new Date(row.trial_granted_at), 'MMM d, yyyy', { locale: dateLocale })}
                         </TableCell>
@@ -236,7 +256,7 @@ export function StudentReports() {
                     activeList.map(row => (
                       <TableRow key={row.user_id}>
                         <TableCell className='font-medium'>{row.full_name}</TableCell>
-                        <TableCell>{row.email}</TableCell>
+                        <TableCell>{row.email || t('reports:students.noEmail')}</TableCell>
                         <TableCell>{row.phone}</TableCell>
                         <TableCell>{row.plan}</TableCell>
                         <TableCell className='text-right'>

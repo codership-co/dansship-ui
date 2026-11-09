@@ -172,7 +172,11 @@ export interface TrialConversionReport {
 export interface TrialStudentWithoutPlanItem {
   user_id: string;
   student_name: string;
-  email: string;
+  /** Null for managed (minor) accounts: contact the guardian instead. */
+  email: string | null;
+  is_managed: boolean;
+  guardian_name: string | null;
+  guardian_email: string | null;
   trial_granted_at: string;
 }
 
@@ -184,7 +188,7 @@ export interface PendingDuoAssignmentItem {
   assignment_id: string;
   buyer_user_id: string;
   buyer_name: string;
-  buyer_email: string;
+  buyer_email: string | null;
   partner_email: string;
   plan_name?: string | null;
   purchased_at: string;
