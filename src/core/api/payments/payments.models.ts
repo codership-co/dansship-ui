@@ -134,10 +134,19 @@ export interface GetAdminPaymentsParams {
   user_id?: string;
 }
 
+export interface PaymentAttempt {
+  gateway_transaction_id: string | null;
+  status: PaymentStatus;
+  processed_at: string;
+  card_brand: string | null;
+  masked_pan: string | null;
+}
+
 export interface PaymentIntentDetail extends PaymentIntent {
   discount_code: string | null;
   plan_name?: string | null;
   referral_code?: string | null;
+  attempts?: Array<PaymentAttempt>;
 }
 
 export interface PresignedUrlResponse {

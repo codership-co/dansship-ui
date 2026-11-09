@@ -10,6 +10,15 @@ export function paymentMethodLabelKey(method: string): string {
   return `payments:method.${method}`;
 }
 
+export function paymentAttemptCardLabel(attempt: {
+  card_brand?: string | null;
+  masked_pan?: string | null;
+}): string | null {
+  const parts = [attempt.card_brand, attempt.masked_pan].filter(Boolean);
+
+  return parts.length > 0 ? parts.join(' ') : null;
+}
+
 function titleCase(value: string): string {
   return value
     .split('_')

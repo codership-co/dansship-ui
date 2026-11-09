@@ -160,6 +160,11 @@
     "rejectConfirmDesc": "¿Estás seguro de que deseas rechazar este pago?",
     "syncBold": "Consultar Bold",
     "syncBoldSuccess": "Estado actualizado desde Bold",
+    "attempts": {
+      "title": "Intentos de pago",
+      "noCard": "Sin datos de tarjeta",
+      "reference": "Ref. Bold"
+    },
     "syncBoldNoChange": "Bold no reportó un estado terminal",
     "syncBoldFailed": "No se pudo consultar Bold",
     "syncBoldFailedDesc": "Intenta de nuevo en unos momentos.",

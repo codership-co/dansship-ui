@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
 
+import { AdminPaymentAttempts } from './admin-payment-attempts';
 import { AdminPaymentPricingBreakdown } from './admin-payment-pricing-breakdown';
 
 import { SpinnerLoader } from '@components/loaders';
@@ -13,7 +14,7 @@ import { PaymentStatusBadge } from '@components/modules';
 import { Badge, Dialog, DialogContent, DialogHeader, DialogTitle, Textarea } from '@components/ui';
 import { PaymentIntent, PaymentIntentDetail, AdminPaymentReviewPayload, DansshipAPI, PaymentStatus } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { paymentPurchaseLabel, purchaseTypeLabel, purchaseTypeLabelKey } from '@helpers';
+import { paymentMethodLabelKey, paymentPurchaseLabel, purchaseTypeLabel, purchaseTypeLabelKey } from '@helpers';
 import { useDateLocale } from '@hooks';
 
 interface AdminPaymentReviewModalProps {
@@ -25,6 +26,7 @@ interface AdminPaymentReviewModalProps {
   onSynced?: () => void;
 }
 
+const SYNC_RESOLVED_OUTCOMES = new Set(['finalized_approved', 'finalized_rejected', 'late_approval_recovered']);
 const PENDING_STATUSES = new Set([PaymentStatus.PENDING, PaymentStatus.PENDING_MANUAL_REVIEW]);
 
 export function AdminPaymentReviewModal({
@@ -138,7 +140,7 @@ export function AdminPaymentReviewModal({
 
       setDetail(prev => ({ ...(prev ?? current), ...data.intent }) as PaymentIntentDetail);
 
-      if (data.outcome === 'finalized_approved' || data.outcome === 'finalized_rejected') {
+      if (SYNC_RESOLVED_OUTCOMES.has(data.outcome)) {
         toast.success(t('payments:admin.syncBoldSuccess'));
         onSynced?.();
       } else {
@@ -204,7 +206,7 @@ export function AdminPaymentReviewModal({
                 ) : null}
                 <p>
                   <span className='font-medium'>{t('payments:methodLabel')}:</span>{' '}
-                  {t(`payments.method.${current.payment_method_type}`)}
+                  {t(paymentMethodLabelKey(current.payment_method_type))}
                 </p>
                 <p>
                   <span className='font-medium'>{t('payments:userLabel')}:</span>{' '}
@@ -234,6 +236,8 @@ export function AdminPaymentReviewModal({
               </div>
 
               <AdminPaymentPricingBreakdown intent={current} />
+
+              <AdminPaymentAttempts attempts={detail?.attempts} />
 
               <div className='space-y-2'>
                 <p className='text-sm font-medium text-gray-900'>{t('payments:proofLabel')}</p>
