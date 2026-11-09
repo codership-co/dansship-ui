@@ -170,38 +170,73 @@ describe('PaymentDocumentsPage bank fields', () => {
     expect(screen.queryByText(/Planilla de seguridad social/)).not.toBeInTheDocument();
   });
 
-  it('shows the planilla slot only for the month the team asked it for', async () => {
-    const summary = (month: number, social_security: unknown) => ({
-      year: 2026,
-      month,
-      status: 'available',
-      missing_requirements: [],
-      social_security,
-      issued_document: null,
-      documents: [],
-      can_generate: true,
-    });
-
+  const request = (month: number, uploaded = false) => ({
+    year: 2026,
+    month,
+    required: true,
+    uploaded,
+    proof_year: 2026,
+    proof_month: month,
+  });
+  const mockList = (requests: Array<unknown>, months: Array<unknown> = []) =>
     vi.spyOn(DansshipAPI.instructorPayments, 'listPaymentDocuments').mockResolvedValue(
       ok({
         profile: profile(),
-        months: [
-          summary(8, null),
-          summary(7, {
-            year: 2026,
-            month: 7,
-            required: true,
-            uploaded: false,
-            proof_year: 2026,
-            proof_month: 7,
-          }),
-        ],
+        months,
+        social_security_requests: requests,
       }) as never,
     );
+
+  it('hides the whole planilla section when nothing was requested', async () => {
+    mockList([]);
+    renderPage();
+
+    await screen.findByText('Guardar datos bancarios');
+
+    expect(screen.queryByText(/Planilla de seguridad social/)).not.toBeInTheDocument();
+  });
+
+  it('shows the planilla only for the requested months', async () => {
+    mockList([request(7)]);
     renderPage();
 
     expect(await screen.findByText('Planilla de seguridad social de Julio 2026')).toBeInTheDocument();
     expect(screen.queryByText('Planilla de seguridad social de Agosto 2026')).not.toBeInTheDocument();
+  });
+
+  it('shows the month as done after the upload and hides it again after the withdrawal', async () => {
+    const list = mockList([request(7)]);
+    const view = renderPage();
+
+    await screen.findByText('Planilla de seguridad social de Julio 2026');
+    expect(screen.getByRole('button', { name: 'Subir archivo', hidden: false })).toBeInTheDocument();
+
+    list.mockResolvedValue(
+      ok({
+        profile: profile(),
+        months: [],
+        social_security_requests: [request(7, true)],
+      }) as never,
+    );
+    view.unmount();
+    renderPage();
+
+    expect(await screen.findByText('Planilla de seguridad social de Julio 2026')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: 'Ver archivo' }).length).toBeGreaterThan(0);
+
+    list.mockResolvedValue(
+      ok({
+        profile: profile(),
+        months: [],
+        social_security_requests: [],
+      }) as never,
+    );
+    cleanup();
+    renderPage();
+
+    await screen.findByText('Guardar datos bancarios');
+
+    expect(screen.queryByText(/Planilla de seguridad social/)).not.toBeInTheDocument();
   });
 
   it('uploads the planilla of the month through the period endpoint', async () => {
@@ -209,30 +244,7 @@ describe('PaymentDocumentsPage bank fields', () => {
       .spyOn(DansshipAPI.instructorPayments, 'uploadSocialSecurityProof')
       .mockResolvedValue(ok({}) as never);
 
-    vi.spyOn(DansshipAPI.instructorPayments, 'listPaymentDocuments').mockResolvedValue(
-      ok({
-        profile: profile(),
-        months: [
-          {
-            year: 2026,
-            month: 7,
-            status: 'blocked',
-            missing_requirements: ['social_security'],
-            social_security: {
-              year: 2026,
-              month: 7,
-              required: true,
-              uploaded: false,
-              proof_year: 2026,
-              proof_month: 7,
-            },
-            issued_document: null,
-            documents: [],
-            can_generate: false,
-          },
-        ],
-      }) as never,
-    );
+    mockList([request(7)]);
     const { container } = renderPage();
 
     await screen.findByText('Planilla de seguridad social de Julio 2026');

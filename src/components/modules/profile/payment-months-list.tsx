@@ -1,8 +1,6 @@
 import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 
-import { PaymentFileCard } from './payment-document-files';
-
 import { cn, formatPrice, partialFixedCoverage } from '@helpers';
 
 import type { PaymentDocument, PaymentMonthSummary } from '@core/api';
@@ -16,10 +14,6 @@ type PaymentMonthsListProps = {
   onConfirm: (documentId: string) => void;
   onDispute: (documentId: string) => void;
   onDownload: (documentId: string) => void;
-  isUploadingProof: boolean;
-  isOpeningProof: boolean;
-  onUploadProof: (month: PaymentMonthSummary, file: File) => void;
-  onViewProof: (month: PaymentMonthSummary) => void;
 };
 
 function monthKey(month: PaymentMonthSummary) {
@@ -116,10 +110,6 @@ function MonthBlock({
   onConfirm,
   onDispute,
   onDownload,
-  isUploadingProof,
-  isOpeningProof,
-  onUploadProof,
-  onViewProof,
 }: { month: PaymentMonthSummary } & Omit<PaymentMonthsListProps, 'months'>) {
   const { t } = useTranslation();
   const documents = monthDocuments(month);
@@ -132,7 +122,11 @@ function MonthBlock({
   const missingNote =
     month.status === 'blocked' && month.missing_requirements.length
       ? month.missing_requirements
-          .map(code => t(`profile:paymentDocuments.missing.${code}`, { defaultValue: code }))
+          .map(code =>
+            t(`profile:paymentDocuments.missing.${code}`, {
+              defaultValue: code,
+            }),
+          )
           .join(', ')
       : null;
   const emptyStatus =
@@ -164,7 +158,6 @@ function MonthBlock({
       daysInMonth: coverage.daysInMonth,
     });
   };
-  const proof = month.social_security?.required ? month.social_security : null;
   const mixedLabel = (document: PaymentDocument) =>
     document.payment_type === 'mixed' ? t('profile:paymentDocuments.paymentTypes.mixed') : null;
 
@@ -316,25 +309,6 @@ function MonthBlock({
           ) : null}
         </div>
       </div>
-
-      {proof ? (
-        <div className='px-4 pb-4'>
-          <PaymentFileCard
-            label={t('profile:paymentDocuments.socialSecurityPeriod', {
-              month: t(`profile:paymentDocuments.months.${proof.proof_month}`),
-              year: proof.proof_year,
-            })}
-            hint={t('profile:paymentDocuments.socialSecurityPeriodHint')}
-            uploaded={proof.uploaded}
-            accept='application/pdf,image/jpeg,image/png,image/webp'
-            acceptedTypes={['application/pdf', 'image/jpeg', 'image/png', 'image/webp']}
-            isUploading={isUploadingProof}
-            isOpeningFile={isOpeningProof}
-            onFile={file => onUploadProof(month, file)}
-            onView={proof.uploaded ? () => onViewProof(month) : undefined}
-          />
-        </div>
-      ) : null}
     </div>
   );
 }
