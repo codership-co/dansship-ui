@@ -152,6 +152,8 @@ export interface PaymentMonthSummary {
 export interface PaymentDocumentListResponse {
   profile: PaymentProfile;
   months: Array<PaymentMonthSummary>;
+  /** Periods the team currently asks the planilla for. Empty: the person sees no planilla section. */
+  social_security_requests: Array<SocialSecurityPeriodStatus>;
 }
 
 export interface GeneratePaymentDocumentPayload {
@@ -210,6 +212,7 @@ function normalizeDocument(document: PaymentDocument): PaymentDocument {
 export function normalizePaymentDocumentList(data: PaymentDocumentListResponse): PaymentDocumentListResponse {
   return {
     ...data,
+    social_security_requests: (data.social_security_requests ?? []).filter(request => request.required),
     months: (data.months ?? []).map(month => ({
       ...month,
       missing_requirements: month.missing_requirements ?? [],

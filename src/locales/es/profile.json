@@ -52,6 +52,8 @@
     "signatureHint": "Imagen de tu firma. Reemplaza el archivo actual.",
     "socialSecurityPeriod": "Planilla de seguridad social de {{month}} {{year}}",
     "socialSecurityPeriodHint": "El equipo la pidió para generar esta cuenta de cobro. PDF o imagen.",
+    "socialSecurityTitle": "Planilla de seguridad social",
+    "socialSecurityNotRequested": "Ya no te estamos pidiendo esta planilla.",
     "viewCurrent": "Ver archivo actual",
     "viewFile": "Ver archivo",
     "uploadFile": "Subir archivo",

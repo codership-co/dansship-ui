@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { Section, SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
-import { PaymentDocumentFiles, PaymentMonthsList } from '@components/modules/profile';
+import { PaymentDocumentFiles, PaymentMonthsList, SocialSecurityRequests } from '@components/modules/profile';
 import {
   Dialog,
   DialogContent,
@@ -26,6 +26,7 @@ import {
   DansshipAPIError,
   type BankAccountType,
   type PaymentMonthSummary,
+  type SocialSecurityPeriodStatus,
   type PaymentProfileFileKind,
 } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -101,10 +102,10 @@ function PaymentDocumentsPage() {
     DansshipAPI.instructorPayments.getFileViewUrl(kind),
   );
   const { call: uploadProof, isLoading: isUploadingProof } = useCallablePromise(
-    (month: PaymentMonthSummary, file: File) =>
+    (month: SocialSecurityPeriodStatus, file: File) =>
       DansshipAPI.instructorPayments.uploadSocialSecurityProof(month.year, month.month, file),
   );
-  const { call: getProofViewUrl, isLoading: isOpeningProof } = useCallablePromise((month: PaymentMonthSummary) =>
+  const { call: getProofViewUrl, isLoading: isOpeningProof } = useCallablePromise((month: SocialSecurityPeriodStatus) =>
     DansshipAPI.instructorPayments.getSocialSecurityProofViewUrl(month.year, month.month),
   );
   const { call: getDocumentViewUrl, isLoading: isOpeningDocument } = useCallablePromise((documentId: string) =>
@@ -191,11 +192,20 @@ function PaymentDocumentsPage() {
     openUrl(data.view_url);
   };
 
-  const handleUploadProof = async (month: PaymentMonthSummary, file: File) => {
+  const handleUploadProof = async (month: SocialSecurityPeriodStatus, file: File) => {
     try {
-      const { ok } = await uploadProof(month, file);
+      const { ok, error: uploadError } = await uploadProof(month, file);
 
       if (!ok) {
+        const code = uploadError instanceof DansshipAPIError ? uploadError.body.error_code : undefined;
+
+        if (code === DANSSHIP_ERROR_CODE.SOCIAL_SECURITY_PROOF_NOT_REQUESTED) {
+          toast.error(t('profile:paymentDocuments.socialSecurityNotRequested'));
+          void reFetch();
+
+          return;
+        }
+
         toast.error(t('profile:paymentDocuments.uploadFailed'));
 
         return;
@@ -208,7 +218,7 @@ function PaymentDocumentsPage() {
     }
   };
 
-  const handleOpenProof = async (month: PaymentMonthSummary) => {
+  const handleOpenProof = async (month: SocialSecurityPeriodStatus) => {
     const { ok, data } = await getProofViewUrl(month);
 
     if (!ok || !data?.view_url) {
@@ -373,6 +383,14 @@ function PaymentDocumentsPage() {
             </form>
           </section>
 
+          <SocialSecurityRequests
+            requests={list?.social_security_requests ?? []}
+            isUploading={isUploadingProof}
+            isOpeningFile={isOpeningProof}
+            onUpload={(request, file) => void handleUploadProof(request, file)}
+            onView={request => void handleOpenProof(request)}
+          />
+
           <section className='grid min-w-0 gap-4'>
             <h3 className='text-lg font-semibold'>{t('profile:paymentDocuments.cuentasTitle')}</h3>
             {!list?.months.length ? (
@@ -392,10 +410,6 @@ function PaymentDocumentsPage() {
                   setDisputeReason('');
                 }}
                 onDownload={documentId => void handleOpenDocument(documentId)}
-                isUploadingProof={isUploadingProof}
-                isOpeningProof={isOpeningProof}
-                onUploadProof={(month, file) => void handleUploadProof(month, file)}
-                onViewProof={month => void handleOpenProof(month)}
               />
             )}
           </section>

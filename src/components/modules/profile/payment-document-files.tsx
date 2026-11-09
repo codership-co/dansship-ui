@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { LuEye, LuUpload } from 'react-icons/lu';
 import { toast } from 'sonner';
 
-import type { PaymentProfile, PaymentProfileFileKind } from '@core/api';
+import type { PaymentProfile, PaymentProfileFileKind, SocialSecurityPeriodStatus } from '@core/api';
 
 export type PaymentFileCardProps = {
   label: string;
@@ -178,12 +178,17 @@ export function PaymentDocumentFiles({
   return (
     <div className='grid gap-1.5'>
       <span className='text-[13px] font-semibold'>
-        {t('profile:paymentDocuments.documentsLoaded', { count: uploadedCount, total: cards.length })}
+        {t('profile:paymentDocuments.documentsLoaded', {
+          count: uploadedCount,
+          total: cards.length,
+        })}
       </span>
       <div className='h-1.5 overflow-hidden rounded-full bg-border'>
         <div
           className='h-full rounded-full bg-primary'
-          style={{ width: `${cards.length ? Math.round((uploadedCount / cards.length) * 100) : 0}%` }}
+          style={{
+            width: `${cards.length ? Math.round((uploadedCount / cards.length) * 100) : 0}%`,
+          }}
         />
       </div>
       <div className='mt-2.5 grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4'>
@@ -203,5 +208,54 @@ export function PaymentDocumentFiles({
         ))}
       </div>
     </div>
+  );
+}
+
+const PROOF_ACCEPT = 'application/pdf,image/jpeg,image/png,image/webp';
+const PROOF_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
+
+type SocialSecurityRequestsProps = {
+  requests: Array<SocialSecurityPeriodStatus>;
+  isUploading: boolean;
+  isOpeningFile: boolean;
+  onUpload: (request: SocialSecurityPeriodStatus, file: File) => void;
+  onView: (request: SocialSecurityPeriodStatus) => void;
+};
+
+/** One card per month the team asked the planilla for. Renders nothing when no month is requested. */
+export function SocialSecurityRequests({
+  requests,
+  isUploading,
+  isOpeningFile,
+  onUpload,
+  onView,
+}: SocialSecurityRequestsProps) {
+  const { t } = useTranslation();
+
+  if (requests.length === 0) return null;
+
+  return (
+    <section className='grid gap-4 rounded-md border bg-white/50 p-5'>
+      <h3 className='text-base font-bold'>{t('profile:paymentDocuments.socialSecurityTitle')}</h3>
+      <div className='grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4'>
+        {requests.map(request => (
+          <PaymentFileCard
+            key={`${request.year}-${request.month}`}
+            label={t('profile:paymentDocuments.socialSecurityPeriod', {
+              month: t(`profile:paymentDocuments.months.${request.proof_month}`),
+              year: request.proof_year,
+            })}
+            hint={t('profile:paymentDocuments.socialSecurityPeriodHint')}
+            uploaded={request.uploaded}
+            accept={PROOF_ACCEPT}
+            acceptedTypes={PROOF_TYPES}
+            isUploading={isUploading}
+            isOpeningFile={isOpeningFile}
+            onFile={file => onUpload(request, file)}
+            onView={request.uploaded ? () => onView(request) : undefined}
+          />
+        ))}
+      </div>
+    </section>
   );
 }
