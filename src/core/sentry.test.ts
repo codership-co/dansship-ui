@@ -1,5 +1,5 @@
 import { RequestState } from 'polpo-http-client';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   DANSSHIP_ERROR_CATEGORY,
@@ -58,6 +58,34 @@ describe('captureUnexpectedException transport policy', () => {
     expect(sentry.scope.setTag).toHaveBeenCalledWith('transport.kind', 'network');
     expect(sentry.scope.setTag).toHaveBeenCalledWith('flow', 'onboarding.load');
     expect(sentry.scope.setExtras).toHaveBeenCalledWith(expect.objectContaining({ 'cause.name': 'TypeError' }));
+  });
+
+  describe('timeouts depending on page visibility', () => {
+    const setVisibility = (state: DocumentVisibilityState) =>
+      Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => state });
+
+    afterEach(() => setVisibility('visible'));
+
+    it('keeps a timeout in a hidden tab as a breadcrumb', () => {
+      setVisibility('hidden');
+
+      captureUnexpectedException(
+        new DansshipTransportError('timeout', 'GET', '/events/teaching/upcoming-week', new Error('timed out')),
+      );
+
+      expect(sentry.captureMessage).not.toHaveBeenCalled();
+      expect(sentry.addBreadcrumb).toHaveBeenCalledTimes(1);
+    });
+
+    it('still reports a timeout in a visible tab', () => {
+      setVisibility('visible');
+
+      captureUnexpectedException(
+        new DansshipTransportError('timeout', 'GET', '/events/teaching/upcoming-week', new Error('timed out')),
+      );
+
+      expect(sentry.captureMessage).toHaveBeenCalledWith('HTTP transport failure');
+    });
   });
 
   it('keeps aborted and offline failures as breadcrumbs', () => {
