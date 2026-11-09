@@ -18,6 +18,7 @@ const EXPECTED_BOOKING_ERROR_CODES = new Set<DANSSHIP_ERROR_CODE>([
   DANSSHIP_ERROR_CODE.BOOKING_LATE_JOIN_CLOSED,
   DANSSHIP_ERROR_CODE.BOOKING_INSTRUCTOR_OWN_CLASS,
   DANSSHIP_ERROR_CODE.BOOKING_INSTRUCTOR_TEACHING_OVERLAP,
+  DANSSHIP_ERROR_CODE.BOOKING_ALREADY_BOOKED,
   DANSSHIP_ERROR_CODE.BOOKING_CLASS_CANCELLED,
   DANSSHIP_ERROR_CODE.BOOKING_NOT_CANCELLABLE,
   DANSSHIP_ERROR_CODE.TWO_FOR_ONE_NOT_ELIGIBLE,
@@ -159,7 +160,11 @@ export function captureUnexpectedException(
     const method = error instanceof DansshipTransportError ? error.method : 'unknown';
     const pathTemplate = toPathTemplate(error instanceof DansshipTransportError ? error.path : '');
 
-    if (kind === 'aborted' || kind === 'offline') {
+    // A timeout in a backgrounded tab is the browser throttling the page, not a server fault.
+    const isBackgroundTimeout =
+      kind === 'timeout' && typeof document !== 'undefined' && document.visibilityState === 'hidden';
+
+    if (kind === 'aborted' || kind === 'offline' || isBackgroundTimeout) {
       addSentryBreadcrumb(
         'http.transport',
         'Request failed before an HTTP response',

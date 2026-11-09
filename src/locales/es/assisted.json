@@ -293,6 +293,7 @@
     "BOOKING_SUBSCRIPTION_NOT_STARTED": "El plan todavía no empieza.",
     "BOOKING_SUBSCRIPTION_EXPIRED": "El plan vence antes de esta clase.",
     "BOOKING_SUBSCRIPTION_NOT_ELIGIBLE": "No tiene un plan con clases disponibles. Puedes regalar la clase.",
+    "BOOKING_ALREADY_BOOKED": "Ya tiene una reserva para esta clase.",
     "BOOKING_TIME_OVERLAP": "Ya tiene otra reserva a esa hora.",
     "BOOKING_INSTRUCTOR_OWN_CLASS": "Un profesor no puede reservar su propia clase.",
     "BOOKING_INSTRUCTOR_TEACHING_OVERLAP": "El profesor da otra clase a esa hora.",
