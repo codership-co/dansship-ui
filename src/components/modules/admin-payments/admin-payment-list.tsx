@@ -29,7 +29,13 @@ import {
 } from '@components/ui';
 import { type AdminPaymentReviewPayload, DansshipAPI, PaymentIntent, PaymentStatus } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { formatPrice, paymentPurchaseLabel, purchaseTypeLabel, purchaseTypeLabelKey } from '@helpers';
+import {
+  formatPrice,
+  paymentMethodLabelKey,
+  paymentPurchaseLabel,
+  purchaseTypeLabel,
+  purchaseTypeLabelKey,
+} from '@helpers';
 import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
 
 const STATUS_OPTIONS: Array<{ value: 'all' | PaymentStatus; labelKey: string }> = [
@@ -189,7 +195,7 @@ export function AdminPaymentList({
 
                         <TableCell>{formatPrice(intent.amount, intent.currency)}</TableCell>
 
-                        <TableCell>{t(`payments.method.${intent.payment_method_type}`)}</TableCell>
+                        <TableCell>{t(paymentMethodLabelKey(intent.payment_method_type))}</TableCell>
 
                         <TableCell>
                           <PaymentStatusBadge status={intent.status} />

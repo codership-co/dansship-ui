@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { useOrPermissions } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PERMISSION } from '@core/permissions';
-import { formatMerchPrice } from '@helpers';
+import { formatMerchPrice, paymentMethodLabelKey } from '@helpers';
 import { usePromise } from '@hooks';
 
 interface OrderDetailProps {
@@ -93,7 +93,7 @@ export function OrderDetail({ orderId, onCancelOrder, isCancelling = false }: Or
         </div>
         <div>
           <p className='text-xs text-gray-500'>{t('payments:methodLabel')}</p>
-          <p className='font-medium'>{resolvedPaymentMethod ? t(`payments.method.${resolvedPaymentMethod}`) : '-'}</p>
+          <p className='font-medium'>{resolvedPaymentMethod ? t(paymentMethodLabelKey(resolvedPaymentMethod)) : '-'}</p>
         </div>
         <div>
           <p className='text-xs text-gray-500'>{t('payments:total')}</p>
