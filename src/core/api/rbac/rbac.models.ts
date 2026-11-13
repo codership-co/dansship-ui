@@ -7,6 +7,6 @@ export interface RbacRole {
 
 export interface UserWithRolesResponse {
   id: string;
-  email: string;
+  email: string | null;
   roles: Array<RbacRole>;
 }
