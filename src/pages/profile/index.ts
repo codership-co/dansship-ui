@@ -4,3 +4,4 @@ export * from './subscription.page';
 export * from './wallet.page';
 export * from './payment-documents.page';
 export * from './gifts.page';
+export * from './recover-classes.page';

@@ -83,10 +83,26 @@ export const DAY_OF_WEEK_OPTIONS = [
 export const AUTH_SESSION_KEY = 'auth_session';
 export const AUTH_TOKEN_KEY = 'auth_token';
 
+/**
+ * Legal documents served from `public/assets/legal`. Replace a file to update
+ * the document; nothing else hard-codes these paths.
+ */
+export const LEGAL_DOCUMENTS = {
+  /** Placeholder until legal ships the final document (ADR-056). */
+  classRecoveryTerms: '/assets/legal/terminos-recuperacion-clases.pdf',
+} as const;
+
+/** `/legal?tab=<value>` opens that document's tab directly. */
+export const LEGAL_TAB_QUERY_PARAM = 'tab';
+export const LEGAL_TAB_QUERY = {
+  classRecoveryTerms: 'class-recovery-terms',
+} as const;
+
 export const PageURLS = {
   home: '/',
   plans: '/plans',
   legal: '/legal',
+  legalClassRecoveryTerms: `/legal?${LEGAL_TAB_QUERY_PARAM}=${LEGAL_TAB_QUERY.classRecoveryTerms}`,
   location: '/location',
   halloween: '/halloween',
   auth: {
@@ -104,6 +120,7 @@ export const PageURLS = {
     user: (id: string | number) => `/profile/${id}`,
     subscription: '/profile/subscription',
     bookings: '/profile/bookings',
+    recoverClasses: '/profile/bookings/recover',
     wallet: '/profile/wallet',
     paymentDocuments: '/profile/payment-documents',
     gifts: '/profile/gifts',

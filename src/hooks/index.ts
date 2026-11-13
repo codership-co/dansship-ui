@@ -10,3 +10,4 @@ export * from './use-meta-pixel-page-view';
 export * from './use-meta-pixel-purchase';
 export * from './use-scroll-to-top';
 export * from './use-router-loading';
+export * from './use-media-query';

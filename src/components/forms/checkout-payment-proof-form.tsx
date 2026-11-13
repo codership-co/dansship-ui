@@ -2,7 +2,7 @@ import { format } from 'date-fns';
 import { Button } from 'polpo/components';
 import { ChangeEvent, DragEvent, ReactNode, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { LuArrowLeft, LuUpload } from 'react-icons/lu';
+import { LuArrowLeft, LuRefreshCw, LuUpload } from 'react-icons/lu';
 import { MdOutlinePayments } from 'react-icons/md';
 import { toast } from 'sonner';
 
@@ -397,7 +397,16 @@ export function CheckoutPaymentProofForm({
                 <section className='grid gap-2' data-sentry-block>
                   <p className='m-0 text-[15px] font-semibold'>{t('eventos:checkout.yourProof')}</p>
                   <div
+                    role='button'
+                    tabIndex={0}
+                    aria-label={proofLabel}
                     onClick={openProofPicker}
+                    onKeyDown={event => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        openProofPicker();
+                      }
+                    }}
                     onDragOver={event => event.preventDefault()}
                     onDrop={handleProofDrop}
                     className={cn(
@@ -437,19 +446,23 @@ export function CheckoutPaymentProofForm({
                         </>
                       )}
                     </span>
-                    <Button
-                      type='button'
-                      color='primary'
-                      variant={selectedProofFile ? 'outlined' : 'solid'}
-                      size='small'
-                      className='shrink-0'
-                      onClick={event => {
-                        event.stopPropagation();
-                        openProofPicker();
-                      }}
-                    >
-                      {selectedProofFile ? t('eventos:checkout.replace') : t('eventos:checkout.upload')}
-                    </Button>
+                    {selectedProofFile ? (
+                      <Button
+                        type='button'
+                        color='primary'
+                        variant='outlined'
+                        size='small'
+                        className='size-10 shrink-0 px-0'
+                        aria-label={t('eventos:checkout.replace')}
+                        title={t('eventos:checkout.replace')}
+                        onClick={event => {
+                          event.stopPropagation();
+                          openProofPicker();
+                        }}
+                      >
+                        <LuRefreshCw className='size-4' aria-hidden />
+                      </Button>
+                    ) : null}
                   </div>
                   <input
                     ref={proofInputRef}

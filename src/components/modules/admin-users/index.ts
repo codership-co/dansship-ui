@@ -17,3 +17,4 @@ export * from './user-wallet-tab';
 export * from './user-notes-tab';
 export * from './user-channels-section';
 export * from './user-payment-documents-tab';
+export * from './user-recoveries-tab';

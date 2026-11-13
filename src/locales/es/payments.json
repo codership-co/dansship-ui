@@ -97,7 +97,8 @@
     "event": "Evento",
     "event_installment": "Cuota de evento",
     "private_class": "Clase privada",
-    "studio_rental": "Alquiler de estudio"
+    "studio_rental": "Alquiler de estudio",
+    "class_recovery": "Recuperación de clases"
   },
   "instructions": {
     "transfer": {
@@ -182,7 +183,9 @@
     },
     "filter": {
       "all": "Todos los estados",
-      "status": "Filtrar por estado"
+      "status": "Filtrar por estado",
+      "allTypes": "Todos los tipos",
+      "type": "Tipo de compra"
     }
   }
 }

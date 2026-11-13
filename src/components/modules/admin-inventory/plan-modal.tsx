@@ -35,6 +35,11 @@ const planSchema = z.object({
   show_on_landing: z.boolean(),
   is_recommended: z.boolean(),
   recommended_order: z.string().optional(),
+  // Optional price per class to recover a lost credit (ADR-056); empty = not recoverable.
+  recovery_price: z
+    .string()
+    .optional()
+    .refine(value => !value?.trim() || Number(value) > 0),
   class_group_allowances: z
     .array(
       z.object({
@@ -59,6 +64,7 @@ export type PlanModalSubmitData = {
   show_on_landing: boolean;
   is_recommended: boolean;
   recommended_order?: number | null;
+  recovery_price: number | null;
   class_group_allowances: Array<{
     class_group_id: string;
     max_classes?: number | null;
@@ -74,6 +80,16 @@ interface PlanModalProps {
   taxTypes: Array<TaxType>;
   defaultTaxTypeId: string;
   isLoading?: boolean;
+}
+
+function parsePositiveAmount(value?: string): number | null {
+  if (value === undefined || value.trim() === '') {
+    return null;
+  }
+
+  const parsed = Number(value);
+
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 }
 
 function parseRecommendedOrder(value?: string): number | null {
@@ -131,6 +147,7 @@ export function PlanModal({
       show_on_landing: false,
       is_recommended: false,
       recommended_order: '',
+      recovery_price: '',
       class_group_allowances: [],
     },
   });
@@ -168,6 +185,10 @@ export function PlanModal({
           initialData.recommended_order !== null && initialData.recommended_order !== undefined
             ? String(initialData.recommended_order)
             : '',
+        recovery_price:
+          initialData.recovery_price !== null && initialData.recovery_price !== undefined
+            ? String(initialData.recovery_price)
+            : '',
         class_group_allowances:
           initialData.class_group_allowances?.length > 0
             ? initialData.class_group_allowances.map(item => ({
@@ -195,6 +216,7 @@ export function PlanModal({
         show_on_landing: false,
         is_recommended: false,
         recommended_order: '',
+        recovery_price: '',
         class_group_allowances: [
           {
             class_group_id: classGroups[0]?.id ?? '',
@@ -218,6 +240,7 @@ export function PlanModal({
       show_on_landing: values.show_on_landing,
       is_recommended: values.is_recommended,
       recommended_order: parseRecommendedOrder(values.recommended_order),
+      recovery_price: parsePositiveAmount(values.recovery_price),
       class_group_allowances: values.class_group_allowances.map(item => ({
         class_group_id: item.class_group_id,
         max_classes: parseMaxClasses(item.max_classes),
@@ -461,6 +484,25 @@ export function PlanModal({
               <p className='text-xs text-gray-500'>{t('billing:landingOrderHint')}</p>
             </div>
           </div>
+
+          {initialData?.is_system ? null : (
+            <div className='space-y-2 border-t pt-4'>
+              <Label htmlFor='recovery_price'>{t('recovery:admin.plan.recoveryPrice')}</Label>
+              <Input
+                id='recovery_price'
+                type='number'
+                min={1}
+                step='1'
+                placeholder='12000'
+                {...register('recovery_price')}
+              />
+              {errors.recovery_price ? (
+                <p className='text-sm text-alert-500'>{t('recovery:admin.plan.recoveryPriceInvalid')}</p>
+              ) : (
+                <p className='text-xs text-gray-500'>{t('recovery:admin.plan.recoveryPriceHint')}</p>
+              )}
+            </div>
+          )}
 
           <div className='flex justify-end space-x-2 pt-4'>
             <Button color='primary' variant='outlined' type='button' onClick={onClose} disabled={isLoading}>

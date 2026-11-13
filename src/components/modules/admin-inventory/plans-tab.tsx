@@ -2,6 +2,7 @@ import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+import { ClassRecoverySettingsCard } from './class-recovery-settings-card';
 import { PlanModal, PlanModalSubmitData } from './plan-modal';
 
 import { SpinnerLoader } from '@components/loaders';
@@ -100,6 +101,8 @@ export function PlansTab() {
 
   return (
     <div className='space-y-4'>
+      <ClassRecoverySettingsCard />
+
       <div className='flex justify-between items-center'>
         <h2 className='text-xl font-semibold'>{t('billing:plansTitle')}</h2>
         <Button
@@ -122,6 +125,7 @@ export function PlansTab() {
               <TableHead>{t('billing:price')}</TableHead>
               <TableHead>{t('billing:classes')}</TableHead>
               <TableHead>{t('billing:validity')}</TableHead>
+              <TableHead className='text-right'>{t('recovery:admin.plan.column')}</TableHead>
               <TableHead>{t('billing:landing')}</TableHead>
               <TableHead>{t('common:status')}</TableHead>
               <TableHead className='text-right'>{t('common:actions')}</TableHead>
@@ -130,7 +134,7 @@ export function PlansTab() {
           <TableBody>
             {plans.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className='text-center py-4 text-gray-500'>
+                <TableCell colSpan={8} className='text-center py-4 text-gray-500'>
                   {t('billing:noPlansFound')}
                 </TableCell>
               </TableRow>
@@ -142,6 +146,9 @@ export function PlansTab() {
                   <TableCell>{plan.classes_included}</TableCell>
                   <TableCell>
                     {plan.validity_days} {t('billing:daysUnit')}
+                  </TableCell>
+                  <TableCell className='text-right font-semibold'>
+                    {plan.recovery_price ? formatPlanPrice(Number(plan.recovery_price), plan.currency) : '—'}
                   </TableCell>
                   <TableCell>
                     <div className='flex flex-wrap gap-1'>

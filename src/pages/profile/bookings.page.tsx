@@ -1,6 +1,7 @@
 import { Button } from 'polpo/components';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
 import { Section, SectionHeading } from '@components/containers';
@@ -27,6 +28,7 @@ import {
   sortReservationsAscending,
   sortReservationsDescending,
   eventReservation,
+  formatPrice,
 } from '@helpers';
 import { RESUME_REVALIDATE, useMyBookings, useMyBookingsHistory, usePromise } from '@hooks';
 
@@ -46,6 +48,7 @@ function initialsFromName(name: string) {
 
 function BookingsPage() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { user } = useAuth();
   const familyEnabled = Boolean(user?.managedUsersEnabled) && !user?.isManaged;
   const { response: familyResponse } = usePromise(() => DansshipAPI.family.listMine(), familyEnabled);
@@ -255,10 +258,20 @@ function BookingsPage() {
     return () => observer.disconnect();
   }, [hasMore, loadNextPage, historyReservations.length]);
 
+  const lateCancelRecoveryPrice =
+    bookingToCancel?.would_restore_credit === false
+      ? (bookingToCancel.recovery?.late_cancel_recovery_price ?? null)
+      : null;
+
   const handleConfirmCancel = async () => {
     if (!bookingToCancel) return;
 
-    const ok = await cancelClass(bookingToCancel.id);
+    const ok = await cancelClass(
+      bookingToCancel.id,
+      lateCancelRecoveryPrice !== null
+        ? { onRecover: () => navigate(PageURLS.profile.recoverClasses, { viewTransition: true }) }
+        : undefined,
+    );
 
     if (!ok) return;
 
@@ -404,6 +417,15 @@ function BookingsPage() {
             <>
               {t('bookings:cancelBookingConfirm')}{' '}
               <span className='font-bold'>{t('bookings:cancelBookingNotReimbursed')}</span>
+              {lateCancelRecoveryPrice !== null ? (
+                <>
+                  {' '}
+                  {t('bookings:recovery.lateCancelHint', {
+                    price: formatPrice(Number(lateCancelRecoveryPrice), 'COP'),
+                    count: bookingToCancel?.recovery?.recovery_window_days ?? 0,
+                  })}
+                </>
+              ) : null}
             </>
           ) : bookingToCancel?.would_restore_credit === true ? (
             `${t('bookings:cancelBookingConfirm')} ${t('bookings:cancelBookingReimbursed')}`

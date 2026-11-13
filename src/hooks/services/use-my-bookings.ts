@@ -184,7 +184,8 @@ export const useMyBookings = () => {
   );
 
   const cancelClass = useCallback(
-    async (id: string) => {
+    /** ``onRecover``: the credit was lost and can be recovered; the toast offers it. */
+    async (id: string, options?: { onRecover?: () => void }) => {
       return withSentrySpan('booking.cancel', 'ui.action', { booking_id: id }, async () => {
         const { error } = await cancelClassPromise(id);
 
@@ -225,7 +226,13 @@ export const useMyBookings = () => {
           return false;
         }
 
-        toast.success(t('bookings:cancelSuccess'));
+        if (options?.onRecover) {
+          toast.success(t('bookings:recovery.lateCancelToast'), {
+            action: { label: t('bookings:recovery.action'), onClick: options.onRecover },
+          });
+        } else {
+          toast.success(t('bookings:cancelSuccess'));
+        }
 
         return true;
       });

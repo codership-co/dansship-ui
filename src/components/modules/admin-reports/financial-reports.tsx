@@ -30,6 +30,8 @@ const purchaseTypeLabel = (value: string, t: (key: string) => string) => {
 
   if (value === 'event_installment') return t('reports:cash.purchaseTypes.eventInstallment');
 
+  if (value === 'class_recovery') return t('reports:cash.purchaseTypes.classRecovery');
+
   return value;
 };
 
@@ -45,6 +47,11 @@ export function FinancialReports() {
 
   const { response: cashData, isLoading: cashLoading } = usePromise(
     () => DansshipAPI.reportsAdmin.getRevenueReport(appliedDateRange.start, appliedDateRange.end),
+    true,
+    deps,
+  );
+  const { response: recoveryData, isLoading: recoveryLoading } = usePromise(
+    () => DansshipAPI.reportsAdmin.getClassRecoveryReport(appliedDateRange.start, appliedDateRange.end),
     true,
     deps,
   );
@@ -84,8 +91,10 @@ export function FinancialReports() {
   const benefits = benefitData?.data?.counts;
   const pricing = pricingData?.data;
   const classTypeNet = classTypeNetData?.data?.items ?? [];
+  const recovery = recoveryData?.data;
   const isLoading =
     cashLoading ||
+    recoveryLoading ||
     taxLoading ||
     walletLoading ||
     giftLoading ||
@@ -167,6 +176,70 @@ export function FinancialReports() {
                         <TableCell>{row.week}</TableCell>
                         <TableCell>{purchaseTypeLabel(row.purchase_type, t)}</TableCell>
                         <TableCell className='text-right'>{formatMoney(row.recognized_total)}</TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <Card className='border-input shadow-sm'>
+            <CardHeader className='border-b border-gray-100 bg-gray-50/50 pb-4'>
+              <CardTitle className='text-lg text-gray-800'>{t('recovery:admin.report.title')}</CardTitle>
+            </CardHeader>
+            <CardContent className='space-y-4 p-4'>
+              <p className='text-sm text-gray-600'>{t('recovery:admin.report.description')}</p>
+              <div className='grid grid-cols-2 md:grid-cols-4 gap-2'>
+                <Metric label={t('recovery:admin.report.revenue')} value={formatMoney(recovery?.revenue)} />
+                <Metric label={t('recovery:admin.report.recovered')} value={String(recovery?.classes_recovered ?? 0)} />
+                <Metric label={t('recovery:admin.report.lost')} value={String(recovery?.lost_classes ?? 0)} />
+                <Metric label={t('recovery:admin.report.courtesy')} value={String(recovery?.courtesy_returns ?? 0)} />
+                <Metric
+                  label={t('recovery:admin.report.active')}
+                  value={t('recovery:admin.report.classesRevenue', {
+                    count: recovery?.active_plan.classes ?? 0,
+                    amount: formatMoney(recovery?.active_plan.revenue),
+                  })}
+                />
+                <Metric
+                  label={t('recovery:admin.report.reactivated')}
+                  value={t('recovery:admin.report.classesRevenue', {
+                    count: recovery?.reactivated_plan.classes ?? 0,
+                    amount: formatMoney(recovery?.reactivated_plan.revenue),
+                  })}
+                />
+                <Metric label={t('recovery:admin.report.extensions')} value={String(recovery?.plan_extensions ?? 0)} />
+                <Metric
+                  label={t('recovery:admin.report.returned')}
+                  value={formatMoney(recovery?.returned_to_wallet_amount)}
+                />
+              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>{t('recovery:admin.report.plan')}</TableHead>
+                    <TableHead className='text-right'>{t('recovery:admin.report.lost')}</TableHead>
+                    <TableHead className='text-right'>{t('recovery:admin.report.recovered')}</TableHead>
+                    <TableHead className='text-right'>{t('recovery:admin.report.courtesy')}</TableHead>
+                    <TableHead className='text-right'>{t('recovery:admin.report.revenue')}</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {(recovery?.by_plan ?? []).length === 0 ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className='py-4 text-center text-gray-500'>
+                        {t('recovery:admin.report.empty')}
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    recovery?.by_plan.map(row => (
+                      <TableRow key={row.plan_name}>
+                        <TableCell>{row.plan_name}</TableCell>
+                        <TableCell className='text-right'>{row.lost_classes}</TableCell>
+                        <TableCell className='text-right'>{row.recovered_paid}</TableCell>
+                        <TableCell className='text-right'>{row.courtesy}</TableCell>
+                        <TableCell className='text-right'>{formatMoney(row.revenue)}</TableCell>
                       </TableRow>
                     ))
                   )}

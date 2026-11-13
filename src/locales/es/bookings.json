@@ -146,5 +146,14 @@
   "companionSuccess": "También reservamos el cupo gratis de tu acompañante.",
   "companionClassFull": "No hay cupo para las dos personas. No se reservó la clase.",
   "companionNotEligible": "Esta clase no aplica para 2x1. No se reservó ninguna clase.",
-  "companionFailed": "No pudimos completar la reserva 2x1. No se reservó ninguna clase."
+  "companionFailed": "No pudimos completar la reserva 2x1. No se reservó ninguna clase.",
+  "recovery": {
+    "action": "Recuperar",
+    "markPending": "Crédito en recuperación",
+    "markRecovered": "Crédito recuperado",
+    "markBookedWithRecovered": "Con crédito recuperado",
+    "lateCancelToast": "Reserva cancelada. La clase no se devolvió a tu plan.",
+    "lateCancelHint_one": "Podrás recuperarla pagando {{price}} durante el día siguiente.",
+    "lateCancelHint_other": "Podrás recuperarla pagando {{price}} durante los próximos {{count}} días."
+  }
 }

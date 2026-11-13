@@ -4,6 +4,18 @@ export type BookingStatus = 'active' | 'cancelled' | 'attended' | 'no_show';
 
 export type MyBookingsScope = 'upcoming' | 'history';
 
+export interface BookingRecovery {
+  recoverable: boolean;
+  unit_price: number | null;
+  deadline: string | null;
+  /** The lost booking is in a recovery payment: pending or approved. */
+  recovery_status: 'pending' | 'approved' | null;
+  booked_with_recovered_credit: boolean;
+  /** Active booking: what recovering it would cost if it is cancelled late. */
+  late_cancel_recovery_price: number | null;
+  recovery_window_days: number | null;
+}
+
 export interface Booking {
   id: string;
   user_id: string;
@@ -26,6 +38,7 @@ export interface Booking {
   gifted_by_name?: string | null;
   attendee_name?: string | null;
   booked_by_user_id?: string | null;
+  recovery?: BookingRecovery | null;
 
   scheduled_class?: ScheduledClass;
 }

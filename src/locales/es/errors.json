@@ -12,7 +12,13 @@
     "BOOKING_INSTRUCTOR_OWN_CLASS": "No puedes reservar la clase que estás asignado a dictar.",
     "BOOKING_INSTRUCTOR_TEACHING_OVERLAP": "No puedes reservar una clase en el mismo horario en el que estás asignado a dictar.",
     "BOOKING_CLASS_FULL": "Esta clase está llena por ahora.",
-    "BOOKING_NOT_CANCELLABLE": "Esta reserva ya no se puede cancelar."
+    "BOOKING_NOT_CANCELLABLE": "Esta reserva ya no se puede cancelar.",
+    "CLASS_RECOVERY_EMPTY_SELECTION": "Elige al menos una clase para recuperar.",
+    "CLASS_RECOVERY_NOT_RECOVERABLE": "Una de las clases que elegiste ya no se puede recuperar. Actualiza la página e inténtalo de nuevo.",
+    "CLASS_RECOVERY_PAYMENT_PENDING": "Ya tienes un pago en revisión para una de estas clases.",
+    "CLASS_RECOVERY_INVALID_PAYMENT_METHOD": "La recuperación se paga con transferencia (QR) o con tu billetera.",
+    "CLASS_RECOVERY_NOT_FOUND": "No encontramos esta recuperación.",
+    "CLASS_RECOVERY_SETTINGS_INVALID": "Los días deben ser números enteros mayores que cero."
   },
   "combo": {
     "addFigureFailed": "Error al agregar la figura al combo",
