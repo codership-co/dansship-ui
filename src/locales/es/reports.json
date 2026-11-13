@@ -82,7 +82,8 @@
       "merch": "Merch",
       "studioRental": "Alquiler de estudio",
       "event": "Evento",
-      "eventInstallment": "Cuota de evento"
+      "eventInstallment": "Cuota de evento",
+      "classRecovery": "Recuperación de clases"
     }
   },
   "tax": {

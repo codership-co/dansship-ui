@@ -23,10 +23,13 @@ export interface Plan {
   is_recommended: boolean;
   show_on_landing: boolean;
   recommended_order?: number | null;
+  /** Price per class to recover a lost credit (ADR-056); null = not recoverable. */
+  recovery_price?: number | null;
+  is_system?: boolean;
   created_at: string;
 }
 
-export type CreatePlanPayload = Omit<Plan, 'id' | 'is_active' | 'created_at'> & {
+export type CreatePlanPayload = Omit<Plan, 'id' | 'is_active' | 'created_at' | 'is_system'> & {
   class_group_allowances: Array<{
     class_group_id: string;
     max_classes?: number | null;

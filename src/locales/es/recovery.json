@@ -1,0 +1,184 @@
+{
+  "page": {
+    "title": "Recuperar clases",
+    "subtitle_one": "Recupera el crédito de las clases que no alcanzaste a tomar. Cada clase se puede recuperar hasta 1 día después de su fecha.",
+    "subtitle_other": "Recupera el crédito de las clases que no alcanzaste a tomar. Cada clase se puede recuperar hasta {{count}} días después de su fecha.",
+    "loading": "Cargando tus clases...",
+    "loadFailed": "No pudimos cargar tus clases. Intenta de nuevo más tarde."
+  },
+  "empty": {
+    "title": "No tienes clases por recuperar",
+    "description": "Aquí aparecerán las clases que puedas recuperar.",
+    "goToBookings": "Ir a Mis reservas"
+  },
+  "list": {
+    "classFallback": "Clase",
+    "expiresOn": "Vence el {{date}}",
+    "expiredOn": "Venció el {{date}}",
+    "taxIncluded": "IVA incluido",
+    "unusedTitle": "Clase sin usar",
+    "lossReason": {
+      "no_show": "No asististe",
+      "late_cancellation": "Cancelaste fuera del plazo"
+    },
+    "selectAll": "Seleccionar todo",
+    "clearAll": "Deseleccionar todo",
+    "until": "Hasta el {{date}}",
+    "pricePerClass": "Recuperar una clase de este plan cuesta",
+    "paymentPending": "Pago pendiente"
+  },
+  "summary": {
+    "classes_one": "{{count}} clase",
+    "classes_other": "{{count}} clases",
+    "continue": "Continuar al pago"
+  },
+  "checkout": {
+    "title": "Confirma tu recuperación",
+    "loading": "Calculando el total...",
+    "usableFor_one": "Podrás usarlas 1 día desde la aprobación",
+    "usableFor_other": "Podrás usarlas {{count}} días desde la aprobación",
+    "value": "Valor {{amount}}",
+    "submit": "Enviar para revisión",
+    "reviewTitle": "Revisión",
+    "payTitle": "Pago",
+    "cancel": "Cancelar",
+    "next": "Continuar",
+    "beforeConfirm": "Antes de confirmar",
+    "accept": "Acepto los <LinkTerms>términos y condiciones</LinkTerms> de la recuperación de clases.",
+    "acceptRequired": "Debes aceptar los términos y condiciones para continuar.",
+    "unusedLine_one": "{{count}} clase sin usar",
+    "unusedLine_other": "{{count}} clases sin usar",
+    "total": "Total"
+  },
+  "result": {
+    "pending": {
+      "title": "Recibimos tu pago",
+      "description": "Lo revisaremos pronto. Te avisaremos por correo cuando esté aprobado."
+    },
+    "approved": {
+      "title": "Recuperación aprobada",
+      "description": "Ya puedes reservar con tus clases recuperadas hasta el {{date}}."
+    },
+    "rejected": {
+      "title": "Pago rechazado",
+      "description": "No se devolvió ninguna clase. Puedes intentarlo de nuevo mientras la clase siga disponible."
+    },
+    "expired": {
+      "title": "El pago venció",
+      "description": "No se devolvió ninguna clase. Puedes intentarlo de nuevo mientras la clase siga disponible."
+    },
+    "cancelled": {
+      "title": "Pago cancelado",
+      "description": "No se devolvió ninguna clase."
+    },
+    "returned_to_wallet": {
+      "title": "Devuelto a tu billetera",
+      "description": "El plan ya no cumple las condiciones para recuperar. El valor quedó en tu billetera."
+    },
+    "reactivated": "Tu plan fue reactivado hasta el {{date}}.",
+    "goToWallet": "Ir a mi billetera",
+    "done": "Entendido"
+  },
+  "errors": {
+    "generic": "No pudimos procesar la recuperación. Intenta de nuevo."
+  },
+  "subscription": {
+    "expired": "Expirada",
+    "expiredOn": "Venció el {{date}}",
+    "reactivated": "Plan reactivado",
+    "recoverAction": "Recuperar clases",
+    "recoverable_one": "{{count}} clase por recuperar",
+    "recoverable_other": "{{count}} clases por recuperar",
+    "recoverableUntil_one": "{{count}} clase por recuperar hasta el {{date}}",
+    "recoverableUntil_other": "{{count}} clases por recuperar hasta el {{date}}",
+    "includesRecovered_one": "Incluye {{count}} recuperada",
+    "includesRecovered_other": "Incluye {{count}} recuperadas"
+  },
+  "admin": {
+    "settings": {
+      "title": "Reactivación de planes vencidos",
+      "windowDays": "Días para recuperar una clase perdida",
+      "windowHint": "Desde la fecha de la clase cancelada tarde o no asistida.",
+      "graceDays": "Días para reactivar tras el vencimiento",
+      "graceHint": "Se evalúa cuando la persona envía el pago.",
+      "extensionDays": "Duración del plan reactivado (días)",
+      "extensionHint": "Cuenta desde que se aprueba el pago.",
+      "save": "Guardar configuración",
+      "saved": "Configuración guardada.",
+      "saveFailed": "No pudimos guardar la configuración."
+    },
+    "plan": {
+      "recoveryPrice": "Precio de recuperación por clase (opcional)",
+      "recoveryPriceHint": "Lo que paga una persona por recuperar una clase perdida o sin usar de este plan. Déjalo vacío si este plan no permite recuperar clases.",
+      "column": "Recuperación",
+      "recoveryPriceInvalid": "Ingresa un valor mayor que cero o deja el campo vacío."
+    },
+    "review": {
+      "title": "Clases a recuperar",
+      "planActive": "Plan vigente",
+      "planExpired": "Vencido hace {{count}} días · se reactivará hasta el {{date}}",
+      "alreadyReactivated": "Este plan ya fue reactivado con otro pago. Solo se puede reactivar una vez. Al continuar, el monto completo ({{amount}}) se devuelve a la billetera y se notifica a la persona.",
+      "willReactivate": "Al aprobar, el plan queda como Plan reactivado hasta el {{date}} y solo podrá usar las clases de este pago.",
+      "priceNote": "Precio guardado al momento del pago.",
+      "unusedLine_one": "{{count}} clase sin usar",
+      "unusedLine_other": "{{count}} clases sin usar",
+      "approveAndReactivate": "Aprobar y reactivar plan",
+      "returnToWallet": "Devolver a la billetera",
+      "statusReturned": "Devuelto a billetera"
+    },
+    "user": {
+      "tab": "Recuperaciones",
+      "intro": "Los pagos de recuperación se revisan en Pagos.",
+      "lostTitle": "Clases perdidas aún recuperables",
+      "noLost": "No tiene clases pendientes por recuperar.",
+      "historyTitle": "Historial",
+      "noHistory": "Sin recuperaciones todavía.",
+      "paid": "Pagada",
+      "courtesy": "Cortesía",
+      "columns": {
+        "date": "Fecha",
+        "detail": "Detalle",
+        "type": "Tipo",
+        "status": "Estado",
+        "amount": "Valor"
+      },
+      "status": {
+        "pending": "Pendiente de revisión",
+        "approved": "Aprobada",
+        "rejected": "Rechazada",
+        "expired": "Vencida",
+        "cancelled": "Cancelada",
+        "returned_to_wallet": "Devuelto a billetera"
+      },
+      "courtesyAction": {
+        "admin_class_credit_refund": "Devolución de créditos de la clase",
+        "admin_booking_reimburse_credit": "Crédito devuelto",
+        "admin_booking_reimburse_held_credit": "Crédito devuelto",
+        "admin_assisted_booking_cancel": "Cancelada por la academia con devolución"
+      },
+      "classesCount_one": "{{count}} clase",
+      "classesCount_other": "{{count}} clases",
+      "courtesyButton": "Devolver como cortesía",
+      "courtesyTitle": "Devolver créditos de una clase",
+      "courtesyDescription": "Sin costo para la persona. Úsalo para causas externas (marchas, temas médicos). Quedará registrado como cortesía.",
+      "courtesyReason": "Motivo (obligatorio)",
+      "courtesyConfirm": "Devolver crédito",
+      "courtesyReasonRequired": "Escribe el motivo de la cortesía."
+    },
+    "report": {
+      "title": "Recuperación de clases",
+      "description": "Ingreso por clases recuperadas pagando (QR o billetera), separado de los planes. La cortesía no genera ingreso. Lo devuelto a la billetera cuenta como efectivo recibido, no como ingreso de recuperación.",
+      "revenue": "Ingreso por recuperación",
+      "recovered": "Recuperadas (pagadas)",
+      "lost": "Clases perdidas",
+      "courtesy": "Devueltas por cortesía",
+      "reactivated": "Con plan reactivado",
+      "active": "Con plan vigente",
+      "extensions": "Planes extendidos",
+      "returned": "Devuelto a billetera",
+      "plan": "Plan",
+      "classesRevenue": "{{count}} clases · {{amount}}",
+      "empty": "No hay recuperaciones en este período."
+    }
+  }
+}

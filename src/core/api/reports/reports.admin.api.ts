@@ -22,6 +22,7 @@ import type {
   StudioRentalUtilizationReport,
   SubscriptionUsageReport,
   TaxCollectedReport,
+  ClassRecoveryReport,
   TrialConversionReport,
   TrialStudentsWithoutPlanReport,
   UnderutilizedScheduleReport,
@@ -109,6 +110,15 @@ export class ReportsAdminAPI {
   async getRevenueIndicators(startDate?: string, endDate?: string) {
     return this.httpClient.callNoError<RevenueIndicatorsReport>({
       path: '/admin/reports/revenue-indicators',
+      method: 'GET',
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
+      params: this.dateParams(startDate, endDate),
+    });
+  }
+
+  async getClassRecoveryReport(startDate?: string, endDate?: string) {
+    return this.httpClient.callNoError<ClassRecoveryReport>({
+      path: '/admin/reports/class-recovery',
       method: 'GET',
       timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),

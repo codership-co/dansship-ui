@@ -8,6 +8,8 @@ export * from './bookings/bookings.models';
 export * from './campaigns/campaigns.models';
 export * from './class-feedback/class-feedback.models';
 export * from './class-levels/class-levels.models';
+export * from './class-recovery/class-recovery.models';
+export * from './class-recovery/class-recovery.helpers';
 export * from './door-code/door-code.models';
 export * from './door-code/door-code.admin.api';
 export * from './family/family.models';

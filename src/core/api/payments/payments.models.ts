@@ -21,6 +21,7 @@ export type PurchaseType =
   | 'event_installment'
   | 'private_class'
   | 'studio_rental'
+  | 'class_recovery'
   | (string & {});
 
 export enum PaymentProofContentType {

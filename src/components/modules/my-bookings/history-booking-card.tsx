@@ -1,8 +1,10 @@
 import { format } from 'date-fns';
 import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 
 import { Badge, ProfilePicture } from '@components/ui';
+import { PageURLS } from '@core/constants';
 import { canRateBooking, cn, isAcademyCancelledBooking, resolvePlanDisplayName } from '@helpers';
 import { useDateLocale } from '@hooks';
 
@@ -52,12 +54,20 @@ const statusBadgeClass = (booking: MyBooking) => {
 export function HistoryBookingCard({ booking, alreadyRated, onRate }: HistoryBookingCardProps) {
   const { t } = useTranslation();
   const locale = useDateLocale();
+  const navigate = useNavigate();
   const cls = booking.scheduled_class;
   const start = new Date(cls.start_time);
   const className = cls.class_definition?.name ?? t('bookings:classFallback');
   const instructorName = cls.instructor?.full_name;
   const planName = booking.plan_name ? resolvePlanDisplayName(booking.plan_name, t) : null;
   const duration = cls.class_definition?.duration_minutes;
+  const recovery = booking.recovery;
+  const recoveryMark =
+    recovery?.recovery_status === 'approved'
+      ? t('bookings:recovery.markRecovered')
+      : recovery?.recovery_status === 'pending'
+        ? t('bookings:recovery.markPending')
+        : null;
   const canRate = canRateBooking({
     status: booking.status,
     endTime: cls.end_time,
@@ -113,9 +123,23 @@ export function HistoryBookingCard({ booking, alreadyRated, onRate }: HistoryBoo
                 {planName}
               </span>
             ) : null}
+            {recoveryMark ? <Badge variant='outlineNeutral'>{recoveryMark}</Badge> : null}
+            {recovery?.booked_with_recovered_credit ? (
+              <Badge variant='outlineNeutral'>{t('bookings:recovery.markBookedWithRecovered')}</Badge>
+            ) : null}
           </div>
 
-          {alreadyRated && booking.status === 'attended' ? (
+          {recovery?.recoverable ? (
+            <Button
+              color='primary'
+              variant='outlined'
+              size='small'
+              type='button'
+              onClick={() => navigate(PageURLS.profile.recoverClasses, { viewTransition: true })}
+            >
+              {t('bookings:recovery.action')}
+            </Button>
+          ) : alreadyRated && booking.status === 'attended' ? (
             <p className='text-sm text-muted-foreground'>{t('bookings:rated')}</p>
           ) : canRate ? (
             <Button color='primary' variant='outlined' size='small' type='button' onClick={() => onRate(booking)}>

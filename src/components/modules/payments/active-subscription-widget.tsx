@@ -1,13 +1,16 @@
-import { format, differenceInDays, isFuture } from 'date-fns';
+import { format, isFuture, parseISO } from 'date-fns';
+import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { LuActivity, LuCalendarDays, LuTicket, LuClock, LuLayers } from 'react-icons/lu';
+import { useNavigate } from 'react-router';
 
 import { Container, SectionEmpty } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { Badge, Card, CardContent, CardDescription, CardHeader, CardTitle } from '@components/ui';
 import { useStudentSession } from '@contexts';
 import { type ActiveSubscription, type SubscriptionStatus } from '@core/api';
-import { resolvePlanDisplayName } from '@helpers';
+import { PageURLS } from '@core/constants';
+import { colombiaCalendarDaysUntil, resolvePlanDisplayName } from '@helpers';
 import { useDateLocale } from '@hooks';
 
 function statusBadgeVariant(status: SubscriptionStatus): 'default' | 'secondary' | 'destructive' | 'outline' {
@@ -38,11 +41,35 @@ function sortSubscriptions(subscriptions: Array<ActiveSubscription>): Array<Acti
   });
 }
 
+function expirationLabel(daysLeft: number, t: (key: string, options?: { count: number }) => string): string {
+  if (daysLeft < 0) return t('subscriptions:expired');
+
+  if (daysLeft === 0) return t('subscriptions:expiresToday');
+
+  if (daysLeft === 1) return t('subscriptions:expiresTomorrow');
+
+  return t('subscriptions:daysLeft', { count: daysLeft });
+}
+
+/** Something the person can still pay to recover on this plan (ADR-056). */
+function recoverableCount(sub: ActiveSubscription): number {
+  return (sub.recovery?.recoverable_classes ?? 0) + (sub.recovery?.unused_credits ?? 0);
+}
+
+function hasRecoverableClasses(sub: ActiveSubscription): boolean {
+  return recoverableCount(sub) > 0;
+}
+
 export function ActiveSubscriptionWidget() {
   const { t } = useTranslation();
   const locale = useDateLocale();
+  const navigate = useNavigate();
   const { subscriptions, summary, isLoadingSubscriptions: isLoading } = useStudentSession();
   const currentSubscriptions = subscriptions.filter(sub => sub.status === 'active' || sub.status === 'pending_payment');
+  // Expired plans still inside the grace window stay visible so their classes can be recovered.
+  const recoverableExpired = subscriptions.filter(
+    sub => sub.status === 'expired' && sub.recovery?.plan_state === 'expired_in_grace' && hasRecoverableClasses(sub),
+  );
   const hasUnlimitedClasses = currentSubscriptions.some(
     sub => sub.status === 'active' && sub.remaining_classes === null,
   );
@@ -59,88 +86,93 @@ export function ActiveSubscriptionWidget() {
     );
   }
 
-  if (currentSubscriptions.length === 0) {
+  if (currentSubscriptions.length === 0 && recoverableExpired.length === 0) {
     return <SectionEmpty message={t('subscriptions:noSubscriptions')} label={t('subscriptions:noSubscriptionsDesc')} />;
   }
 
-  const sorted = sortSubscriptions(currentSubscriptions);
+  const sorted = sortSubscriptions([...currentSubscriptions, ...recoverableExpired]);
 
   return (
     <div className='space-y-6'>
       {/* Summary Section */}
-      <Card className='relative overflow-hidden border-secondary/50 shadow-sm'>
-        <div className='absolute top-0 left-0 h-full w-2 bg-primary' />
+      {currentSubscriptions.length > 0 && (
+        <Card className='relative overflow-hidden border-secondary/50 shadow-sm'>
+          <div className='absolute top-0 left-0 h-full w-2 bg-primary' />
 
-        <CardHeader className='pb-4 pl-8'>
-          <CardTitle>
-            <span className='flex items-center text-xl'>
-              <LuLayers className='mr-2 h-5 w-5 text-primary' />
-              {t('subscriptions:summary')}
-            </span>
-          </CardTitle>
-        </CardHeader>
-
-        <CardContent className='pl-8'>
-          <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
-            <div className='flex flex-col'>
-              <div className='mb-2 flex items-center text-gray-500'>
-                <LuTicket className='mr-2 h-4 w-4' />
-                <span className='text-sm font-medium'>{t('subscriptions:totalRemaining')}</span>
-              </div>
-
-              <span className='text-3xl font-extrabold text-gray-900'>
-                {hasUnlimitedClasses ? t('subscriptions:unlimitedClasses') : summary?.total_remaining_classes}
+          <CardHeader className='pb-4 pl-8'>
+            <CardTitle>
+              <span className='flex items-center text-xl'>
+                <LuLayers className='mr-2 h-5 w-5 text-primary' />
+                {t('subscriptions:summary')}
               </span>
-            </div>
+            </CardTitle>
+          </CardHeader>
 
-            <div className='flex flex-col'>
-              <div className='mb-2 flex items-center text-gray-500'>
-                <LuTicket className='mr-2 h-4 w-4' />
-                <span className='text-sm font-medium'>{t('subscriptions:totalBonusClasses')}</span>
+          <CardContent className='pl-8'>
+            <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
+              <div className='flex flex-col'>
+                <div className='mb-2 flex items-center text-gray-500'>
+                  <LuTicket className='mr-2 h-4 w-4' />
+                  <span className='text-sm font-medium'>{t('subscriptions:totalRemaining')}</span>
+                </div>
+
+                <span className='text-3xl font-extrabold text-gray-900'>
+                  {hasUnlimitedClasses ? t('subscriptions:unlimitedClasses') : summary?.total_remaining_classes}
+                </span>
               </div>
 
-              <span className='text-3xl font-extrabold text-gray-900'>{summary?.total_bonus_classes ?? 0}</span>
-            </div>
+              <div className='flex flex-col'>
+                <div className='mb-2 flex items-center text-gray-500'>
+                  <LuTicket className='mr-2 h-4 w-4' />
+                  <span className='text-sm font-medium'>{t('subscriptions:totalBonusClasses')}</span>
+                </div>
 
-            <div className='flex flex-col'>
-              <div className='mb-2 flex items-center text-gray-500'>
-                <LuActivity className='mr-2 h-4 w-4' />
-                <span className='text-sm font-medium'>{t('subscriptions:activePlans')}</span>
+                <span className='text-3xl font-extrabold text-gray-900'>{summary?.total_bonus_classes ?? 0}</span>
               </div>
 
-              <span className='text-3xl font-extrabold text-gray-900'>{summary?.active_count}</span>
-            </div>
+              <div className='flex flex-col'>
+                <div className='mb-2 flex items-center text-gray-500'>
+                  <LuActivity className='mr-2 h-4 w-4' />
+                  <span className='text-sm font-medium'>{t('subscriptions:activePlans')}</span>
+                </div>
 
-            <div className='flex flex-col'>
-              <div className='mb-2 flex items-center text-gray-500'>
-                <LuCalendarDays className='mr-2 h-4 w-4' />
-                <span className='text-sm font-medium'>{t('subscriptions:nextExpiration')}</span>
+                <span className='text-3xl font-extrabold text-gray-900'>{summary?.active_count}</span>
               </div>
 
-              <span className='text-xl font-bold text-gray-900'>
-                {nextBoundedExpiration !== undefined
-                  ? format(new Date(nextBoundedExpiration), 'MMM d, yyyy', { locale })
-                  : hasUnlimitedClasses
-                    ? t('subscriptions:noExpiration')
-                    : summary?.next_expiration
-                      ? format(new Date(summary.next_expiration), 'MMM d, yyyy', { locale })
-                      : '—'}
-              </span>
+              <div className='flex flex-col'>
+                <div className='mb-2 flex items-center text-gray-500'>
+                  <LuCalendarDays className='mr-2 h-4 w-4' />
+                  <span className='text-sm font-medium'>{t('subscriptions:nextExpiration')}</span>
+                </div>
+
+                <span className='text-xl font-bold text-gray-900'>
+                  {nextBoundedExpiration !== undefined
+                    ? format(new Date(nextBoundedExpiration), 'MMM d, yyyy', { locale })
+                    : hasUnlimitedClasses
+                      ? t('subscriptions:noExpiration')
+                      : summary?.next_expiration
+                        ? format(new Date(summary.next_expiration), 'MMM d, yyyy', { locale })
+                        : '—'}
+                </span>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Individual Subscription Cards */}
       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
         {sorted.map(sub => {
           const expDate = new Date(sub.expiration_date);
-          const daysLeft = differenceInDays(expDate, new Date());
+          const daysLeft = colombiaCalendarDaysUntil(expDate);
           const totalClasses = sub.class_count_snapshot;
           const isUnlimited = sub.remaining_classes === null;
+          // Credits recovered by paying are classes the person can book, on top of the plan's own counter.
+          const recovered = sub.recovered_classes_remaining ?? 0;
+          const remaining = (sub.remaining_classes ?? 0) + recovered;
           const percentage =
             !isUnlimited && totalClasses !== null && totalClasses > 0
-              ? ((sub.remaining_classes ?? 0) / totalClasses) * 100
+              ? Math.min((remaining / totalClasses) * 100, 100)
               : isUnlimited
                 ? 100
                 : 0;
@@ -170,8 +202,15 @@ export function ActiveSubscriptionWidget() {
                   )}
 
                   <Badge variant={statusBadgeVariant(sub.status)}>
-                    {sub.status === 'pending_payment' ? t('subscriptions:pendingPayment') : sub.status}
+                    {sub.status === 'pending_payment'
+                      ? t('subscriptions:pendingPayment')
+                      : sub.status === 'expired'
+                        ? t('recovery:subscription.expired')
+                        : sub.status}
                   </Badge>
+                  {sub.reactivated_at ? (
+                    <Badge variant='outlineActive'>{t('recovery:subscription.reactivated')}</Badge>
+                  ) : null}
                 </div>
 
                 <div className='grid grid-cols-2 gap-4'>
@@ -179,13 +218,19 @@ export function ActiveSubscriptionWidget() {
                     <span className='mb-1 text-sm text-gray-500'>{t('subscriptions:classesRemaining')}</span>
 
                     <span className='text-2xl font-bold text-gray-900'>
-                      {isUnlimited ? t('subscriptions:unlimitedClasses') : sub.remaining_classes}
+                      {isUnlimited ? t('subscriptions:unlimitedClasses') : remaining}
                     </span>
+
+                    {recovered > 0 ? (
+                      <span className='mt-1 text-sm text-gray-500'>
+                        {t('recovery:subscription.includesRecovered', { count: recovered })}
+                      </span>
+                    ) : null}
 
                     <div className='mt-2 h-2 w-full overflow-hidden rounded-full bg-gray-100'>
                       <div
                         className={`h-full rounded-full ${
-                          !isUnlimited && (sub.remaining_classes ?? 0) <= 1 ? 'bg-alert-500' : 'bg-primary'
+                          !isUnlimited && remaining <= 1 ? 'bg-alert-500' : 'bg-primary'
                         }`}
                         style={{ width: `${percentage}%` }}
                       />
@@ -204,7 +249,7 @@ export function ActiveSubscriptionWidget() {
                         </span>
 
                         <p className={`mt-1 text-sm font-medium ${daysLeft <= 3 ? 'text-alert-500' : 'text-gray-500'}`}>
-                          {daysLeft > 0 ? t('subscriptions:daysLeft', { count: daysLeft }) : t('subscriptions:expired')}
+                          {expirationLabel(daysLeft, t)}
                         </p>
                       </>
                     )}
@@ -222,6 +267,29 @@ export function ActiveSubscriptionWidget() {
                         {format(new Date(sub.bonus_expires_at), 'MMM d, yyyy', { locale })}
                       </p>
                     )}
+                  </div>
+                )}
+
+                {hasRecoverableClasses(sub) && (
+                  <div className='grid gap-2 border-t border-border pt-4'>
+                    <p className='m-0 text-sm text-gray-600'>
+                      {sub.recovery?.plan_state === 'expired_in_grace' && sub.recovery.grace_deadline
+                        ? t('recovery:subscription.recoverableUntil', {
+                            count: recoverableCount(sub),
+                            // A date-only string: parse it as a local day, not as UTC midnight.
+                            date: format(parseISO(sub.recovery.grace_deadline), 'MMM d, yyyy', { locale }),
+                          })
+                        : t('recovery:subscription.recoverable', { count: recoverableCount(sub) })}
+                    </p>
+                    <Button
+                      color='primary'
+                      variant='solid'
+                      size='small'
+                      type='button'
+                      onClick={() => navigate(PageURLS.profile.recoverClasses, { viewTransition: true })}
+                    >
+                      {t('recovery:subscription.recoverAction')}
+                    </Button>
                   </div>
                 )}
               </CardContent>

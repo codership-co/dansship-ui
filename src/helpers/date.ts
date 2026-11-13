@@ -1,9 +1,24 @@
-import { addDays, differenceInMinutes, format, formatDistance, parseISO } from 'date-fns';
+import { addDays, differenceInCalendarDays, differenceInMinutes, format, formatDistance, parseISO } from 'date-fns';
 
 import { getDateLocale } from '@hooks';
 
 const COLOMBIA_TIMEZONE = 'America/Bogota';
 const COLOMBIA_UTC_OFFSET_HOURS = 5;
+
+const colombiaDay = (value: Date): string =>
+  new Intl.DateTimeFormat('en-CA', { timeZone: COLOMBIA_TIMEZONE }).format(value);
+
+/**
+ * Calendar days from today to `target` in the academy's calendar (America/Bogota):
+ * 0 on the last day, 1 the day before, negative once it has passed. The API
+ * counts a plan as valid through its whole last day, so 24-hour blocks would
+ * call a plan expired hours too early.
+ */
+export const colombiaCalendarDaysUntil = (target: string | Date, now: Date = new Date()): number =>
+  differenceInCalendarDays(
+    parseISO(colombiaDay(typeof target === 'string' ? new Date(target) : target)),
+    parseISO(colombiaDay(now)),
+  );
 
 export const formatDate = (date: string | Date, lang = 'en'): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;

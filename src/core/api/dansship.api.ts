@@ -8,6 +8,8 @@ import { CampaignsAdminAPI } from './campaigns/campaigns.admin.api';
 import { CampaignsAPI } from './campaigns/campaigns.api';
 import { ClassFeedbackAdminAPI, ClassFeedbackAPI } from './class-feedback/class-feedback.api';
 import { ClassLevelsAPI } from './class-levels/class-levels.api';
+import { ClassRecoveryAdminAPI } from './class-recovery/class-recovery.admin.api';
+import { ClassRecoveryAPI } from './class-recovery/class-recovery.api';
 import { abortInFlight, DansshipHttpClient } from './dansship-http-client';
 import { getResponseError, logger } from './dansship.error';
 import { DoorCodeAdminAPI } from './door-code/door-code.admin.api';
@@ -67,6 +69,8 @@ export class DansshipAPI {
   static classFeedback = new ClassFeedbackAPI(this.httpClient);
   static classFeedbackAdmin = new ClassFeedbackAdminAPI(this.httpClient);
   static classLevels = new ClassLevelsAPI(this.httpClient);
+  static classRecovery = new ClassRecoveryAPI(this.httpClient);
+  static classRecoveryAdmin = new ClassRecoveryAdminAPI(this.httpClient);
   static family = new FamilyAPI(this.httpClient);
   static figures = new FiguresAPI(this.httpClient);
   static figuresAdmin = new FiguresAdminAPI(this.httpClient);

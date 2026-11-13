@@ -364,3 +364,33 @@ export interface ClassCancellationReport {
   items: Array<ClassCancellationItem>;
   trend: Array<ClassCancellationTrendPoint>;
 }
+
+export interface ClassRecoveryReportBucket {
+  classes: number;
+  revenue: number | string;
+}
+
+export interface ClassRecoveryReportPlanRow {
+  plan_name: string;
+  lost_classes: number;
+  recovered_paid: number;
+  courtesy: number;
+  revenue: number | string;
+}
+
+/** Finance block "Recuperación de clases" (ADR-056). */
+export interface ClassRecoveryReport {
+  payments_count: number;
+  revenue: number | string;
+  cash_collected: number | string;
+  wallet_applied: number | string;
+  classes_recovered: number;
+  lost_classes: number;
+  courtesy_returns: number;
+  active_plan: ClassRecoveryReportBucket;
+  reactivated_plan: ClassRecoveryReportBucket;
+  plan_extensions: number;
+  returned_to_wallet_count: number;
+  returned_to_wallet_amount: number | string;
+  by_plan: Array<ClassRecoveryReportPlanRow>;
+}

@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 
 import { AdminPaymentAttempts } from './admin-payment-attempts';
 import { AdminPaymentPricingBreakdown } from './admin-payment-pricing-breakdown';
+import { ClassRecoveryReviewSection, classRecoveryApproveLabelKey } from './class-recovery-review-section';
 
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
@@ -15,7 +16,7 @@ import { Badge, Dialog, DialogContent, DialogHeader, DialogTitle, Textarea } fro
 import { PaymentIntent, PaymentIntentDetail, AdminPaymentReviewPayload, DansshipAPI, PaymentStatus } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { paymentMethodLabelKey, paymentPurchaseLabel, purchaseTypeLabel, purchaseTypeLabelKey } from '@helpers';
-import { useDateLocale } from '@hooks';
+import { useClassRecoveryReview, useDateLocale } from '@hooks';
 
 interface AdminPaymentReviewModalProps {
   open: boolean;
@@ -99,10 +100,14 @@ export function AdminPaymentReviewModal({
   }, [open, intent]);
 
   const current = detail ?? intent;
+  const isRecovery = current?.purchase_type === 'class_recovery';
+  const { review: recoveryReview } = useClassRecoveryReview(current?.id, Boolean(open && isRecovery));
 
   if (!current) {
     return null;
   }
+
+  const approveLabelKey = (isRecovery && classRecoveryApproveLabelKey(recoveryReview)) || 'payments:admin.approve';
 
   const canReview = current.status === PaymentStatus.PENDING_MANUAL_REVIEW;
   const canSyncBold =
@@ -237,6 +242,8 @@ export function AdminPaymentReviewModal({
 
               <AdminPaymentPricingBreakdown intent={current} />
 
+              {isRecovery && recoveryReview ? <ClassRecoveryReviewSection review={recoveryReview} /> : null}
+
               <AdminPaymentAttempts attempts={detail?.attempts} />
 
               <div className='space-y-2'>
@@ -287,7 +294,7 @@ export function AdminPaymentReviewModal({
                       {t('payments:admin.reject')}
                     </Button>
                     <Button color='primary' variant='solid' onClick={() => void handleApprove()} disabled={busy}>
-                      {isReviewing ? t('common:saving') : t('payments:admin.approve')}
+                      {isReviewing ? t('common:saving') : t(approveLabelKey)}
                     </Button>
                   </>
                 ) : (

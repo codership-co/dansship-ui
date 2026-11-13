@@ -17,6 +17,7 @@ import {
   UserRolesManager,
   UserSubscriptionsTab,
   UserWalletTab,
+  UserRecoveriesTab,
   UserEventsTab,
   UserRegistrationActions,
   UserFamilyTab,
@@ -40,6 +41,7 @@ const PAYMENT_DOCUMENTS_TAB = 'payment-documents';
 const INSTRUCTOR_CLASSES_TAB = 'instructor-classes';
 const INSTRUCTOR_CSAT_TAB = 'instructor-csat';
 const FAMILY_TAB = 'family';
+const RECOVERIES_TAB = 'recoveries';
 
 function UserDetailsPage() {
   const { t } = useTranslation();
@@ -88,6 +90,7 @@ function UserDetailsPage() {
     ...(canManageEventos ? [TALLERES_TAB] : []),
     ...(canReadBenefits ? [BENEFITS_TAB] : []),
     ...(canManageWallet ? [WALLET_TAB] : []),
+    ...(canManagePayments ? [RECOVERIES_TAB] : []),
     ...(showPaymentDocuments ? [PAYMENT_DOCUMENTS_TAB] : []),
     ...(showInstructorClasses ? [INSTRUCTOR_CLASSES_TAB] : []),
     ...(showInstructorCsat ? [INSTRUCTOR_CSAT_TAB] : []),
@@ -163,6 +166,9 @@ function UserDetailsPage() {
               {canManageWallet ? (
                 <TabsTrigger value={WALLET_TAB}>{t('admin:users.details.tabs.wallet')}</TabsTrigger>
               ) : null}
+              {canManagePayments ? (
+                <TabsTrigger value={RECOVERIES_TAB}>{t('recovery:admin.user.tab')}</TabsTrigger>
+              ) : null}
               {showPaymentDocuments ? (
                 <TabsTrigger value={PAYMENT_DOCUMENTS_TAB}>
                   {t('admin:users.details.tabs.paymentDocuments')}
@@ -228,6 +234,12 @@ function UserDetailsPage() {
             {canManageWallet ? (
               <TabsContent value={WALLET_TAB}>
                 {activeTab === WALLET_TAB && userId ? <UserWalletTab userId={userId} /> : null}
+              </TabsContent>
+            ) : null}
+
+            {canManagePayments ? (
+              <TabsContent value={RECOVERIES_TAB}>
+                {activeTab === RECOVERIES_TAB && userId ? <UserRecoveriesTab userId={userId} /> : null}
               </TabsContent>
             ) : null}
 

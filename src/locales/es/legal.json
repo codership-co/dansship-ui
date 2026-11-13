@@ -14,6 +14,10 @@
     "classTermsAndConditions": {
       "tab": "Términos y condiciones de planes y servicio",
       "description": "Al comprar y asistir a nuestras clases y servicios, aceptas cumplir con nuestros Términos y Condiciones de planes y servicio."
+    },
+    "classRecoveryTerms": {
+      "tab": "Recuperación de clases",
+      "description": "Condiciones para recuperar el crédito de las clases que no pudiste tomar."
     }
   }
 }

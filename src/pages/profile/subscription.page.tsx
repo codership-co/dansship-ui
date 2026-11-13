@@ -96,9 +96,14 @@ function SubscriptionPage() {
                         </p>
                       </div>
 
-                      <Badge variant={statusBadgeVariant(subscription.status)}>
-                        {t(`subscriptions:store.status.${subscription.status}`)}
-                      </Badge>
+                      <div className='flex flex-wrap gap-2'>
+                        <Badge variant={statusBadgeVariant(subscription.status)}>
+                          {t(`subscriptions:store.status.${subscription.status}`)}
+                        </Badge>
+                        {subscription.reactivated_at ? (
+                          <Badge variant='outlineActive'>{t('recovery:subscription.reactivated')}</Badge>
+                        ) : null}
+                      </div>
                     </div>
                   </div>
                 ))

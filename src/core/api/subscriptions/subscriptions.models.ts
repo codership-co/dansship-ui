@@ -44,6 +44,15 @@ export interface MySubscriptionsResponse {
   summary: SubscriptionSummary;
 }
 
+export type SubscriptionRecoveryPlanState = 'active' | 'expired_in_grace' | 'already_reactivated' | 'not_eligible';
+
+export interface SubscriptionRecoveryState {
+  plan_state: SubscriptionRecoveryPlanState;
+  recoverable_classes: number;
+  unused_credits: number;
+  grace_deadline: string | null;
+}
+
 export interface ActiveSubscription {
   id: string;
   plan_id: string;
@@ -67,6 +76,12 @@ export interface ActiveSubscription {
   remaining_classes: number | null;
   bonus_classes_remaining?: number;
   bonus_expires_at?: string | null;
+  /** Credits recovered by paying (ADR-056). */
+  recovered_classes_remaining?: number;
+  base_expiration_date?: string | null;
+  /** Set when the plan is a "Plan reactivado". */
+  reactivated_at?: string | null;
+  recovery?: SubscriptionRecoveryState | null;
   start_date: string;
   expiration_date: string;
   original_price: number;

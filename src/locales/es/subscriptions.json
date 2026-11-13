@@ -22,6 +22,8 @@
   "noExpiration": "Sin vencimiento",
   "daysLeft": "{{count}} días restantes",
   "expired": "Expirado",
+  "expiresToday": "Vence hoy",
+  "expiresTomorrow": "Vence mañana",
   "noPlansAvailable": "No Hay Planes Disponibles",
   "noPlansDesc": "Vuelve más tarde para ver nuevos paquetes.",
   "bestValue": "RECOMENDADO",

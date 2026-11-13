@@ -27,7 +27,13 @@ import {
   CardHeader,
   CardTitle,
 } from '@components/ui';
-import { type AdminPaymentReviewPayload, DansshipAPI, PaymentIntent, PaymentStatus } from '@core/api';
+import {
+  type AdminPaymentReviewPayload,
+  DansshipAPI,
+  PaymentIntent,
+  PaymentStatus,
+  type PurchaseType,
+} from '@core/api';
 import { PageURLS } from '@core/constants';
 import {
   formatPrice,
@@ -47,6 +53,16 @@ const STATUS_OPTIONS: Array<{ value: 'all' | PaymentStatus; labelKey: string }> 
   { value: PaymentStatus.EXPIRED, labelKey: 'payments:status.expired' },
 ];
 
+const PURCHASE_TYPE_OPTIONS: Array<{ value: 'all' | PurchaseType; labelKey: string }> = [
+  { value: 'all', labelKey: 'payments:admin.filter.allTypes' },
+  { value: 'plan', labelKey: 'payments:purchaseType.plan' },
+  { value: 'event', labelKey: 'payments:purchaseType.event' },
+  { value: 'event_installment', labelKey: 'payments:purchaseType.event_installment' },
+  { value: 'studio_rental', labelKey: 'payments:purchaseType.studio_rental' },
+  { value: 'merch', labelKey: 'payments:purchaseType.merch' },
+  { value: 'class_recovery', labelKey: 'payments:purchaseType.class_recovery' },
+];
+
 export function AdminPaymentList({
   userId,
   readOnly = false,
@@ -57,14 +73,16 @@ export function AdminPaymentList({
   const { t } = useTranslation();
   const locale = useDateLocale();
   const [statusFilter, setStatusFilter] = useState<'all' | PaymentStatus>('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | PurchaseType>('all');
   const [selectedIntent, setSelectedIntent] = useState<PaymentIntent | null>(null);
 
   const filters = useMemo(
     () => ({
       status: statusFilter === 'all' ? undefined : statusFilter,
+      purchase_type: typeFilter === 'all' ? undefined : typeFilter,
       user_id: userId,
     }),
-    [statusFilter, userId],
+    [statusFilter, typeFilter, userId],
   );
 
   const {
@@ -121,6 +139,22 @@ export function AdminPaymentList({
 
                 <SelectContent>
                   {STATUS_OPTIONS.map(option => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {t(option.labelKey)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className='w-full max-w-xs'>
+              <Select value={typeFilter} onValueChange={value => setTypeFilter(value as 'all' | PurchaseType)}>
+                <SelectTrigger>
+                  <SelectValue placeholder={t('payments:admin.filter.type')} />
+                </SelectTrigger>
+
+                <SelectContent>
+                  {PURCHASE_TYPE_OPTIONS.map(option => (
                     <SelectItem key={option.value} value={option.value}>
                       {t(option.labelKey)}
                     </SelectItem>
