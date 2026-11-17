@@ -88,6 +88,7 @@ describe('resolveCheckoutPromotion', () => {
   it('fixes the start and hides the codes for a monthly purchase for oneself', () => {
     expect(resolveCheckoutPromotion(plan, self)).toEqual({
       startIsFixed: true,
+      startNoteVisible: true,
       codesHidden: true,
       quarterlyKeepsOwn: false,
       giftClaim: null,
@@ -97,6 +98,7 @@ describe('resolveCheckoutPromotion', () => {
   it('keeps the start fixed but gives the codes back for the quarterly mode', () => {
     expect(resolveCheckoutPromotion(plan, { ...self, isQuarterly: true })).toEqual({
       startIsFixed: true,
+      startNoteVisible: false,
       codesHidden: false,
       quarterlyKeepsOwn: true,
       giftClaim: null,
@@ -118,12 +120,14 @@ describe('resolveCheckoutPromotion', () => {
   it('changes nothing for Plan Duo or without a promotion', () => {
     expect(resolveCheckoutPromotion(plan, { ...self, isDuo: true })).toEqual({
       startIsFixed: false,
+      startNoteVisible: false,
       codesHidden: false,
       quarterlyKeepsOwn: false,
       giftClaim: null,
     });
     expect(resolveCheckoutPromotion({ promotion: null }, self)).toEqual({
       startIsFixed: false,
+      startNoteVisible: false,
       codesHidden: false,
       quarterlyKeepsOwn: false,
       giftClaim: null,

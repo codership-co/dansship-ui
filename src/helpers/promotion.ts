@@ -68,6 +68,8 @@ export function acceptedTermsVersion(
 export interface CheckoutPromotionRules {
   /** No start-date field: the plan starts when the payment is approved. */
   startIsFixed: boolean;
+  /** The "plan starts on approval" note. Quarterly purchases do not show it, they only keep their own discount. */
+  startNoteVisible: boolean;
   /** No discount or referral code field: the promotion discount is exclusive. */
   codesHidden: boolean;
   /** Quarterly purchase inside a promotion that does not discount it. */
@@ -82,9 +84,11 @@ export function resolveCheckoutPromotion(
   mode: { isGift: boolean; isDuo: boolean; isQuarterly: boolean },
 ): CheckoutPromotionRules {
   const quarterly = mode.isQuarterly && !mode.isDuo;
+  const startIsFixed = !mode.isGift && !mode.isDuo && promotionFixesStart(plan);
 
   return {
-    startIsFixed: !mode.isGift && !mode.isDuo && promotionFixesStart(plan),
+    startIsFixed,
+    startNoteVisible: startIsFixed && !quarterly,
     codesHidden: !mode.isDuo && promotionDiscountApplies(plan, quarterly),
     quarterlyKeepsOwn: promotionSkipsQuarterly(plan, quarterly),
     giftClaim: mode.isGift ? giftClaimPolicyFor(plan, quarterly) : null,

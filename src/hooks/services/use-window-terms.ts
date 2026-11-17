@@ -5,9 +5,13 @@ import { toast } from 'sonner';
 import { useCallablePromise } from '../use-callable-promise';
 import { usePromise } from '../use-promise';
 
-import { DansshipAPI, type PromotionWindowTerms } from '@core/api';
+import { DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError, type PromotionWindowTerms } from '@core/api';
+import { captureUnexpectedException } from '@core/sentry';
 
 const EMPTY_TERMS: Array<PromotionWindowTerms> = [];
+
+const isRejectedTerms = (error: unknown) =>
+  error instanceof DansshipAPIError && error.body.error_code === DANSSHIP_ERROR_CODE.PROMOTION_TERMS_INVALID;
 
 /** Terms PDF of the promotion windows (only promotions can carry terms) and the save/history calls. */
 export const useWindowTerms = () => {
@@ -27,13 +31,24 @@ export const useWindowTerms = () => {
 
   const saveTerms = useCallback(
     async (definitionId: string, title: string, file: File | null) => {
-      const { ok } = await savePromise(definitionId, title, file).catch(() => ({ ok: false }));
+      // The upload throws and the save returns its error: both end up here, so the admin sees why and Sentry sees it.
+      const { ok, error } = await savePromise(definitionId, title, file).then(
+        result => ({ ok: result.ok, error: result.error }),
+        (uploadError: unknown) => ({ ok: false, error: uploadError }),
+      );
 
       if (ok) {
         toast.success(t('admin:inventory.promotionsPanel.terms.saveSuccess'));
         reFetch();
       } else {
-        toast.error(t('admin:inventory.promotionsPanel.terms.saveFailed'));
+        toast.error(
+          isRejectedTerms(error)
+            ? t(`errors:codes.${DANSSHIP_ERROR_CODE.PROMOTION_TERMS_INVALID}`)
+            : t('admin:inventory.promotionsPanel.terms.saveFailed'),
+        );
+        captureUnexpectedException(error ?? new Error('Promotion terms save failed'), {
+          tags: { flow: 'admin.promotionTerms.save', definition_id: definitionId },
+        });
       }
 
       return ok;

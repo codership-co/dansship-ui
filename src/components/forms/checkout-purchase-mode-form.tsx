@@ -125,7 +125,7 @@ export function CheckoutPurchaseModeForm({
   const duoHalfClasses = Math.floor(classesIncluded / 2);
   const promotion = plan.promotion ?? null;
   // Everything the promotion changes comes from the API: no dates, percentages or day counts live in the UI.
-  const { startIsFixed, codesHidden, quarterlyKeepsOwn, giftClaim } = resolveCheckoutPromotion(plan, {
+  const { startIsFixed, startNoteVisible, codesHidden, quarterlyKeepsOwn, giftClaim } = resolveCheckoutPromotion(plan, {
     isGift,
     isDuo,
     isQuarterly: Boolean(isQuarterly),
@@ -469,7 +469,7 @@ export function CheckoutPurchaseModeForm({
           </div>
         ) : null}
 
-        {startIsFixed && promotion && !quarterlyKeepsOwn ? (
+        {startNoteVisible && promotion ? (
           <CheckoutNote Icon={LuClock}>
             <span className='font-semibold'>{t(promotionCopyKey(promotion.code, 'startNote'))}</span>
           </CheckoutNote>
