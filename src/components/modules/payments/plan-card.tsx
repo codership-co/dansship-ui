@@ -1,15 +1,24 @@
 import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 
+import { Badge } from '@components/ui';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@components/ui/card';
 import { PublicPlan } from '@core/api';
-import { cn } from '@helpers';
+import { cn, promotionCopyKey } from '@helpers';
 
 const getPrice = (value: unknown): number => {
   const parsed = Number(value);
 
   return Number.isFinite(parsed) ? parsed : 0;
 };
+
+const formatCop = (value: number): string =>
+  new Intl.NumberFormat('es-CO', {
+    style: 'currency',
+    currency: 'COP',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(value);
 
 interface PlanCardProps {
   plan: PublicPlan;
@@ -22,7 +31,8 @@ interface PlanCardProps {
 
 export function PlanCard({ plan, onSelectPlan, isFeatured, hoverable, className, asIndividual }: PlanCardProps) {
   const { t } = useTranslation();
-  const price = getPrice(plan.price);
+  const promotion = plan.promotion ?? null;
+  const price = getPrice(promotion ? promotion.promotional_price : plan.price);
 
   return (
     <section key={plan.id} className='group'>
@@ -50,7 +60,14 @@ export function PlanCard({ plan, onSelectPlan, isFeatured, hoverable, className,
 
         {!asIndividual && (
           <CardHeader className='pb-4 pt-5 sm:pb-5 sm:pt-6 gap-0'>
-            <CardTitle className='text-[1.8rem] font-semibold font-title sm:text-[2.1rem]'>{plan.name}</CardTitle>
+            <div className='flex items-center justify-between gap-2'>
+              <CardTitle className='text-[1.8rem] font-semibold font-title sm:text-[2.1rem]'>{plan.name}</CardTitle>
+              {promotion ? (
+                <Badge variant='highlight' className='px-3 py-1'>
+                  {t(promotionCopyKey(promotion.code, 'badge'), { percentage: promotion.discount_percentage })}
+                </Badge>
+              ) : null}
+            </div>
 
             <CardDescription className='text-label'>
               {plan.description ||
@@ -64,15 +81,13 @@ export function PlanCard({ plan, onSelectPlan, isFeatured, hoverable, className,
         <CardContent className='flex grow flex-col pt-0'>
           {!asIndividual && (
             <section className='mb-5 sm:mb-7'>
+              {promotion ? (
+                <span className='block text-xl font-medium line-through opacity-80 sm:text-2xl'>
+                  {formatCop(getPrice(promotion.original_price))}
+                </span>
+              ) : null}
               <div className='flex items-end gap-1.5 sm:gap-2'>
-                <h2 className='lg:text-header3 xl:text-header2 font-main m-0'>
-                  {new Intl.NumberFormat('es-CO', {
-                    style: 'currency',
-                    currency: 'COP',
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                  }).format(price)}
-                </h2>
+                <h2 className='lg:text-header3 xl:text-header2 font-main m-0'>{formatCop(price)}</h2>
 
                 <label className='mb-2'>{plan.currency}</label>
               </div>

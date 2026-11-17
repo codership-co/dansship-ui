@@ -19,6 +19,14 @@ export function toNumber(value: unknown, fallback = 0): number {
 export function normalizePlan(plan: PublicPlan): PublicPlan {
   return {
     ...plan,
+    promotion: plan.promotion
+      ? {
+          ...plan.promotion,
+          discount_percentage: toNumber(plan.promotion.discount_percentage),
+          original_price: toNumber(plan.promotion.original_price),
+          promotional_price: toNumber(plan.promotion.promotional_price),
+        }
+      : null,
     price: toNumber(plan.price),
     classes_included: plan.classes_included === null ? null : toNumber(plan.classes_included),
     validity_days: toNumber(plan.validity_days),

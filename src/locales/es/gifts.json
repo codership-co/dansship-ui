@@ -4,7 +4,7 @@
   "purchaseModeSelfTitle": "Para mí",
   "purchaseModeSelfDescription": "El plan queda en tu cuenta.",
   "purchaseModeGiftTitle": "Regalo",
-  "purchaseModeGiftDescription": "El destinatario elige la fecha de inicio al reclamarlo.",
+  "purchaseModeGiftDescription": "El plan empieza cuando el destinatario lo reclame.",
   "recipientName": "Nombre del destinatario",
   "recipientNamePlaceholder": "Nombre de quien recibirá el regalo",
   "recipientEmail": "Correo del destinatario",
@@ -13,7 +13,7 @@
   "anonymous": "Enviar de forma anónima",
   "senderDisplayName": "Tu nombre (visible para el destinatario)",
   "senderDisplayNamePlaceholder": "Cómo quieres que te vean",
-  "startDateGiftNote": "La fecha de inicio del plan se definirá cuando el destinatario reclame el regalo.",
+  "startDateGiftNote": "El plan empieza cuando el destinatario reclame el regalo.",
   "checkoutGiftStepTitle": "Datos del regalo",
   "checkoutGiftSummaryTitle": "Regalo",
   "giftEligibilityFailed": "No pudimos validar este correo para el regalo. Revisa e intenta de nuevo.",
@@ -45,5 +45,9 @@
     "pending_claim": "Por reclamar",
     "claimed": "Reclamado",
     "expired": "Expirado"
-  }
+  },
+  "claimWindowTitle": "La destinataria tiene {{days}} días para reclamar tu regalo.",
+  "claimWindowBody": "Cuentan desde que se apruebe tu pago y el plan empieza cuando lo reclame.",
+  "claimRefund": "Si no lo reclama a tiempo, lo pagado vuelve a tu billetera.",
+  "claimNoRefund": "Si no lo reclama a tiempo, no se devuelve el dinero."
 }

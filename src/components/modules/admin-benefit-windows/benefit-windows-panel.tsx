@@ -1,11 +1,13 @@
 import { Button } from 'polpo/components';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
+import { WindowTermsEditor } from './window-terms-editor';
+
 import { SpinnerLoader } from '@components/loaders';
 import { Input, Label, Switch, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
-import { useBenefitWindows } from '@hooks';
+import { useBenefitWindows, useWindowTerms } from '@hooks';
 
 const TWO_FOR_ONE_CODES = new Set(['TWO_FOR_ONE', 'JUEVES_2X1']);
 
@@ -17,6 +19,7 @@ interface DateDraft {
 export function BenefitWindowsPanel() {
   const { t } = useTranslation();
   const { windows, isLoading, isSaving, updateWindow } = useBenefitWindows();
+  const { promotionTerms, isSaving: isSavingTerms, saveTerms, loadVersions } = useWindowTerms();
   const [drafts, setDrafts] = useState<Record<string, DateDraft>>({});
 
   useEffect(() => {
@@ -89,76 +92,109 @@ export function BenefitWindowsPanel() {
             };
             const weekly = TWO_FOR_ONE_CODES.has(window.code);
             const title = weekly ? t('admin:inventory.promotionsPanel.twoForOneName') : window.name;
+            // Only promotion windows carry terms; the 30 % shown here is read-only context.
+            const termsEntry = promotionTerms.find(entry => entry.definition_id === window.id);
 
             return (
-              <TableRow key={window.id}>
-                <TableCell>
-                  <div className='font-medium text-gray-900'>{title}</div>
-                  <div className='text-xs text-gray-500'>{window.code}</div>
-                </TableCell>
-                <TableCell>
-                  <div className='flex items-center gap-2'>
-                    <Switch
-                      checked={window.is_active}
-                      disabled={isSaving}
-                      aria-label={title}
-                      onCheckedChange={checked => {
-                        void updateWindow(window.id, { is_active: checked });
-                      }}
-                    />
-                    <Label className='text-sm text-gray-600'>
-                      {window.is_active ? t('common:active') : t('common:inactive')}
-                    </Label>
-                  </div>
-                </TableCell>
-                {weekly ? (
-                  <>
-                    <TableCell>{t('admin:inventory.promotionsPanel.definedPerWeek')}</TableCell>
-                    <TableCell>{t('admin:inventory.promotionsPanel.definedPerWeek')}</TableCell>
-                    <TableCell />
-                  </>
-                ) : (
-                  <>
-                    <TableCell>
-                      <Input
-                        type='date'
-                        value={draft.starts_on}
-                        aria-label={t('admin:inventory.promotionsPanel.from')}
-                        onChange={event =>
-                          setDrafts(previous => ({
-                            ...previous,
-                            [window.id]: { ...draft, starts_on: event.target.value },
-                          }))
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        type='date'
-                        value={draft.ends_on}
-                        aria-label={t('admin:inventory.promotionsPanel.until')}
-                        onChange={event =>
-                          setDrafts(previous => ({
-                            ...previous,
-                            [window.id]: { ...draft, ends_on: event.target.value },
-                          }))
-                        }
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Button
-                        color='primary'
-                        variant='solid'
-                        type='button'
+              <Fragment key={window.id}>
+                <TableRow>
+                  <TableCell>
+                    <div className='font-medium text-gray-900'>{title}</div>
+                    <div className='text-xs text-gray-500'>{window.code}</div>
+                    {termsEntry && termsEntry.discount_percentage !== null ? (
+                      <div className='text-xs text-primary'>
+                        {t('admin:inventory.promotionsPanel.summary', {
+                          percentage: Number(termsEntry.discount_percentage),
+                          modes: termsEntry.discount_modes
+                            .map(mode => t(`admin:inventory.promotionsPanel.modes.${mode}`))
+                            .join(', '),
+                        })}
+                      </div>
+                    ) : null}
+                  </TableCell>
+                  <TableCell>
+                    <div className='flex items-center gap-2'>
+                      <Switch
+                        checked={window.is_active}
                         disabled={isSaving}
-                        onClick={() => void saveDates(window.id)}
-                      >
-                        {t('admin:inventory.promotionsPanel.save')}
-                      </Button>
+                        aria-label={title}
+                        onCheckedChange={checked => {
+                          void updateWindow(window.id, { is_active: checked });
+                        }}
+                      />
+                      <Label className='text-sm text-gray-600'>
+                        {window.is_active ? t('common:active') : t('common:inactive')}
+                      </Label>
+                    </div>
+                  </TableCell>
+                  {weekly ? (
+                    <>
+                      <TableCell>{t('admin:inventory.promotionsPanel.definedPerWeek')}</TableCell>
+                      <TableCell>{t('admin:inventory.promotionsPanel.definedPerWeek')}</TableCell>
+                      <TableCell />
+                    </>
+                  ) : (
+                    <>
+                      <TableCell>
+                        <Input
+                          type='date'
+                          value={draft.starts_on}
+                          aria-label={t('admin:inventory.promotionsPanel.from')}
+                          onChange={event =>
+                            setDrafts(previous => ({
+                              ...previous,
+                              [window.id]: {
+                                ...draft,
+                                starts_on: event.target.value,
+                              },
+                            }))
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Input
+                          type='date'
+                          value={draft.ends_on}
+                          aria-label={t('admin:inventory.promotionsPanel.until')}
+                          onChange={event =>
+                            setDrafts(previous => ({
+                              ...previous,
+                              [window.id]: {
+                                ...draft,
+                                ends_on: event.target.value,
+                              },
+                            }))
+                          }
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Button
+                          color='primary'
+                          variant='solid'
+                          type='button'
+                          disabled={isSaving}
+                          onClick={() => void saveDates(window.id)}
+                        >
+                          {t('admin:inventory.promotionsPanel.save')}
+                        </Button>
+                      </TableCell>
+                    </>
+                  )}
+                </TableRow>
+                {termsEntry ? (
+                  <TableRow>
+                    <TableCell colSpan={5}>
+                      <WindowTermsEditor
+                        promotionName={window.name}
+                        entry={termsEntry}
+                        isSaving={isSavingTerms}
+                        onSave={(title, file) => saveTerms(window.id, title, file)}
+                        loadVersions={() => loadVersions(window.id)}
+                      />
                     </TableCell>
-                  </>
-                )}
-              </TableRow>
+                  </TableRow>
+                ) : null}
+              </Fragment>
             );
           })}
         </TableBody>

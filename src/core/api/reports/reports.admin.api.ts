@@ -23,6 +23,7 @@ import type {
   SubscriptionUsageReport,
   TaxCollectedReport,
   ClassRecoveryReport,
+  PromotionCostReport,
   TrialConversionReport,
   TrialStudentsWithoutPlanReport,
   UnderutilizedScheduleReport,
@@ -223,26 +224,23 @@ export class ReportsAdminAPI {
   }
 
   async exportActiveStudentsCsv() {
-    // Raw fetch: this download skips DansshipHttpClient, so it does not refresh a 401 or abort on resume.
-    const response = await fetch(`${import.meta.env.VITE_DANSSHIP_API_URL}/admin/reports/active-students-list.csv`, {
+    await this.downloadCsv('/admin/reports/active-students-list.csv', 'estudiantes-activos.csv');
+  }
+
+  async getPromotionCost(startDate?: string, endDate?: string) {
+    return this.httpClient.callNoError<PromotionCostReport>({
+      path: '/admin/reports/promotion-cost',
       method: 'GET',
-      credentials: 'include',
-      headers: { accept: 'text/csv' },
+      timeoutMs: REPORT_GET_TIMEOUT_MS,
+      params: this.dateParams(startDate, endDate),
     });
+  }
 
-    if (!response.ok) {
-      throw new Error('Active students export failed');
-    }
-
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = 'estudiantes-activos.csv';
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    URL.revokeObjectURL(url);
+  async exportPromotionCostCsv(startDate?: string, endDate?: string) {
+    await this.downloadCsv('/admin/reports/promotion-cost.csv', 'costo-de-campana.csv', {
+      from_date: startDate,
+      to_date: endDate,
+    });
   }
 
   async getNetRevenueByClassType(startDate?: string, endDate?: string) {
@@ -330,6 +328,32 @@ export class ReportsAdminAPI {
       timeoutMs: REPORT_GET_TIMEOUT_MS,
       params: this.dateParams(startDate, endDate),
     });
+  }
+
+  /** Raw fetch: a download skips DansshipHttpClient, so it does not refresh a 401 or abort on resume. */
+  private async downloadCsv(path: string, filename: string, params: Record<string, string | undefined> = {}) {
+    const query = new URLSearchParams(
+      Object.entries(params).filter((entry): entry is [string, string] => Boolean(entry[1])),
+    ).toString();
+    const response = await fetch(`${import.meta.env.VITE_DANSSHIP_API_URL}${path}${query ? `?${query}` : ''}`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: { accept: 'text/csv' },
+    });
+
+    if (!response.ok) {
+      throw new Error(`CSV export failed: ${path}`);
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
   }
 
   private dateParams(startDate?: string, endDate?: string): DateRangeParams {

@@ -6,8 +6,15 @@ import { LuArrowLeft, LuArrowRight } from 'react-icons/lu';
 import { z } from 'zod';
 
 import { PaymentMethodSelector } from '@components/modules/payments/payment-method-selector';
-import { PaymentMethod, PublicPlan, type AppliedDiscountMapped } from '@core/api';
-import { formatPrice } from '@helpers';
+import { PromotionTermsLink } from '@components/modules/payments/promotion-terms-link';
+import {
+  PaymentMethod,
+  PublicPlan,
+  type AppliedDiscountMapped,
+  type GiftClaimPolicyPreview,
+  type PromotionPreviewMapped,
+} from '@core/api';
+import { acceptedTermsVersion, formatPrice } from '@helpers';
 
 export const createCheckoutReviewSchema = (t: TFunction) =>
   z
@@ -101,6 +108,8 @@ export interface PaymentData {
   bonusBenefitName: string | null;
   walletAmountApplied: number;
   amountToCharge: number;
+  promotion: PromotionPreviewMapped | null;
+  giftClaim: GiftClaimPolicyPreview | null;
 }
 
 export const DefaultPaymentData: PaymentData = {
@@ -122,6 +131,8 @@ export const DefaultPaymentData: PaymentData = {
   bonusBenefitName: null,
   walletAmountApplied: 0,
   amountToCharge: 0,
+  promotion: null,
+  giftClaim: null,
 };
 
 export const defaultCheckoutFormValues: CheckoutFormValues = {
@@ -140,6 +151,11 @@ export const defaultCheckoutFormValues: CheckoutFormValues = {
 };
 
 function discountLineLabel(t: TFunction, discount: AppliedDiscountMapped): string {
+  // A promotion names its own line (key and percentage come from the API).
+  if (discount.labelKey) {
+    return t(discount.labelKey, { percentage: discount.value });
+  }
+
   if (discount.code === 'QUARTERLY_PCT_10') {
     return t('subscriptions:discountQuarterly');
   }
@@ -190,6 +206,9 @@ interface CheckoutPayFormProps {
   paymentMethod: PaymentMethod | null;
   onPaymentMethodChange: (method: PaymentMethod) => void;
   isWalletCovered: boolean;
+  /** Version of the promotion terms the buyer accepted, or null. Required when the preview returned terms. */
+  acceptedTermsVersionId: string | null;
+  onAcceptedTermsVersionChange: (versionId: string | null) => void;
   onBack: () => void;
   onSubmit: () => void;
 }
@@ -201,11 +220,15 @@ export function CheckoutPayForm({
   paymentMethod,
   onPaymentMethodChange,
   isWalletCovered,
+  acceptedTermsVersionId,
+  onAcceptedTermsVersionChange,
   onBack,
   onSubmit,
 }: CheckoutPayFormProps) {
   const { t } = useTranslation();
   const [termsAndConditions, setTermsAndConditions] = useState(false);
+  const promotionTerms = paymentData.promotion?.terms ?? null;
+  const promotionTermsAccepted = acceptedTermsVersion(promotionTerms, acceptedTermsVersionId) !== null;
   const isDuo = checkoutData.purchase_mode === 'duo';
   const discountLines =
     paymentData.appliedDiscounts.length > 0
@@ -312,6 +335,19 @@ export function CheckoutPayForm({
             value={termsAndConditions}
             setValue={() => setTermsAndConditions(p => !p)}
           />
+          {promotionTerms ? (
+            <Checkbox
+              label={
+                <Trans
+                  i18nKey='subscriptions:promotionTermsCheckbox'
+                  components={{ LinkTerms: <PromotionTermsLink terms={promotionTerms} /> }}
+                />
+              }
+              name='promotion_terms'
+              value={promotionTermsAccepted}
+              setValue={() => onAcceptedTermsVersionChange(promotionTermsAccepted ? null : promotionTerms.version_id)}
+            />
+          ) : null}
         </section>
 
         <div className='flex flex-wrap justify-end gap-2 pt-4'>
@@ -321,7 +357,11 @@ export function CheckoutPayForm({
           </Button>
 
           <Button
-            disabled={!termsAndConditions || (!isWalletCovered && !paymentMethod)}
+            disabled={
+              !termsAndConditions ||
+              (promotionTerms !== null && !promotionTermsAccepted) ||
+              (!isWalletCovered && !paymentMethod)
+            }
             color='primary'
             variant='solid'
             className='flex items-center'

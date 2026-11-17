@@ -19,6 +19,8 @@ export interface OptionalFileUploadProps {
   disabled?: boolean;
   label?: string;
   helperText?: string;
+  /** Replaces the default "invalid type" toast, which names image formats. */
+  invalidTypeMessage?: string;
   className?: string;
   showPreview?: boolean;
 }
@@ -32,6 +34,7 @@ export function OptionalFileUpload({
   disabled = false,
   label,
   helperText,
+  invalidTypeMessage,
   className,
   showPreview = true,
 }: OptionalFileUploadProps) {
@@ -51,7 +54,7 @@ export function OptionalFileUpload({
     if (!file) return;
 
     if (!acceptedTypes.includes(file.type)) {
-      toast.error(t('common:fileUpload.invalidType'));
+      toast.error(invalidTypeMessage ?? t('common:fileUpload.invalidType'));
       event.currentTarget.value = '';
 
       return;

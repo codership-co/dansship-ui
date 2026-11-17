@@ -18,7 +18,7 @@ import { FormStepperLayout } from '@components/layouts/form-stepper-layout';
 import { PaymentMethod, type PublicPlan } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { addSentryBreadcrumb } from '@core/sentry';
-import { cn } from '@helpers';
+import { acceptedTermsVersion, cn, previewFixesStart } from '@helpers';
 
 export enum CheckoutStep {
   MODE = 'MODE',
@@ -61,6 +61,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
   const [step, setStep] = useState<CheckoutStep>(CheckoutStep.MODE);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const [isQuarterly, setIsQuarterly] = useState(false);
+  const [acceptedTermsVersionId, setAcceptedTermsVersionId] = useState<string | null>(null);
   const [checkoutData, setCheckoutData] = useState<CheckoutFormValues>({
     ...defaultCheckoutFormValues,
     start_date: new Date(),
@@ -84,6 +85,8 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
 
   const applyPaymentPreview = useCallback((nextPaymentData: PaymentData) => {
     setPaymentData(nextPaymentData);
+    // A new preview may carry another terms version: the buyer accepts what is shown, again if it changed.
+    setAcceptedTermsVersionId(current => acceptedTermsVersion(nextPaymentData.promotion?.terms, current));
 
     const fullyCovered = nextPaymentData.amountToCharge === 0 && nextPaymentData.walletAmountApplied > 0;
 
@@ -182,6 +185,8 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
           paymentMethod={paymentMethod}
           onPaymentMethodChange={setPaymentMethod}
           isWalletCovered={isWalletCovered}
+          acceptedTermsVersionId={acceptedTermsVersionId}
+          onAcceptedTermsVersionChange={setAcceptedTermsVersionId}
           onBack={() => setStep(payBackStep)}
           onSubmit={handlePaySubmit}
         />
@@ -201,6 +206,8 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
           amountToCharge={paymentData.amountToCharge}
           walletAmountApplied={paymentData.walletAmountApplied}
           originalPrice={paymentData.originalPrice}
+          promotionStartFixed={previewFixesStart(paymentData.promotion)}
+          promotionTermsVersionId={acceptedTermsVersion(paymentData.promotion?.terms, acceptedTermsVersionId)}
           onClose={onClose}
           onBack={() => setStep(CheckoutStep.PAY)}
           onSubmit={(intentId: string) => {

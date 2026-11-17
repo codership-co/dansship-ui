@@ -40,6 +40,32 @@ export interface UpdateBenefitWindowPayload {
   ends_on?: string | null;
 }
 
+export interface WindowTermsVersion {
+  id: string;
+  version: number;
+  title: string;
+  /** Public URL of the terms PDF. Null when the version means "no terms". */
+  file_url: string | null;
+  created_at: string;
+  created_by_name: string | null;
+}
+
+/** A promotion window that can carry terms. The percentage is read-only context. */
+export interface PromotionWindowTerms {
+  definition_id: string;
+  code: string;
+  discount_percentage: string | number | null;
+  discount_modes: Array<string>;
+  exclusive: boolean;
+  current: WindowTermsVersion | null;
+}
+
+export interface SaveWindowTermsPayload {
+  title: string;
+  /** Key returned by the upload URL endpoint. Null saves "no terms". */
+  file_key: string | null;
+}
+
 export type TwoForOneWeekStatus = 'draft' | 'published' | 'archived';
 
 export interface TwoForOneWeek {

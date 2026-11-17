@@ -2,7 +2,7 @@ import { HttpClient } from 'polpo-http-client';
 
 import { uploadFileWithPresignedRetry } from '../common/put-file-to-presigned-url';
 
-import { mapAppliedDiscounts, normalizeIntent, toNumber } from './payments.helpers';
+import { mapAppliedDiscounts, mapPromotionPreview, normalizeIntent, toNumber } from './payments.helpers';
 
 import {
   DANSSHIP_ERROR_CATEGORY,
@@ -128,6 +128,8 @@ export class PaymentsAPI {
         bonus_benefit_name: data.bonus_benefit_name ?? null,
         discount_benefit_code: data.discount_benefit_code ?? null,
         applied_discounts: mapAppliedDiscounts(data.applied_discounts),
+        promotion: mapPromotionPreview(data.promotion),
+        gift_claim: data.gift_claim ?? null,
         is_first_plan_purchase: data.is_first_plan_purchase ?? false,
         wallet_amount_applied: toNumber(data.wallet_amount_applied),
         amount_to_charge: toNumber(data.amount_to_charge, toNumber(data.final_price)),

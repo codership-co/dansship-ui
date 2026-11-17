@@ -4,7 +4,7 @@ import { Button } from 'polpo/components';
 import { useCallback, useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { LuArrowRight, LuX } from 'react-icons/lu';
+import { LuArrowRight, LuClock, LuGift, LuX } from 'react-icons/lu';
 
 import { DateField, EmailField, TextField } from '@components/form-fields';
 import {
@@ -15,6 +15,7 @@ import {
   defaultCheckoutFormValues,
 } from '@components/forms/checkout-review-plan-form';
 import { Spinner } from '@components/loaders';
+import { CheckoutNote } from '@components/modules/payments/checkout-note';
 import {
   CheckoutPurchaseMode,
   CheckoutPurchaseModeSelector,
@@ -22,7 +23,7 @@ import {
 import { Badge, Label, Switch, Tabs, TabsList, TabsTrigger } from '@components/ui';
 import { DANSSHIP_ERROR_CODE, DansshipAPI, DansshipAPIError, PaymentPreviewRequest, PublicPlan } from '@core/api';
 import { captureUnexpectedException, withSentrySpan } from '@core/sentry';
-import { formatPrice, isColombiaSeptember } from '@helpers';
+import { formatPrice, isColombiaSeptember, promotionCopyKey, resolveCheckoutPromotion } from '@helpers';
 import { useCallablePromise } from '@hooks';
 
 const referralRejectionKey = (reason: string | null | undefined): string | null => {
@@ -122,6 +123,14 @@ export function CheckoutPurchaseModeForm({
   const isDuo = purchaseMode === 'duo';
   const isQuarterly = watch('is_quarterly');
   const duoHalfClasses = Math.floor(classesIncluded / 2);
+  const promotion = plan.promotion ?? null;
+  // Everything the promotion changes comes from the API: no dates, percentages or day counts live in the UI.
+  const { startIsFixed, codesHidden, quarterlyKeepsOwn, giftClaim } = resolveCheckoutPromotion(plan, {
+    isGift,
+    isDuo,
+    isQuarterly: Boolean(isQuarterly),
+  });
+  const promotionParams = { percentage: promotion?.discount_percentage };
 
   const handlePurchaseModeChange = useCallback(
     (nextMode: CheckoutPurchaseMode) => {
@@ -239,6 +248,22 @@ export function CheckoutPurchaseModeForm({
                 gift_sender_display_name: '',
               };
 
+      // A promotion owns the start date and excludes codes: neither is sent, the server ignores them anyway.
+      const rules = resolveCheckoutPromotion(plan, {
+        isGift: mode === 'gift',
+        isDuo: mode === 'duo',
+        isQuarterly: Boolean(formData.is_quarterly),
+      });
+
+      if (rules.codesHidden) {
+        nextData.discount_code = '';
+        nextData.referral_code = '';
+      }
+
+      if (rules.startIsFixed) {
+        nextData.start_date = new Date();
+      }
+
       const nextPaymentData = await withSentrySpan('checkout.preview', 'ui.action', { plan_id: plan.id }, async () => {
         const previewPayload: PaymentPreviewRequest = { plan_id: plan.id };
         const nextDiscountCode = nextData.discount_code.trim();
@@ -335,6 +360,8 @@ export function CheckoutPurchaseModeForm({
           bonusBenefitName: bonus_benefit_name,
           walletAmountApplied: wallet_amount_applied,
           amountToCharge: amount_to_charge,
+          promotion: data.promotion,
+          giftClaim: data.gift_claim,
         } satisfies PaymentData;
       });
 
@@ -353,11 +380,11 @@ export function CheckoutPurchaseModeForm({
 
       await onSubmit(nextData, nextPaymentData);
     },
-    [onSubmit, plan.currency, plan.id, previewPayment, t],
+    [onSubmit, plan, previewPayment, t],
   );
 
-  const showMergedCodeTabs = purchaseMode === 'self';
-  const showSingleDiscountField = purchaseMode === 'gift';
+  const showMergedCodeTabs = purchaseMode === 'self' && !codesHidden;
+  const showSingleDiscountField = purchaseMode === 'gift' && !codesHidden;
   const codeFieldDisabled = isLoading;
 
   const discountErrorMessage =
@@ -393,6 +420,11 @@ export function CheckoutPurchaseModeForm({
             />
           </div>
           {isDuo ? <p className='m-0 text-xs text-gray-500'>{t('subscriptions:quarterlyDuoDisabledNote')}</p> : null}
+          {quarterlyKeepsOwn && promotion ? (
+            <p className='m-0 text-xs text-gray-500'>
+              {t(promotionCopyKey(promotion.code, 'quarterlyNote'), promotionParams)}
+            </p>
+          ) : null}
         </div>
 
         {isGift ? (
@@ -437,7 +469,13 @@ export function CheckoutPurchaseModeForm({
           </div>
         ) : null}
 
-        {purchaseMode === 'self' ? (
+        {startIsFixed && promotion && !quarterlyKeepsOwn ? (
+          <CheckoutNote Icon={LuClock}>
+            <span className='font-semibold'>{t(promotionCopyKey(promotion.code, 'startNote'))}</span>
+          </CheckoutNote>
+        ) : null}
+
+        {purchaseMode === 'self' && !startIsFixed ? (
           <DateField
             control={control}
             name='start_date'
@@ -503,6 +541,16 @@ export function CheckoutPurchaseModeForm({
             helperText={t('subscriptions:codeOnePerPurchase')}
             errorMessage={discountErrorMessage}
           />
+        ) : null}
+
+        {giftClaim ? (
+          <CheckoutNote Icon={LuGift} tone='gift'>
+            <span className='font-semibold text-gray-900'>
+              {t('gifts:claimWindowTitle', { days: giftClaim.claim_days })}
+            </span>{' '}
+            {t('gifts:claimWindowBody')}{' '}
+            {giftClaim.refund_to_wallet ? t('gifts:claimRefund') : t('gifts:claimNoRefund')}
+          </CheckoutNote>
         ) : null}
       </div>
 
