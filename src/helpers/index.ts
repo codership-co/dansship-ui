@@ -13,6 +13,7 @@ export * from './language';
 export * from './messaging-links';
 export * from './payments';
 export * from './plans';
+export * from './promotion';
 export * from './role-redirect';
 export * from './class-level';
 export * from './roster';

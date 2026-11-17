@@ -126,5 +126,28 @@
       "expired": "Expirada",
       "canceled": "Cancelada"
     }
+  },
+  "discountBlackFriday": "Descuento Black Friday ({{percentage}} %)",
+  "promotionTermsCheckbox": "Acepto los <LinkTerms>términos de esta promoción</LinkTerms>",
+  "promotionTermsRequired": "Para continuar, acepta los términos de la promoción.",
+  "promotions": {
+    "BLACK_FRIDAY_2026": {
+      "badge": "Black Friday −{{percentage}} %",
+      "bannerKicker": "Black Friday",
+      "bannerTitle": "<Percentage>{{percentage}} %</Percentage> de descuento en planes mensuales",
+      "bannerSubtitle": "Elige tu plan y empieza a bailar apenas se apruebe tu pago. <strong>Solo por tiempo limitado.</strong>",
+      "bannerCta": "Ver planes",
+      "startNote": "Durante Black Friday tu plan empieza apenas se apruebe el pago.",
+      "quarterlyNote": "El pago trimestral conserva su 10 %. El {{percentage}} % de Black Friday aplica solo a planes mensuales."
+    },
+    "default": {
+      "badge": "Promoción −{{percentage}} %",
+      "bannerKicker": "Promoción",
+      "bannerTitle": "<Percentage>{{percentage}} %</Percentage> de descuento en planes mensuales",
+      "bannerSubtitle": "Elige tu plan y empieza a bailar apenas se apruebe tu pago. <strong>Solo por tiempo limitado.</strong>",
+      "bannerCta": "Ver planes",
+      "startNote": "Durante esta promoción tu plan empieza apenas se apruebe el pago.",
+      "quarterlyNote": "El pago trimestral conserva su descuento. El {{percentage}} % de esta promoción aplica solo a planes mensuales."
+    }
   }
 }

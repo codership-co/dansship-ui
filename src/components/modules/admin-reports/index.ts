@@ -9,3 +9,4 @@ export * from './notification-settings';
 export * from './class-cancellations-table';
 export * from './class-feedback-table';
 export * from './report-date-range';
+export * from './promotion-cost-card';

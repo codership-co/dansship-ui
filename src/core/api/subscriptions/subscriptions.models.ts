@@ -1,3 +1,20 @@
+export interface GiftClaimPolicy {
+  claim_days: number;
+  refund_to_wallet: boolean;
+}
+
+/** Promotion open right now for a plan. Prices are for the monthly mode; the server decides everything. */
+export interface PlanPromotion {
+  code: string;
+  label_key: string;
+  discount_percentage: number;
+  discount_modes: Array<string>;
+  original_price: number;
+  promotional_price: number;
+  start_rule: string;
+  terms_required: boolean;
+}
+
 export interface PublicPlan {
   id: string;
   name: string;
@@ -9,6 +26,8 @@ export interface PublicPlan {
   features?: Array<string>;
   is_recommended?: boolean;
   recommended_order?: number | null;
+  promotion?: PlanPromotion | null;
+  gift_claim?: { monthly: GiftClaimPolicy; quarterly: GiftClaimPolicy };
 }
 
 export interface DiscountValidationResponse {

@@ -1,4 +1,10 @@
-import type { AdminPaymentListResponse, BoldCheckoutConfig, PaymentIntent } from './payments.models';
+import type {
+  AdminPaymentListResponse,
+  BoldCheckoutConfig,
+  PaymentIntent,
+  PromotionPreview,
+  PromotionPreviewMapped,
+} from './payments.models';
 
 export function toNumber(value: unknown, fallback = 0): number {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
@@ -20,6 +26,7 @@ export function mapAppliedDiscounts(
         type: string;
         value: string | number;
         calculated_amount: string | number;
+        label_key?: string | null;
       }>
     | null
     | undefined,
@@ -30,7 +37,25 @@ export function mapAppliedDiscounts(
     type: item.type,
     value: toNumber(item.value),
     calculatedAmount: toNumber(item.calculated_amount),
+    labelKey: item.label_key ?? null,
   }));
+}
+
+export function mapPromotionPreview(promotion: PromotionPreview | null | undefined): PromotionPreviewMapped | null {
+  if (!promotion) {
+    return null;
+  }
+
+  return {
+    code: promotion.code,
+    labelKey: promotion.label_key,
+    discountPercentage: promotion.discount_percentage === null ? null : toNumber(promotion.discount_percentage),
+    originalPrice: toNumber(promotion.original_price),
+    promotionalPrice: toNumber(promotion.promotional_price),
+    startRule: promotion.start_rule ?? null,
+    ignoredInputs: promotion.ignored_inputs ?? [],
+    terms: promotion.terms ?? null,
+  };
 }
 
 function toOptionalNumber(value: unknown): number | null {

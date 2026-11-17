@@ -1,3 +1,5 @@
+import type { PromotionPreview } from '../payments/payments.models';
+
 export interface UsersSearchParams {
   search?: string;
   is_instructor?: boolean;
@@ -54,6 +56,7 @@ export interface InPersonPlanPreview {
   tax_amount: string | number;
   base_amount: string | number;
   rejection_reason: string | null;
+  promotion?: PromotionPreview | null;
 }
 
 export interface InPersonPlanPurchasePayload {
@@ -63,6 +66,9 @@ export interface InPersonPlanPurchasePayload {
   referral_code?: string | null;
   is_quarterly?: boolean;
   idempotency_key?: string;
+  /** The admin marks that the customer accepted the promotion terms in person. */
+  promotion_terms_accepted?: boolean;
+  promotion_terms_version_id?: string;
 }
 
 export interface InPersonPlanPurchaseResponse {

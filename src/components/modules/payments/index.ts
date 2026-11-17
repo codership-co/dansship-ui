@@ -7,3 +7,5 @@ export * from './payment-status-badge';
 export * from './user-payment-history';
 export * from './payment-method-selector';
 export * from './active-subscription-widget';
+export * from './promotion-terms-link';
+export * from './checkout-note';

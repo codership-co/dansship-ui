@@ -11,7 +11,9 @@ import { TransferPaymentInstructions } from '@components/modules/payments/transf
 import { Badge } from '@components/ui';
 import {
   type CreatePaymentIntentPayload,
+  DANSSHIP_ERROR_CODE,
   DansshipAPI,
+  DansshipAPIError,
   openBoldEmbeddedCheckout,
   PaymentMethod,
   PaymentProofContentTypesList,
@@ -58,6 +60,10 @@ interface CheckoutPaymentProofFormProps {
   onCreateIntent?: () => Promise<string | null>;
   /** Replaces the student proof upload, e.g. the admin endpoint when paying on someone's behalf. */
   uploadProofForIntent?: (intentId: string, file: File) => Promise<unknown>;
+  /** A promotion owns the start date: none is sent and the plan starts when the payment is approved. */
+  promotionStartFixed?: boolean;
+  /** Set when the buyer accepted the promotion terms shown in the previous step. */
+  promotionTermsVersionId?: string | null;
   /** Replaces the whole intent + proof flow: the caller registers the payment from the chosen proof. */
   onConfirmWithProof?: (file: File) => Promise<unknown>;
   paymentQrUrl?: string | null;
@@ -88,6 +94,8 @@ export function CheckoutPaymentProofForm({
   currency,
   onCreateIntent,
   uploadProofForIntent,
+  promotionStartFixed = false,
+  promotionTermsVersionId = null,
   onConfirmWithProof,
   paymentQrUrl,
   allowPdfProof = false,
@@ -100,6 +108,20 @@ export function CheckoutPaymentProofForm({
   footerClassName,
 }: CheckoutPaymentProofFormProps) {
   const { t } = useTranslation();
+
+  // The terms were edited after the buyer saw them, or were not accepted: say that instead of a generic failure.
+  const createFailureMessage = (error: unknown): string => {
+    const code = error instanceof DansshipAPIError ? error.body.error_code : null;
+
+    if (
+      code === DANSSHIP_ERROR_CODE.PROMOTION_TERMS_NOT_ACCEPTED ||
+      code === DANSSHIP_ERROR_CODE.PROMOTION_TERMS_VERSION_MISMATCH
+    ) {
+      return t(`errors:codes.${code}`);
+    }
+
+    return t('payments:createFailedDesc');
+  };
   const { call: createIntent, isLoading: isCreating } = useCallablePromise((payload: CreatePaymentIntentPayload) =>
     DansshipAPI.payments.createIntent(payload),
   );
@@ -248,6 +270,11 @@ export function CheckoutPaymentProofForm({
       payment_method_type: isWalletMethod ? PaymentMethod.WALLET : paymentMethod,
     };
 
+    if (promotionTermsVersionId) {
+      payload.promotion_terms_accepted = true;
+      payload.promotion_terms_version_id = promotionTermsVersionId;
+    }
+
     if (isDuoCheckout) {
       payload.is_duo = true;
       payload.duo_partner_email = duo_partner_email.trim();
@@ -267,7 +294,7 @@ export function CheckoutPaymentProofForm({
         payload.gift_message = gift_message.trim() ? gift_message.trim() : undefined;
         payload.gift_is_anonymous = gift_is_anonymous;
         payload.gift_sender_display_name = gift_is_anonymous ? undefined : gift_sender_display_name.trim() || undefined;
-      } else if (start_date) {
+      } else if (start_date && !promotionStartFixed) {
         payload.start_date = start_date.toISOString();
       }
     }
@@ -281,7 +308,7 @@ export function CheckoutPaymentProofForm({
       );
 
       if (!ok) {
-        toast.error(t('payments:createFailedDesc'));
+        toast.error(createFailureMessage(error));
         captureUnexpectedException(error ?? new Error('Bold checkout intent create failed'), {
           tags: { flow: 'checkout.bold', plan_id: plan.id },
         });
@@ -321,7 +348,7 @@ export function CheckoutPaymentProofForm({
     );
 
     if (!ok) {
-      toast.error(t('payments:createFailedDesc'));
+      toast.error(createFailureMessage(error));
       captureUnexpectedException(error ?? new Error('Payment intent create failed'), {
         tags: { flow: 'checkout.createIntent', plan_id: plan.id },
       });

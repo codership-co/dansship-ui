@@ -18,7 +18,11 @@
     "CLASS_RECOVERY_PAYMENT_PENDING": "Ya tienes un pago en revisión para una de estas clases.",
     "CLASS_RECOVERY_INVALID_PAYMENT_METHOD": "La recuperación se paga con transferencia (QR) o con tu billetera.",
     "CLASS_RECOVERY_NOT_FOUND": "No encontramos esta recuperación.",
-    "CLASS_RECOVERY_SETTINGS_INVALID": "Los días deben ser números enteros mayores que cero."
+    "CLASS_RECOVERY_SETTINGS_INVALID": "Los días deben ser números enteros mayores que cero.",
+    "PROMOTION_TERMS_NOT_ACCEPTED": "Debes aceptar los términos de la promoción para continuar.",
+    "PROMOTION_TERMS_VERSION_MISMATCH": "Los términos de la promoción cambiaron. Revísalos y acéptalos de nuevo.",
+    "PROMOTION_TERMS_INVALID": "El PDF o el título de los términos no es válido. Sube un PDF de hasta 10 MB y un título de máximo 150 caracteres.",
+    "BENEFIT_WINDOW_TERMS_NOT_SUPPORTED": "Esta promoción no admite términos."
   },
   "combo": {
     "addFigureFailed": "Error al agregar la figura al combo",

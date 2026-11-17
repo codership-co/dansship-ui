@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { SpinnerLoader } from '@components/loaders';
+import { PromotionCostCard } from '@components/modules/admin-reports/promotion-cost-card';
 import { formatMoney, ReportDateRange } from '@components/modules/admin-reports/report-date-range';
 import {
   Card,
@@ -73,6 +74,11 @@ export function FinancialReports() {
     true,
     deps,
   );
+  const { response: promotionData, isLoading: promotionLoading } = usePromise(
+    () => DansshipAPI.reportsAdmin.getPromotionCost(appliedDateRange.start, appliedDateRange.end),
+    true,
+    deps,
+  );
   const { response: pricingData, isLoading: pricingLoading } = usePromise(
     () => DansshipAPI.reportsAdmin.getRevenueIndicators(appliedDateRange.start, appliedDateRange.end),
     true,
@@ -90,6 +96,7 @@ export function FinancialReports() {
   const gifts = giftData?.data;
   const benefits = benefitData?.data?.counts;
   const pricing = pricingData?.data;
+  const promotion = promotionData?.data;
   const classTypeNet = classTypeNetData?.data?.items ?? [];
   const recovery = recoveryData?.data;
   const isLoading =
@@ -99,6 +106,7 @@ export function FinancialReports() {
     walletLoading ||
     giftLoading ||
     benefitLoading ||
+    promotionLoading ||
     pricingLoading ||
     classTypeNetLoading;
 
@@ -119,6 +127,9 @@ export function FinancialReports() {
         </div>
       ) : (
         <div className='grid grid-cols-1 gap-8'>
+          {promotion && (promotion.rows.length > 0 || promotion.refunded_gifts.gift_count > 0) ? (
+            <PromotionCostCard report={promotion} startDate={appliedDateRange.start} endDate={appliedDateRange.end} />
+          ) : null}
           <Card className='border-input shadow-sm'>
             <CardHeader className='border-b border-gray-100 bg-gray-50/50 pb-4'>
               <CardTitle className='text-lg text-gray-800'>{t('reports:cash.title')}</CardTitle>

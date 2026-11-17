@@ -253,5 +253,28 @@
     "emptyFill": "No hay eventos en este período.",
     "revenueExcludesCollaboration": "Los eventos en colaboración no entran en estos ingresos. Siguen contando en ocupación.",
     "collaborationBadge": "Colaboración"
+  },
+  "promotionCost": {
+    "title": "Costo de campaña",
+    "export": "Exportar CSV",
+    "exportFailed": "No se pudo exportar el reporte.",
+    "kpis": {
+      "purchases": "Compras con descuento",
+      "collected": "Ingreso cobrado",
+      "givenUp": "Ingreso sacrificado",
+      "refundedGifts": "Regalos devueltos a billetera"
+    },
+    "table": {
+      "plan": "Plan",
+      "purchases": "Compras",
+      "normalPrice": "Precio normal",
+      "collected": "Ingreso cobrado",
+      "givenUp": "Ingreso sacrificado",
+      "total": "Total",
+      "withoutDiscount": "Trimestral (sin descuento)",
+      "normal": "Normal"
+    },
+    "refundedValue": "{{count}} · {{amount}}",
+    "note": "Ingreso sacrificado = precio normal menos lo cobrado, solo en compras con el descuento. Incluye regalos; los regalos devueltos a la billetera se muestran aparte."
   }
 }

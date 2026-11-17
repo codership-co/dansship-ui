@@ -46,6 +46,9 @@ export interface CreatePaymentIntentPayload {
   is_duo?: boolean;
   duo_partner_email?: string;
   is_quarterly?: boolean;
+  /** Required (true) when the preview returned promotion terms. */
+  promotion_terms_accepted?: boolean;
+  promotion_terms_version_id?: string;
 }
 
 export interface BoldCheckoutConfig {
@@ -190,6 +193,7 @@ export interface AppliedDiscountPreview {
   type: string;
   value: string | number;
   calculated_amount: string | number;
+  label_key?: string | null;
 }
 
 export interface AppliedDiscountMapped {
@@ -198,6 +202,43 @@ export interface AppliedDiscountMapped {
   type: string;
   value: number;
   calculatedAmount: number;
+  labelKey?: string | null;
+}
+
+export interface PromotionTermsPreview {
+  version_id: string;
+  version: number;
+  title: string;
+  /** Public URL of the terms PDF. */
+  file_url: string;
+}
+
+export interface PromotionPreview {
+  code: string;
+  label_key: string;
+  discount_percentage: string | number | null;
+  original_price: string | number;
+  promotional_price: string | number;
+  start_rule: string | null;
+  ignored_inputs: Array<string>;
+  terms: PromotionTermsPreview | null;
+}
+
+export interface PromotionPreviewMapped {
+  code: string;
+  labelKey: string;
+  discountPercentage: number | null;
+  originalPrice: number;
+  promotionalPrice: number;
+  /** `on_approval` while the server fixes the start date; null otherwise. */
+  startRule: string | null;
+  ignoredInputs: Array<string>;
+  terms: PromotionTermsPreview | null;
+}
+
+export interface GiftClaimPolicyPreview {
+  claim_days: number;
+  refund_to_wallet: boolean;
 }
 
 export interface InstallmentChargeOption {
@@ -240,6 +281,8 @@ export interface PaymentPreviewResponse {
   deposit_amount?: string | null;
   balance_amount?: string | null;
   installment_options?: Array<InstallmentChargeOption>;
+  promotion?: PromotionPreview | null;
+  gift_claim?: GiftClaimPolicyPreview | null;
 }
 
 export interface PaymentPreviewMappedResponse {
@@ -266,4 +309,6 @@ export interface PaymentPreviewMappedResponse {
   deposit_amount: number | null;
   balance_amount: number | null;
   installment_options: Array<InstallmentChargeOptionMapped>;
+  promotion: PromotionPreviewMapped | null;
+  gift_claim: GiftClaimPolicyPreview | null;
 }

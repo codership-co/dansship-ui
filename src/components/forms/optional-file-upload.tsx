@@ -1,5 +1,5 @@
 import { Button } from 'polpo/components';
-import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuTrash2, LuUpload } from 'react-icons/lu';
 import { toast } from 'sonner';
@@ -19,6 +19,8 @@ export interface OptionalFileUploadProps {
   disabled?: boolean;
   label?: string;
   helperText?: string;
+  /** Replaces the default "invalid type" toast, which names image formats. */
+  invalidTypeMessage?: string;
   className?: string;
   showPreview?: boolean;
 }
@@ -32,15 +34,34 @@ export function OptionalFileUpload({
   disabled = false,
   label,
   helperText,
+  invalidTypeMessage,
   className,
   showPreview = true,
 }: OptionalFileUploadProps) {
   const { t } = useTranslation();
   const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(previewUrl);
+  // The blob URL this component created for the last picked file; released when it is replaced or cleared.
+  const ownUrlRef = useRef<string | null>(null);
+
+  const releaseOwnUrl = () => {
+    if (ownUrlRef.current) {
+      URL.revokeObjectURL(ownUrlRef.current);
+      ownUrlRef.current = null;
+    }
+  };
 
   useEffect(() => {
     setLocalPreviewUrl(previewUrl);
   }, [previewUrl]);
+
+  // A parent that controls `value` and resets it to null (for example after saving) clears the picked file.
+  useEffect(() => {
+    if (value === null && ownUrlRef.current) {
+      releaseOwnUrl();
+      setLocalPreviewUrl(previewUrl);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- only a change of `value` may clear the picked file
+  }, [value]);
 
   const fileAccept = useMemo(() => acceptedTypes.join(','), [acceptedTypes]);
   const isDisabled = disabled || isUploading;
@@ -51,19 +72,24 @@ export function OptionalFileUpload({
     if (!file) return;
 
     if (!acceptedTypes.includes(file.type)) {
-      toast.error(t('common:fileUpload.invalidType'));
+      toast.error(invalidTypeMessage ?? t('common:fileUpload.invalidType'));
       event.currentTarget.value = '';
 
       return;
     }
 
+    releaseOwnUrl();
+
     const nextPreviewUrl = URL.createObjectURL(file);
+
+    ownUrlRef.current = nextPreviewUrl;
     setLocalPreviewUrl(nextPreviewUrl);
     onChange(file, nextPreviewUrl);
     event.currentTarget.value = '';
   };
 
   const handleClear = () => {
+    releaseOwnUrl();
     setLocalPreviewUrl(null);
     onChange(null, null);
   };

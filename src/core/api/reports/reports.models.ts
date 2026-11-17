@@ -134,6 +134,35 @@ export interface BenefitCostReport {
   counts: BenefitCostCounts;
 }
 
+export interface PromotionCostRow {
+  promotion_code: string;
+  plan_id: string;
+  plan_name: string;
+  purchases: number;
+  unit_normal_price: string;
+  normal_price_total: string;
+  collected: string;
+  cash_collected: string;
+  wallet_applied: string;
+  given_up: string;
+}
+
+export interface PromotionCostTotals {
+  purchases: number;
+  normal_price_total: string;
+  collected: string;
+  cash_collected: string;
+  wallet_applied: string;
+  given_up: string;
+}
+
+export interface PromotionCostReport {
+  totals: PromotionCostTotals;
+  rows: Array<PromotionCostRow>;
+  refunded_gifts: { gift_count: number; amount: string };
+  without_discount: { purchase_count: number; collected: string };
+}
+
 export interface ActiveStudentsTrendPoint {
   week: string;
   unique_students: number;

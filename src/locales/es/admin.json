@@ -47,6 +47,35 @@
           "published": "Publicada",
           "archived": "Archivada"
         }
+      },
+      "summary": "{{percentage}} % en planes {{modes}} · Exclusiva (no se combina con otros descuentos)",
+      "modes": {
+        "monthly": "mensuales",
+        "quarterly": "trimestrales"
+      },
+      "terms": {
+        "title": "Términos de la promoción",
+        "noVersion": "Sin versión",
+        "version": "Versión {{version}}",
+        "chooseFile": "Elegir PDF",
+        "fileHint": "PDF de hasta 10 MB. Es público: cualquiera con el enlace puede abrirlo.",
+        "invalidType": "Solo se aceptan archivos PDF.",
+        "viewCurrent": "Ver PDF actual",
+        "viewVersion": "Ver PDF",
+        "noFileVersion": "Sin términos",
+        "remove": "Quitar términos",
+        "hintEmpty": "Sin PDF no se pide casilla en el checkout.",
+        "hintSaved": "Versión {{version}} · subida el {{date}} por {{author}}. Al guardar se crea la versión {{next}}; las compras anteriores conservan la que aceptaron.",
+        "hintSavedNoAuthor": "Versión {{version}} · subida el {{date}}. Al guardar se crea la versión {{next}}; las compras anteriores conservan la que aceptaron.",
+        "save": "Guardar términos",
+        "history": "Historial de versiones",
+        "historyTitle": "Historial de versiones",
+        "historyEmpty": "Todavía no hay versiones guardadas.",
+        "historyEntry": "Versión {{version}} · {{date}}",
+        "historyAuthor": "Por {{author}}",
+        "close": "Cerrar",
+        "saveSuccess": "Términos guardados.",
+        "saveFailed": "No se pudieron guardar los términos."
       }
     }
   },
@@ -167,7 +196,10 @@
       "purchaseFailed": "No se pudo registrar la compra.",
       "purchaseDone": "La compra quedó registrada.",
       "backToUser": "Volver al usuario",
-      "assist": "Dar atención"
+      "assist": "Dar atención",
+      "promotionTermsAccepted": "El cliente aceptó en persona los <LinkTerms>términos de esta promoción</LinkTerms>",
+      "promotionTermsTitle": "Términos de la promoción",
+      "promotionCodesIgnored": "Los códigos no se aplican: la promoción es exclusiva y no se combina con otros descuentos."
     },
     "details": {
       "title": "Detalle de Usuario",

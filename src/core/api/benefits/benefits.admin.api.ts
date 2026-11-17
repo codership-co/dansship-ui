@@ -1,15 +1,21 @@
 import { HttpClient } from 'polpo-http-client';
 
+import { uploadFileWithPresignedRetry } from '../common/put-file-to-presigned-url';
+
 import { DansshipAPIError } from '@core/api';
 
 import type {
   BenefitGrant,
   BenefitWindow,
   ListBenefitGrantsParams,
+  PromotionWindowTerms,
+  SaveWindowTermsPayload,
   SetTwoForOneWeekPayload,
   TwoForOneWeek,
   UpdateBenefitWindowPayload,
+  WindowTermsVersion,
 } from './benefits.models';
+import type { PresignedUrlResponse } from '../payments/payments.models';
 
 export class BenefitsAdminAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
@@ -33,6 +39,49 @@ export class BenefitsAdminAPI {
     return this.httpClient.callNoError<BenefitWindow, UpdateBenefitWindowPayload>({
       path: `/admin/benefits/windows/${id}`,
       method: 'PATCH',
+      data: payload,
+    });
+  }
+
+  async listPromotionWindowTerms() {
+    return this.httpClient.callNoError<Array<PromotionWindowTerms>>({
+      path: '/admin/benefits/window-terms',
+      method: 'GET',
+    });
+  }
+
+  async listWindowTermsVersions(definitionId: string) {
+    return this.httpClient.callNoError<Array<WindowTermsVersion>>({
+      path: `/admin/benefits/windows/${definitionId}/terms/versions`,
+      method: 'GET',
+    });
+  }
+
+  async getWindowTermsUploadUrl(definitionId: string, contentType: string) {
+    return this.httpClient.callNoError<PresignedUrlResponse, { content_type: string }>({
+      path: `/admin/benefits/windows/${definitionId}/terms/upload-url`,
+      method: 'POST',
+      data: { content_type: contentType },
+    });
+  }
+
+  /** Uploads the terms PDF straight to the bucket and resolves with its file key. */
+  async uploadWindowTermsPdf(definitionId: string, file: File) {
+    return uploadFileWithPresignedRetry(
+      file,
+      async () => {
+        const { ok, data } = await this.getWindowTermsUploadUrl(definitionId, file.type);
+
+        return ok ? data : null;
+      },
+      async fileKey => fileKey,
+    );
+  }
+
+  async saveWindowTerms(definitionId: string, payload: SaveWindowTermsPayload) {
+    return this.httpClient.callNoError<WindowTermsVersion, SaveWindowTermsPayload>({
+      path: `/admin/benefits/windows/${definitionId}/terms`,
+      method: 'PUT',
       data: payload,
     });
   }
