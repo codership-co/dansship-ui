@@ -7,6 +7,8 @@
     "BOOKING_LATE_JOIN_CLOSED": "El plazo para reservar esta clase ya cerró.",
     "BOOKING_ALREADY_BOOKED": "Ya tienes una reserva para esta clase.",
     "BOOKING_CLASS_CANCELLED": "Esta clase está cancelada y no se puede reabrir para registrar asistencia.",
+    "SCHEDULE_CANCEL_NOTE_REQUIRED": "Para cancelar una clase que ya ocurrió debes escribir el motivo.",
+    "SCHEDULE_CLASS_ALREADY_BILLED": "Esta clase ya está incluida en una cuenta de cobro emitida del instructor. Anula la cuenta de cobro antes de cancelar la clase.",
     "BOOKING_CLASS_GROUP_NOT_COVERED": "El plan activo no cubre este tipo de clase.",
     "BOOKING_TIME_OVERLAP": "Este usuario ya tiene otra clase reservada en ese horario.",
     "BOOKING_INSTRUCTOR_OWN_CLASS": "No puedes reservar la clase que estás asignado a dictar.",

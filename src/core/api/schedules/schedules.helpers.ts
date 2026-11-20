@@ -1,3 +1,5 @@
+import { DANSSHIP_ERROR_CODE, DansshipAPIError } from '../dansship.error';
+
 import type { AgendaEvent } from './schedules.models';
 
 export interface AgendaConflict {
@@ -91,4 +93,18 @@ export function buildAgendaConflicts(events: Array<AgendaEvent>): Array<AgendaCo
   return conflicts.sort(
     (left, right) => new Date(left.overlapStart).getTime() - new Date(right.overlapStart).getTime(),
   );
+}
+
+const CANCEL_CLASS_ERROR_CODES = new Set<string>([
+  DANSSHIP_ERROR_CODE.SCHEDULE_CANCEL_NOTE_REQUIRED,
+  DANSSHIP_ERROR_CODE.SCHEDULE_CLASS_ALREADY_BILLED,
+]);
+
+/** i18n key for a failed published-class cancellation. */
+export function cancelClassErrorKey(error: unknown): string {
+  if (error instanceof DansshipAPIError && CANCEL_CLASS_ERROR_CODES.has(error.body.error_code)) {
+    return `errors:codes.${error.body.error_code}`;
+  }
+
+  return 'schedules:classCancelFailed';
 }

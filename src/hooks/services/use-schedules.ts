@@ -7,6 +7,7 @@ import { RESUME_REVALIDATE, usePromise } from '../use-promise';
 
 import {
   AddClassPayload,
+  cancelClassErrorKey,
   DansshipAPI,
   DansshipAPIError,
   DANSSHIP_ERROR_CODE,
@@ -159,13 +160,13 @@ export const useSchedules = ({ weekStartDate }: UseSchedulesOptions = {}) => {
   );
   const cancelPublishedClass = useCallback(
     async (targetWeekId: string, classId: string, payload: CancelPublishedClassPayload = {}) => {
-      const { ok, data } = await cancelPublishedClassPromise(targetWeekId, classId, payload);
+      const { ok, data, error } = await cancelPublishedClassPromise(targetWeekId, classId, payload);
 
       if (ok) {
         toast.success(t('schedules:classCancelled'));
         await refreshScheduleData();
       } else {
-        toast.error(t('schedules:classCancelFailed'));
+        toast.error(t(cancelClassErrorKey(error)));
       }
 
       return data;
