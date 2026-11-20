@@ -7,6 +7,8 @@ import { useTranslation } from 'react-i18next';
 import { LuCircleCheck, LuOctagonAlert, LuLoaderCircle } from 'react-icons/lu';
 import { z } from 'zod';
 
+import { CancelClassDialog } from './cancel-class-dialog';
+
 import { ConfirmDialog } from '@components/modals';
 import {
   Dialog,
@@ -72,7 +74,8 @@ interface ClassSlotModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: ClassSlotFormValues) => Promise<void> | void;
-  onDelete?: (options?: { cancellationNote?: string | null }) => Promise<void> | void;
+  /** Resolve `false` when deletion/cancellation failed to keep the confirmation open. */
+  onDelete?: (options?: { cancellationNote?: string | null }) => Promise<boolean | void> | boolean | void;
   initialData?: ScheduledClass | null;
   // Options
   rooms: Array<Room>;
@@ -88,6 +91,8 @@ interface ClassSlotModalProps {
   canCancelPublishedClass?: boolean;
   /** When false, hide the save action (e.g. cancel-only viewers of published classes) */
   canSave?: boolean;
+  /** The class already happened: fields are read-only and only cancellation is offered */
+  isPastClass?: boolean;
 }
 
 export function ClassSlotModal({
@@ -107,9 +112,9 @@ export function ClassSlotModal({
   isPublishedEdit = false,
   canCancelPublishedClass = false,
   canSave = true,
+  isPastClass = false,
 }: ClassSlotModalProps) {
   const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
-  const [cancellationNote, setCancellationNote] = useState('');
   const { t } = useTranslation();
   const isCancelled = Boolean(initialData?.is_cancelled);
   const {
@@ -255,7 +260,6 @@ export function ClassSlotModal({
   useEffect(() => {
     if (!isOpen) {
       setIsDeleteConfirmOpen(false);
-      setCancellationNote('');
     }
   }, [isOpen]);
 
@@ -263,12 +267,12 @@ export function ClassSlotModal({
   const isReadOnlyCancelled = isPublishedEdit && isCancelled;
   const isPublishedScheduleLocked = isPublishedEdit && Boolean(initialData?.has_active_bookings);
 
-  const handleDelete = async () => {
+  const handleDelete = async (cancellationNote?: string | null) => {
     if (!onDelete) return;
 
-    await onDelete(isPublishedEdit ? { cancellationNote: cancellationNote.trim() || null } : undefined);
-    setIsDeleteConfirmOpen(false);
-    setCancellationNote('');
+    const succeeded = await onDelete(isPublishedEdit ? { cancellationNote: cancellationNote ?? null } : undefined);
+
+    if (succeeded !== false) setIsDeleteConfirmOpen(false);
   };
 
   return (
@@ -284,9 +288,13 @@ export function ClassSlotModal({
           </DialogTitle>
         </DialogHeader>
 
-        {isPublishedEdit && (
+        {isPublishedEdit && !isReadOnlyCancelled && (
           <div className='shrink-0 rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800'>
-            {isPublishedScheduleLocked ? t('schedules:publishedEditInfo') : t('schedules:publishedEditEmptyInfo')}
+            {isPastClass
+              ? t('schedules:pastClassInfo')
+              : isPublishedScheduleLocked
+                ? t('schedules:publishedEditInfo')
+                : t('schedules:publishedEditEmptyInfo')}
           </div>
         )}
 
@@ -300,7 +308,7 @@ export function ClassSlotModal({
         )}
 
         <form onSubmit={handleSubmit(onSubmit)} className='flex min-h-0 flex-1 flex-col'>
-          <div className='min-h-0 flex-1 space-y-4 overflow-y-auto pr-1'>
+          <fieldset disabled={isPastClass} className='min-h-0 flex-1 space-y-4 overflow-y-auto pr-1'>
             <div className='space-y-2'>
               <Label>{t('schedules:class')}</Label>
               <Select
@@ -503,7 +511,7 @@ export function ClassSlotModal({
                 {submitError}
               </div>
             )}
-          </div>
+          </fieldset>
 
           <div className='flex shrink-0 items-center justify-between border-t pt-4 mt-4'>
             {initialData && !isReadOnlyCancelled && (!isPublishedEdit || canCancelPublishedClass) ? (
@@ -524,7 +532,7 @@ export function ClassSlotModal({
               <Button color='primary' variant='outlined' type='button' onClick={onClose} disabled={isBusy}>
                 {t('common:cancel')}
               </Button>
-              {!isReadOnlyCancelled && canSave && (
+              {!isReadOnlyCancelled && !isPastClass && canSave && (
                 <Button color='primary' variant='solid' type='submit' disabled={isBusy}>
                   {isLoading ? t('common:saving') : t('schedules:saveClass')}
                 </Button>
@@ -534,47 +542,13 @@ export function ClassSlotModal({
         </form>
 
         {isPublishedEdit ? (
-          <Dialog open={isDeleteConfirmOpen} onOpenChange={setIsDeleteConfirmOpen}>
-            <DialogContent className='sm:max-w-md'>
-              <DialogHeader>
-                <DialogTitle>{t('schedules:cancelClassTitle')}</DialogTitle>
-              </DialogHeader>
-              <p className='text-sm text-muted-foreground'>{t('schedules:cancelClassConfirm')}</p>
-              <div className='space-y-2'>
-                <Label htmlFor='cancellation_note'>{t('schedules:cancellationNoteLabel')}</Label>
-                <textarea
-                  id='cancellation_note'
-                  className='flex min-h-24 w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
-                  placeholder={t('schedules:cancellationNotePlaceholder')}
-                  value={cancellationNote}
-                  onChange={event => setCancellationNote(event.target.value)}
-                  maxLength={2000}
-                  disabled={isDeleting}
-                />
-                <p className='text-xs text-gray-500'>{t('schedules:cancellationNoteHelp')}</p>
-              </div>
-              <div className='flex justify-end gap-2 pt-2'>
-                <Button
-                  color='primary'
-                  variant='outlined'
-                  type='button'
-                  onClick={() => setIsDeleteConfirmOpen(false)}
-                  disabled={isDeleting}
-                >
-                  {t('common:keep')}
-                </Button>
-                <Button
-                  color='alert'
-                  variant='solid'
-                  type='button'
-                  onClick={() => void handleDelete()}
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? t('common:deleting') : t('schedules:cancelClassBtn')}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+          <CancelClassDialog
+            open={isDeleteConfirmOpen}
+            onOpenChange={setIsDeleteConfirmOpen}
+            onConfirm={handleDelete}
+            isCancelling={isDeleting}
+            isPastClass={isPastClass}
+          />
         ) : (
           <ConfirmDialog
             open={isDeleteConfirmOpen}

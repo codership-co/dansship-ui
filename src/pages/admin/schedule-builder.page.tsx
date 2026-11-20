@@ -155,14 +155,21 @@ function AdminScheduleBuilderPage() {
     setIsModalOpen(true);
   };
 
+  /** Past classes of published/archived weeks open in cancel-only mode (retroactive cancel). */
+  const canOpenPastClass = (isPublished || isArchived) && canCancelPublishedClass;
+
+  const canOpenUpcomingClass = (): boolean => {
+    if (isArchived) return false;
+
+    if (isPublished) return canEditPublishedClass || canCancelPublishedClass;
+
+    return canEditDraftSchedule;
+  };
+
   const handleClassClick = (cls: ScheduledClass) => {
-    if (isArchived) return;
+    const canOpen = isClassInPast(cls) ? canOpenPastClass : canOpenUpcomingClass();
 
-    if (isClassInPast(cls)) return;
-
-    if (isPublished && !(canEditPublishedClass || canCancelPublishedClass)) return;
-
-    if (!isPublished && !canEditDraftSchedule) return;
+    if (!canOpen) return;
 
     void reFetchWeekDetails();
     setEditingClass(cls);
@@ -272,13 +279,20 @@ function AdminScheduleBuilderPage() {
     }
   };
 
-  const handleDeleteClass = async (options?: { cancellationNote?: string | null }) => {
-    if (!editingClass) return;
+  /** Published/archived weeks cancel (soft); draft weeks delete, even once the class time passes. */
+  const isPublishedEditMode = editingClass !== null && (isPublished || isArchived);
+  const isEditingPastClass = editingClass !== null && isPublishedEditMode && isClassInPast(editingClass);
 
-    if (isPublished) {
-      await cancelPublishedClass(selectedWeekId, editingClass.id, {
+  /** Resolves false when the cancellation failed, so the modal keeps the admin's note. */
+  const handleDeleteClass = async (options?: { cancellationNote?: string | null }): Promise<boolean> => {
+    if (!editingClass) return false;
+
+    if (isPublishedEditMode) {
+      const cancelled = await cancelPublishedClass(selectedWeekId, editingClass.id, {
         cancellation_note: options?.cancellationNote ?? null,
       });
+
+      if (!cancelled) return false;
     } else {
       await removeClass(selectedWeekId, editingClass.id);
     }
@@ -286,6 +300,8 @@ function AdminScheduleBuilderPage() {
     setIsModalOpen(false);
     setEditingClass(null);
     setSubmitError(null);
+
+    return true;
   };
 
   const handleModalClose = () => {
@@ -404,6 +420,7 @@ function AdminScheduleBuilderPage() {
             classes={activeWeekDetail?.classes || []}
             events={(agendaEvents?.data ?? []).filter(isScheduleBuilderOverlayEvent)}
             onSlotClick={handleSlotClick}
+            allowPastClassClick={canOpenPastClass}
             onClassClick={selectedClass => {
               if ('event_type' in selectedClass) {
                 return;
@@ -460,9 +477,10 @@ function AdminScheduleBuilderPage() {
         onDelete={handleDeleteClass}
         isDeleting={isRemovingClass || isCancellingPublishedClass}
         submitError={submitError}
-        isPublishedEdit={isPublished && editingClass !== null}
+        isPublishedEdit={isPublishedEditMode}
+        isPastClass={isEditingPastClass}
         canCancelPublishedClass={canCancelPublishedClass}
-        canSave={!isPublished || canEditPublishedClass}
+        canSave={!isEditingPastClass && (!isPublished || canEditPublishedClass)}
       />
 
       <ConfirmDialog

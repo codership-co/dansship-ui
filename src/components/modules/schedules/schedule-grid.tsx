@@ -28,6 +28,8 @@ interface ScheduleGridProps {
   events?: Array<GridEvent>;
   onSlotClick?: (date: string, timeHour: number) => void;
   onClassClick?: (event: GridEvent) => void;
+  /** Admin-only: past classes stay clickable (e.g. to cancel them retroactively). */
+  allowPastClassClick?: boolean;
   onAddAtTime?: (date: string, time: string) => void;
   /** Admin-only: open the class or event roster without leaving the calendar. */
   onViewRoster?: (target: RosterTarget) => void;
@@ -240,6 +242,7 @@ export function ScheduleGrid({
   events = [],
   onSlotClick,
   onClassClick,
+  allowPastClassClick = false,
   onAddAtTime,
   onViewRoster,
   dayColumnMinWidth = 150,
@@ -519,6 +522,7 @@ export function ScheduleGrid({
                     ? Boolean((cls as AgendaEvent).metadata?.is_cancelled === 'true')
                     : Boolean((cls as ScheduledClass).is_cancelled);
                 const isMuted = isClassPast || isClassCancelled;
+                const isClickable = isClassCancelled || !isClassPast || allowPastClassClick;
                 const isHighlighted = Boolean(highlightedClassId && id === highlightedClassId);
                 const occupancyKind = 'event_type' in cls ? cls.metadata?.kind : undefined;
                 const rosterTarget: RosterTarget | null =
@@ -565,7 +569,7 @@ export function ScheduleGrid({
                         return;
                       }
 
-                      if (isClassCancelled || !isClassPast) {
+                      if (isClickable) {
                         onClassClick?.(cls);
                       }
                     }}
@@ -573,7 +577,7 @@ export function ScheduleGrid({
                       enableRangeSelect ? 'pointer-events-none' : ''
                     } ${
                       isMuted
-                        ? `bg-gray-100 border border-gray-300 opacity-60 ${isClassCancelled ? 'cursor-pointer' : 'cursor-default'}`
+                        ? `bg-gray-100 border border-gray-300 opacity-60 ${isClickable ? 'cursor-pointer' : 'cursor-default'}`
                         : `border cursor-pointer transition-colors ${bgClass}`
                     }`}
                     style={{
