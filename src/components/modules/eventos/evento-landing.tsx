@@ -9,17 +9,26 @@ import { EventoCheckoutModal } from './evento-checkout-modal';
 import { landingHasInstallmentAmounts, paymentNotice } from './installment-notice';
 import { sessionSummaryText } from './session-summary';
 import { SimpleRegistrationDialog, type SimpleRegistrationOutcome } from './simple-registration-dialog';
+import { TicketCheckoutModal } from './ticket-checkout-modal';
 
 import { SpinnerLoader } from '@components/loaders';
+import { ArtistSignupCard } from '@components/modules/event-participation';
 import { Badge } from '@components/ui';
 import { useAuth, useOrPermissions } from '@contexts';
-import { DansshipAPI, DansshipAPIError, type EventLanding, type SimplePersonInput } from '@core/api';
+import {
+  DansshipAPI,
+  DansshipAPIError,
+  splitLandingTypes,
+  type EventLanding,
+  type LandingPriceRow,
+  type SimplePersonInput,
+} from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions } from '@core/permissions';
 import { consumePendingEventoCheckoutIntent, formatPrice, setPendingEventoCheckoutIntent } from '@helpers';
 import { usePromise } from '@hooks';
 
-function LandingHero({ landing }: { landing: EventLanding }) {
+function LandingHero({ landing, showCapacity }: { landing: EventLanding; showCapacity: boolean }) {
   const { t } = useTranslation();
 
   return (
@@ -42,11 +51,13 @@ function LandingHero({ landing }: { landing: EventLanding }) {
           </Badge>
           {landing.requires_partner ? <Badge variant='outlineTertiary'>{t('eventos:landing.pairBadge')}</Badge> : null}
         </div>
-        <Badge variant={landing.sold_out ? 'destructive' : 'outlineActive'}>
-          {landing.sold_out
-            ? t('eventos:landing.soldOut')
-            : t('eventos:landing.capacity', { remaining: landing.remaining, capacity: landing.capacity })}
-        </Badge>
+        {showCapacity ? (
+          <Badge variant={landing.sold_out ? 'destructive' : 'outlineActive'}>
+            {landing.sold_out
+              ? t('eventos:landing.soldOut')
+              : t('eventos:landing.capacity', { remaining: landing.remaining, capacity: landing.capacity })}
+          </Badge>
+        ) : null}
       </div>
       <div className='grid gap-2'>
         <h1 className='m-0 text-[1.75rem] font-bold leading-tight text-foreground sm:text-3xl'>{landing.name}</h1>
@@ -58,7 +69,7 @@ function LandingHero({ landing }: { landing: EventLanding }) {
   );
 }
 
-function EventDetails({ landing }: { landing: EventLanding }) {
+function EventDetails({ landing, showInstructor }: { landing: EventLanding; showInstructor: boolean }) {
   const { t } = useTranslation();
   const sessionSummary = sessionSummaryText(landing, t);
 
@@ -85,15 +96,17 @@ function EventDetails({ landing }: { landing: EventLanding }) {
         </div>
       </dl>
       {sessionSummary ? <p className='m-0 text-sm font-medium'>{sessionSummary}</p> : null}
-      <div className='flex items-center gap-2.5'>
-        <div className='grid size-8 shrink-0 place-content-center rounded-full bg-primary/15 text-[11px] font-semibold text-primary'>
-          {landing.instructor?.initials}
+      {showInstructor ? (
+        <div className='flex items-center gap-2.5'>
+          <div className='grid size-8 shrink-0 place-content-center rounded-full bg-primary/15 text-[11px] font-semibold text-primary'>
+            {landing.instructor?.initials}
+          </div>
+          <div>
+            <p className='m-0 text-sm font-semibold'>{landing.instructor?.name}</p>
+            <p className='m-0 text-[10.5px] text-muted-foreground'>{t('eventos:landing.instructor')}</p>
+          </div>
         </div>
-        <div>
-          <p className='m-0 text-sm font-semibold'>{landing.instructor?.name}</p>
-          <p className='m-0 text-[10.5px] text-muted-foreground'>{t('eventos:landing.instructor')}</p>
-        </div>
-      </div>
+      ) : null}
     </div>
   );
 }
@@ -115,7 +128,7 @@ function installmentCaption(
   return values.map(value => formatPrice(value, 'COP')).join(' · ');
 }
 
-function PriceBlock({ landing }: { landing: EventLanding }) {
+function PriceBlock({ landing, rows }: { landing: EventLanding; rows: Array<LandingPriceRow> }) {
   const { t } = useTranslation();
 
   return (
@@ -124,11 +137,11 @@ function PriceBlock({ landing }: { landing: EventLanding }) {
         {landing.kind === 'combo' ? t('eventos:landing.priceTitleCombo') : t('eventos:landing.priceTitle')}
       </h2>
       <div className='grid gap-2.5'>
-        {landing.price_rows.map((row, index) => (
+        {rows.map((row, index) => (
           <div
             key={row.label}
             className={`flex items-start justify-between gap-4 ${
-              index < landing.price_rows.length - 1 ? 'border-b border-border pb-2.5' : ''
+              index < rows.length - 1 ? 'border-b border-border pb-2.5' : ''
             }`}
           >
             <span className='text-sm'>{row.label}</span>
@@ -139,7 +152,9 @@ function PriceBlock({ landing }: { landing: EventLanding }) {
                 </span>
               ) : null}
               <span className={`block text-base font-bold ${index === 0 ? 'text-primary' : ''}`}>
-                {formatPrice(Number(row.price), 'COP')}
+                {Number(row.price) === 0 && landing.participation
+                  ? t('eventos:participation.free')
+                  : formatPrice(Number(row.price), 'COP')}
               </span>
             </span>
           </div>
@@ -154,10 +169,16 @@ export function EventoLanding({
   slug,
   preview,
   accessToken,
+  participantAccess = null,
+  repayPurchaseId = null,
 }: {
   slug: string;
   preview: boolean;
   accessToken?: string;
+  /** Token of a link-only participant type (the artists' link), ADR-064. */
+  participantAccess?: string | null;
+  /** "Volver a pagar" from Mis reservas: opens the payment step of that ticket purchase. */
+  repayPurchaseId?: string | null;
 }) {
   const { t } = useTranslation();
   const { isAuthenticated, ready, startSession } = useAuth();
@@ -166,6 +187,7 @@ export function EventoLanding({
   const canPreview = useOrPermissions(AdminPermissions.eventos);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [simpleOpen, setSimpleOpen] = useState(false);
+  const [repayOpen, setRepayOpen] = useState(Boolean(repayPurchaseId));
   const useAdminPreview = preview && canPreview;
   const canFetch = Boolean(accessToken || slug) && (!preview || (ready && canPreview));
 
@@ -175,9 +197,9 @@ export function EventoLanding({
         ? DansshipAPI.eventos.getByAccessToken(accessToken)
         : useAdminPreview
           ? DansshipAPI.eventosAdmin.preview(slug)
-          : DansshipAPI.eventos.getBySlug(slug),
+          : DansshipAPI.eventos.getBySlug(slug, participantAccess),
     canFetch,
-    [slug, preview, useAdminPreview, isAuthenticated, accessToken],
+    [slug, preview, useAdminPreview, isAuthenticated, accessToken, participantAccess],
   );
   const landing = response?.ok ? response.data : undefined;
   const requestFailed = Boolean(error) || Boolean(response && !response.ok && response.status !== 404);
@@ -263,6 +285,34 @@ export function EventoLanding({
     return 'failed';
   };
 
+  // ADR-064: a Muestra shows its participant types instead of the single-purchase flow.
+  const participation = landing.participation ?? null;
+  const { registrations, tickets } = splitLandingTypes(participation);
+  const ticketType = tickets[0] ?? null;
+  const priceRows: Array<LandingPriceRow> = participation
+    ? ticketType
+      ? [
+          ...ticketType.fees.map(fee => ({ label: fee.label, price: fee.price })),
+          ...(ticketType.minors.allowed && ticketType.minors.max_age
+            ? [
+                {
+                  label: t('eventos:participation.landing.minorsRow', { age: ticketType.minors.max_age }),
+                  price: ticketType.minors.price ?? 0,
+                },
+              ]
+            : []),
+        ]
+      : []
+    : landing.price_rows;
+  const startTicketCheckout = () => {
+    if (!isAuthenticated) {
+      goToLogin();
+
+      return;
+    }
+
+    setCheckoutOpen(true);
+  };
   const ctaDisabled = landing.sold_out || landing.already_registered;
   const ctaLabel = landing.already_registered
     ? t('eventos:landing.ctaAlreadyRegistered')
@@ -281,9 +331,9 @@ export function EventoLanding({
 
   return (
     <div className='mx-auto grid max-w-xl gap-5 pb-8 lg:max-w-3xl'>
-      <LandingHero landing={landing} />
+      <LandingHero landing={landing} showCapacity={!participation || Boolean(ticketType)} />
       {landing.kind === 'event' ? (
-        <EventDetails landing={landing} />
+        <EventDetails landing={landing} showInstructor={!participation} />
       ) : (
         <div className='grid gap-3 sm:grid-cols-2'>
           {landing.components.map(component => (
@@ -312,18 +362,44 @@ export function EventoLanding({
           ))}
         </div>
       )}
-      <PriceBlock landing={landing} />
+      {registrations.map(type => (
+        <ArtistSignupCard key={type.id} slug={landing.slug} type={type} accessToken={participantAccess} />
+      ))}
+      {priceRows.length > 0 ? <PriceBlock landing={landing} rows={priceRows} /> : null}
       {notice ? (
         <div className='flex items-start gap-2.5 rounded-xl bg-secondary p-3'>
           <LuInfo className='mt-0.5 size-4 shrink-0' aria-hidden />
           <p className='m-0 text-xs font-medium leading-relaxed'>{notice}</p>
         </div>
       ) : null}
-      <div className='flex justify-end'>
-        <Button type='button' color='primary' variant='solid' disabled={ctaDisabled} onClick={startCheckout}>
-          {ctaLabel}
-        </Button>
-      </div>
+      {participation ? (
+        ticketType ? (
+          <div className='flex flex-wrap items-center justify-end gap-3'>
+            {ticketType.state === 'closed' ? (
+              <Badge variant='outlineNeutral'>{t('eventos:tickets.salesClosed')}</Badge>
+            ) : null}
+            <Button
+              type='button'
+              color='primary'
+              variant='solid'
+              disabled={ticketType.state !== 'open'}
+              onClick={startTicketCheckout}
+            >
+              {ticketType.state === 'closed'
+                ? t('eventos:tickets.salesClosed')
+                : ticketType.state === 'sold_out'
+                  ? t('eventos:landing.ctaSoldOut')
+                  : t('eventos:tickets.cta')}
+            </Button>
+          </div>
+        ) : null
+      ) : (
+        <div className='flex justify-end'>
+          <Button type='button' color='primary' variant='solid' disabled={ctaDisabled} onClick={startCheckout}>
+            {ctaLabel}
+          </Button>
+        </div>
+      )}
       {landing.simple_registration_enabled ? (
         <SimpleRegistrationDialog
           open={simpleOpen}
@@ -356,12 +432,27 @@ export function EventoLanding({
           }
         />
       ) : null}
-      <EventoCheckoutModal
-        landing={landing}
-        accessToken={accessToken}
-        isOpen={checkoutOpen && !ctaDisabled}
-        onClose={() => setCheckoutOpen(false)}
-      />
+      {participation ? (
+        ticketType ? (
+          <TicketCheckoutModal
+            landing={landing}
+            ticketType={ticketType}
+            isOpen={(checkoutOpen && ticketType.state === 'open') || (repayOpen && isAuthenticated)}
+            repayPurchaseId={repayOpen ? repayPurchaseId : null}
+            onClose={() => {
+              setCheckoutOpen(false);
+              setRepayOpen(false);
+            }}
+          />
+        ) : null
+      ) : (
+        <EventoCheckoutModal
+          landing={landing}
+          accessToken={accessToken}
+          isOpen={checkoutOpen && !ctaDisabled}
+          onClose={() => setCheckoutOpen(false)}
+        />
+      )}
     </div>
   );
 }

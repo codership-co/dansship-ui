@@ -98,6 +98,9 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
   const [participation, setParticipation] = useState(String(event?.collaborator_participation_percentage ?? 0));
   const [status, setStatus] = useState<EventStatus>(event?.status ?? 'draft');
   const [eventType, setEventType] = useState<EventType>(event?.type ?? 'taller');
+  // ADR-064: a Muestra sells through its participant types, so it has no price rules here.
+  const isShowcase = eventType === 'showcase';
+  const usesExternalPlace = eventType === 'recital' || isShowcase;
   const [basePrice, setBasePrice] = useState(String(event?.base_price ?? ''));
   const [tiers, setTiers] = useState<Array<EventPriceTierInput>>(
     event?.price_tiers.map(tier => ({
@@ -193,7 +196,7 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
     }
 
     setSaving(true);
-    const isRecital = eventType === 'recital';
+    const isRecital = usesExternalPlace;
     const installmentPayload = installmentDrafts.map((row, index) => ({
       sequence: index + 1,
       due_date: row.due_date,
@@ -218,9 +221,9 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
             ? {}
             : {
                 base_price: 0,
-                price_tiers: [{ condition_type: 'has_active_plan', condition_params: {}, price: 0 }],
+                price_tiers: isShowcase ? [] : [{ condition_type: 'has_active_plan', condition_params: {}, price: 0 }],
               }),
-          ...(locked ? {} : { type: eventType, installments: installmentPayload }),
+          ...(locked ? {} : { type: eventType, ...(isShowcase ? {} : { installments: installmentPayload }) }),
         }
       : {
           name: name.trim(),
@@ -439,6 +442,7 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
                 <option value='taller'>{t('eventos:types.taller')}</option>
                 <option value='clase_especial'>{t('eventos:types.clase_especial')}</option>
                 <option value='recital'>{t('eventos:types.recital')}</option>
+                <option value='showcase'>{t('eventos:types.showcase')}</option>
               </select>
             </div>
             <div className='grid gap-2'>
@@ -455,7 +459,7 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
           </div>
           <div className='grid gap-4 md:grid-cols-2'>
             <div className='grid gap-2'>
-              {eventType === 'recital' ? (
+              {usesExternalPlace ? (
                 <>
                   <Label htmlFor='event-location'>{t('eventos:admin.externalLocation')}</Label>
                   <Input
@@ -525,7 +529,7 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
         </CardContent>
       </Card>
 
-      {eventType === 'recital' ? null : (
+      {usesExternalPlace ? null : (
         <Card>
           <CardHeader>
             <CardTitle>{t('eventos:admin.collaboration')}</CardTitle>
@@ -580,17 +584,19 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
         </Card>
       )}
 
-      <Card>
-        <CardContent className='flex items-center justify-between gap-4 pt-6'>
-          <span className='grid gap-1'>
-            <span>{t('eventos:admin.simpleRegistration')}</span>
-            <span className='text-sm text-muted-foreground'>{t('eventos:admin.simpleRegistrationHint')}</span>
-          </span>
-          <Switch checked={simpleRegistration} onCheckedChange={checked => setSimpleRegistration(checked)} />
-        </CardContent>
-      </Card>
+      {isShowcase ? null : (
+        <Card>
+          <CardContent className='flex items-center justify-between gap-4 pt-6'>
+            <span className='grid gap-1'>
+              <span>{t('eventos:admin.simpleRegistration')}</span>
+              <span className='text-sm text-muted-foreground'>{t('eventos:admin.simpleRegistrationHint')}</span>
+            </span>
+            <Switch checked={simpleRegistration} onCheckedChange={checked => setSimpleRegistration(checked)} />
+          </CardContent>
+        </Card>
+      )}
 
-      {eventType === 'recital' ? null : (
+      {usesExternalPlace ? null : (
         <Card>
           <CardContent className='flex items-center justify-between gap-4 pt-6'>
             <span>{t('eventos:admin.requiresPartner')}</span>
@@ -603,123 +609,126 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
         </Card>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            {eventType === 'recital' ? t('eventos:admin.installments') : t('eventos:admin.priceRules')}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {eventType === 'recital' ? (
-            <div className='grid gap-4'>
-              {installmentDrafts.map((row, index) => (
-                <div key={index} className='grid gap-2 md:grid-cols-[1fr_1fr_1fr_auto]'>
-                  <div className='grid gap-1'>
-                    <Label>{t('eventos:admin.installmentDue')}</Label>
-                    <Input
-                      type='date'
-                      disabled={locked}
-                      value={row.due_date}
-                      onChange={change =>
-                        setInstallmentDrafts(current =>
-                          current.map((item, itemIndex) =>
-                            itemIndex === index ? { ...item, due_date: change.target.value } : item,
-                          ),
-                        )
-                      }
-                      required
-                    />
+      {isShowcase ? null : (
+        <Card>
+          <CardHeader>
+            <CardTitle>
+              {eventType === 'recital' ? t('eventos:admin.installments') : t('eventos:admin.priceRules')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {eventType === 'recital' ? (
+              <div className='grid gap-4'>
+                {installmentDrafts.map((row, index) => (
+                  <div key={index} className='grid gap-2 md:grid-cols-[1fr_1fr_1fr_auto]'>
+                    <div className='grid gap-1'>
+                      <Label>{t('eventos:admin.installmentDue')}</Label>
+                      <Input
+                        type='date'
+                        disabled={locked}
+                        value={row.due_date}
+                        onChange={change =>
+                          setInstallmentDrafts(current =>
+                            current.map((item, itemIndex) =>
+                              itemIndex === index ? { ...item, due_date: change.target.value } : item,
+                            ),
+                          )
+                        }
+                        required
+                      />
+                    </div>
+                    <div className='grid gap-1'>
+                      <Label>{t('eventos:admin.installmentBase')}</Label>
+                      <Input
+                        type='number'
+                        min={1}
+                        disabled={locked}
+                        value={row.base}
+                        onChange={change =>
+                          setInstallmentDrafts(current =>
+                            current.map((item, itemIndex) =>
+                              itemIndex === index ? { ...item, base: change.target.value } : item,
+                            ),
+                          )
+                        }
+                        required
+                      />
+                    </div>
+                    <div className='grid gap-1'>
+                      <Label>{t('eventos:admin.installmentPlan')}</Label>
+                      <Input
+                        type='number'
+                        min={1}
+                        disabled={locked}
+                        value={row.plan}
+                        onChange={change =>
+                          setInstallmentDrafts(current =>
+                            current.map((item, itemIndex) =>
+                              itemIndex === index ? { ...item, plan: change.target.value } : item,
+                            ),
+                          )
+                        }
+                        required
+                      />
+                    </div>
+                    <div className='flex items-end'>
+                      <Button
+                        color='primary'
+                        variant='outlined'
+                        type='button'
+                        disabled={locked || installmentDrafts.length < 2}
+                        onClick={() =>
+                          setInstallmentDrafts(current => current.filter((_, itemIndex) => itemIndex !== index))
+                        }
+                      >
+                        {t('eventos:admin.removeInstallment')}
+                      </Button>
+                    </div>
                   </div>
-                  <div className='grid gap-1'>
-                    <Label>{t('eventos:admin.installmentBase')}</Label>
-                    <Input
-                      type='number'
-                      min={1}
-                      disabled={locked}
-                      value={row.base}
-                      onChange={change =>
-                        setInstallmentDrafts(current =>
-                          current.map((item, itemIndex) =>
-                            itemIndex === index ? { ...item, base: change.target.value } : item,
-                          ),
-                        )
-                      }
-                      required
-                    />
-                  </div>
-                  <div className='grid gap-1'>
-                    <Label>{t('eventos:admin.installmentPlan')}</Label>
-                    <Input
-                      type='number'
-                      min={1}
-                      disabled={locked}
-                      value={row.plan}
-                      onChange={change =>
-                        setInstallmentDrafts(current =>
-                          current.map((item, itemIndex) =>
-                            itemIndex === index ? { ...item, plan: change.target.value } : item,
-                          ),
-                        )
-                      }
-                      required
-                    />
-                  </div>
-                  <div className='flex items-end'>
-                    <Button
-                      color='primary'
-                      variant='outlined'
-                      type='button'
-                      disabled={locked || installmentDrafts.length < 2}
-                      onClick={() =>
-                        setInstallmentDrafts(current => current.filter((_, itemIndex) => itemIndex !== index))
-                      }
-                    >
-                      {t('eventos:admin.removeInstallment')}
-                    </Button>
-                  </div>
-                </div>
-              ))}
-              <Button
-                color='primary'
-                variant='outlined'
-                type='button'
-                disabled={locked}
-                onClick={() => setInstallmentDrafts(current => [...current, { due_date: '', base: '', plan: '' }])}
-              >
-                {t('eventos:admin.addInstallment')}
-              </Button>
-              {installmentDateError ? (
-                <p className='m-0 text-sm text-destructive'>{t('eventos:admin.installmentDueBeforeEvent')}</p>
-              ) : null}
-              <p className='m-0 text-sm'>
-                {t('eventos:admin.installmentTotalBase')}:{' '}
-                {formatPrice(
-                  installmentDrafts.reduce((sum, row) => sum + Number(row.base || 0), 0),
-                  'COP',
-                )}
-              </p>
-              <p className='m-0 text-sm'>
-                {t('eventos:admin.installmentTotalPlan')}:{' '}
-                {formatPrice(
-                  installmentDrafts.reduce((sum, row) => sum + Number(row.plan || 0), 0),
-                  'COP',
-                )}
-              </p>
-            </div>
-          ) : (
-            <PriceTiersEditor
-              conditions={conditions}
-              tiers={tiers}
-              basePrice={basePrice}
-              baseLabel={requiresPartner ? t('eventos:admin.basePricePair') : t('eventos:admin.basePrice')}
-              locked={locked}
-              onChange={setTiers}
-              onBasePriceChange={setBasePrice}
-            />
-          )}
-        </CardContent>
-      </Card>
+                ))}
+                <Button
+                  color='primary'
+                  variant='outlined'
+                  type='button'
+                  disabled={locked}
+                  onClick={() => setInstallmentDrafts(current => [...current, { due_date: '', base: '', plan: '' }])}
+                >
+                  {t('eventos:admin.addInstallment')}
+                </Button>
+                {installmentDateError ? (
+                  <p className='m-0 text-sm text-destructive'>{t('eventos:admin.installmentDueBeforeEvent')}</p>
+                ) : null}
+                <p className='m-0 text-sm'>
+                  {t('eventos:admin.installmentTotalBase')}:{' '}
+                  {formatPrice(
+                    installmentDrafts.reduce((sum, row) => sum + Number(row.base || 0), 0),
+                    'COP',
+                  )}
+                </p>
+                <p className='m-0 text-sm'>
+                  {t('eventos:admin.installmentTotalPlan')}:{' '}
+                  {formatPrice(
+                    installmentDrafts.reduce((sum, row) => sum + Number(row.plan || 0), 0),
+                    'COP',
+                  )}
+                </p>
+              </div>
+            ) : (
+              <PriceTiersEditor
+                conditions={conditions}
+                tiers={tiers}
+                basePrice={basePrice}
+                baseLabel={requiresPartner ? t('eventos:admin.basePricePair') : t('eventos:admin.basePrice')}
+                locked={locked}
+                onChange={setTiers}
+                onBasePriceChange={setBasePrice}
+              />
+            )}
+          </CardContent>
+        </Card>
+      )}
       {event ? <EventSessionsPanel event={event} rooms={rooms} /> : null}
+
       {event && (isCollaboration || event.type === 'recital') ? (
         <Card>
           <CardHeader>

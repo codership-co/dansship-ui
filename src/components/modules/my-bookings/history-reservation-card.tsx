@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import { HistoryBookingCard } from './history-booking-card';
+import { ParticipationReservationCard } from './participation-reservation-card';
 
 import { Badge } from '@components/ui';
 import { PageURLS } from '@core/constants';
@@ -40,6 +41,10 @@ export function HistoryReservationCard({ item, alreadyRated, onRateClass }: Hist
 
   if (item.kind === 'class') {
     return <HistoryBookingCard booking={item.booking} alreadyRated={alreadyRated} onRate={onRateClass} />;
+  }
+
+  if (item.kind === 'participation') {
+    return <ParticipationReservationCard row={item.participation} tone='history' />;
   }
 
   const start = new Date(item.startsAt);

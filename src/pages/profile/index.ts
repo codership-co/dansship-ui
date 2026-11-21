@@ -5,3 +5,5 @@ export * from './wallet.page';
 export * from './payment-documents.page';
 export * from './gifts.page';
 export * from './recover-classes.page';
+export * from './inscripcion.page';
+export * from './inscripcion-editar.page';

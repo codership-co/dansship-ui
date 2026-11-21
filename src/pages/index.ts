@@ -4,6 +4,7 @@ export * from './error';
 export * from './halloween.page';
 export * from './home.page';
 export * from './plans.page';
+export * from './evento-inscripcion.page';
 export * from './ui.page';
 export * from './legal.page';
 export * from './location.page';

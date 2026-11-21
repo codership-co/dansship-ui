@@ -1,7 +1,7 @@
 import { useParams } from 'react-router';
 
 import { SpinnerLoader } from '@components/loaders';
-import { EventoEditForm } from '@components/modules/admin-eventos';
+import { EventoAdminTabs, EventoEditForm } from '@components/modules/admin-eventos';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -21,9 +21,11 @@ function AdminEventoEditPage() {
     );
   }
 
+  const event = isNew ? undefined : (response?.data ?? undefined);
+
   return (
     <div className='mx-auto max-w-5xl px-4 py-8 pt-28 sm:pt-32'>
-      <EventoEditForm event={isNew ? undefined : (response?.data ?? undefined)} />
+      {event?.uses_participant_types ? <EventoAdminTabs event={event} /> : <EventoEditForm event={event} />}
     </div>
   );
 }
