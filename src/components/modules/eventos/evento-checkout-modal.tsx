@@ -40,7 +40,7 @@ const PANE_BODY = 'px-4 pt-4 pb-6 sm:px-8 md:pt-12 md:pr-8 md:pl-12';
 const PANE_FOOTER = 'px-4 sm:px-8 md:py-4 md:pr-8 md:pl-12';
 const TOTAL_SCOPES = ['recital', 'taller', 'clase_especial'];
 
-interface TicketEvent {
+export interface TicketEvent {
   name: string;
   typeLabel: string;
   date: CheckoutEventDate | null;
@@ -49,7 +49,7 @@ interface TicketEvent {
   instructor: string;
 }
 
-function EventTicket({ event }: { event: TicketEvent }) {
+export function EventTicket({ event }: { event: TicketEvent }) {
   const { t } = useTranslation();
 
   return (

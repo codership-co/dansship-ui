@@ -3,3 +3,8 @@ export * from './evento-edit-form';
 export * from './combo-edit-form';
 export * from './price-tiers-editor';
 export * from './evento-roster';
+export * from './evento-admin-tabs';
+export * from './artist-signup-detail';
+export * from './participant-type-editor';
+export * from './participation-people-table';
+export * from './participation-summary';

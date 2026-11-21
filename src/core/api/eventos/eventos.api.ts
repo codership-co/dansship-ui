@@ -36,10 +36,11 @@ export class EventosAPI {
     });
   }
 
-  async getBySlug(slug: string) {
+  async getBySlug(slug: string, participantAccess?: string | null) {
     return this.httpClient.callNoError<EventLanding>({
       path: `/events/by-slug/${slug}`,
       method: 'GET',
+      params: participantAccess ? { participant_access: participantAccess } : undefined,
     });
   }
 

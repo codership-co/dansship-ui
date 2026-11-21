@@ -15,6 +15,8 @@ import { getResponseError, logger } from './dansship.error';
 import { DoorCodeAdminAPI } from './door-code/door-code.admin.api';
 import { EventosAdminAPI } from './eventos/eventos.admin.api';
 import { EventosAPI } from './eventos/eventos.api';
+import { ParticipationAdminAPI } from './eventos/participation.admin.api';
+import { ParticipationAPI } from './eventos/participation.api';
 import { FamilyAPI } from './family/family.api';
 import { FiguresAdminAPI } from './figures/figures.admin.api';
 import { FiguresAPI } from './figures/figures.api';
@@ -95,6 +97,8 @@ export class DansshipAPI {
   static subscriptionsAdmin = new SubscriptionsAdminAPI(this.httpClient);
   static eventos = new EventosAPI(this.httpClient);
   static eventosAdmin = new EventosAdminAPI(this.httpClient);
+  static participation = new ParticipationAPI(this.httpClient);
+  static participationAdmin = new ParticipationAdminAPI(this.httpClient);
   static usersAdmin = new UsersAdminAPI(this.httpClient);
   static userContextAdmin = new UserContextAdminAPI(this.httpClient);
   static rbacAdmin = new RbacAdminAPI(this.httpClient);

@@ -117,4 +117,106 @@ describe('EventoLanding', () => {
     expect(await screen.findByText('No encontramos este evento.')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Intentar de nuevo' })).toBeNull();
   });
+
+  it('shows the artists card and the guest fees on a showcase event', async () => {
+    vi.mocked(DansshipAPI.eventos.getBySlug).mockResolvedValue({
+      ok: true,
+      data: {
+        ...landing,
+        type: 'showcase',
+        participation: {
+          remaining: 100,
+          capacity: 100,
+          types: [
+            {
+              id: 'artists',
+              name: 'Artistas',
+              registration_mode: 'single_or_group',
+              state: 'open',
+              closes_at: null,
+              requires_account: true,
+              fees: [],
+              minors: { allowed: true, max_age: 18, per_adult_max: null },
+              terms: null,
+              my_signup_id: null,
+            },
+            {
+              id: 'guests',
+              name: 'Invitados',
+              registration_mode: 'multi_ticket',
+              state: 'open',
+              closes_at: null,
+              requires_account: true,
+              fees: [
+                { label: 'Comunidad Dansship', price: '5000' },
+                { label: 'Público general', price: '10000' },
+              ],
+              minors: { allowed: true, max_age: 12, per_adult_max: 3, price: '0' },
+              terms: null,
+              my_signup_id: null,
+            },
+          ],
+        },
+      } as EventLanding,
+      status: 200,
+      error: null,
+    });
+
+    render(
+      <MemoryRouter>
+        <EventoLanding slug='video-class-halloween' preview={false} participantAccess='tok' />
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByRole('heading', { name: '¿Te vas a presentar?' })).toBeVisible();
+    expect(screen.getByText('Comunidad Dansship')).toBeVisible();
+    expect(screen.getByText('Menores de 12 años (con un adulto)')).toBeVisible();
+    expect(screen.getByText('Gratis')).toBeVisible();
+    expect(DansshipAPI.eventos.getBySlug).toHaveBeenCalledWith('video-class-halloween', 'tok');
+  });
+
+  it('keeps the purchase button on events without participant types', async () => {
+    vi.mocked(DansshipAPI.eventos.getBySlug).mockResolvedValue({ ok: true, data: landing, status: 200, error: null });
+
+    renderLanding();
+
+    expect(await screen.findByRole('heading', { name: 'Video class Halloween' })).toBeVisible();
+    expect(screen.queryByRole('heading', { name: '¿Te vas a presentar?' })).toBeNull();
+    expect(screen.getAllByRole('button').length).toBeGreaterThan(0);
+  });
+
+  it('shows "Venta cerrada" with the purchase button disabled after the close date', async () => {
+    vi.mocked(DansshipAPI.eventos.getBySlug).mockResolvedValue({
+      ok: true,
+      data: {
+        ...landing,
+        type: 'showcase',
+        participation: {
+          remaining: 40,
+          capacity: 100,
+          types: [
+            {
+              id: 'guests',
+              name: 'Invitados',
+              registration_mode: 'multi_ticket',
+              state: 'closed',
+              closes_at: '2026-12-12T04:59:00Z',
+              requires_account: true,
+              fees: [{ label: 'Entrada general', price: '10000' }],
+              minors: { allowed: false, max_age: null, per_adult_max: null },
+              terms: null,
+              my_signup_id: null,
+            },
+          ],
+        },
+      } as EventLanding,
+      status: 200,
+      error: null,
+    });
+
+    renderLanding();
+
+    const button = await screen.findByRole('button', { name: 'Venta cerrada' });
+    expect(button).toBeDisabled();
+  });
 });

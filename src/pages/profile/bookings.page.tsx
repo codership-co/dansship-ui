@@ -29,6 +29,7 @@ import {
   sortReservationsDescending,
   eventReservation,
   formatPrice,
+  participationReservation,
 } from '@helpers';
 import { RESUME_REVALIDATE, useMyBookings, useMyBookingsHistory, usePromise } from '@hooks';
 
@@ -93,6 +94,18 @@ function BookingsPage() {
     [],
     RESUME_REVALIDATE,
   );
+  const { response: participationUpcomingResponse } = usePromise(
+    () => DansshipAPI.participation.listMine('upcoming'),
+    true,
+    [],
+    RESUME_REVALIDATE,
+  );
+  const { response: participationHistoryResponse } = usePromise(
+    () => DansshipAPI.participation.listMine('history'),
+    true,
+    [],
+    RESUME_REVALIDATE,
+  );
   const { response: rentalRequestsResponse, isLoading: isLoadingRentalRequests } = usePromise(
     () => DansshipAPI.studioRental.getMyRequests(),
     true,
@@ -142,12 +155,12 @@ function BookingsPage() {
   );
 
   const guardianUpcomingExtras = useMemo(() => {
-    const events = (eventUpcomingResponse?.data ?? []).length;
+    const events = (eventUpcomingResponse?.data ?? []).length + (participationUpcomingResponse?.data ?? []).length;
     const rentals = rentalRequests.filter(request => isUpcomingRental(request)).length;
     const series = rentalSeries.filter(item => isUpcomingRentalSeries(item)).length;
 
     return events + rentals + series;
-  }, [eventUpcomingResponse?.data, rentalRequests, rentalSeries]);
+  }, [eventUpcomingResponse?.data, participationUpcomingResponse?.data, rentalRequests, rentalSeries]);
 
   const attendeeOptions = useMemo(() => {
     if (!user || minors.length === 0) {
@@ -183,7 +196,10 @@ function BookingsPage() {
 
   const upcomingItems = useMemo(() => {
     const classes = upcomingBookings.filter(matchesAttendee).map(classReservation);
-    const events = (eventUpcomingResponse?.data ?? []).map(eventReservation);
+    const events = [
+      ...(eventUpcomingResponse?.data ?? []).map(eventReservation),
+      ...(participationUpcomingResponse?.data ?? []).map(participationReservation),
+    ];
     const rentals = rentalRequests
       .filter(request => isUpcomingRental(request))
       .map(request => rentalReservation(request, roomNameById[request.slots[0]?.room_id] ?? ''));
@@ -198,6 +214,7 @@ function BookingsPage() {
   }, [
     upcomingBookings,
     eventUpcomingResponse?.data,
+    participationUpcomingResponse?.data,
     rentalRequests,
     rentalSeries,
     roomNameById,
@@ -207,7 +224,10 @@ function BookingsPage() {
   ]);
 
   const extraHistory = useMemo(() => {
-    const events = (eventHistoryResponse?.data ?? []).map(eventReservation);
+    const events = [
+      ...(eventHistoryResponse?.data ?? []).map(eventReservation),
+      ...(participationHistoryResponse?.data ?? []).map(participationReservation),
+    ];
     const rentals = rentalRequests
       .filter(request => !isUpcomingRental(request))
       .map(request => rentalReservation(request, roomNameById[request.slots[0]?.room_id] ?? ''));
@@ -216,7 +236,7 @@ function BookingsPage() {
       .map(item => rentalSeriesReservation(item, roomNameById[item.room_id] ?? ''));
 
     return [...events, ...rentals, ...series];
-  }, [eventHistoryResponse?.data, rentalRequests, rentalSeries, roomNameById]);
+  }, [eventHistoryResponse?.data, participationHistoryResponse?.data, rentalRequests, rentalSeries, roomNameById]);
 
   const historyReservations = useMemo(
     () =>

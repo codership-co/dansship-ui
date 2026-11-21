@@ -1,5 +1,7 @@
+import type { LandingParticipation } from './participation.models';
+
 export type EventStatus = 'draft' | 'published';
-export type EventType = 'taller' | 'clase_especial' | 'recital';
+export type EventType = 'taller' | 'clase_especial' | 'recital' | 'showcase';
 export type EventOfferingKind = 'event' | 'combo';
 export type EventRegistrationSource = 'direct' | 'combo';
 export type EventRegistrationStatus = 'pending_payment' | 'confirmed' | 'expired' | 'rejected' | 'withdrawn';
@@ -156,6 +158,8 @@ export interface EventLanding {
   } | null;
   components: Array<LandingComponentCard>;
   payment_qr_url?: string | null;
+  /** ADR-064: participant types this viewer can see (showcase events only). */
+  participation?: LandingParticipation | null;
 }
 
 export interface AdminEventListItem {
@@ -208,6 +212,7 @@ export interface EventAdmin {
   visibility?: 'public' | 'link_only' | 'invite_only';
   access_token?: string | null;
   sessions?: Array<EventSession>;
+  uses_participant_types?: boolean;
   created_at: string;
   updated_at: string;
 }

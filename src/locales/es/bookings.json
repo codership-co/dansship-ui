@@ -155,5 +155,14 @@
     "lateCancelToast": "Reserva cancelada. La clase no se devolvió a tu plan.",
     "lateCancelHint_one": "Podrás recuperarla pagando {{price}} durante el día siguiente.",
     "lateCancelHint_other": "Podrás recuperarla pagando {{price}} durante los próximos {{count}} días."
+  },
+  "participation": {
+    "signupLabel": "Inscripción · {{type}}",
+    "actName": "Presentación: {{name}}",
+    "viewSignup": "Ver inscripción",
+    "performed": "Te presentaste",
+    "ticketFor": "Entrada de {{name}}",
+    "withMinors": "Entra con: {{names}} (menor, sin QR)",
+    "repay": "Volver a pagar"
   }
 }

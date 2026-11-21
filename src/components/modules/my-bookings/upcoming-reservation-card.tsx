@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 
 import { EventInstallmentActions } from './event-installment-actions';
 import { EventSessionLines } from './event-session-lines';
+import { ParticipationReservationCard } from './participation-reservation-card';
 import { UpcomingBookingCard } from './upcoming-booking-card';
 
 import { type MyBooking } from '@core/api';
@@ -60,6 +61,10 @@ export function UpcomingReservationCard({ item, isCancelDisabled, onCancelClass 
 
   if (item.kind === 'class') {
     return <UpcomingBookingCard booking={item.booking} isCancelDisabled={isCancelDisabled} onCancel={onCancelClass} />;
+  }
+
+  if (item.kind === 'participation') {
+    return <ParticipationReservationCard row={item.participation} />;
   }
 
   const start = new Date(item.startsAt);
