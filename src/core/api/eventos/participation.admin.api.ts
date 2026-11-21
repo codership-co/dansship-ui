@@ -1,5 +1,6 @@
 import { HttpClient } from 'polpo-http-client';
 
+import { downloadCsvFile } from '../common/download-csv';
 import { uploadFileWithPresignedRetry } from '../common/put-file-to-presigned-url';
 
 import { DansshipAPIError } from '@core/api';
@@ -116,27 +117,8 @@ export class ParticipationAdminAPI {
     });
   }
 
-  /** Raw fetch, like the reports CSV: a download skips the HTTP client. */
   async downloadPeopleCsv(eventId: string, query: ParticipationPeopleQuery, filename: string) {
-    const search = new URLSearchParams(peopleParams(query)).toString();
-    const response = await fetch(
-      `${import.meta.env.VITE_DANSSHIP_API_URL}/admin/events/${eventId}/participation/people.csv${search ? `?${search}` : ''}`,
-      { method: 'GET', credentials: 'include', headers: { accept: 'text/csv' } },
-    );
-
-    if (!response.ok) {
-      throw new Error('CSV export failed');
-    }
-
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = filename;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    URL.revokeObjectURL(url);
+    await downloadCsvFile(`/admin/events/${eventId}/participation/people.csv`, filename, peopleParams(query));
   }
 
   async getSignup(signupId: string) {

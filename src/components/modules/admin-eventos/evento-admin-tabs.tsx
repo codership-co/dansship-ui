@@ -20,7 +20,8 @@ function asTab(value: string | null): EventAdminTab {
 }
 
 /**
- * Admin of an event with participant types (ADR-064). "Información" is the existing form,
+ * Admin of an event with participant types (ADR-064). Panels stay mounted (forceMount) so
+ * unsaved edits survive a tab switch. "Información" is the existing form,
  * unchanged; the other tabs are the participant-type editor, the summary and every person.
  */
 export function EventoAdminTabs({ event }: { event: EventAdmin }) {
@@ -56,16 +57,16 @@ export function EventoAdminTabs({ event }: { event: EventAdmin }) {
           </TabsTrigger>
         ))}
       </TabsList>
-      <TabsContent value='info'>
+      <TabsContent value='info' forceMount className='data-[state=inactive]:hidden'>
         <EventoEditForm event={event} />
       </TabsContent>
-      <TabsContent value='types'>
+      <TabsContent value='types' forceMount className='data-[state=inactive]:hidden'>
         <ParticipantTypesPanel eventId={event.id} eventSlug={event.slug} eventCapacity={event.capacity} />
       </TabsContent>
-      <TabsContent value='summary'>
+      <TabsContent value='summary' forceMount className='data-[state=inactive]:hidden'>
         <ParticipationSummaryPanel eventId={event.id} />
       </TabsContent>
-      <TabsContent value='people'>
+      <TabsContent value='people' forceMount className='data-[state=inactive]:hidden'>
         <ParticipationPeopleTable eventId={event.id} eventSlug={event.slug} />
       </TabsContent>
     </Tabs>
