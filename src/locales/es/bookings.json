@@ -163,6 +163,14 @@
     "performed": "Te presentaste",
     "ticketFor": "Entrada de {{name}}",
     "withMinors": "Entra con: {{names}} (menor, sin QR)",
-    "repay": "Volver a pagar"
+    "repay": "Volver a pagar",
+    "viewQr": "Ver QR",
+    "viewMyEntry": "Ver mi entrada",
+    "history": {
+      "used": "Usada · {{time}}",
+      "not_used": "No usada",
+      "performed": "Te presentaste",
+      "approved": "Inscripción aprobada"
+    }
   }
 }

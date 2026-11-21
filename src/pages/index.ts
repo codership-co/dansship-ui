@@ -2,6 +2,7 @@ export * from './auth';
 export * from './admin';
 export * from './error';
 export * from './halloween.page';
+export * from './tu-entrada.page';
 export * from './home.page';
 export * from './plans.page';
 export * from './evento-inscripcion.page';

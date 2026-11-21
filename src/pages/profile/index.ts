@@ -7,3 +7,4 @@ export * from './gifts.page';
 export * from './recover-classes.page';
 export * from './inscripcion.page';
 export * from './inscripcion-editar.page';
+export * from './entrada.page';

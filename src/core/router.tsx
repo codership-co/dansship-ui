@@ -10,6 +10,7 @@ import { PageURLS } from '@core/constants';
 import {
   Error404Page,
   SecureHalloweenPage,
+  TuEntradaPage,
   HomePage,
   LocationPage,
   PaymentsResultsLoader,
@@ -31,11 +32,14 @@ import {
   SecureAdminEventoComboEditPage,
   SecureAdminEventoEditPage,
   SecureAdminEventoInscripcionPage,
+  SecureAdminEntradasPage,
+  SecureAdminEntradaValidarPage,
   SecureAdminUserDetailsPage,
   SecureAdminUserEditPage,
   SecureAdminUserListPage,
   SecureBookingsPage,
   SecureInscripcionPage,
+  SecureEntradaPage,
   SecureInscripcionEditarPage,
   SecureRecoverClassesPage,
   SecureClassesPage,
@@ -112,6 +116,7 @@ const routes: Array<RouteObject> = [
         ],
       },
       { path: 'halloween', Component: SecureHalloweenPage },
+      { path: 'tu-entrada/:token', Component: TuEntradaPage },
       {
         Component: RouterPageLayout,
         children: [
@@ -189,6 +194,7 @@ const routes: Array<RouteObject> = [
               { path: 'bookings/recover', Component: SecureRecoverClassesPage },
               { path: 'bookings/inscripciones/:signupId', Component: SecureInscripcionPage },
               { path: 'bookings/inscripciones/:signupId/editar', Component: SecureInscripcionEditarPage },
+              { path: 'bookings/entradas/:personId', Component: SecureEntradaPage },
               { path: 'wallet', Component: SecureWalletPage },
               { path: 'payment-documents', Component: SecurePaymentDocumentsPage },
               { path: 'gifts', Component: SecureGiftsPage },
@@ -262,6 +268,8 @@ const routes: Array<RouteObject> = [
               { path: 'eventos/combos/:comboId', Component: SecureAdminEventoComboEditPage },
               { path: 'eventos/:eventId', Component: SecureAdminEventoEditPage },
               { path: 'eventos/:eventId/inscripciones/:signupId', Component: SecureAdminEventoInscripcionPage },
+              { path: 'entradas', Component: SecureAdminEntradasPage },
+              { path: 'entradas/:eventId', Component: SecureAdminEntradaValidarPage },
               {
                 path: 'workshops',
                 loader: ({ request }) => redirect(`${PageURLS.admin.eventos}${new URL(request.url).search}`),

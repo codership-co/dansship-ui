@@ -145,6 +145,7 @@ export enum PERMISSION {
   // EVENT
   EVENT_MANAGE = 'manage:event',
   EVENT_PURCHASE = 'purchase:event',
+  EVENT_ENTRY_VALIDATE = 'validate:event_entry',
 
   // CLASS FEEDBACK
   CLASS_FEEDBACK_READ = 'read:class_feedback',

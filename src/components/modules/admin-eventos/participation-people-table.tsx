@@ -1,9 +1,12 @@
+import { format } from 'date-fns';
 import { Button } from 'polpo/components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LuDownload } from 'react-icons/lu';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
+
+import { EntryPersonDialog } from './entry-person-dialog';
 
 import { SpinnerLoader } from '@components/loaders';
 import { AdminPaymentReviewModal } from '@components/modules/admin-payments';
@@ -63,6 +66,8 @@ export function ParticipationPeopleTable({ eventId, eventSlug }: { eventId: stri
     participant_type_id: null,
   });
   const [status, setStatus] = useState<PeopleStatusGroup | ''>('');
+  const [entered, setEntered] = useState<'' | 'yes' | 'no'>('');
+  const [editing, setEditing] = useState<ParticipationPersonRow | null>(null);
   const [search, setSearch] = useState('');
   const [query, setQuery] = useState('');
   const [downloading, setDownloading] = useState(false);
@@ -78,13 +83,14 @@ export function ParticipationPeopleTable({ eventId, eventSlug }: { eventId: stri
     participant_type_id: chip.participant_type_id,
     status: status || null,
     q: query || null,
+    entered: entered === '' ? null : entered === 'yes',
   };
   const [reviewIntent, setReviewIntent] = useState<PaymentIntent | null>(null);
   const [reviewing, setReviewing] = useState(false);
   const { response, isLoading, reFetch } = usePromise(
     () => DansshipAPI.participationAdmin.listPeople(eventId, filters),
     true,
-    [eventId, chip.kind, chip.participant_type_id, status, query],
+    [eventId, chip.kind, chip.participant_type_id, status, query, entered],
   );
   const data = response?.data;
   const holders = chip.kind === 'holders';
@@ -173,7 +179,7 @@ export function ParticipationPeopleTable({ eventId, eventSlug }: { eventId: stri
           {t('eventos:participation.people.exportCsv')}
         </Button>
       </div>
-      <div className='grid gap-2 sm:grid-cols-[minmax(0,1fr)_14rem]'>
+      <div className='grid gap-2 sm:grid-cols-[minmax(0,1fr)_14rem_14rem]'>
         <Input
           type='search'
           value={search}
@@ -191,6 +197,16 @@ export function ParticipationPeopleTable({ eventId, eventSlug }: { eventId: stri
           <option value='review'>{t('eventos:participation.people.statusReview')}</option>
           <option value='approved'>{t('eventos:participation.people.statusApproved')}</option>
           <option value='not_approved'>{t('eventos:participation.people.statusRejected')}</option>
+        </select>
+        <select
+          aria-label={t('eventos:participation.people.entryFilter')}
+          className={SELECT_CLASS}
+          value={entered}
+          onChange={change => setEntered(change.target.value as '' | 'yes' | 'no')}
+        >
+          <option value=''>{t('eventos:participation.people.entryAll')}</option>
+          <option value='yes'>{t('eventos:participation.people.entryYes')}</option>
+          <option value='no'>{t('eventos:participation.people.entryNo')}</option>
         </select>
       </div>
       {isLoading && !data ? (
@@ -229,6 +245,7 @@ export function ParticipationPeopleTable({ eventId, eventSlug }: { eventId: stri
                   </>
                 ) : null}
                 <TableHead>{t('eventos:participation.people.status')}</TableHead>
+                <TableHead>{t('eventos:participation.people.entry')}</TableHead>
                 <TableHead>
                   <span className='sr-only'>{t('eventos:participation.people.actions')}</span>
                 </TableHead>
@@ -289,7 +306,23 @@ export function ParticipationPeopleTable({ eventId, eventSlug }: { eventId: stri
                   <TableCell>
                     <PersonStatusBadge row={row} />
                   </TableCell>
+                  <TableCell className='whitespace-nowrap'>
+                    {row.entered_at ? (
+                      <span title={row.validated_by_name ?? undefined}>
+                        {t('eventos:participation.people.entered', {
+                          time: format(new Date(row.entered_at), 'dd/MM HH:mm'),
+                        })}
+                      </span>
+                    ) : (
+                      t('eventos:participation.people.notEntered')
+                    )}
+                  </TableCell>
                   <TableCell className='text-right'>
+                    {row.role !== 'holder' ? (
+                      <Button type='button' variant='text' color='primary' size='small' onClick={() => setEditing(row)}>
+                        {t('eventos:participation.people.edit')}
+                      </Button>
+                    ) : null}
                     {row.role === 'ticket' &&
                     row.payment_intent_id &&
                     row.payment_status === 'pending_manual_review' &&
@@ -321,6 +354,13 @@ export function ParticipationPeopleTable({ eventId, eventSlug }: { eventId: stri
         </div>
       )}
       <p className='m-0 text-xs text-muted-foreground'>{t('eventos:participation.people.hint')}</p>
+      <EntryPersonDialog
+        person={editing}
+        onOpenChange={open => {
+          if (!open) setEditing(null);
+        }}
+        onSaved={() => void reFetch()}
+      />
       <AdminPaymentReviewModal
         open={Boolean(reviewIntent)}
         intent={reviewIntent}

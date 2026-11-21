@@ -13,6 +13,7 @@ import { ClassRecoveryAPI } from './class-recovery/class-recovery.api';
 import { abortInFlight, DansshipHttpClient } from './dansship-http-client';
 import { getResponseError, logger } from './dansship.error';
 import { DoorCodeAdminAPI } from './door-code/door-code.admin.api';
+import { EntryAPI } from './eventos/entry.api';
 import { EventosAdminAPI } from './eventos/eventos.admin.api';
 import { EventosAPI } from './eventos/eventos.api';
 import { ParticipationAdminAPI } from './eventos/participation.admin.api';
@@ -99,6 +100,7 @@ export class DansshipAPI {
   static eventosAdmin = new EventosAdminAPI(this.httpClient);
   static participation = new ParticipationAPI(this.httpClient);
   static participationAdmin = new ParticipationAdminAPI(this.httpClient);
+  static entry = new EntryAPI(this.httpClient);
   static usersAdmin = new UsersAdminAPI(this.httpClient);
   static userContextAdmin = new UserContextAdminAPI(this.httpClient);
   static rbacAdmin = new RbacAdminAPI(this.httpClient);

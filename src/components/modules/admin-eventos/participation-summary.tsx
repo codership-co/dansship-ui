@@ -75,6 +75,23 @@ export function ParticipationSummaryPanel({ eventId }: { eventId: string }) {
         />
       </div>
       <p className='m-0 text-xs text-muted-foreground'>{t('eventos:participation.summary.capacityHint')}</p>
+      {summary.attendance ? (
+        <div className='grid gap-2'>
+          <p className='m-0 font-semibold'>{t('eventos:participation.summary.attendance')}</p>
+          <div className='grid gap-3 sm:grid-cols-3'>
+            {(['guests', 'minors', 'artists'] as const).map(group => (
+              <StatCard
+                key={group}
+                title={t(`eventos:participation.summary.attendance${group[0].toUpperCase()}${group.slice(1)}`)}
+                value={String(summary.attendance?.[group].entered ?? 0)}
+                detail={t('eventos:participation.summary.attendanceDetail', {
+                  expected: summary.attendance?.[group].expected ?? 0,
+                })}
+              />
+            ))}
+          </div>
+        </div>
+      ) : null}
       {summary.revenue.by_fee.length > 0 ? (
         <Card>
           <CardContent className='grid gap-2 pt-6'>

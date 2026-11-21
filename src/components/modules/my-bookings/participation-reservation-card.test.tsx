@@ -27,6 +27,11 @@ const row: MyParticipationRow = {
   purchase_id: null,
   payment_intent_id: null,
   payment_status: null,
+  person_id: 'person-0',
+  has_entry_pass: false,
+  entered_at: null,
+  is_attendee: false,
+  issues_entry_qr: false,
 };
 
 describe('ParticipationReservationCard', () => {
@@ -88,5 +93,52 @@ describe('ParticipationReservationCard', () => {
 
     expect(screen.getByText('Lista')).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Volver a pagar' })).toBeNull();
+  });
+
+  it('offers "Ver QR" only while the ticket has an active pass', () => {
+    const ticket = { ...row, kind: 'ticket' as const, status: 'confirmed' as const, issues_entry_qr: true };
+    const { rerender } = render(
+      <MemoryRouter>
+        <ParticipationReservationCard row={{ ...ticket, has_entry_pass: false }} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByRole('button', { name: 'Ver QR' })).toBeNull();
+
+    rerender(
+      <MemoryRouter>
+        <ParticipationReservationCard row={{ ...ticket, has_entry_pass: true }} />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Ver QR' })).toBeVisible();
+  });
+
+  it('offers "Ver mi entrada" to an approved artist', () => {
+    render(
+      <MemoryRouter>
+        <ParticipationReservationCard
+          row={{ ...row, status: 'approved', issues_entry_qr: true, has_entry_pass: true }}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Ver mi entrada' })).toBeVisible();
+  });
+
+  it.each([
+    [{ kind: 'ticket', status: 'confirmed', entered_at: '2026-12-12T21:05:00Z' }, /Usada · \d\d:05/],
+    [{ kind: 'ticket', status: 'confirmed', entered_at: null }, /No usada/],
+    [{ kind: 'signup', status: 'approved', entered_at: '2026-12-12T21:05:00Z' }, /Te presentaste/],
+    [{ kind: 'signup', status: 'approved', entered_at: null }, /Inscripción aprobada/],
+  ] as const)('shows the history state %o', (change, text) => {
+    render(
+      <MemoryRouter>
+        <ParticipationReservationCard row={{ ...row, ...change, issues_entry_qr: true }} tone='history' />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText(text)).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Ver QR' })).toBeNull();
   });
 });

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
 import { SignupStatusBadge } from '@components/modules/event-participation';
-import { type MyParticipationRow } from '@core/api';
+import { canOpenEntry, entryHistoryState, type MyParticipationRow } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { cn } from '@helpers';
 import { useDateLocale } from '@hooks';
@@ -23,7 +23,9 @@ export function ParticipationReservationCard({ row, tone = 'upcoming' }: Partici
   const navigate = useNavigate();
   const locale = useDateLocale();
   const start = new Date(row.starts_at);
-  const performed = tone === 'history' && row.kind === 'signup' && row.status === 'approved';
+  const history = tone === 'history' ? entryHistoryState(row) : null;
+  const performed = tone === 'history' && !row.issues_entry_qr && row.kind === 'signup' && row.status === 'approved';
+  const showEntry = tone === 'upcoming' && canOpenEntry(row);
 
   return (
     <article
@@ -70,11 +72,28 @@ export function ParticipationReservationCard({ row, tone = 'upcoming' }: Partici
           </p>
         ) : null}
         <div className='mt-2 flex min-w-0 flex-wrap items-center justify-between gap-2'>
-          {performed ? (
+          {history ? (
+            <p className='m-0 text-xs font-medium text-muted-foreground'>
+              {t(`bookings:participation.history.${history}`, {
+                time: row.entered_at ? format(new Date(row.entered_at), 'HH:mm') : '',
+              })}
+            </p>
+          ) : performed ? (
             <p className='m-0 text-xs font-medium text-muted-foreground'>{t('bookings:participation.performed')}</p>
           ) : (
             <SignupStatusBadge status={row.status} />
           )}
+          {showEntry ? (
+            <Button
+              color='primary'
+              variant='solid'
+              size='small'
+              type='button'
+              onClick={() => navigate(PageURLS.profile.entry(row.person_id ?? ''), { viewTransition: true })}
+            >
+              {row.kind === 'signup' ? t('bookings:participation.viewMyEntry') : t('bookings:participation.viewQr')}
+            </Button>
+          ) : null}
           {row.kind === 'ticket' && row.repayable && row.purchase_id ? (
             <Button
               color='primary'
@@ -99,7 +118,7 @@ export function ParticipationReservationCard({ row, tone = 'upcoming' }: Partici
               {t('bookings:viewPayment')}
             </Button>
           ) : null}
-          {row.kind === 'signup' ? (
+          {row.kind === 'signup' && !row.is_attendee ? (
             <Button
               color='primary'
               variant='outlined'

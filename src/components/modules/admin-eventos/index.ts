@@ -8,3 +8,5 @@ export * from './artist-signup-detail';
 export * from './participant-type-editor';
 export * from './participation-people-table';
 export * from './participation-summary';
+export * from './entry-person-dialog';
+export * from './entry-window-editor';

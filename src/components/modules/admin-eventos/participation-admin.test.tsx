@@ -3,15 +3,21 @@ import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { ArtistSignupDetail } from './artist-signup-detail';
+import { EntryWindowEditor } from './entry-window-editor';
 import { EventoAdminTabs } from './evento-admin-tabs';
 import { ParticipantTypeEditor } from './participant-type-editor';
 import { ParticipationPeopleTable } from './participation-people-table';
+import { ParticipationSummaryPanel } from './participation-summary';
 
 import { artistTypeAdmin, mySignup } from '@components/modules/event-participation/participation.fixtures';
 import { DansshipAPI, type AdminSignupDetail, type EventAdmin, type ParticipationPeople } from '@core/api';
 import '@core/i18n';
 
 vi.mock('./evento-edit-form', () => ({ EventoEditForm: () => <p>Formulario de información</p> }));
+vi.mock('@contexts', async importOriginal => ({
+  ...(await importOriginal<typeof import('@contexts')>()),
+  useOrPermissions: () => true,
+}));
 
 const ok = <T,>(data: T) => ({ ok: true, data, status: 200, error: null }) as never;
 
@@ -48,6 +54,9 @@ const people: ParticipationPeople = {
       amount: null,
       payment_intent_id: null,
       payment_status: null,
+      entered_at: null,
+      validated_by_name: null,
+      has_entry_pass: false,
     },
   ],
 };
@@ -180,5 +189,177 @@ describe('participant-type admin', () => {
 
     await waitFor(() => expect(DansshipAPI.participationAdmin.approve).toHaveBeenCalledWith('signup-1'));
     expect(await screen.findAllByText('Aprobada')).not.toHaveLength(0);
+  });
+
+  it('links the door from the event for people who can validate', () => {
+    inRouter(
+      <EventoAdminTabs event={{ id: 'event-1', slug: 'clausura', name: 'Clausura', capacity: 100 } as EventAdmin} />,
+      '/admin/eventos/event-1?tab=people',
+    );
+
+    expect(screen.getByRole('link', { name: 'Validar entradas' })).toHaveAttribute('href', '/admin/entradas/event-1');
+  });
+
+  it('filters by entry, edits a ticket email and resends the QR', async () => {
+    const ticket = {
+      ...people.rows[0],
+      person_id: 'ticket-1',
+      role: 'ticket' as const,
+      full_name: 'Bruno',
+      email: 'bruno@example.com',
+      status: 'confirmed' as const,
+      entered_at: '2026-12-12T21:05:00Z',
+      validated_by_name: 'Puerta',
+      has_entry_pass: true,
+    };
+    vi.spyOn(DansshipAPI.participationAdmin, 'listPeople').mockResolvedValue(ok({ ...people, rows: [ticket] }));
+    const update = vi.spyOn(DansshipAPI.entry, 'updatePerson').mockResolvedValue(
+      ok({
+        person_id: 'ticket-1',
+        full_name: 'Bruno',
+        email: 'nuevo@example.com',
+        has_active_pass: true,
+        entered_at: null,
+      }),
+    );
+    const resend = vi.spyOn(DansshipAPI.entry, 'resendEntry').mockResolvedValue(
+      ok({
+        person_id: 'ticket-1',
+        full_name: 'Bruno',
+        email: 'nuevo@example.com',
+        has_active_pass: true,
+        entered_at: null,
+      }),
+    );
+
+    inRouter(<ParticipationPeopleTable eventId='event-1' eventSlug='clausura' />);
+
+    expect(await screen.findByText(/12\/12 \d\d:05/)).toBeVisible();
+    fireEvent.change(screen.getByRole('combobox', { name: 'Filtrar por ingreso' }), { target: { value: 'yes' } });
+    await waitFor(() =>
+      expect(DansshipAPI.participationAdmin.listPeople).toHaveBeenLastCalledWith(
+        'event-1',
+        expect.objectContaining({ entered: true }),
+      ),
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Editar' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText(/el QR y el enlace anteriores dejan de funcionar/)).toBeVisible();
+    fireEvent.change(within(dialog).getByLabelText('Correo'), { target: { value: 'nuevo@example.com' } });
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Reenviar QR' }));
+    await waitFor(() => expect(resend).toHaveBeenCalledWith('ticket-1'));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Guardar' }));
+    await waitFor(() => expect(update).toHaveBeenCalledWith('ticket-1', { email: 'nuevo@example.com' }));
+  });
+
+  it('shows attendance in Resumen once the event issues entry QRs', async () => {
+    vi.spyOn(DansshipAPI.participationAdmin, 'getSummary').mockResolvedValue(
+      ok({
+        capacity: { capacity: 100, held: 2, free: 98 },
+        registrations: [],
+        expected_people: { total: 3, tickets: 2, ticket_minors: 1, performers: 0, members: 0 },
+        revenue: { approved: 0, in_review: 0, total: 0, by_fee: [] },
+        donations: [],
+        attendance: {
+          guests: { entered: 1, expected: 2 },
+          minors: { entered: 0, expected: 1 },
+          artists: { entered: 0, expected: 0 },
+        },
+      }),
+    );
+
+    inRouter(<ParticipationSummaryPanel eventId='event-1' />);
+
+    expect(await screen.findByText('Asistencia')).toBeVisible();
+    expect(screen.getByText('Invitados que ingresaron')).toBeVisible();
+    expect(screen.getByText('de 2 esperados')).toBeVisible();
+  });
+
+  it('voids a guest ticket after confirming, never once it was used', async () => {
+    const ticket = {
+      ...people.rows[0],
+      person_id: 'ticket-2',
+      role: 'ticket' as const,
+      full_name: 'Carla',
+      email: 'carla@example.com',
+      status: 'confirmed' as const,
+      has_entry_pass: true,
+    };
+    vi.spyOn(DansshipAPI.participationAdmin, 'listPeople').mockResolvedValue(ok({ ...people, rows: [ticket] }));
+    const voidEntry = vi.spyOn(DansshipAPI.entry, 'voidEntry').mockResolvedValue(
+      ok({
+        person_id: 'ticket-2',
+        full_name: 'Carla',
+        email: 'carla@example.com',
+        has_active_pass: false,
+        entered_at: null,
+      }),
+    );
+
+    inRouter(<ParticipationPeopleTable eventId='event-1' eventSlug='clausura' />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Editar' }));
+    const dialog = await screen.findByRole('dialog');
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Anular entrada' }));
+    expect(voidEntry).not.toHaveBeenCalled();
+    expect(within(dialog).getByText(/el cupo queda libre/)).toBeVisible();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Sí, anular' }));
+    await waitFor(() => expect(voidEntry).toHaveBeenCalledWith('ticket-2'));
+  });
+
+  it('hides "Anular entrada" for a ticket already used at the door', async () => {
+    const used = {
+      ...people.rows[0],
+      person_id: 'ticket-3',
+      role: 'ticket' as const,
+      status: 'confirmed' as const,
+      entered_at: '2026-12-12T21:05:00Z',
+    };
+    vi.spyOn(DansshipAPI.participationAdmin, 'listPeople').mockResolvedValue(ok({ ...people, rows: [used] }));
+
+    inRouter(<ParticipationPeopleTable eventId='event-1' eventSlug='clausura' />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Editar' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).queryByRole('button', { name: 'Anular entrada' })).toBeNull();
+  });
+
+  it('hides "Reenviar QR" for a ticket without an active pass', async () => {
+    const pending = { ...people.rows[0], person_id: 'ticket-4', role: 'ticket' as const, has_entry_pass: false };
+    vi.spyOn(DansshipAPI.participationAdmin, 'listPeople').mockResolvedValue(ok({ ...people, rows: [pending] }));
+
+    inRouter(<ParticipationPeopleTable eventId='event-1' eventSlug='clausura' />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Editar' }));
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).queryByRole('button', { name: 'Reenviar QR' })).toBeNull();
+  });
+
+  it('sets the entry window in Bogotá time and resets it', async () => {
+    const base = { opens_at: '2026-12-12T17:30:00Z', closes_at: '2026-12-13T01:30:00Z', is_override: false };
+    vi.spyOn(DansshipAPI.entry, 'getEntryWindow').mockResolvedValue(ok(base));
+    const save = vi
+      .spyOn(DansshipAPI.entry, 'setEntryWindow')
+      .mockResolvedValueOnce(
+        ok({ opens_at: '2026-11-21T15:00:00Z', closes_at: '2026-11-21T17:00:00Z', is_override: true }),
+      )
+      .mockResolvedValueOnce(ok(base));
+
+    inRouter(<EntryWindowEditor eventId='event-1' />);
+
+    const opens = await screen.findByLabelText('Abre');
+    await waitFor(() => expect(opens).toHaveValue('2026-12-12T12:30'));
+    fireEvent.change(opens, { target: { value: '2026-11-21T10:00' } });
+    fireEvent.change(screen.getByLabelText('Cierra'), { target: { value: '2026-11-21T12:00' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar ventana' }));
+    await waitFor(() =>
+      expect(save).toHaveBeenCalledWith('event-1', {
+        opens_at: '2026-11-21T10:00:00-05:00',
+        closes_at: '2026-11-21T12:00:00-05:00',
+      }),
+    );
+    fireEvent.click(await screen.findByRole('button', { name: 'Volver a la ventana por defecto' }));
+    await waitFor(() => expect(save).toHaveBeenLastCalledWith('event-1', { opens_at: null, closes_at: null }));
   });
 });

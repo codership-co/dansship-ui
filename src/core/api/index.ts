@@ -32,6 +32,8 @@ export * from './studio-rental/studio-rental.models';
 export * from './subscriptions/subscriptions.models';
 export * from './eventos/eventos.models';
 export * from './eventos/participation.models';
+export * from './eventos/entry.models';
+export * from './eventos/entry.helpers';
 export * from './eventos/participation.helpers';
 export * from './users/users.models';
 export * from './user-context/user-context.models';

@@ -560,7 +560,12 @@
       "committed": "Se comprometieron",
       "received": "Recibidas",
       "committedCount_one": "{{count}} inscripción",
-      "committedCount_other": "{{count}} inscripciones"
+      "committedCount_other": "{{count}} inscripciones",
+      "attendance": "Asistencia",
+      "attendanceGuests": "Invitados que ingresaron",
+      "attendanceMinors": "Menores que ingresaron",
+      "attendanceArtists": "Artistas que ingresaron",
+      "attendanceDetail": "de {{expected}} esperados"
     },
     "people": {
       "typeFilter": "Filtrar por tipo",
@@ -598,7 +603,18 @@
       "hint": "Una fila por persona que entra al evento. Al filtrar por un tipo aparecen sus columnas propias. El CSV respeta los filtros.",
       "reviewProof": "Revisar comprobante",
       "reviewFailed": "No pudimos abrir el pago.",
-      "entersWith": "Entra con {{name}}"
+      "entersWith": "Entra con {{name}}",
+      "entry": "Ingreso",
+      "entered": "{{time}}",
+      "notEntered": "—",
+      "entryFilter": "Filtrar por ingreso",
+      "entryAll": "Todos (ingreso)",
+      "entryYes": "Ya ingresaron",
+      "entryNo": "No han ingresado",
+      "edit": "Editar",
+      "resendQr": "Reenviar QR",
+      "resendDone": "Enviamos un QR nuevo. El anterior ya no funciona.",
+      "resendFailed": "No pudimos reenviar el QR."
     },
     "detail": {
       "notFound": "No encontramos esta inscripción.",
@@ -701,6 +717,36 @@
       "edit": "Editar inscripción",
       "notFound": "No encontramos esta inscripción.",
       "notEditable": "Esta inscripción ya no se puede editar."
+    },
+    "editPerson": {
+      "title": "Editar entrada",
+      "hint": "Si cambias el correo, el QR y el enlace anteriores dejan de funcionar y enviamos uno nuevo. La tarifa no cambia.",
+      "name": "Nombre",
+      "email": "Correo",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "saved": "Entrada actualizada",
+      "failed": "No pudimos guardar los cambios.",
+      "void": "Anular entrada",
+      "voidConfirmTitle": "¿Anular esta entrada?",
+      "voidConfirmHint": "El QR y el enlace dejan de funcionar y el cupo queda libre para otra compra. Los menores que entran con esta persona también se anulan. No se devuelve dinero desde aquí ni se envía correo.",
+      "voidConfirm": "Sí, anular",
+      "voidKeep": "No, mantener",
+      "voided": "Entrada anulada. El cupo quedó libre.",
+      "voidFailed": "No pudimos anular la entrada."
+    },
+    "entryWindow": {
+      "title": "Ventana de ingreso",
+      "hint": "Cuándo se puede validar la entrada en la puerta (hora de Bogotá). Por defecto abre 3 horas antes y cierra 2 horas después del evento. Úsala para el ensayo en un evento de prueba.",
+      "opens": "Abre",
+      "closes": "Cierra",
+      "current": "Ahora: {{opens}} – {{closes}}",
+      "custom": "Personalizada",
+      "default": "Por defecto",
+      "save": "Guardar ventana",
+      "reset": "Volver a la ventana por defecto",
+      "saved": "Ventana de ingreso guardada",
+      "failed": "No pudimos guardar la ventana de ingreso."
     }
   },
   "tickets": {
@@ -730,5 +776,79 @@
     "totalSubtitle_other": "{{count}} entradas · IVA incluido ({{vat}})",
     "repayNotice": "No pudimos aprobar tu comprobante anterior. Paga de nuevo y sube el comprobante para confirmar tus entradas.",
     "terms": "Acepto los <LinkTerms>términos y condiciones</LinkTerms> de las entradas."
+  },
+  "entry": {
+    "qrLabel": "Código QR de tu entrada",
+    "qrFailed": "No pudimos dibujar el código. Recarga la página.",
+    "refreshing": "Tiempo hasta el próximo código",
+    "autoRefresh": "El código se actualiza solo",
+    "instructions": "Muestra este código en la puerta. Cambia cada pocos segundos, así que una captura de pantalla no sirve.",
+    "minors": "Entran contigo: {{names}} (menores, sin QR)",
+    "entered": "Ingreso registrado a las {{time}}",
+    "offlineTitle": "Sin conexión",
+    "offlineHint": "El código no se puede actualizar. En la puerta te buscan por tu nombre o por este correo:",
+    "unavailableTitle": "Entrada no disponible",
+    "loadFailed": "No pudimos cargar tu entrada. Intenta de nuevo.",
+    "backToBookings": "Volver a Mis reservas",
+    "reasons": {
+      "unknown": "Código no reconocido o reemplazado.",
+      "expired": "Código vencido. Pide que lo muestre de nuevo en vivo.",
+      "other_event": "Esta entrada es de otro evento.",
+      "payment_in_review": "Pago en revisión: todavía no puede ingresar.",
+      "registration_in_review": "Inscripción en revisión: todavía no puede ingresar.",
+      "not_holding": "Esta persona ya no tiene cupo.",
+      "not_enterable": "Esta persona no puede ingresar.",
+      "minor_enters_with_adult": "Los menores ingresan con su adulto."
+    },
+    "dateFormat": "EEEE d 'de' MMMM · HH:mm",
+    "staleTitle": "No pudimos actualizar el código",
+    "staleHint": "Revisa tu conexión. Mientras tanto, en la puerta te buscan por tu nombre o por este correo:"
+  },
+  "door": {
+    "nav": "Validar entradas",
+    "title": "Validar entradas",
+    "subtitle": "Eventos con ingreso abierto hoy.",
+    "noEvents": "No hay eventos con ingreso abierto hoy.",
+    "open": "Ingreso abierto",
+    "notOpen": "Abre más tarde",
+    "listCounters": "Invitados {{guests}} · Artistas {{artists}}",
+    "backToEvents": "Volver a eventos",
+    "openUntil": "Ingreso abierto hasta las {{time}}",
+    "opensAt": "El ingreso abre a las {{time}}",
+    "offline": "Sin conexión. No se registra ningún ingreso hasta que vuelva la conexión.",
+    "tabs": {
+      "scan": "Escanear",
+      "search": "Buscar"
+    },
+    "counters": {
+      "guests": "Invitados",
+      "minors": "Menores",
+      "artists": "Artistas"
+    },
+    "camera": "Cámara para escanear entradas",
+    "cameraStarting": "Abriendo la cámara…",
+    "cameraDenied": "No pudimos abrir la cámara (permiso denegado o conexión no segura). Usa Buscar para marcar el ingreso por nombre o correo.",
+    "result": {
+      "valid": "VÁLIDO",
+      "already_used": "YA USADO",
+      "invalid": "INVÁLIDO"
+    },
+    "usedAt": "Ingresó a las {{time}} · validó {{name}}",
+    "next": "Escanear siguiente",
+    "minorsCount_one": "+ {{count}} menor",
+    "minorsCount_other": "+ {{count}} menores",
+    "minorEntered": "{{name}} ingresó a las {{time}}",
+    "enterMinor": "Marcar ingreso de {{name}}",
+    "searchPlaceholder": "Nombre o correo",
+    "searchHint": "Escribe al menos 2 letras.",
+    "searchEmpty": "No encontramos a nadie con ese nombre o correo.",
+    "enteredAt": "Ya ingresó a las {{time}} · {{name}}",
+    "markEntry": "Marcar ingreso",
+    "entryMarked": "Ingreso registrado",
+    "donation": "Donación: {{labels}}",
+    "markDonation": "Donación recibida",
+    "donationReceived": "Donación recibida ✓",
+    "actionFailed": "No se pudo completar. Intenta de nuevo.",
+    "fromEvent": "Validar entradas"
   }
 }

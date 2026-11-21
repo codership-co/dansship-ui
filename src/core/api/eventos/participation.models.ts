@@ -261,6 +261,12 @@ export interface MyParticipationRow {
   purchase_id: string | null;
   payment_intent_id: string | null;
   payment_status: string | null;
+  /** Part 2: the person this row's QR belongs to and its entry state. */
+  person_id: string | null;
+  has_entry_pass: boolean;
+  entered_at: string | null;
+  is_attendee: boolean;
+  issues_entry_qr: boolean;
 }
 
 export interface PeopleFilterChip {
@@ -300,6 +306,9 @@ export interface ParticipationPersonRow {
   amount: string | number | null;
   payment_intent_id: string | null;
   payment_status: string | null;
+  entered_at: string | null;
+  validated_by_name: string | null;
+  has_entry_pass: boolean;
 }
 
 export interface ParticipationPeople {
@@ -313,6 +322,7 @@ export interface ParticipationPeopleQuery {
   participant_type_id?: string | null;
   status?: PeopleStatusGroup | null;
   q?: string | null;
+  entered?: boolean | null;
 }
 
 export interface ParticipationSummary {
@@ -333,6 +343,12 @@ export interface ParticipationSummary {
     by_fee: Array<{ label: string; amount: string | number; count: number; total: string | number }>;
   };
   donations: Array<{ donation_type_id: string; label: string; committed: number; received: number }>;
+  /** Part 2: null while no type of the event issues entry QRs. */
+  attendance: {
+    guests: { entered: number; expected: number };
+    minors: { entered: number; expected: number };
+    artists: { entered: number; expected: number };
+  } | null;
 }
 
 // ── Tickets (Slice B) ─────────────────────────────────────────────────

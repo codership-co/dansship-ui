@@ -29,6 +29,8 @@ function peopleParams(query: ParticipationPeopleQuery): Record<string, string> {
 
   if (query.q?.trim()) params.q = query.q.trim();
 
+  if (query.entered !== undefined && query.entered !== null) params.entered = String(query.entered);
+
   return params;
 }
 
