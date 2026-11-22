@@ -565,7 +565,18 @@
       "attendanceGuests": "Invitados que ingresaron",
       "attendanceMinors": "Menores que ingresaron",
       "attendanceArtists": "Artistas que ingresaron",
-      "attendanceDetail": "de {{expected}} esperados"
+      "attendanceDetail": "de {{expected}} esperados",
+      "closing": "Cierre del evento",
+      "closingTickets": "Entradas aprobadas",
+      "closingTicketsDetail": "+ {{minors}} menores",
+      "closingEntered": "Ingresaron",
+      "closingEnteredDetail": "QR {{scan}} · manual {{manual}} · menores {{minors}}",
+      "closingNoShows": "No usaron su entrada",
+      "closingNoShowsDetail": "de {{count}} entradas aprobadas",
+      "closingArtists": "Artistas que se presentaron",
+      "closingArtistsDetail": "Integrantes: {{present}} de {{approved}}",
+      "byFeeInReview": "Entradas en revisión por tarifa",
+      "closingNotYet": "Aún sin ingresar"
     },
     "people": {
       "typeFilter": "Filtrar por tipo",
@@ -747,6 +758,27 @@
       "reset": "Volver a la ventana por defecto",
       "saved": "Ventana de ingreso guardada",
       "failed": "No pudimos guardar la ventana de ingreso."
+    },
+    "print": {
+      "button": "Imprimir lista",
+      "confidential": "CONFIDENCIAL · contiene datos personales. No dejar a la vista ni botar sin destruir.",
+      "printedAt": "Impreso el {{date}}",
+      "filter": "Lista: {{filter}}",
+      "total_one": "{{count}} persona",
+      "total_other": "{{count}} personas",
+      "entry": "Ingreso",
+      "name": "Nombre",
+      "email": "Correo",
+      "type": "Tipo",
+      "status": "Estado",
+      "group": "Grupo",
+      "leader": "Líder",
+      "donations": "Donaciones",
+      "received": "recibida",
+      "minor": "{{name}} (menor)",
+      "announcement": "Mensaje: {{text}}",
+      "entriesHint": "Marca la casilla al ingresar. Cuando vuelva la señal, registra cada ingreso con Buscar → Marcar ingreso.",
+      "empty": "No hay personas con este filtro."
     }
   },
   "tickets": {

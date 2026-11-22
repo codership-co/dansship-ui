@@ -1,12 +1,14 @@
 import { format } from 'date-fns';
 import { Button } from 'polpo/components';
 import { useEffect, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { LuDownload } from 'react-icons/lu';
+import { LuDownload, LuPrinter } from 'react-icons/lu';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
 
 import { EntryPersonDialog } from './entry-person-dialog';
+import { ParticipationPrintList, PRINT_BODY_CLASS } from './participation-print-list';
 
 import { SpinnerLoader } from '@components/loaders';
 import { AdminPaymentReviewModal } from '@components/modules/admin-payments';
@@ -59,7 +61,19 @@ function roleLabel(row: ParticipationPersonRow, t: (key: string, options?: Recor
 }
 
 /** "Inscritos": every person of the event with type and status filters, search and CSV. */
-export function ParticipationPeopleTable({ eventId, eventSlug }: { eventId: string; eventSlug: string }) {
+interface ParticipationPeopleTableProps {
+  eventId: string;
+  eventSlug: string;
+  eventName?: string;
+  eventStartsAt?: string | null;
+}
+
+export function ParticipationPeopleTable({
+  eventId,
+  eventSlug,
+  eventName = '',
+  eventStartsAt,
+}: ParticipationPeopleTableProps) {
   const { t } = useTranslation();
   const [chip, setChip] = useState<Pick<PeopleFilterChip, 'kind' | 'participant_type_id'>>({
     kind: 'all',
@@ -68,6 +82,7 @@ export function ParticipationPeopleTable({ eventId, eventSlug }: { eventId: stri
   const [status, setStatus] = useState<PeopleStatusGroup | ''>('');
   const [entered, setEntered] = useState<'' | 'yes' | 'no'>('');
   const [editing, setEditing] = useState<ParticipationPersonRow | null>(null);
+  const [printedAt, setPrintedAt] = useState<Date | null>(null);
   const [search, setSearch] = useState('');
   const [query, setQuery] = useState('');
   const [downloading, setDownloading] = useState(false);
@@ -96,6 +111,24 @@ export function ParticipationPeopleTable({ eventId, eventSlug }: { eventId: stri
   const holders = chip.kind === 'holders';
   const members = chip.kind === 'members';
   const tickets = chip.kind === 'tickets';
+
+  /**
+   * Print straight from the click (browsers want a user gesture): flushSync mounts the
+   * print-only list, the body class hides the app chrome, afterprint unmounts it again.
+   */
+  const printList = () => {
+    flushSync(() => setPrintedAt(new Date()));
+    document.body.classList.add(PRINT_BODY_CLASS);
+    window.addEventListener(
+      'afterprint',
+      () => {
+        document.body.classList.remove(PRINT_BODY_CLASS);
+        setPrintedAt(null);
+      },
+      { once: true },
+    );
+    window.print();
+  };
 
   const exportCsv = async () => {
     setDownloading(true);
@@ -145,6 +178,25 @@ export function ParticipationPeopleTable({ eventId, eventSlug }: { eventId: stri
         ? t('eventos:participation.people.members')
         : (item.participant_type_name ?? '');
 
+  const activeChip = data?.filters.find(item => chipKey(item) === chipKey(chip));
+  const statusLabels: Record<PeopleStatusGroup, string> = {
+    review: t('eventos:participation.people.statusReview'),
+    approved: t('eventos:participation.people.statusApproved'),
+    not_approved: t('eventos:participation.people.statusRejected'),
+  };
+  const filterLabel = [
+    activeChip ? chipLabel(activeChip) : t('eventos:participation.people.all'),
+    status ? statusLabels[status] : null,
+    entered === 'yes'
+      ? t('eventos:participation.people.entryYes')
+      : entered === 'no'
+        ? t('eventos:participation.people.entryNo')
+        : null,
+    query ? `“${query}”` : null,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+
   return (
     <div className='grid gap-4'>
       <div className='flex flex-wrap items-center justify-between gap-3'>
@@ -168,16 +220,22 @@ export function ParticipationPeopleTable({ eventId, eventSlug }: { eventId: stri
             );
           })}
         </div>
-        <Button
-          type='button'
-          variant='outlined'
-          color='primary'
-          disabled={downloading}
-          onClick={() => void exportCsv()}
-        >
-          <LuDownload className='size-4' aria-hidden />
-          {t('eventos:participation.people.exportCsv')}
-        </Button>
+        <div className='flex flex-wrap gap-2'>
+          <Button type='button' variant='outlined' color='primary' disabled={!data} onClick={printList}>
+            <LuPrinter className='size-4' aria-hidden />
+            {t('eventos:participation.print.button')}
+          </Button>
+          <Button
+            type='button'
+            variant='outlined'
+            color='primary'
+            disabled={downloading}
+            onClick={() => void exportCsv()}
+          >
+            <LuDownload className='size-4' aria-hidden />
+            {t('eventos:participation.people.exportCsv')}
+          </Button>
+        </div>
       </div>
       <div className='grid gap-2 sm:grid-cols-[minmax(0,1fr)_14rem_14rem]'>
         <Input
@@ -354,6 +412,17 @@ export function ParticipationPeopleTable({ eventId, eventSlug }: { eventId: stri
         </div>
       )}
       <p className='m-0 text-xs text-muted-foreground'>{t('eventos:participation.people.hint')}</p>
+      {data && printedAt ? (
+        <ParticipationPrintList
+          rows={data.rows}
+          columns={data.columns}
+          kind={chip.kind}
+          eventName={eventName}
+          eventStartsAt={eventStartsAt}
+          filterLabel={filterLabel}
+          printedAt={printedAt}
+        />
+      ) : null}
       <EntryPersonDialog
         person={editing}
         onOpenChange={open => {

@@ -57,6 +57,8 @@ const people: ParticipationPeople = {
       entered_at: null,
       validated_by_name: null,
       has_entry_pass: false,
+      attached_to_person_id: null,
+      announcement_copy: null,
     },
   ],
 };
@@ -259,13 +261,14 @@ describe('participant-type admin', () => {
         capacity: { capacity: 100, held: 2, free: 98 },
         registrations: [],
         expected_people: { total: 3, tickets: 2, ticket_minors: 1, performers: 0, members: 0 },
-        revenue: { approved: 0, in_review: 0, total: 0, by_fee: [] },
+        revenue: { approved: 0, in_review: 0, total: 0, by_fee: [], in_review_by_fee: [] },
         donations: [],
         attendance: {
           guests: { entered: 1, expected: 2 },
           minors: { entered: 0, expected: 1 },
           artists: { entered: 0, expected: 0 },
         },
+        closing: null,
       }),
     );
 

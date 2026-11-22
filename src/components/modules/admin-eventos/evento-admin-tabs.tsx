@@ -83,7 +83,12 @@ export function EventoAdminTabs({ event }: { event: EventAdmin }) {
         <ParticipationSummaryPanel eventId={event.id} />
       </TabsContent>
       <TabsContent value='people' forceMount className='data-[state=inactive]:hidden'>
-        <ParticipationPeopleTable eventId={event.id} eventSlug={event.slug} />
+        <ParticipationPeopleTable
+          eventId={event.id}
+          eventSlug={event.slug}
+          eventName={event.name}
+          eventStartsAt={event.starts_at}
+        />
       </TabsContent>
     </Tabs>
   );

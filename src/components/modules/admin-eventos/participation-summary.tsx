@@ -92,11 +92,71 @@ export function ParticipationSummaryPanel({ eventId }: { eventId: string }) {
           </div>
         </div>
       ) : null}
+      {summary.closing ? (
+        <div className='grid gap-2'>
+          <p className='m-0 font-semibold'>{t('eventos:participation.summary.closing')}</p>
+          <div className='grid gap-3 sm:grid-cols-2 lg:grid-cols-4'>
+            <StatCard
+              title={t('eventos:participation.summary.closingTickets')}
+              value={String(summary.closing.tickets_approved)}
+              detail={t('eventos:participation.summary.closingTicketsDetail', {
+                minors: summary.closing.ticket_minors_approved,
+              })}
+            />
+            <StatCard
+              title={t('eventos:participation.summary.closingEntered')}
+              value={String(summary.closing.entered_by_scan + summary.closing.entered_by_manual)}
+              detail={t('eventos:participation.summary.closingEnteredDetail', {
+                scan: summary.closing.entered_by_scan,
+                manual: summary.closing.entered_by_manual,
+                minors: summary.closing.minors_entered,
+              })}
+            />
+            <StatCard
+              title={
+                summary.closing.entry_closed
+                  ? t('eventos:participation.summary.closingNoShows')
+                  : t('eventos:participation.summary.closingNotYet')
+              }
+              value={String(summary.closing.no_show_tickets)}
+              detail={t('eventos:participation.summary.closingNoShowsDetail', {
+                count: summary.closing.tickets_approved,
+              })}
+            />
+            <StatCard
+              title={t('eventos:participation.summary.closingArtists')}
+              value={`${summary.closing.artists_presented} / ${summary.closing.artists_approved}`}
+              detail={t('eventos:participation.summary.closingArtistsDetail', {
+                present: summary.closing.members_presented,
+                approved: summary.closing.members_approved,
+              })}
+            />
+          </div>
+        </div>
+      ) : null}
       {summary.revenue.by_fee.length > 0 ? (
         <Card>
           <CardContent className='grid gap-2 pt-6'>
             <p className='m-0 font-semibold'>{t('eventos:participation.summary.byFee')}</p>
             {summary.revenue.by_fee.map(row => (
+              <div key={`${row.label}-${row.amount}`} className='flex justify-between gap-3 text-sm'>
+                <span>
+                  {t('eventos:participation.summary.feeLine', {
+                    count: row.count,
+                    price: formatPrice(Number(row.amount), 'COP'),
+                  })}
+                </span>
+                <span className='font-semibold'>{formatPrice(Number(row.total), 'COP')}</span>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      ) : null}
+      {summary.revenue.in_review_by_fee.length > 0 ? (
+        <Card>
+          <CardContent className='grid gap-2 pt-6'>
+            <p className='m-0 font-semibold'>{t('eventos:participation.summary.byFeeInReview')}</p>
+            {summary.revenue.in_review_by_fee.map(row => (
               <div key={`${row.label}-${row.amount}`} className='flex justify-between gap-3 text-sm'>
                 <span>
                   {t('eventos:participation.summary.feeLine', {

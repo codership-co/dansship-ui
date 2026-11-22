@@ -309,6 +309,9 @@ export interface ParticipationPersonRow {
   entered_at: string | null;
   validated_by_name: string | null;
   has_entry_pass: boolean;
+  /** Part 3: the adult a minor enters with; for leaders, the text read aloud. */
+  attached_to_person_id: string | null;
+  announcement_copy: string | null;
 }
 
 export interface ParticipationPeople {
@@ -340,7 +343,9 @@ export interface ParticipationSummary {
     approved: string | number;
     in_review: string | number;
     total: string | number;
+    /** Approved tickets only (snapshotted price). */
     by_fee: Array<{ label: string; amount: string | number; count: number; total: string | number }>;
+    in_review_by_fee: Array<{ label: string; amount: string | number; count: number; total: string | number }>;
   };
   donations: Array<{ donation_type_id: string; label: string; committed: number; received: number }>;
   /** Part 2: null while no type of the event issues entry QRs. */
@@ -348,6 +353,21 @@ export interface ParticipationSummary {
     guests: { entered: number; expected: number };
     minors: { entered: number; expected: number };
     artists: { entered: number; expected: number };
+  } | null;
+  /** Part 3: closing numbers, counts only. */
+  closing: {
+    tickets_approved: number;
+    ticket_minors_approved: number;
+    entered_by_scan: number;
+    entered_by_manual: number;
+    minors_entered: number;
+    no_show_tickets: number;
+    artists_approved: number;
+    artists_presented: number;
+    members_approved: number;
+    members_presented: number;
+    /** No-shows are final only once the entry window has closed. */
+    entry_closed: boolean;
   } | null;
 }
 
