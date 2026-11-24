@@ -151,6 +151,8 @@ export const PageURLS = {
     bookings: '/admin/bookings',
     assisted: '/admin/assisted',
     assistedFor: (userId: string | number, tab?: string) => `/admin/assisted?user=${userId}${tab ? `&tab=${tab}` : ''}`,
+    /** "+ Inscribir persona": Atención asistida → Evento with the event preselected. */
+    assistedEvent: (eventId: string) => `/admin/assisted?tab=event&event=${encodeURIComponent(eventId)}`,
     payments: '/admin/payments',
     merch: '/admin/merch',
     merchPos: '/admin/merch/pos',
@@ -190,8 +192,10 @@ export const PageURLS = {
   eventoLanding: (slug: string) => `/eventos/${slug}`,
   eventoRepay: (slug: string, purchaseId: string) => `/eventos/${slug}?repagar=${encodeURIComponent(purchaseId)}`,
   eventoAccess: (token: string) => `/eventos/acceso/${token}`,
-  eventoSignupForm: (slug: string, typeId: string, accessToken?: string | null) =>
-    `/eventos/${slug}/inscripcion/${typeId}${accessToken ? `?acceso=${encodeURIComponent(accessToken)}` : ''}`,
+  /** The admin's "Previsualizar": the landing (a draft too) as the person sees it, nothing is saved or paid. */
+  eventoPreview: (slug: string) => `/eventos/${slug}?preview=1`,
+  eventoSignupForm: (slug: string, typeId: string, preview = false) =>
+    `/eventos/${slug}/inscripcion/${typeId}${preview ? '?preview=1' : ''}`,
   managedEvents: '/eventos/managed',
   managedEvent: (id: string) => `/eventos/managed/${id}`,
   talleres: '/eventos',

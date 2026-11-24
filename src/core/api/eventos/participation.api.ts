@@ -8,6 +8,10 @@ import type {
   MyParticipationRow,
   MySignup,
   ParticipantForm,
+  SignupApplication,
+  SignupApplicationResult,
+  SignupPaymentResult,
+  SignupQuote,
   SignupSubmitPayload,
   TicketLine,
   TicketPurchaseDetail,
@@ -35,16 +39,99 @@ function toTotals(preview: RawPreview): TicketTotals {
   };
 }
 
-/** Signer side of participant types (ADR-064): artist registration and "Mis reservas" rows. */
+type RawSignupResult = Omit<SignupApplicationResult, 'lines' | 'total' | 'amount_to_charge'> & {
+  lines: Array<RawLine>;
+  total: string | number;
+  amount_to_charge: string | number | null;
+};
+
+type RawSignupPayment = Omit<SignupPaymentResult, 'amount_to_charge'> & {
+  amount_to_charge: string | number;
+};
+
+function toSignupPayment(data: RawSignupPayment): SignupPaymentResult {
+  return { ...data, amount_to_charge: toNumber(data.amount_to_charge) };
+}
+
+/** Signer side of participant types (ADR-064, events redesign): one signup flow and "Mis reservas" rows. */
 export class ParticipationAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
-  async getForm(typeId: string, accessToken?: string | null) {
+  /** `preview` is the admin's "Previsualizar": a draft's form too (read only). */
+  async getForm(typeId: string, preview = false) {
     return this.httpClient.callNoError<ParticipantForm>({
-      path: `/events/participant-types/${typeId}/form`,
+      path: preview
+        ? `/admin/events/preview/participant-types/${typeId}/form`
+        : `/events/participant-types/${typeId}/form`,
       method: 'GET',
-      params: accessToken ? { access_token: accessToken } : undefined,
     });
+  }
+
+  /** One quote for any type: lines, total and (paid types) the payment preview. `preview`: the admin's preview. */
+  async quoteSignup(slug: string, payload: SignupApplication, preview = false) {
+    return this.httpClient.callNoError<
+      {
+        charges_money: boolean;
+        lines: Array<RawLine>;
+        total: string | number;
+        preview: RawPreview | null;
+      },
+      SignupApplication,
+      SignupQuote
+    >(
+      {
+        path: preview ? `/admin/events/preview/${slug}/signups/quote` : `/events/by-slug/${slug}/signups/quote`,
+        method: 'POST',
+        data: payload,
+      },
+      data => ({
+        charges_money: data.charges_money,
+        lines: toLines(data.lines),
+        total: toNumber(data.total),
+        totals: data.preview ? toTotals(data.preview) : null,
+      }),
+    );
+  }
+
+  /** One signup for any type; paid types also open the purchase and its payment intent. */
+  async submitSignup(slug: string, payload: SignupApplication) {
+    return this.httpClient.callNoError<RawSignupResult, SignupApplication, SignupApplicationResult>(
+      {
+        path: `/events/by-slug/${slug}/signups`,
+        method: 'POST',
+        data: payload,
+      },
+      data => ({
+        ...data,
+        lines: toLines(data.lines),
+        total: toNumber(data.total),
+        amount_to_charge: data.amount_to_charge === null ? null : toNumber(data.amount_to_charge),
+      }),
+    );
+  }
+
+  /** "Pagar" a "paga después" signup without a plan (the whole amount). */
+  async paySignup(signupId: string, paymentMethodType: string) {
+    return this.httpClient.callNoError<RawSignupPayment, { payment_method_type: string }, SignupPaymentResult>(
+      {
+        path: `/events/signups/${signupId}/pay`,
+        method: 'POST',
+        data: { payment_method_type: paymentMethodType },
+      },
+      toSignupPayment,
+    );
+  }
+
+  /** "Pagar anticipo" / "Pagar siguiente cuota": a transfer for the given installment lines. */
+  async paySignupInstallments(signupId: string, sequences: Array<number>) {
+    return this.httpClient.callNoError<RawSignupPayment, { sequences: Array<number> }, SignupPaymentResult>(
+      {
+        path: `/events/signups/${signupId}/installments/pay`,
+        method: 'POST',
+        data: { sequences },
+      },
+      toSignupPayment,
+    );
   }
 
   async submit(typeId: string, payload: SignupSubmitPayload) {
@@ -84,10 +171,17 @@ export class ParticipationAPI {
       { tickets: Array<RawLine>; preview: RawPreview },
       TicketQuotePayload,
       TicketQuote
-    >({ path: `/events/by-slug/${slug}/tickets/quote`, method: 'POST', data: payload }, data => ({
-      tickets: toLines(data.tickets),
-      totals: toTotals(data.preview),
-    }));
+    >(
+      {
+        path: `/events/by-slug/${slug}/tickets/quote`,
+        method: 'POST',
+        data: payload,
+      },
+      data => ({
+        tickets: toLines(data.tickets),
+        totals: toTotals(data.preview),
+      }),
+    );
   }
 
   async purchaseTickets(slug: string, payload: TicketPurchasePayload) {
@@ -99,17 +193,27 @@ export class ParticipationAPI {
       },
       TicketPurchasePayload,
       TicketPurchaseResult
-    >({ path: `/events/by-slug/${slug}/tickets/purchases`, method: 'POST', data: payload }, data => ({
-      ...data,
-      tickets: toLines(data.tickets),
-      total: toNumber(data.total),
-      amount_to_charge: toNumber(data.amount_to_charge),
-    }));
+    >(
+      {
+        path: `/events/by-slug/${slug}/tickets/purchases`,
+        method: 'POST',
+        data: payload,
+      },
+      data => ({
+        ...data,
+        tickets: toLines(data.tickets),
+        total: toNumber(data.total),
+        amount_to_charge: toNumber(data.amount_to_charge),
+      }),
+    );
   }
 
   async getTicketPurchase(purchaseId: string) {
     return this.httpClient.callNoError<
-      Omit<TicketPurchaseDetail, 'tickets' | 'totals'> & { tickets: Array<RawLine>; preview: RawPreview },
+      Omit<TicketPurchaseDetail, 'tickets' | 'totals'> & {
+        tickets: Array<RawLine>;
+        preview: RawPreview;
+      },
       object,
       TicketPurchaseDetail
     >({ path: `/events/ticket-purchases/${purchaseId}`, method: 'GET' }, ({ preview, tickets, ...data }) => ({

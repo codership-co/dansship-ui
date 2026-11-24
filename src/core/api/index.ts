@@ -35,6 +35,7 @@ export * from './eventos/participation.models';
 export * from './eventos/entry.models';
 export * from './eventos/entry.helpers';
 export * from './eventos/participation.helpers';
+export * from './eventos/participant-type.helpers';
 export * from './users/users.models';
 export * from './user-context/user-context.models';
 export * from './wallets/wallets.models';

@@ -3,6 +3,8 @@ import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 
+import { SignupPayActions } from './signup-pay-actions';
+
 import { SignupStatusBadge } from '@components/modules/event-participation';
 import { canOpenEntry, entryHistoryState, type MyParticipationRow } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -94,7 +96,7 @@ export function ParticipationReservationCard({ row, tone = 'upcoming' }: Partici
               {row.kind === 'signup' ? t('bookings:participation.viewMyEntry') : t('bookings:participation.viewQr')}
             </Button>
           ) : null}
-          {row.kind === 'ticket' && row.repayable && row.purchase_id ? (
+          {row.repayable && row.purchase_id ? (
             <Button
               color='primary'
               variant='solid'
@@ -118,18 +120,19 @@ export function ParticipationReservationCard({ row, tone = 'upcoming' }: Partici
               {t('bookings:viewPayment')}
             </Button>
           ) : null}
-          {row.kind === 'signup' && !row.is_attendee ? (
+          {row.kind === 'signup' && !row.is_attendee && row.signup_id ? (
             <Button
               color='primary'
               variant='outlined'
               size='small'
               type='button'
-              onClick={() => navigate(PageURLS.profile.signup(row.signup_id), { viewTransition: true })}
+              onClick={() => navigate(PageURLS.profile.signup(row.signup_id ?? ''), { viewTransition: true })}
             >
               {t('bookings:participation.viewSignup')}
             </Button>
           ) : null}
         </div>
+        {tone === 'upcoming' && !row.is_attendee ? <SignupPayActions row={row} /> : null}
       </div>
     </article>
   );

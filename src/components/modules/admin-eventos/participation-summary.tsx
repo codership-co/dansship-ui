@@ -75,6 +75,24 @@ export function ParticipationSummaryPanel({ eventId }: { eventId: string }) {
         />
       </div>
       <p className='m-0 text-xs text-muted-foreground'>{t('eventos:participation.summary.capacityHint')}</p>
+      {summary.refunds && (summary.refunds.due_count > 0 || summary.refunds.refunded_count > 0) ? (
+        <div className='grid gap-2'>
+          <p className='m-0 font-semibold'>{t('eventos:participation.summary.refunds')}</p>
+          <div className='grid gap-3 sm:grid-cols-2'>
+            <StatCard
+              title={t('eventos:participation.summary.refundsDue')}
+              value={formatPrice(Number(summary.refunds.due_amount), 'COP')}
+              detail={t('eventos:participation.summary.refundsCount', { count: summary.refunds.due_count })}
+            />
+            <StatCard
+              title={t('eventos:participation.summary.refundsDone')}
+              value={formatPrice(Number(summary.refunds.refunded_amount), 'COP')}
+              detail={t('eventos:participation.summary.refundsCount', { count: summary.refunds.refunded_count })}
+            />
+          </div>
+          <p className='m-0 text-xs text-muted-foreground'>{t('eventos:participation.summary.refundsHint')}</p>
+        </div>
+      ) : null}
       {summary.attendance ? (
         <div className='grid gap-2'>
           <p className='m-0 font-semibold'>{t('eventos:participation.summary.attendance')}</p>

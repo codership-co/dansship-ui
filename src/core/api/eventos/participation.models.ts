@@ -1,7 +1,19 @@
-/** Participant types and signups of an event (ADR-064). Mirrors polership-api participation_schema.py. */
+/** Participant types and signups of an event (ADR-064, events redesign). Mirrors polership-api participation_schema.py. */
 
-export type ParticipantRegistrationMode = 'single' | 'single_or_group' | 'multi_ticket';
-export type ParticipantAccessMode = 'public' | 'link';
+/** "¿Quién se inscribe?": one entry per kind; the UI registries key on these. */
+export type RegistrationOptionKind = 'single' | 'pair' | 'group' | 'multi_ticket' | 'group_booking';
+export type PricingModelKind = 'per_person' | 'package';
+/** Whose account a fee condition is checked on (lowest applicable fee wins). */
+export type ConditionSubject = 'holder' | 'each_person';
+export type DueAnchorKind = 'fixed_date' | 'at_signup' | 'event_day' | 'days_before_event';
+export type PayLaterAnchor = 'after_signup' | 'before_event';
+export type ParticipantNoticeKind =
+  | 'signup_approved'
+  | 'signup_not_approved'
+  | 'group_member_added'
+  | 'entry_pass'
+  | 'pending_payment'
+  | 'installment_reminder';
 export type ParticipantContributionModel = 'free' | 'money' | 'in_kind' | 'money_and_in_kind';
 export type EventFormFieldKind =
   | 'short_text'
@@ -10,7 +22,9 @@ export type EventFormFieldKind =
   | 'choice'
   | 'multi_choice'
   | 'checkbox'
-  | 'people';
+  | 'people'
+  /** A section title (Google Forms style): its `help_text` is the description. */
+  | 'section';
 export type EventSignupStatus =
   | 'in_review'
   | 'approved'
@@ -20,7 +34,7 @@ export type EventSignupStatus =
   | 'payment_rejected'
   | 'expired';
 export type ParticipantTypeState = 'open' | 'closed' | 'sold_out';
-export type PeopleKind = 'all' | 'holders' | 'members' | 'tickets';
+export type PeopleKind = 'all' | 'holders' | 'members' | 'tickets' | 'refund_due';
 export type PeopleStatusGroup = 'review' | 'approved' | 'not_approved';
 
 export interface FieldVisibleWhen {
@@ -41,6 +55,8 @@ export interface ParticipantField {
   kind: EventFormFieldKind;
   required: boolean;
   options: ParticipantFieldOptions;
+  /** Help under the question, or a section's description. */
+  help_text?: string | null;
   visible_when?: FieldVisibleWhen | null;
   admin_editable_copy?: boolean;
   show_in_admin_list?: boolean;
@@ -76,14 +92,85 @@ export interface ParticipantTermsPreview {
   file_url: string;
 }
 
-export interface ParticipantTypeConfig {
+/** One way of signing up. Settings depend on `kind`; `label` is the answer in "¿Cómo te inscribes?". */
+export interface RegistrationOption {
+  kind: RegistrationOptionKind;
+  label?: string | null;
+  min_people?: number | null;
+  max_people?: number | null;
+  max_members?: number | null;
+  members_required?: boolean | null;
+  max_tickets?: number | null;
+}
+
+/** "Cómo se ve". Empty or null = the UI default copy. */
+export interface CardCopy {
+  button_text?: string | null;
+  title?: string | null;
+  text?: string | null;
+  closing_message?: string | null;
+}
+
+export interface ParticipantPackage {
+  id?: string | null;
   name: string;
-  registration_mode: ParticipantRegistrationMode;
-  access_mode: ParticipantAccessMode;
+  base_price: string | number;
+  included_people: number;
+  additional_person_price: string | number;
+}
+
+export interface ConditionDiscount {
+  id?: string | null;
+  label: string;
+  condition_type: string;
+  condition_params?: Record<string, unknown>;
+  percent: string | number;
+}
+
+export interface DueAnchor {
+  anchor: DueAnchorKind;
+  /** `fixed_date`: YYYY-MM-DD (Bogotá). */
+  date?: string | null;
+  /** `days_before_event`: 0–365. */
+  days?: number | null;
+}
+
+export interface PaymentLineAmount {
+  fee_id: string;
+  amount: string | number;
+}
+
+/** One installment: a percent of the total, or an amount per fee. */
+export interface PaymentLine {
+  sequence?: number;
+  percent?: string | number | null;
+  amounts?: Array<PaymentLineAmount>;
+  due: DueAnchor;
+}
+
+/** How long an admin "paga después" enrollment holds its place unpaid; null = until the event starts. */
+export interface PayLaterDeadline {
+  anchor: PayLaterAnchor;
+  days: number;
+}
+
+export interface EmailSettings {
+  /** null = every available notice. */
+  enabled: Array<ParticipantNoticeKind> | null;
+  extra_message: string | null;
+}
+
+/** Body of `PUT /admin/events/{id}/participant-types/{type_id}`. */
+export interface ParticipantTypeUpsert {
+  name: string;
+  registration_options: Array<RegistrationOption>;
+  card_copy: CardCopy;
   requires_account: boolean;
   requires_approval: boolean;
   contribution_model: ParticipantContributionModel;
   counts_toward_capacity: boolean;
+  quota: number | null;
+  condition_subject: ConditionSubject;
   minors_allowed: boolean;
   minor_max_age: number | null;
   minors_per_adult_max: number | null;
@@ -94,20 +181,28 @@ export interface ParticipantTypeConfig {
   is_active: boolean;
   fields: Array<ParticipantField>;
   fees: Array<ParticipantFee>;
+  pricing_model: PricingModelKind;
+  packages: Array<ParticipantPackage>;
+  condition_discounts: Array<ConditionDiscount>;
+  /** Empty = single payment. */
+  payment_plan: Array<PaymentLine>;
+  installment_reminder_days: Array<number> | null;
+  pay_later_deadline: PayLaterDeadline | null;
+  email_settings: EmailSettings | null;
   donation_types: Array<DonationType>;
 }
 
-export interface ParticipantTypeAdmin extends ParticipantTypeConfig {
+export interface ParticipantTypeAdmin extends ParticipantTypeUpsert {
   id: string;
   event_id: string;
   position: number;
-  access_token: string | null;
-  terms: ParticipantTermsVersion | null;
+  /** Notices this configuration can send (what the editor offers). */
+  available_notices: Array<ParticipantNoticeKind>;
   signup_count: number;
   people_count: number;
 }
 
-export type ParticipantTypePreset = 'artists' | 'guests';
+export type ParticipantTypePreset = 'general' | 'artists' | 'guests';
 
 export interface ParticipantMinorsRules {
   allowed: boolean;
@@ -116,21 +211,35 @@ export interface ParticipantMinorsRules {
   price?: string | number | null;
 }
 
+/** A package as the public sees it (never which discount applies). */
+export interface PublicPackage {
+  id: string;
+  name: string;
+  base_price: string | number;
+  included_people: number;
+  additional_person_price: string | number;
+}
+
 export interface LandingParticipantType {
   id: string;
   name: string;
-  registration_mode: ParticipantRegistrationMode;
+  registration_options: Array<RegistrationOption>;
+  card_copy: CardCopy;
   state: ParticipantTypeState;
   closes_at: string | null;
   requires_account: boolean;
+  /** Name and price only, never who qualifies. */
   fees: Array<{ label: string; price: string | number }>;
   minors: ParticipantMinorsRules;
-  terms: ParticipantTermsPreview | null;
+  pricing_model: PricingModelKind;
+  packages: Array<PublicPackage>;
   my_signup_id: string | null;
 }
 
 export interface LandingParticipation {
   types: Array<LandingParticipantType>;
+  /** The event's terms, one PDF for every type; null = no checkbox. */
+  terms: ParticipantTermsPreview | null;
   remaining: number;
   capacity: number;
 }
@@ -157,6 +266,7 @@ export interface ParticipantForm {
   donation_types: Array<{ id: string; label: string }>;
   minors: ParticipantMinorsRules;
   family_minors: Array<FamilyMinorOption>;
+  registration_options: Array<RegistrationOption>;
   terms: ParticipantTermsPreview | null;
   my_signup_id: string | null;
 }
@@ -182,7 +292,9 @@ export interface SignupSubmitPayload {
   donation_type_ids: Array<string>;
   accepted_terms: boolean;
   terms_version_id: string | null;
-  access_token?: string | null;
+  registration_option?: RegistrationOptionKind | null;
+  partner_email?: string | null;
+  tickets?: Array<TicketInputPayload>;
 }
 
 export interface SignupPerson {
@@ -212,6 +324,7 @@ export interface MySignup {
   place_label: string | null;
   participant_type_id: string;
   participant_type_name: string;
+  registration_option?: RegistrationOptionKind;
   status: EventSignupStatus;
   answers: Array<SignupAnswerView>;
   raw_answers: Record<string, SignupAnswerValue>;
@@ -235,6 +348,22 @@ export interface AdminSignupDetail extends MySignup {
   edited_at: string | null;
   terms_version: number | null;
   editable_copy_fields: Array<string>;
+  /** How the current terms were accepted ("admin" = recorded on "+ Inscribir persona"). */
+  terms_acceptance?: SignupTermsAcceptance | null;
+  /** A paid signup not approved keeps its approved payment; the refund happens outside the platform. */
+  approved_amount?: string | number;
+  refund_due?: boolean;
+  refunded_outside_at?: string | null;
+  refunded_outside_by_name?: string | null;
+}
+
+export type TermsSource = 'self' | 'admin';
+
+export interface SignupTermsAcceptance {
+  version: number;
+  accepted_at: string;
+  source: TermsSource;
+  recorded_by_name: string | null;
 }
 
 export interface AdminSignupUpdatePayload {
@@ -242,11 +371,24 @@ export interface AdminSignupUpdatePayload {
   admin_note?: string;
 }
 
+export type InstallmentViewStatus = 'pending' | 'overdue' | 'in_review' | 'paid';
+
+export interface SignupInstallmentView {
+  sequence: number;
+  due_date: string;
+  amount: string | number;
+  status: InstallmentViewStatus;
+}
+
+/** What "Pagar" would open now. */
+export type ParticipationPayAction = 'none' | 'pay' | 'pay_deposit';
+
 export interface MyParticipationRow {
-  kind: 'signup' | 'ticket';
+  /** `registration` = a legacy event (served by `/events/registrations/me` in the UI until the API closes gap G3). */
+  kind: 'signup' | 'ticket' | 'registration';
   repayable: boolean;
   id: string;
-  signup_id: string;
+  signup_id: string | null;
   event_id: string;
   event_name: string;
   event_slug: string;
@@ -267,6 +409,8 @@ export interface MyParticipationRow {
   entered_at: string | null;
   is_attendee: boolean;
   issues_entry_qr: boolean;
+  installments?: Array<SignupInstallmentView>;
+  pay_action?: ParticipationPayAction;
 }
 
 export interface PeopleFilterChip {
@@ -312,6 +456,10 @@ export interface ParticipationPersonRow {
   /** Part 3: the adult a minor enters with; for leaders, the text read aloud. */
   attached_to_person_id: string | null;
   announcement_copy: string | null;
+  /** Not approved with an approved payment, not yet marked as refunded outside the platform. */
+  refund_due?: boolean;
+  refunded_outside?: boolean;
+  terms_source?: TermsSource | null;
 }
 
 export interface ParticipationPeople {
@@ -369,6 +517,15 @@ export interface ParticipationSummary {
     /** No-shows are final only once the entry window has closed. */
     entry_closed: boolean;
   } | null;
+  /** Not-approved paid signups: money to return outside the platform. */
+  refunds?: RefundSummary;
+}
+
+export interface RefundSummary {
+  due_count: number;
+  due_amount: string | number;
+  refunded_count: number;
+  refunded_amount: string | number;
 }
 
 // ── Tickets (Slice B) ─────────────────────────────────────────────────
@@ -384,7 +541,6 @@ export interface TicketInputPayload {
 export interface TicketQuotePayload {
   participant_type_id: string;
   tickets: Array<TicketInputPayload>;
-  access_token?: string | null;
 }
 
 export interface TicketPurchasePayload extends TicketQuotePayload {
@@ -441,4 +597,95 @@ export interface TicketPurchaseDetail {
   payment_status: string | null;
   repayable: boolean;
   terms: ParticipantTermsPreview | null;
+}
+
+// ── One signup flow (any participant type) ────────────────────────────
+
+/** Body of `POST /events/by-slug/{slug}/signups[/quote]`. People come from the chosen option. */
+export interface SignupApplication {
+  participant_type_id: string;
+  registration_option?: RegistrationOptionKind | null;
+  answers: Record<string, SignupAnswerValue>;
+  members: Array<SignupMemberPayload>;
+  tickets: Array<TicketInputPayload>;
+  partner_email?: string | null;
+  package_id?: string | null;
+  people_count?: number | null;
+  donation_type_ids: Array<string>;
+  accepted_terms: boolean;
+  terms_version_id: string | null;
+  /** Required to submit a paid type (not to quote). */
+  payment_method_type?: string | null;
+}
+
+/** Quote of a signup, mapped to numbers. `totals` is null for free types. */
+export interface SignupQuote {
+  charges_money: boolean;
+  lines: Array<TicketLine>;
+  total: number;
+  totals: TicketTotals | null;
+}
+
+export interface SignupApplicationResult {
+  signup_id: string;
+  status: EventSignupStatus;
+  registration_option: RegistrationOptionKind;
+  lines: Array<TicketLine>;
+  total: number;
+  purchase_id: string | null;
+  payment_intent_id: string | null;
+  amount_to_charge: number | null;
+  payment_qr_url: string | null;
+}
+
+/** A payment opened from Mis reservas ("Pagar", "Pagar anticipo", "Pagar siguiente cuota"). */
+export interface SignupPaymentResult {
+  signup_id: string;
+  purchase_id: string;
+  payment_intent_id: string;
+  sequences: Array<number>;
+  amount_to_charge: number;
+  payment_qr_url: string | null;
+}
+
+// ── Admin enrollment ("+ Inscribir persona") ──────────────────────────
+
+export type EnrollmentPayment = 'paid' | 'pay_later';
+
+export interface AdminEnrollmentPayload {
+  participant_type_id: string;
+  user_id: string;
+  registration_option?: RegistrationOptionKind | null;
+  answers?: Record<string, SignupAnswerValue>;
+  members?: Array<SignupMemberPayload>;
+  tickets?: Array<TicketInputPayload>;
+  partner_email?: string | null;
+  package_id?: string | null;
+  people_count?: number | null;
+  donation_type_ids?: Array<string>;
+  /** Paid types only; omitted for free types. */
+  payment?: EnrollmentPayment | null;
+  proof_key?: string | null;
+  idempotency_key?: string | null;
+  /** When the event has a terms PDF; default true. */
+  record_terms_acceptance?: boolean;
+}
+
+/** Total, discount, deposit (lines due now) and balance, mapped to numbers. */
+export interface AdminEnrollmentQuote {
+  charges_money: boolean;
+  total: number;
+  discount_percent: number | null;
+  deposit: number;
+  balance: number;
+  lines: Array<TicketLine>;
+}
+
+export interface AdminEnrollmentResult {
+  signup_id: string;
+  user_id: string | null;
+  status: EventSignupStatus;
+  purchase_id: string | null;
+  payment_intent_id: string | null;
+  pay_by: string | null;
 }

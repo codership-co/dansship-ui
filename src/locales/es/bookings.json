@@ -171,6 +171,17 @@
       "not_used": "No usada",
       "performed": "Te presentaste",
       "approved": "Inscripción aprobada"
+    },
+    "pay": "Pagar",
+    "payDeposit": "Pagar anticipo",
+    "payNextInstallment": "Pagar siguiente cuota",
+    "paymentSent": "Recibimos tu comprobante. Lo revisamos y te avisamos.",
+    "payFailed": "No pudimos abrir el pago.",
+    "installmentStatus": {
+      "pending": "Pendiente",
+      "overdue": "Vencida",
+      "in_review": "En revisión",
+      "paid": "Pagada"
     }
   }
 }

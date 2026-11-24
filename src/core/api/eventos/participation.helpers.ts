@@ -2,10 +2,9 @@ import { DansshipAPIError } from '../dansship.error';
 
 import type {
   EventSignupStatus,
-  LandingParticipation,
+  MyParticipationRow,
   ParticipantField,
   ParticipantTypeAdmin,
-  ParticipantTypeConfig,
   SignupAnswerValue,
 } from './participation.models';
 
@@ -23,6 +22,11 @@ export function bogotaLocalToIso(local: string): string | null {
   const withSeconds = local.length === 16 ? `${local}:00` : local;
 
   return `${withSeconds}${BOGOTA_OFFSET}`;
+}
+
+/** A Bogotá date (YYYY-MM-DD) and clock (HH:MM[:SS]) → ISO instant. */
+export function bogotaDateTimeToIso(date: string, time: string): string {
+  return `${date}T${time.slice(0, 5)}:00${BOGOTA_OFFSET}`;
 }
 
 /** ISO instant → `datetime-local` value as seen in Bogotá. */
@@ -51,53 +55,34 @@ export function bogotaDayLabel(iso: string | null | undefined): string {
     return '';
   }
 
+  // «viernes 27 de noviembre» (Intl writes «viernes, 27 de noviembre»).
   return new Intl.DateTimeFormat('es-CO', {
     timeZone: 'America/Bogota',
     weekday: 'long',
     day: 'numeric',
     month: 'long',
-  }).format(new Date(iso));
+  })
+    .format(new Date(iso))
+    .replace(',', '');
 }
 
-/** The editable part of a type, as the PUT endpoint expects it. */
-export function participantTypeConfig(type: ParticipantTypeAdmin): ParticipantTypeConfig {
-  return {
-    name: type.name,
-    registration_mode: type.registration_mode,
-    access_mode: type.access_mode,
-    requires_account: type.requires_account,
-    requires_approval: type.requires_approval,
-    contribution_model: type.contribution_model,
-    counts_toward_capacity: type.counts_toward_capacity,
-    minors_allowed: type.minors_allowed,
-    minor_max_age: type.minor_max_age,
-    minors_per_adult_max: type.minors_per_adult_max,
-    minors_count_toward_capacity: type.minors_count_toward_capacity,
-    minor_price: type.minor_price,
-    closes_at: type.closes_at,
-    issues_entry_qr: type.issues_entry_qr,
-    is_active: type.is_active,
-    fields: type.fields.map(field => ({ ...field, options: { ...field.options } })),
-    fees: type.fees.map(fee => ({ ...fee })),
-    donation_types: type.donation_types.map(item => ({ ...item })),
-  };
-}
-
-export function chargesMoney(model: ParticipantTypeConfig['contribution_model']): boolean {
-  return model === 'money' || model === 'money_and_in_kind';
-}
-
-export function takesDonations(model: ParticipantTypeConfig['contribution_model']): boolean {
-  return model === 'in_kind' || model === 'money_and_in_kind';
-}
-
-/** Shareable link of a link-only type: the same event page with its token. */
-export function participantAccessLink(origin: string, slug: string, token: string | null): string | null {
-  if (!token) {
-    return null;
+/** «Sábado 12 de diciembre · 3:30 p. m.», in Bogotá: the start of an event (its end may be hidden). */
+export function bogotaStartLabel(iso: string | null | undefined): string {
+  if (!iso) {
+    return '';
   }
 
-  return `${origin}/eventos/${slug}?acceso=${encodeURIComponent(token)}`;
+  const day = bogotaDayLabel(iso);
+  const time = new Intl.DateTimeFormat('es-CO', {
+    timeZone: 'America/Bogota',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  })
+    .format(new Date(iso))
+    .replace(/\u00a0|\u202f/g, ' ');
+
+  return `${day.charAt(0).toUpperCase()}${day.slice(1)} · ${time}`;
 }
 
 /** A field is shown when it has no rule or its source answer matches. */
@@ -148,7 +133,7 @@ export type SignupStatusTone = 'review' | 'approved' | 'rejected';
 export function signupStatusTone(status: EventSignupStatus): SignupStatusTone {
   if (status === 'approved' || status === 'confirmed') return 'approved';
 
-  if (status === 'in_review' || status === 'pending_payment') return 'review';
+  if (status === 'in_review' || status === 'pending_payment' || status === 'payment_rejected') return 'review';
 
   return 'rejected';
 }
@@ -185,12 +170,86 @@ export function participationErrorDetails(error: unknown): { field_key?: string;
     : {};
 }
 
-/** The registration types (artists) and the ticket types the viewer can see on the landing. */
-export function splitLandingTypes(participation: LandingParticipation | null | undefined) {
-  const types = participation?.types ?? [];
+/** Today's date in Bogotá as YYYY-MM-DD. */
+function bogotaToday(now: Date): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota' }).format(now);
+}
 
+/**
+ * Installment lines "Pagar anticipo" / "Pagar siguiente cuota" opens: every unpaid line already due,
+ * and at least the first unpaid one. The row does not say which (API gap G4), so the UI derives it.
+ */
+export function nextPayableSequences(
+  row: Pick<MyParticipationRow, 'installments'>,
+  now: Date = new Date(),
+): Array<number> {
+  const unpaid = (row.installments ?? [])
+    .filter(line => line.status === 'pending' || line.status === 'overdue')
+    .sort((left, right) => left.sequence - right.sequence);
+
+  if (unpaid.length === 0) {
+    return [];
+  }
+
+  const today = bogotaToday(now);
+  const due = unpaid.filter(line => line.status === 'overdue' || line.due_date <= today);
+
+  return (due.length > 0 ? due : unpaid.slice(0, 1)).map(line => line.sequence);
+}
+
+/**
+ * Mis reservas rows of events configured by participant types. Legacy rows (`kind: "registration"`) keep
+ * coming from `/events/registrations/me` until the unified endpoint carries their payment options (gap G3).
+ */
+export function configuredParticipationRows(
+  rows: Array<MyParticipationRow> | null | undefined,
+): Array<MyParticipationRow> {
+  return (rows ?? []).filter(row => row.kind !== 'registration');
+}
+
+const DRAFT_TYPE_PREFIX = 'draft:';
+
+/** A type added in the editor ("+ Agregar tipo de participante") that the API does not know yet. */
+export const isDraftType = (type: Pick<ParticipantTypeAdmin, 'id'>) => type.id.startsWith(DRAFT_TYPE_PREFIX);
+
+/**
+ * A new type that only lives in the editor until "Guardar tipo": one person, full account, no approval,
+ * free, counts toward the capacity, active. The API creates it on save.
+ */
+export function draftParticipantType(eventId: string, name: string, position: number): ParticipantTypeAdmin {
   return {
-    registrations: types.filter(type => type.registration_mode !== 'multi_ticket'),
-    tickets: types.filter(type => type.registration_mode === 'multi_ticket'),
+    id: `${DRAFT_TYPE_PREFIX}${crypto.randomUUID()}`,
+    event_id: eventId,
+    position,
+    name,
+    registration_options: [{ kind: 'single', label: null }],
+    card_copy: { button_text: null, title: null, text: null, closing_message: null },
+    requires_account: true,
+    requires_approval: false,
+    contribution_model: 'free',
+    counts_toward_capacity: true,
+    quota: null,
+    condition_subject: 'holder',
+    minors_allowed: false,
+    minor_max_age: null,
+    minors_per_adult_max: null,
+    minors_count_toward_capacity: false,
+    minor_price: null,
+    closes_at: null,
+    issues_entry_qr: false,
+    is_active: true,
+    fields: [],
+    fees: [],
+    pricing_model: 'per_person',
+    packages: [],
+    condition_discounts: [],
+    payment_plan: [],
+    installment_reminder_days: null,
+    pay_later_deadline: null,
+    email_settings: null,
+    available_notices: [],
+    donation_types: [],
+    signup_count: 0,
+    people_count: 0,
   };
 }

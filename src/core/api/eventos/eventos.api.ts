@@ -36,11 +36,11 @@ export class EventosAPI {
     });
   }
 
-  async getBySlug(slug: string, participantAccess?: string | null) {
+  /** A private event answers 404 unless the viewer may open it. */
+  async getBySlug(slug: string) {
     return this.httpClient.callNoError<EventLanding>({
       path: `/events/by-slug/${slug}`,
       method: 'GET',
-      params: participantAccess ? { participant_access: participantAccess } : undefined,
     });
   }
 

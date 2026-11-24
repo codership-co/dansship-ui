@@ -24,15 +24,18 @@ import {
   TableRow,
   Textarea,
 } from '@components/ui';
-import { answerText, DansshipAPI, participationErrorMessage, type AdminSignupDetail } from '@core/api';
+import { answerText, DansshipAPI, participationErrorMessage, toNumber, type AdminSignupDetail } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { formatDateTime } from '@helpers';
+import { formatDateTime, formatPrice } from '@helpers';
 import { usePromise } from '@hooks';
 
-type Decision = 'approve' | 'reject';
+type Decision = 'approve' | 'reject' | 'refunded' | 'not_refunded';
 
-/** One artist registration for the admin: what she sent, the decision, the read-aloud copy and the note. */
-export function ArtistSignupDetail({ eventId, signupId }: { eventId: string; signupId: string }) {
+/**
+ * One signup of any participant type for the admin: what was sent, the payment, the decision
+ * (paid types are reviewed once paid), the refund outside the platform, the read-aloud copy and the note.
+ */
+export function SignupDetail({ eventId, signupId }: { eventId: string; signupId: string }) {
   const { t } = useTranslation();
   const { response, isLoading } = usePromise(() => DansshipAPI.participationAdmin.getSignup(signupId), true, [
     signupId,
@@ -79,11 +82,13 @@ export function ArtistSignupDetail({ eventId, signupId }: { eventId: string; sig
 
     setBusy(true);
     try {
-      const call =
-        decision === 'approve'
-          ? DansshipAPI.participationAdmin.approve(signupId)
-          : DansshipAPI.participationAdmin.reject(signupId);
-      const { ok, data, error } = await call;
+      const calls = {
+        approve: () => DansshipAPI.participationAdmin.approve(signupId),
+        reject: () => DansshipAPI.participationAdmin.reject(signupId),
+        refunded: () => DansshipAPI.participationAdmin.setRefundedOutside(signupId, true),
+        not_refunded: () => DansshipAPI.participationAdmin.setRefundedOutside(signupId, false),
+      };
+      const { ok, data, error } = await calls[decision]();
 
       if (!ok || !data) {
         toast.error(participationErrorMessage(error, t, 'eventos:participation.detail.decisionFailed'));
@@ -92,11 +97,7 @@ export function ArtistSignupDetail({ eventId, signupId }: { eventId: string; sig
       }
 
       apply(data);
-      toast.success(
-        decision === 'approve'
-          ? t('eventos:participation.detail.approved')
-          : t('eventos:participation.detail.rejected'),
-      );
+      toast.success(t(DECISION_COPY[decision].success));
     } finally {
       setBusy(false);
       setDecision(null);
@@ -137,6 +138,8 @@ export function ArtistSignupDetail({ eventId, signupId }: { eventId: string; sig
   };
 
   const canApprove = detail.status === 'in_review';
+  const approvedAmount = toNumber(detail.approved_amount ?? 0);
+  const showsPayment = approvedAmount > 0 || Boolean(detail.refund_due) || Boolean(detail.refunded_outside_at);
   const canReject = detail.status === 'in_review' || detail.status === 'approved';
   const copyLabel = (key: string) => detail.answers.find(item => item.key === key)?.label ?? key;
 
@@ -296,6 +299,20 @@ export function ArtistSignupDetail({ eventId, signupId }: { eventId: string; sig
             </CardHeader>
             <CardContent className='grid gap-3'>
               <PersonStatusBadge row={detail} />
+              {detail.terms_acceptance ? (
+                <small className='text-xs text-muted-foreground'>
+                  {detail.terms_acceptance.source === 'admin'
+                    ? t('eventos:participation.detail.termsByAdmin', {
+                        version: detail.terms_acceptance.version,
+                        date: formatDateTime(detail.terms_acceptance.accepted_at, 'es'),
+                        name: detail.terms_acceptance.recorded_by_name ?? '',
+                      })
+                    : t('eventos:participation.detail.termsBySelf', {
+                        version: detail.terms_acceptance.version,
+                        date: formatDateTime(detail.terms_acceptance.accepted_at, 'es'),
+                      })}
+                </small>
+              ) : null}
               {detail.reviewed_at ? (
                 <small className='text-xs text-muted-foreground'>
                   {t('eventos:participation.detail.reviewedAt', { date: formatDateTime(detail.reviewed_at, 'es') })}
@@ -323,6 +340,53 @@ export function ArtistSignupDetail({ eventId, signupId }: { eventId: string; sig
               </div>
             </CardContent>
           </Card>
+          {showsPayment ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('eventos:participation.detail.payment')}</CardTitle>
+              </CardHeader>
+              <CardContent className='grid gap-3'>
+                <p className='m-0 text-sm'>
+                  {t('eventos:participation.detail.approvedAmount', { amount: formatPrice(approvedAmount, 'COP') })}
+                </p>
+                {detail.refund_due ? (
+                  <>
+                    <p className='m-0 text-sm text-muted-foreground'>
+                      {t('eventos:participation.detail.refundDueHint')}
+                    </p>
+                    <Button
+                      type='button'
+                      variant='outlined'
+                      color='primary'
+                      disabled={busy}
+                      onClick={() => setDecision('refunded')}
+                    >
+                      {t('eventos:participation.detail.markRefunded')}
+                    </Button>
+                  </>
+                ) : null}
+                {detail.refunded_outside_at ? (
+                  <>
+                    <p className='m-0 text-sm'>
+                      {t('eventos:participation.detail.refundedAt', {
+                        date: formatDateTime(detail.refunded_outside_at, 'es'),
+                        name: detail.refunded_outside_by_name ?? '',
+                      })}
+                    </p>
+                    <Button
+                      type='button'
+                      variant='flat'
+                      color='secondary'
+                      disabled={busy}
+                      onClick={() => setDecision('not_refunded')}
+                    >
+                      {t('eventos:participation.detail.undoRefunded')}
+                    </Button>
+                  </>
+                ) : null}
+              </CardContent>
+            </Card>
+          ) : null}
           <Card>
             <CardContent className='flex items-center justify-between gap-3 pt-6'>
               <span className='grid gap-0.5'>
@@ -348,22 +412,42 @@ export function ArtistSignupDetail({ eventId, signupId }: { eventId: string; sig
         }}
         onConfirm={decide}
         isLoading={busy}
-        title={
-          decision === 'approve'
-            ? t('eventos:participation.detail.approveTitle')
-            : t('eventos:participation.detail.rejectTitle')
-        }
-        description={
-          decision === 'approve'
-            ? t('eventos:participation.detail.approveDescription')
-            : t('eventos:participation.detail.rejectDescription')
-        }
-        confirmLabel={
-          decision === 'approve' ? t('eventos:participation.detail.approve') : t('eventos:participation.detail.reject')
-        }
+        title={decision ? t(DECISION_COPY[decision].title) : ''}
+        description={decision ? t(DECISION_COPY[decision].description) : ''}
+        confirmLabel={decision ? t(DECISION_COPY[decision].confirm) : ''}
         cancelLabel={t('eventos:participation.cancel')}
         confirmVariant={decision === 'reject' ? 'destructive' : 'default'}
       />
     </div>
   );
 }
+
+const DETAIL = 'eventos:participation.detail';
+
+/** Copy of each confirmed admin action on a signup. */
+const DECISION_COPY: Record<Decision, { title: string; description: string; confirm: string; success: string }> = {
+  approve: {
+    title: `${DETAIL}.approveTitle`,
+    description: `${DETAIL}.approveDescription`,
+    confirm: `${DETAIL}.approve`,
+    success: `${DETAIL}.approved`,
+  },
+  reject: {
+    title: `${DETAIL}.rejectTitle`,
+    description: `${DETAIL}.rejectDescription`,
+    confirm: `${DETAIL}.reject`,
+    success: `${DETAIL}.rejected`,
+  },
+  refunded: {
+    title: `${DETAIL}.refundedTitle`,
+    description: `${DETAIL}.refundedDescription`,
+    confirm: `${DETAIL}.markRefunded`,
+    success: `${DETAIL}.refundedSaved`,
+  },
+  not_refunded: {
+    title: `${DETAIL}.undoRefundedTitle`,
+    description: `${DETAIL}.undoRefundedDescription`,
+    confirm: `${DETAIL}.undoRefunded`,
+    success: `${DETAIL}.undoRefundedSaved`,
+  },
+};

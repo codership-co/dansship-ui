@@ -3,7 +3,7 @@ import { useParams } from 'react-router';
 
 import { Section } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
-import { ArtistSignupForm } from '@components/modules/event-participation';
+import { ParticipantSignupForm } from '@components/modules/event-participation';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -38,7 +38,7 @@ function InscripcionEditarPage() {
       <div className='mx-auto max-w-2xl'>
         {signup && form ? (
           signup.editable ? (
-            <ArtistSignupForm form={form} accessToken={null} signup={signup} />
+            <ParticipantSignupForm form={form} signup={signup} />
           ) : (
             <p className='text-muted-foreground'>{t('eventos:participation.mine.notEditable')}</p>
           )

@@ -141,4 +141,63 @@ describe('ParticipationReservationCard', () => {
     expect(screen.getByText(text)).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Ver QR' })).toBeNull();
   });
+
+  it.each([
+    ['pay_deposit', [{ sequence: 1, due_date: '2026-11-20', amount: '532000', status: 'pending' }], 'Pagar anticipo'],
+    [
+      'pay',
+      [
+        { sequence: 1, due_date: '2026-11-20', amount: '532000', status: 'paid' },
+        { sequence: 2, due_date: '2026-12-19', amount: '532000', status: 'pending' },
+      ],
+      'Pagar siguiente cuota',
+    ],
+    ['pay', [], 'Pagar'],
+  ] as const)('offers the "%s" action as "%s"', (payAction, installments, label) => {
+    render(
+      <MemoryRouter>
+        <ParticipationReservationCard
+          row={{ ...row, status: 'pending_payment', pay_action: payAction, installments: [...installments] }}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByRole('button', { name: label })).toBeVisible();
+  });
+
+  it('lists the installments with their status', () => {
+    render(
+      <MemoryRouter>
+        <ParticipationReservationCard
+          row={{
+            ...row,
+            status: 'confirmed',
+            pay_action: 'none',
+            installments: [{ sequence: 1, due_date: '2026-11-20', amount: '532000', status: 'overdue' }],
+          }}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText(/Vencida/)).toBeVisible();
+  });
+
+  it('offers no payment action for a paid signup in review', () => {
+    render(
+      <MemoryRouter>
+        <ParticipationReservationCard
+          row={{
+            ...row,
+            status: 'in_review',
+            purchase_id: 'purchase-1',
+            pay_action: 'none',
+            installments: [{ sequence: 2, due_date: '2026-12-19', amount: '532000', status: 'pending' }],
+          }}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(screen.queryByRole('button', { name: /^Pagar/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Volver a pagar' })).toBeNull();
+  });
 });

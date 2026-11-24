@@ -5,12 +5,12 @@ import {
   bogotaLocalToIso,
   isFieldVisible,
   isoToBogotaLocal,
-  participantAccessLink,
+  configuredParticipationRows,
+  nextPayableSequences,
   signupStatusTone,
-  splitLandingTypes,
 } from './participation.helpers';
 
-import type { LandingParticipation, ParticipantField } from './participation.models';
+import type { MyParticipationRow, ParticipantField } from './participation.models';
 
 const t = (key: string) => key;
 
@@ -44,26 +44,37 @@ describe('participation helpers', () => {
     expect(answerText('', t)).toBe('—');
   });
 
-  it('builds the artists link on the same event page', () => {
-    expect(participantAccessLink('https://dansship.com', 'clausura', 'a b')).toBe(
-      'https://dansship.com/eventos/clausura?acceso=a%20b',
-    );
-    expect(participantAccessLink('https://dansship.com', 'clausura', null)).toBeNull();
-  });
-
-  it('groups statuses by tone and splits landing types', () => {
+  it('groups statuses by tone', () => {
     expect(signupStatusTone('not_approved')).toBe('rejected');
     expect(signupStatusTone('pending_payment')).toBe('review');
-    const participation = {
-      types: [
-        { id: '1', registration_mode: 'single_or_group' },
-        { id: '2', registration_mode: 'multi_ticket' },
+    expect(signupStatusTone('confirmed')).toBe('approved');
+    expect(signupStatusTone('expired')).toBe('rejected');
+  });
+
+  it('pays the deposit lines already due, or the first unpaid one', () => {
+    const row = {
+      installments: [
+        { sequence: 1, due_date: '2026-11-20', amount: '532000', status: 'overdue' },
+        { sequence: 2, due_date: '2026-12-19', amount: '532000', status: 'pending' },
       ],
-    } as LandingParticipation;
+    } as Pick<MyParticipationRow, 'installments'>;
+    const now = new Date('2026-11-23T15:00:00Z');
 
-    const split = splitLandingTypes(participation);
+    expect(nextPayableSequences(row, now)).toEqual([1]);
+    expect(nextPayableSequences({ installments: [{ ...row.installments![1] }] }, now)).toEqual([2]);
+    expect(
+      nextPayableSequences(
+        { installments: [{ ...row.installments![0], status: 'in_review' }, row.installments![1]] },
+        now,
+      ),
+    ).toEqual([2]);
+    expect(nextPayableSequences({ installments: [] }, now)).toEqual([]);
+  });
 
-    expect(split.registrations.map(type => type.id)).toEqual(['1']);
-    expect(split.tickets.map(type => type.id)).toEqual(['2']);
+  it('keeps legacy rows out of the configured Mis reservas rows', () => {
+    const rows = [{ kind: 'signup' }, { kind: 'registration' }, { kind: 'ticket' }] as Array<MyParticipationRow>;
+
+    expect(configuredParticipationRows(rows).map(row => row.kind)).toEqual(['signup', 'ticket']);
+    expect(configuredParticipationRows(null)).toEqual([]);
   });
 });

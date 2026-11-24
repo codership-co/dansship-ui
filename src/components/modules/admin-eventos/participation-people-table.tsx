@@ -3,7 +3,7 @@ import { Button } from 'polpo/components';
 import { useEffect, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { LuDownload, LuPrinter } from 'react-icons/lu';
+import { LuDownload, LuPlus, LuPrinter } from 'react-icons/lu';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
 
@@ -13,6 +13,7 @@ import { ParticipationPrintList, PRINT_BODY_CLASS } from './participation-print-
 import { SpinnerLoader } from '@components/loaders';
 import { AdminPaymentReviewModal } from '@components/modules/admin-payments';
 import { Badge, Input, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
+import { useOrPermissions } from '@contexts';
 import {
   adminCellText,
   DansshipAPI,
@@ -26,6 +27,7 @@ import {
   type PeopleStatusGroup,
 } from '@core/api';
 import { PageURLS } from '@core/constants';
+import { AssistedPermissions } from '@core/permissions';
 import { cn, formatPrice } from '@helpers';
 import { usePromise } from '@hooks';
 
@@ -44,6 +46,25 @@ export function PersonStatusBadge({ row }: { row: Pick<ParticipationPersonRow, '
       {signupStatusLabel(row.status, t, 'admin')}
     </Badge>
   );
+}
+
+/** A not-approved paid signup: its money is returned outside the platform, then marked. */
+export function RefundBadge({ row }: { row: Pick<ParticipationPersonRow, 'refund_due' | 'refunded_outside'> }) {
+  const { t } = useTranslation();
+
+  if (row.refund_due) {
+    return (
+      <Badge variant='outlineWarning' size='small'>
+        {t('eventos:participation.people.refundDue')}
+      </Badge>
+    );
+  }
+
+  return row.refunded_outside ? (
+    <Badge variant='outlineNeutral' size='small'>
+      {t('eventos:participation.people.refundedOutside')}
+    </Badge>
+  ) : null;
 }
 
 function roleLabel(row: ParticipationPersonRow, t: (key: string, options?: Record<string, unknown>) => string) {
@@ -75,6 +96,7 @@ export function ParticipationPeopleTable({
   eventStartsAt,
 }: ParticipationPeopleTableProps) {
   const { t } = useTranslation();
+  const canEnroll = useOrPermissions(AssistedPermissions.eventEnroll);
   const [chip, setChip] = useState<Pick<PeopleFilterChip, 'kind' | 'participant_type_id'>>({
     kind: 'all',
     participant_type_id: null,
@@ -176,7 +198,9 @@ export function ParticipationPeopleTable({
       ? t('eventos:participation.people.all')
       : item.kind === 'members'
         ? t('eventos:participation.people.members')
-        : (item.participant_type_name ?? '');
+        : item.kind === 'refund_due'
+          ? t('eventos:participation.people.refundDue')
+          : (item.participant_type_name ?? '');
 
   const activeChip = data?.filters.find(item => chipKey(item) === chipKey(chip));
   const statusLabels: Record<PeopleStatusGroup, string> = {
@@ -221,6 +245,14 @@ export function ParticipationPeopleTable({
           })}
         </div>
         <div className='flex flex-wrap gap-2'>
+          {canEnroll ? (
+            <Link to={PageURLS.admin.assistedEvent(eventId)} viewTransition>
+              <Button type='button' variant='solid' color='primary'>
+                <LuPlus className='size-4' aria-hidden />
+                {t('eventos:participation.people.enroll')}
+              </Button>
+            </Link>
+          ) : null}
           <Button type='button' variant='outlined' color='primary' disabled={!data} onClick={printList}>
             <LuPrinter className='size-4' aria-hidden />
             {t('eventos:participation.print.button')}
@@ -320,6 +352,11 @@ export function ParticipationPeopleTable({
                           ? t('eventos:participation.people.noEmailAge', { age: row.age })
                           : t('eventos:participation.people.noEmail'))}
                     </p>
+                    {row.terms_source === 'admin' ? (
+                      <p className='m-0 text-xs text-muted-foreground'>
+                        {t('eventos:participation.people.termsByAdmin')}
+                      </p>
+                    ) : null}
                   </TableCell>
                   {holders ? (
                     data.columns.map(column => (
@@ -362,7 +399,10 @@ export function ParticipationPeopleTable({
                     </>
                   ) : null}
                   <TableCell>
-                    <PersonStatusBadge row={row} />
+                    <div className='flex flex-wrap gap-1'>
+                      <PersonStatusBadge row={row} />
+                      <RefundBadge row={row} />
+                    </div>
                   </TableCell>
                   <TableCell className='whitespace-nowrap'>
                     {row.entered_at ? (

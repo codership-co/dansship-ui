@@ -1,4 +1,4 @@
-import type { MySignup, ParticipantForm, ParticipantTypeAdmin } from '@core/api';
+import type { LandingParticipantType, MySignup, ParticipantForm, ParticipantTypeAdmin } from '@core/api';
 
 /** Test data shaped like the Clausura artists type (ADR-064). */
 export const artistForm: ParticipantForm = {
@@ -47,6 +47,10 @@ export const artistForm: ParticipantForm = {
   ],
   minors: { allowed: true, max_age: 18, per_adult_max: null },
   family_minors: [{ user_id: 'minor-1', full_name: 'Lucía Ríos', age: 9 }],
+  registration_options: [
+    { kind: 'single', label: 'Sola' },
+    { kind: 'group', label: 'En grupo', max_members: 30, members_required: true },
+  ],
   terms: { version_id: 'terms-1', version: 1, title: 'Términos', file_url: 'https://cdn.test/terms.pdf' },
   my_signup_id: null,
 };
@@ -80,30 +84,82 @@ export const mySignup: MySignup = {
   submitted_at: '2026-11-20T21:05:00Z',
 };
 
-export const artistTypeAdmin: ParticipantTypeAdmin = {
-  id: 'type-1',
-  event_id: 'event-1',
-  position: 0,
+/** A participant type as the admin API returns it; override what each reference configuration needs. */
+export function typeAdmin(overrides: Partial<ParticipantTypeAdmin> = {}): ParticipantTypeAdmin {
+  return {
+    id: 'type-1',
+    event_id: 'event-1',
+    position: 0,
+    name: 'General',
+    registration_options: [{ kind: 'single', label: null }],
+    card_copy: { button_text: null, title: null, text: null, closing_message: null },
+    requires_account: true,
+    requires_approval: false,
+    contribution_model: 'money',
+    counts_toward_capacity: true,
+    quota: null,
+    condition_subject: 'holder',
+    minors_allowed: false,
+    minor_max_age: null,
+    minors_per_adult_max: null,
+    minors_count_toward_capacity: false,
+    minor_price: null,
+    closes_at: null,
+    issues_entry_qr: false,
+    is_active: true,
+    fields: [],
+    fees: [{ id: 'fee-all', label: 'Público general', condition_type: null, condition_params: {}, price: '75000.00' }],
+    pricing_model: 'per_person',
+    packages: [],
+    condition_discounts: [],
+    payment_plan: [],
+    installment_reminder_days: null,
+    pay_later_deadline: null,
+    email_settings: null,
+    available_notices: ['pending_payment'],
+    donation_types: [],
+    signup_count: 0,
+    people_count: 0,
+    ...overrides,
+  };
+}
+
+export const artistTypeAdmin: ParticipantTypeAdmin = typeAdmin({
   name: 'Artistas',
-  registration_mode: 'single_or_group',
-  access_mode: 'link',
-  access_token: 'tok-123',
-  requires_account: true,
+  registration_options: [
+    { kind: 'single', label: 'Sola' },
+    { kind: 'group', label: 'En grupo', max_members: 30, members_required: true },
+  ],
   requires_approval: true,
   contribution_model: 'in_kind',
   counts_toward_capacity: false,
   minors_allowed: true,
   minor_max_age: 18,
-  minors_per_adult_max: null,
-  minors_count_toward_capacity: false,
-  minor_price: null,
   closes_at: '2026-11-28T04:59:00Z',
   issues_entry_qr: true,
-  is_active: true,
   fields: artistForm.fields,
   fees: [],
   donation_types: [{ id: 'don-1', label: 'Juguetes para niños' }],
-  terms: null,
+  available_notices: ['signup_approved', 'signup_not_approved', 'group_member_added', 'entry_pass'],
   signup_count: 3,
   people_count: 3,
-};
+});
+
+/** A type as the event page lists it. */
+export function landingType(overrides: Partial<LandingParticipantType> = {}): LandingParticipantType {
+  return {
+    id: 'type-1',
+    name: 'Artistas',
+    registration_options: [{ kind: 'single', label: null }],
+    card_copy: { button_text: null, title: null, text: null, closing_message: null },
+    state: 'open',
+    closes_at: null,
+    requires_account: true,
+    fees: [],
+    minors: { allowed: false, max_age: null, per_adult_max: null, price: null },
+    pricing_model: 'per_person',
+    packages: [],
+    my_signup_id: null,
+    ...overrides,
+  };
+}

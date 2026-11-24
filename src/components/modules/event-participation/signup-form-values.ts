@@ -1,7 +1,14 @@
+import { emptyTicket, ticketPayload, type TicketDraft } from './tickets';
+
+import { answerErrorPath, emptyAnswer, isAnswerEmpty, isAnswerItem } from '@components/modules/dynamic-form/form-items';
+
 import type {
   MySignup,
   ParticipantField,
+  RegistrationOption,
+  RegistrationOptionKind,
   SignupAnswerValue,
+  SignupApplication,
   SignupMemberPayload,
   SignupSubmitPayload,
 } from '@core/api';
@@ -15,40 +22,45 @@ export interface MemberDraft {
 }
 
 export interface SignupFormValues {
+  /** "¿Cómo te inscribes?": the chosen option; the people inputs come from it. */
+  registration_option: RegistrationOptionKind | '';
   answers: Record<string, SignupAnswerValue>;
   members: Array<MemberDraft>;
+  tickets: Array<TicketDraft>;
+  partner_email: string;
+  package_id: string;
+  people_count: string;
   donation_type_ids: Array<string>;
   accepted_terms: boolean;
 }
 
 type Translate = (key: string, options?: Record<string, unknown>) => string;
 
-export function emptyAnswer(field: ParticipantField): SignupAnswerValue {
-  if (field.kind === 'checkbox') return false;
-
-  if (field.kind === 'multi_choice') return [];
-
-  if (field.kind === 'link') return { url: '', note: '' };
-
-  return '';
-}
-
-export function initialSignupValues(fields: Array<ParticipantField>, signup?: MySignup | null): SignupFormValues {
+export function initialSignupValues(
+  fields: Array<ParticipantField>,
+  signup?: MySignup | null,
+  options: Array<RegistrationOption> = [],
+): SignupFormValues {
   const answers: Record<string, SignupAnswerValue> = {};
 
   fields.forEach(field => {
-    if (field.kind === 'people') return;
+    if (!isAnswerItem(field)) return;
 
     const saved = signup?.raw_answers[field.key];
 
     answers[field.key] =
       field.kind === 'link' && saved && typeof saved === 'object' && !Array.isArray(saved)
         ? { url: saved.url ?? '', note: saved.note ?? '' }
-        : (saved ?? emptyAnswer(field));
+        : (saved ?? (emptyAnswer(field) as SignupAnswerValue));
   });
 
   return {
+    registration_option: signup?.registration_option ?? (options.length === 1 ? options[0].kind : ''),
     answers,
+    tickets: [emptyTicket()],
+    partner_email: '',
+    package_id: '',
+    people_count: '',
     members: (signup?.members ?? []).map(member => ({
       full_name: member.full_name,
       is_minor: member.is_minor,
@@ -61,37 +73,22 @@ export function initialSignupValues(fields: Array<ParticipantField>, signup?: My
   };
 }
 
-function isEmpty(field: ParticipantField, value: SignupAnswerValue): boolean {
-  if (value === null || value === undefined) return true;
-
-  if (field.kind === 'checkbox') return value !== true;
-
-  if (Array.isArray(value)) return value.length === 0;
-
-  if (typeof value === 'object') return !value.url?.trim();
-
-  return typeof value === 'string' && !value.trim();
-}
+const isEmpty = (field: ParticipantField, value: SignupAnswerValue) => isAnswerEmpty(field, value);
 
 /** Client-side checks that mirror the server (which stays the source of truth). Keys are form paths. */
 export function validateSignup(
   values: SignupFormValues,
   visibleFields: Array<ParticipantField>,
   t: Translate,
+  option?: RegistrationOption | null,
 ): Record<string, string> {
   const errors: Record<string, string> = {};
 
   visibleFields.forEach(field => {
-    if (field.kind === 'people') {
-      if (field.required && values.members.length === 0) {
-        errors.members = t('eventos:participation.form.membersRequired');
-      }
-
-      return;
-    }
+    if (!isAnswerItem(field)) return;
 
     const value = values.answers[field.key];
-    const path = field.kind === 'link' ? `answers.${field.key}.url` : `answers.${field.key}`;
+    const path = answerErrorPath('answers', field);
 
     if (field.required && isEmpty(field, value)) {
       errors[path] = t('validation:required');
@@ -106,7 +103,19 @@ export function validateSignup(
     }
   });
 
-  values.members.forEach((member, index) => {
+  if (values.registration_option === 'group' && option?.members_required !== false && values.members.length === 0) {
+    errors.members = t('eventos:participation.form.membersRequired');
+  }
+
+  if (values.registration_option === 'pair' && !values.partner_email.includes('@')) {
+    errors.partner_email = t('eventos:participation.form.emailInvalid');
+  }
+
+  if (values.registration_option === 'group_booking' && !(Number(values.people_count) > 0)) {
+    errors.people_count = t('validation:required');
+  }
+
+  (values.registration_option === 'group' ? values.members : []).forEach((member, index) => {
     if (!member.full_name.trim()) {
       errors[`members.${index}.full_name`] = t('validation:required');
     }
@@ -125,13 +134,14 @@ export function validateSignup(
 export function toSignupPayload(
   values: SignupFormValues,
   visibleFields: Array<ParticipantField>,
-  extra: { termsVersionId: string | null; accessToken: string | null },
+  extra: { termsVersionId: string | null },
 ): SignupSubmitPayload {
   const answers: Record<string, SignupAnswerValue> = {};
-  const showsMembers = visibleFields.some(field => field.kind === 'people');
+  // Members come from the chosen option ("En grupo"), not from a form field.
+  const showsMembers = values.registration_option === 'group';
 
   visibleFields.forEach(field => {
-    if (field.kind === 'people') return;
+    if (!isAnswerItem(field)) return;
 
     const value = values.answers[field.key];
 
@@ -169,6 +179,30 @@ export function toSignupPayload(
     donation_type_ids: values.donation_type_ids,
     accepted_terms: values.accepted_terms,
     terms_version_id: extra.termsVersionId,
-    access_token: extra.accessToken,
+    ...(values.registration_option ? { registration_option: values.registration_option } : {}),
+  };
+}
+
+/** The one signup body (`POST /events/by-slug/{slug}/signups[/quote]`): people come from the chosen option. */
+export function toSignupApplication(
+  values: SignupFormValues,
+  visibleFields: Array<ParticipantField>,
+  extra: { participantTypeId: string; termsVersionId: string | null },
+): SignupApplication {
+  const base = toSignupPayload(values, visibleFields, { termsVersionId: extra.termsVersionId });
+  const option = values.registration_option;
+
+  return {
+    participant_type_id: extra.participantTypeId,
+    registration_option: option || null,
+    answers: base.answers,
+    members: base.members,
+    tickets: option === 'multi_ticket' ? ticketPayload(values.tickets) : [],
+    partner_email: option === 'pair' ? values.partner_email.trim() : null,
+    package_id: values.package_id || null,
+    people_count: option === 'group_booking' && values.people_count ? Number(values.people_count) : null,
+    donation_type_ids: base.donation_type_ids,
+    accepted_terms: base.accepted_terms,
+    terms_version_id: base.terms_version_id,
   };
 }

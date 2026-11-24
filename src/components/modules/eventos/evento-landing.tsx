@@ -7,19 +7,20 @@ import { toast } from 'sonner';
 
 import { EventoCheckoutModal } from './evento-checkout-modal';
 import { landingHasInstallmentAmounts, paymentNotice } from './installment-notice';
+import { PreviewBanner } from './preview-banner';
 import { sessionSummaryText } from './session-summary';
+import { SignupCheckoutModal } from './signup-checkout-modal';
 import { SimpleRegistrationDialog, type SimpleRegistrationOutcome } from './simple-registration-dialog';
-import { TicketCheckoutModal } from './ticket-checkout-modal';
 
 import { SpinnerLoader } from '@components/loaders';
-import { ArtistSignupCard } from '@components/modules/event-participation';
+import { ParticipantTypeCard } from '@components/modules/event-participation';
 import { Badge } from '@components/ui';
 import { useAuth, useOrPermissions } from '@contexts';
 import {
   DansshipAPI,
   DansshipAPIError,
-  splitLandingTypes,
   type EventLanding,
+  type LandingParticipantType,
   type LandingPriceRow,
   type SimplePersonInput,
 } from '@core/api';
@@ -90,7 +91,7 @@ function EventDetails({ landing, showInstructor }: { landing: EventLanding; show
         </div>
         <div className='min-w-0'>
           <dt className='text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground'>
-            {t('eventos:landing.room')}
+            {landing.room_name ? t('eventos:landing.room') : t('eventos:landing.place')}
           </dt>
           <dd className='m-0 text-sm font-semibold leading-snug'>{landing.room_name || landing.external_location}</dd>
         </div>
@@ -169,15 +170,13 @@ export function EventoLanding({
   slug,
   preview,
   accessToken,
-  participantAccess = null,
   repayPurchaseId = null,
 }: {
   slug: string;
   preview: boolean;
+  /** Legacy link-only events (`/eventos/acceso/:token`). */
   accessToken?: string;
-  /** Token of a link-only participant type (the artists' link), ADR-064. */
-  participantAccess?: string | null;
-  /** "Volver a pagar" from Mis reservas: opens the payment step of that ticket purchase. */
+  /** "Volver a pagar" from Mis reservas: opens the payment step of that purchase. */
   repayPurchaseId?: string | null;
 }) {
   const { t } = useTranslation();
@@ -188,6 +187,7 @@ export function EventoLanding({
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [simpleOpen, setSimpleOpen] = useState(false);
   const [repayOpen, setRepayOpen] = useState(Boolean(repayPurchaseId));
+  const [pendingTypeId, setPendingTypeId] = useState<string | null>(null);
   const useAdminPreview = preview && canPreview;
   const canFetch = Boolean(accessToken || slug) && (!preview || (ready && canPreview));
 
@@ -197,9 +197,9 @@ export function EventoLanding({
         ? DansshipAPI.eventos.getByAccessToken(accessToken)
         : useAdminPreview
           ? DansshipAPI.eventosAdmin.preview(slug)
-          : DansshipAPI.eventos.getBySlug(slug, participantAccess),
+          : DansshipAPI.eventos.getBySlug(slug),
     canFetch,
-    [slug, preview, useAdminPreview, isAuthenticated, accessToken, participantAccess],
+    [slug, preview, useAdminPreview, isAuthenticated, accessToken],
   );
   const landing = response?.ok ? response.data : undefined;
   const requestFailed = Boolean(error) || Boolean(response && !response.ok && response.status !== 404);
@@ -269,7 +269,12 @@ export function EventoLanding({
 
     if (ok) {
       await startSession();
-      setCheckoutOpen(true);
+
+      if (pendingTypeId) {
+        navigate(PageURLS.eventoSignupForm(landing.slug, pendingTypeId), { viewTransition: true });
+      } else {
+        setCheckoutOpen(true);
+      }
 
       return 'created';
     }
@@ -285,33 +290,22 @@ export function EventoLanding({
     return 'failed';
   };
 
-  // ADR-064: a Muestra shows its participant types instead of the single-purchase flow.
+  // Events configured by participant types show one card per active type; the label never decides it.
   const participation = landing.participation ?? null;
-  const { registrations, tickets } = splitLandingTypes(participation);
-  const ticketType = tickets[0] ?? null;
-  const priceRows: Array<LandingPriceRow> = participation
-    ? ticketType
-      ? [
-          ...ticketType.fees.map(fee => ({ label: fee.label, price: fee.price })),
-          ...(ticketType.minors.allowed && ticketType.minors.max_age
-            ? [
-                {
-                  label: t('eventos:participation.landing.minorsRow', { age: ticketType.minors.max_age }),
-                  price: ticketType.minors.price ?? 0,
-                },
-              ]
-            : []),
-        ]
-      : []
-    : landing.price_rows;
-  const startTicketCheckout = () => {
-    if (!isAuthenticated) {
-      goToLogin();
+  const offersSimpleRegistration =
+    landing.simple_registration_enabled || Boolean(participation?.types.some(type => !type.requires_account));
+  const priceRows: Array<LandingPriceRow> = participation ? [] : landing.price_rows;
+
+  /** A type's button: simple registration when it allows it, otherwise the signup page (which asks to sign in). */
+  const startType = (type: LandingParticipantType) => {
+    if (!isAuthenticated && !type.requires_account) {
+      setPendingTypeId(type.id);
+      setSimpleOpen(true);
 
       return;
     }
 
-    setCheckoutOpen(true);
+    navigate(PageURLS.eventoSignupForm(landing.slug, type.id, useAdminPreview), { viewTransition: true });
   };
   const ctaDisabled = landing.sold_out || landing.already_registered;
   const ctaLabel = landing.already_registered
@@ -331,7 +325,8 @@ export function EventoLanding({
 
   return (
     <div className='mx-auto grid max-w-xl gap-5 pb-8 lg:max-w-3xl'>
-      <LandingHero landing={landing} showCapacity={!participation || Boolean(ticketType)} />
+      {useAdminPreview ? <PreviewBanner /> : null}
+      <LandingHero landing={landing} showCapacity />
       {landing.kind === 'event' ? (
         <EventDetails landing={landing} showInstructor={!participation} />
       ) : (
@@ -362,8 +357,8 @@ export function EventoLanding({
           ))}
         </div>
       )}
-      {registrations.map(type => (
-        <ArtistSignupCard key={type.id} slug={landing.slug} type={type} accessToken={participantAccess} />
+      {participation?.types.map(type => (
+        <ParticipantTypeCard key={type.id} type={type} onStart={startType} />
       ))}
       {priceRows.length > 0 ? <PriceBlock landing={landing} rows={priceRows} /> : null}
       {notice ? (
@@ -372,35 +367,14 @@ export function EventoLanding({
           <p className='m-0 text-xs font-medium leading-relaxed'>{notice}</p>
         </div>
       ) : null}
-      {participation ? (
-        ticketType ? (
-          <div className='flex flex-wrap items-center justify-end gap-3'>
-            {ticketType.state === 'closed' ? (
-              <Badge variant='outlineNeutral'>{t('eventos:tickets.salesClosed')}</Badge>
-            ) : null}
-            <Button
-              type='button'
-              color='primary'
-              variant='solid'
-              disabled={ticketType.state !== 'open'}
-              onClick={startTicketCheckout}
-            >
-              {ticketType.state === 'closed'
-                ? t('eventos:tickets.salesClosed')
-                : ticketType.state === 'sold_out'
-                  ? t('eventos:landing.ctaSoldOut')
-                  : t('eventos:tickets.cta')}
-            </Button>
-          </div>
-        ) : null
-      ) : (
+      {participation ? null : (
         <div className='flex justify-end'>
           <Button type='button' color='primary' variant='solid' disabled={ctaDisabled} onClick={startCheckout}>
             {ctaLabel}
           </Button>
         </div>
       )}
-      {landing.simple_registration_enabled ? (
+      {offersSimpleRegistration ? (
         <SimpleRegistrationDialog
           open={simpleOpen}
           onOpenChange={setSimpleOpen}
@@ -433,18 +407,12 @@ export function EventoLanding({
         />
       ) : null}
       {participation ? (
-        ticketType ? (
-          <TicketCheckoutModal
-            landing={landing}
-            ticketType={ticketType}
-            isOpen={(checkoutOpen && ticketType.state === 'open') || (repayOpen && isAuthenticated)}
-            repayPurchaseId={repayOpen ? repayPurchaseId : null}
-            onClose={() => {
-              setCheckoutOpen(false);
-              setRepayOpen(false);
-            }}
-          />
-        ) : null
+        <SignupCheckoutModal
+          landing={landing}
+          isOpen={repayOpen && isAuthenticated && Boolean(repayPurchaseId)}
+          repayPurchaseId={repayPurchaseId}
+          onClose={() => setRepayOpen(false)}
+        />
       ) : (
         <EventoCheckoutModal
           landing={landing}

@@ -1,0 +1,59 @@
+{
+  "kinds": {
+    "short_text": "Texto corto",
+    "long_text": "Texto largo",
+    "link": "Enlace",
+    "choice": "Lista",
+    "multi_choice": "Selección múltiple",
+    "checkbox": "Casilla",
+    "people": "Personas",
+    "section": "Sección"
+  },
+  "answer": {
+    "choicePlaceholder": "Elige una opción",
+    "maxLengthHint": "Máximo {{max}} caracteres.",
+    "counter": "{{count}} / {{max}}",
+    "linkNote": "¿Algo que debamos saber? (opcional)"
+  },
+  "builder": {
+    "addQuestion": "Agregar pregunta",
+    "addSection": "Agregar sección",
+    "section": "Sección",
+    "edit": "Editar",
+    "remove": "Quitar {{label}}",
+    "moveUp": "Subir {{label}}",
+    "moveDown": "Bajar {{label}}",
+    "required": "Obligatorio",
+    "requiredFor": "Obligatorio: {{label}}",
+    "visibleWhenHint": "solo si es {{value}}",
+    "sectionsHint": "Agrupa las preguntas en secciones, como en Google Forms: cada sección tiene un título y, si quieres, una descripción. Las preguntas que van después de una sección le pertenecen."
+  },
+  "dialog": {
+    "addQuestion": "Agregar pregunta",
+    "editQuestion": "Editar pregunta",
+    "questionHint": "Así se pregunta en el formulario.",
+    "addSection": "Agregar sección",
+    "editSection": "Editar sección",
+    "sectionHint": "Una sección agrupa las preguntas que van después de ella.",
+    "label": "Pregunta",
+    "sectionTitle": "Título de la sección",
+    "kind": "Tipo de pregunta",
+    "helpText": "Texto de ayuda (opcional)",
+    "helpTextHint": "Se muestra debajo de la pregunta.",
+    "sectionDescription": "Descripción (opcional)",
+    "choices": "Opciones",
+    "choicesHint": "Una opción por línea.",
+    "maxLength": "Máximo de caracteres",
+    "withNote": "Pedir también una nota",
+    "required": "Obligatorio",
+    "showInList": "Mostrar como columna en el listado",
+    "adminCopy": "El equipo edita una copia",
+    "adminCopyHint": "Por ejemplo el mensaje que se lee antes de la presentación; la persona conserva su texto original.",
+    "visibleWhen": "Mostrar solo si",
+    "visibleValue": "Valor que lo muestra",
+    "alwaysVisible": "Siempre",
+    "chooseValue": "Elige una opción",
+    "cancel": "Cancelar",
+    "apply": "Aplicar"
+  }
+}

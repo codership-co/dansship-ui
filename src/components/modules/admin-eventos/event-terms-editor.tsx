@@ -6,76 +6,55 @@ import { toast } from 'sonner';
 import { OptionalFileUpload } from '@components/forms/optional-file-upload';
 import { WindowTermsHistoryDialog } from '@components/modules/admin-benefit-windows/window-terms-history-dialog';
 import { Badge } from '@components/ui';
-import { DansshipAPI, participationErrorMessage, type ParticipantTermsVersion } from '@core/api';
+import { participationErrorMessage } from '@core/api';
 import { formatDateTime } from '@helpers';
+import { useEventTerms } from '@hooks';
 
 const ACCEPTED_TYPES = ['application/pdf'];
 
-interface ParticipantTermsEditorProps {
+interface EventTermsEditorProps {
   eventId: string;
-  typeId: string;
-  typeName: string;
-  current: ParticipantTermsVersion | null;
-  onSaved: (version: ParticipantTermsVersion) => void;
+  eventName: string;
 }
 
 /**
- * Terms PDF of one participant type. Same pattern as the Black Friday promotion terms:
- * every save creates a new version, earlier versions stay readable, the server audits it.
+ * Terms PDF of the event: one document for every participant type. Every save is a new version
+ * (earlier ones stay readable); with no PDF, the signup asks no checkbox.
  */
-export function ParticipantTermsEditor({ eventId, typeId, typeName, current, onSaved }: ParticipantTermsEditorProps) {
+export function EventTermsEditor({ eventId, eventName }: EventTermsEditorProps) {
   const { t } = useTranslation();
+  const { versions, current, hasTerms, isSaving, saveTerms } = useEventTerms(eventId);
   const [file, setFile] = useState<File | null>(null);
-  const [isSaving, setSaving] = useState(false);
   const [isHistoryOpen, setHistoryOpen] = useState(false);
 
   const save = async (nextFile: File | null) => {
-    setSaving(true);
-    try {
-      const fileKey = nextFile ? await DansshipAPI.participationAdmin.uploadTermsPdf(eventId, typeId, nextFile) : null;
+    const result = await saveTerms(t('eventos:participation.terms.documentTitle', { name: eventName }), nextFile);
 
-      if (nextFile && !fileKey) {
-        toast.error(t('eventos:participation.terms.uploadFailed'));
+    if (!result.ok) {
+      toast.error(participationErrorMessage(result.error, t, 'eventos:participation.terms.saveFailed'));
 
-        return;
-      }
-
-      const { ok, data, error } = await DansshipAPI.participationAdmin.saveTerms(eventId, typeId, {
-        title: t('eventos:participation.terms.documentTitle', { name: typeName }),
-        file_key: fileKey,
-      });
-
-      if (!ok || !data) {
-        toast.error(participationErrorMessage(error, t, 'eventos:participation.terms.saveFailed'));
-
-        return;
-      }
-
-      setFile(null);
-      onSaved(data);
-      toast.success(t('eventos:participation.terms.saved', { version: data.version }));
-    } finally {
-      setSaving(false);
+      return;
     }
-  };
 
-  const loadVersions = async () => {
-    const { data } = await DansshipAPI.participationAdmin.listTerms(eventId, typeId);
-
-    return (data ?? []).map(version => ({ ...version, created_by_name: version.created_by_name ?? null }));
+    setFile(null);
+    toast.success(t('eventos:participation.terms.savedGeneric'));
   };
 
   return (
     <div className='grid gap-3'>
-      <div className='flex flex-wrap items-center justify-between gap-2'>
-        <p className='m-0 text-sm text-muted-foreground'>{t('eventos:participation.terms.hint')}</p>
+      <div className='flex flex-wrap items-center gap-2'>
         <Badge variant='outlineNeutral' size='small'>
-          {current?.file_url
+          {hasTerms && current
             ? t('eventos:participation.terms.version', { version: current.version })
             : t('eventos:participation.terms.none')}
         </Badge>
+        {hasTerms && current ? (
+          <small className='text-xs text-muted-foreground'>
+            {t('eventos:participation.terms.uploadedOn', { date: formatDateTime(current.created_at, 'es') })}
+          </small>
+        ) : null}
       </div>
-      {current?.file_url ? (
+      {hasTerms && current?.file_url ? (
         <a
           href={current.file_url}
           target='_blank'
@@ -90,32 +69,25 @@ export function ParticipantTermsEditor({ eventId, typeId, typeName, current, onS
         acceptedTypes={ACCEPTED_TYPES}
         showPreview={false}
         isUploading={isSaving}
-        label={t('eventos:participation.terms.chooseFile')}
+        label={
+          hasTerms ? t('eventos:participation.terms.chooseNewVersion') : t('eventos:participation.terms.chooseFile')
+        }
         helperText={t('eventos:participation.terms.fileHint')}
         invalidTypeMessage={t('eventos:participation.terms.invalidType')}
         onChange={nextFile => setFile(nextFile)}
       />
-      {current ? (
-        <small className='text-xs text-muted-foreground'>
-          {t('eventos:participation.terms.savedHint', {
-            version: current.version,
-            next: current.version + 1,
-            date: formatDateTime(current.created_at, 'es'),
-          })}
-        </small>
-      ) : null}
       <div className='flex flex-wrap items-center justify-between gap-2'>
         <div className='flex flex-wrap gap-2'>
           <Button
             type='button'
             variant='flat'
             color='secondary'
-            disabled={!current}
+            disabled={versions.length === 0}
             onClick={() => setHistoryOpen(true)}
           >
             {t('eventos:participation.terms.history')}
           </Button>
-          {current?.file_url ? (
+          {hasTerms ? (
             <Button type='button' variant='flat' color='secondary' disabled={isSaving} onClick={() => void save(null)}>
               {t('eventos:participation.terms.remove')}
             </Button>
@@ -134,8 +106,10 @@ export function ParticipantTermsEditor({ eventId, typeId, typeName, current, onS
       <WindowTermsHistoryDialog
         open={isHistoryOpen}
         onOpenChange={setHistoryOpen}
-        promotionName={typeName}
-        loadVersions={loadVersions}
+        promotionName={eventName}
+        loadVersions={async () =>
+          versions.map(version => ({ ...version, created_by_name: version.created_by_name ?? null }))
+        }
       />
     </div>
   );

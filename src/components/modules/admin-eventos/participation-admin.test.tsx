@@ -2,18 +2,18 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { ArtistSignupDetail } from './artist-signup-detail';
 import { EntryWindowEditor } from './entry-window-editor';
-import { EventoAdminTabs } from './evento-admin-tabs';
+import { EventWorkspace } from './event-workspace';
 import { ParticipantTypeEditor } from './participant-type-editor';
 import { ParticipationPeopleTable } from './participation-people-table';
 import { ParticipationSummaryPanel } from './participation-summary';
+import { SignupDetail } from './signup-detail';
 
 import { artistTypeAdmin, mySignup } from '@components/modules/event-participation/participation.fixtures';
 import { DansshipAPI, type AdminSignupDetail, type EventAdmin, type ParticipationPeople } from '@core/api';
 import '@core/i18n';
 
-vi.mock('./evento-edit-form', () => ({ EventoEditForm: () => <p>Formulario de información</p> }));
+vi.mock('./event-info-form', () => ({ EventInfoForm: () => <p>Formulario de información</p> }));
 vi.mock('@contexts', async importOriginal => ({
   ...(await importOriginal<typeof import('@contexts')>()),
   useOrPermissions: () => true,
@@ -26,6 +26,7 @@ const people: ParticipationPeople = {
     { kind: 'all', participant_type_id: null, participant_type_name: null, count: 3 },
     { kind: 'holders', participant_type_id: 'type-1', participant_type_name: 'Artistas', count: 1 },
     { kind: 'members', participant_type_id: null, participant_type_name: null, count: 2 },
+    { kind: 'refund_due', participant_type_id: null, participant_type_name: null, count: 1 },
   ],
   columns: [],
   rows: [
@@ -59,9 +60,22 @@ const people: ParticipationPeople = {
       has_entry_pass: false,
       attached_to_person_id: null,
       announcement_copy: null,
+      refund_due: true,
+      refunded_outside: false,
+      terms_source: 'admin',
     },
   ],
 };
+
+const configuredEvent = {
+  id: 'event-1',
+  slug: 'clausura',
+  name: 'Clausura',
+  capacity: 100,
+  status: 'draft',
+  configuration_model: 'participant_types',
+  visibility: 'public',
+} as EventAdmin;
 
 const detail: AdminSignupDetail = {
   ...mySignup,
@@ -99,6 +113,7 @@ describe('participant-type admin', () => {
     vi.spyOn(DansshipAPI.participationAdmin, 'updateType').mockResolvedValue(ok(artistTypeAdmin));
     vi.spyOn(DansshipAPI.participationAdmin, 'getSignup').mockResolvedValue(ok(detail));
     vi.spyOn(DansshipAPI.participationAdmin, 'approve').mockResolvedValue(ok({ ...detail, status: 'approved' }));
+    vi.spyOn(DansshipAPI.eventosAdmin, 'listPriceConditions').mockResolvedValue(ok([]));
   });
 
   afterEach(() => {
@@ -107,52 +122,106 @@ describe('participant-type admin', () => {
     vi.unstubAllGlobals();
   });
 
-  it('shows the four tabs and opens the participant types', async () => {
-    inRouter(
-      <EventoAdminTabs event={{ id: 'event-1', slug: 'clausura', name: 'Clausura', capacity: 100 } as EventAdmin} />,
-    );
+  it('shows the four tabs of an existing event', async () => {
+    inRouter(<EventWorkspace event={configuredEvent} />);
 
     expect(screen.getByText('Formulario de información')).toBeVisible();
     const tabs = screen.getAllByRole('tab').map(tab => tab.textContent);
     expect(tabs).toEqual(['Información', 'Tipos de participante', 'Resumen', 'Inscritos']);
   });
 
-  it('saves the editor with the close date in Bogotá and shows the artists link', async () => {
+  it('shows only Información and Tipos de participante while creating', () => {
+    inRouter(<EventWorkspace />, '/admin/eventos/new');
+
+    expect(screen.getAllByRole('tab').map(tab => tab.textContent)).toEqual(['Información', 'Tipos de participante']);
+  });
+
+  it('saves the editor with the close date in Bogotá and no per-type link', async () => {
+    const onSave = vi.fn().mockResolvedValue({ ok: true, data: artistTypeAdmin });
+
     inRouter(
       <ParticipantTypeEditor
-        eventId='event-1'
-        eventSlug='clausura'
-        eventCapacity={100}
         type={artistTypeAdmin}
-        onSaved={() => undefined}
+        conditions={[]}
+        eventCapacity={100}
+        isPrivate={false}
+        onSave={onSave}
       />,
     );
 
-    expect(screen.getByDisplayValue(/\/eventos\/clausura\?acceso=tok-123$/)).toBeVisible();
     expect(screen.getByDisplayValue('2026-11-27T23:59')).toBeVisible();
-    fireEvent.change(screen.getByLabelText('Nombre del tipo'), { target: { value: 'Artistas 2026' } });
+    expect(screen.queryByDisplayValue(/acceso=/)).toBeNull();
+    expect(screen.queryByText(/Cambiar enlace|Solo con enlace/)).toBeNull();
+    fireEvent.change(screen.getByLabelText('Nombre del tipo *'), { target: { value: 'Artistas 2026' } });
     fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }));
 
-    await waitFor(() => expect(DansshipAPI.participationAdmin.updateType).toHaveBeenCalledTimes(1));
-    expect(DansshipAPI.participationAdmin.updateType).toHaveBeenCalledWith(
-      'event-1',
-      'type-1',
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    expect(onSave).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'Artistas 2026', closes_at: '2026-11-27T23:59:00-05:00' }),
     );
   });
 
-  it('locks "who signs up" once the type has signups', () => {
+  it('locks the options in use once the type has signups', () => {
     inRouter(
       <ParticipantTypeEditor
-        eventId='event-1'
-        eventSlug='clausura'
-        eventCapacity={100}
         type={artistTypeAdmin}
-        onSaved={() => undefined}
+        conditions={[]}
+        eventCapacity={100}
+        isPrivate={false}
+        onSave={vi.fn()}
       />,
     );
 
-    expect(screen.getByLabelText('¿Quién se inscribe?')).toBeDisabled();
+    expect(screen.getByRole('checkbox', { name: 'Una persona' })).toBeDisabled();
+    expect(screen.getByRole('checkbox', { name: 'Pareja' })).toBeEnabled();
+  });
+
+  it('marks rows to refund outside the platform and filters them with "Por devolver"', async () => {
+    inRouter(<ParticipationPeopleTable eventId='event-1' eventSlug='clausura' />);
+
+    expect(await screen.findByText('Por devolver', { selector: 'span, div' })).toBeVisible();
+    expect(screen.getByText('Términos registrados por el admin')).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Por devolver · 1' }));
+
+    await waitFor(() =>
+      expect(DansshipAPI.participationAdmin.listPeople).toHaveBeenLastCalledWith(
+        'event-1',
+        expect.objectContaining({ kind: 'refund_due' }),
+      ),
+    );
+    expect(screen.getByRole('link', { name: /Inscribir persona/ })).toHaveAttribute(
+      'href',
+      '/admin/assisted?tab=event&event=event-1',
+    );
+  });
+
+  it('marks a not-approved paid signup as refunded outside the platform and undoes it', async () => {
+    const refundable = { ...detail, status: 'not_approved' as const, approved_amount: '90000.00', refund_due: true };
+    const marked = {
+      ...refundable,
+      refund_due: false,
+      refunded_outside_at: '2026-11-23T15:00:00Z',
+      refunded_outside_by_name: 'Admin',
+    };
+
+    vi.mocked(DansshipAPI.participationAdmin.getSignup).mockResolvedValue(ok(refundable));
+    const setRefunded = vi
+      .spyOn(DansshipAPI.participationAdmin, 'setRefundedOutside')
+      .mockResolvedValueOnce(ok(marked))
+      .mockResolvedValueOnce(ok({ ...refundable }));
+    inRouter(<SignupDetail eventId='event-1' signupId='signup-1' />);
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Marcar como devuelto por fuera de la plataforma' }));
+    fireEvent.click(
+      within(await screen.findByRole('dialog')).getByRole('button', {
+        name: 'Marcar como devuelto por fuera de la plataforma',
+      }),
+    );
+    await waitFor(() => expect(setRefunded).toHaveBeenCalledWith('signup-1', true));
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Deshacer' }));
+    fireEvent.click(within(await screen.findByRole('dialog')).getByRole('button', { name: 'Deshacer' }));
+    await waitFor(() => expect(setRefunded).toHaveBeenCalledWith('signup-1', false));
   });
 
   it('filters Inscritos by type and exports the CSV with the same filter', async () => {
@@ -181,7 +250,7 @@ describe('participant-type admin', () => {
   });
 
   it('approves an artist from the detail after confirming', async () => {
-    inRouter(<ArtistSignupDetail eventId='event-1' signupId='signup-1' />);
+    inRouter(<SignupDetail eventId='event-1' signupId='signup-1' />);
 
     expect(await screen.findByRole('heading', { name: 'Valentina Ríos' })).toBeVisible();
     expect(screen.getByDisplayValue('Hola')).toBeVisible();
@@ -194,12 +263,24 @@ describe('participant-type admin', () => {
   });
 
   it('links the door from the event for people who can validate', () => {
-    inRouter(
-      <EventoAdminTabs event={{ id: 'event-1', slug: 'clausura', name: 'Clausura', capacity: 100 } as EventAdmin} />,
-      '/admin/eventos/event-1?tab=people',
-    );
+    inRouter(<EventWorkspace event={configuredEvent} />, '/admin/eventos/event-1?tab=people');
 
     expect(screen.getByRole('link', { name: 'Validar entradas' })).toHaveAttribute('href', '/admin/entradas/event-1');
+  });
+
+  it('"Previsualizar" opens the event as the person sees it, once it has dates', () => {
+    inRouter(<EventWorkspace event={{ ...configuredEvent, starts_at: '2026-12-12T20:30:00Z' }} />);
+
+    expect(screen.getByRole('link', { name: /Previsualizar/ })).toHaveAttribute(
+      'href',
+      `/eventos/${configuredEvent.slug}?preview=1`,
+    );
+
+    cleanup();
+    inRouter(<EventWorkspace event={{ ...configuredEvent, starts_at: null }} />);
+
+    expect(screen.queryByRole('link', { name: /Previsualizar/ })).toBeNull();
+    expect(screen.getByRole('button', { name: /Previsualizar/ })).toBeDisabled();
   });
 
   it('filters by entry, edits a ticket email and resends the QR', async () => {
@@ -351,6 +432,8 @@ describe('participant-type admin', () => {
 
     inRouter(<EntryWindowEditor eventId='event-1' />);
 
+    expect(await screen.findByText('Ahora: 12/12 12:30 – 12/12 20:30 · Por defecto')).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Cambiar' }));
     const opens = await screen.findByLabelText('Abre');
     await waitFor(() => expect(opens).toHaveValue('2026-12-12T12:30'));
     fireEvent.change(opens, { target: { value: '2026-11-21T10:00' } });

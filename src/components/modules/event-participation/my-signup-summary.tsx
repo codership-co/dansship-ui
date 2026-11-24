@@ -42,11 +42,11 @@ export function MySignupSummary({ signup }: { signup: MySignup }) {
             .join(' · ')}
         />
       </div>
-      <section className='grid gap-2 rounded-[14px] border bg-white p-4'>
+      <section className='grid gap-2 rounded-[14px] border border-border bg-white p-4'>
         <SignupStatusBadge status={signup.status} />
         <p className='m-0 text-sm'>{statusMessage(signup, t)}</p>
       </section>
-      <section className='grid gap-3 rounded-[14px] border bg-white p-4'>
+      <section className='grid gap-3 rounded-[14px] border border-border bg-white p-4'>
         <h2 className='m-0 text-base font-semibold'>{t('eventos:participation.mine.sent')}</h2>
         <dl className='m-0 grid gap-3'>
           {signup.answers.map(item => (

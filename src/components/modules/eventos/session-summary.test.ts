@@ -26,6 +26,12 @@ describe('sessionSummaryText', () => {
     ).toBe('Incluye 4 sesiones: sábados 5:00 pm–7:00 pm');
   });
 
+  it('names only the start when the event hides its end time', () => {
+    expect(
+      sessionSummaryText({ session_summary: { extra_count: 4, weekday: 5, start_time: '17:00', end_time: null } }, t),
+    ).toBe('Incluye 4 sesiones: sábados 5:00 pm');
+  });
+
   it('uses only the count when the times differ', () => {
     expect(
       sessionSummaryText({ session_summary: { extra_count: 3, weekday: null, start_time: null, end_time: null } }, t),

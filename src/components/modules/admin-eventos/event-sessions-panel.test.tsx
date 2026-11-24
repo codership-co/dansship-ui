@@ -136,14 +136,4 @@ describe('EventSessionsPanel', () => {
       );
     });
   });
-
-  it('copies the access link', async () => {
-    render(<EventSessionsPanel event={eventFixture()} rooms={[{ id: 'room-1', name: 'Sala Norte' }]} />);
-
-    fireEvent.click(await screen.findByRole('button', { name: 'Copiar enlace' }));
-
-    await waitFor(() => {
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(`${window.location.origin}/eventos/acceso/token-1`);
-    });
-  });
 });

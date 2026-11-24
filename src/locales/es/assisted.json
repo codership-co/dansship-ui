@@ -144,6 +144,30 @@
     "noOptions": {
       "pair": "Los eventos en pareja todavía no se pueden registrar desde aquí: el precio es por pareja.",
       "generic": "No se pudo calcular el pago de este evento para la persona. Intenta de nuevo o elige otro evento."
+    },
+    "backToEvent": "← Volver al evento",
+    "noPaymentPermission": "No tienes permiso para registrar pagos de este evento.",
+    "enroll": {
+      "type": "Tipo de participante",
+      "typePlaceholder": "Elige el tipo",
+      "noTypes": "Este evento no tiene tipos de participante activos.",
+      "discount": "Descuento",
+      "total": "Total",
+      "deposit": "Anticipo (se paga ahora)",
+      "balance": "Saldo",
+      "alreadyPaid": "¿Ya pagó?",
+      "payment": {
+        "paid": "Sí, ya pagó",
+        "pay_later": "No, paga después"
+      },
+      "payLaterHint": "El cupo queda guardado con el pago pendiente hasta el plazo del tipo. La persona recibe un correo y paga desde Mis reservas.",
+      "recordTerms": "Registrar los términos como aceptados",
+      "enroll": "Inscribir",
+      "enrollPending": "Inscribir con pago pendiente",
+      "done": "Inscribimos a la persona.",
+      "pendingUntil": "Inscribimos a la persona con pago pendiente hasta el {{date}}.",
+      "failed": "No pudimos inscribir a la persona.",
+      "noPermission": "No tienes permiso para inscribir personas en este evento."
     }
   },
   "class": {

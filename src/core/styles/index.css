@@ -173,6 +173,13 @@
     --uplift: 10rem;
   }
 
+  /* polpo locks the page scroll (overflow: hidden on <html>) for every modal, tooltips included. For a tooltip
+     that hides the 10px scrollbar, the page shifts under the cursor and the tooltip flickers open and closed.
+     A tooltip never needs the lock; real modals keep it. (scrollbar-gutter is ignored with ::-webkit-scrollbar.) */
+  html:has(.polpo-tooltip) {
+    overflow: auto !important;
+  }
+
   html,
   body,
   #root {

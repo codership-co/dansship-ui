@@ -1,12 +1,13 @@
 import { Button } from 'polpo/components';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router';
+import { Link } from 'react-router';
 import { toast } from 'sonner';
 
 import { EventSessionsPanel } from './event-sessions-panel';
 import { EventoRoster } from './evento-roster';
 import { InstallmentPaymentDialog } from './installment-payment-dialog';
+import { LegacyEventAccessPanel } from './legacy-event-access-panel';
 import { PriceTiersEditor } from './price-tiers-editor';
 
 import { SectionHeading } from '@components/containers';
@@ -31,8 +32,8 @@ import { useCallablePromise, usePromise } from '@hooks';
 
 type InstallmentDraft = { due_date: string; base: string; plan: string };
 
-function installmentDraftsFrom(event?: EventAdmin): Array<InstallmentDraft> {
-  if (event?.installments?.length) {
+function installmentDraftsFrom(event: EventAdmin): Array<InstallmentDraft> {
+  if (event.installments?.length) {
     return event.installments.map(row => ({
       due_date: row.due_date,
       base: String(row.amounts.find(amount => amount.tier_position === null)?.amount ?? ''),
@@ -70,49 +71,52 @@ function defaultStart() {
 }
 
 interface EventoEditFormProps {
-  event?: EventAdmin;
+  event: EventAdmin;
 }
 
+/**
+ * Edit view of legacy events (recital, the combo's workshops), which the API still serves.
+ * Creating legacy events is closed (`EVENT_LEGACY_CREATE_CLOSED`): new events use `EventWorkspace`.
+ */
 export function EventoEditForm({ event }: EventoEditFormProps) {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const locked = Boolean(event?.fields_locked);
-  const startParts = colombiaParts(event?.starts_at ?? defaultStart());
-  const endParts = colombiaParts(event?.ends_at ?? defaultStart());
-  const [name, setName] = useState(event?.name ?? '');
-  const [description, setDescription] = useState(event?.description ?? '');
+  const locked = Boolean(event.fields_locked);
+  const startParts = colombiaParts(event.starts_at ?? defaultStart());
+  const endParts = colombiaParts(event.ends_at ?? defaultStart());
+  const [name, setName] = useState(event.name ?? '');
+  const [description, setDescription] = useState(event.description ?? '');
   const [date, setDate] = useState(startParts.date);
   const [startTime, setStartTime] = useState(startParts.time);
   const [endTime, setEndTime] = useState(endParts.time === startParts.time ? '12:00' : endParts.time);
-  const [capacity, setCapacity] = useState(String(event?.capacity ?? 24));
-  const [roomId, setRoomId] = useState(event?.room_id ?? '');
-  const [externalLocation, setExternalLocation] = useState(event?.external_location ?? '');
+  const [capacity, setCapacity] = useState(String(event.capacity ?? 24));
+  const [roomId, setRoomId] = useState(event.room_id ?? '');
+  const [externalLocation, setExternalLocation] = useState(event.external_location ?? '');
   const [installmentDrafts, setInstallmentDrafts] = useState(installmentDraftsFrom(event));
-  const [instructorId, setInstructorId] = useState(event?.instructor_id ?? '');
-  const [requiresPartner, setRequiresPartner] = useState(event?.requires_partner ?? false);
-  const [simpleRegistration, setSimpleRegistration] = useState(event?.simple_registration_enabled ?? false);
-  const [isCollaboration, setIsCollaboration] = useState(event?.is_collaboration ?? false);
-  const [collaboratorEmail, setCollaboratorEmail] = useState(event?.collaborator_email ?? '');
-  const [collaboratorName, setCollaboratorName] = useState<string | null>(event?.collaborator_display_name ?? null);
+  const [instructorId, setInstructorId] = useState(event.instructor_id ?? '');
+  const [requiresPartner, setRequiresPartner] = useState(event.requires_partner ?? false);
+  const [simpleRegistration, setSimpleRegistration] = useState(event.simple_registration_enabled ?? false);
+  const [isCollaboration, setIsCollaboration] = useState(event.is_collaboration ?? false);
+  const [collaboratorEmail, setCollaboratorEmail] = useState(event.collaborator_email ?? '');
+  const [collaboratorName, setCollaboratorName] = useState<string | null>(event.collaborator_display_name ?? null);
   const [collaboratorError, setCollaboratorError] = useState<string | null>(null);
-  const [participation, setParticipation] = useState(String(event?.collaborator_participation_percentage ?? 0));
-  const [status, setStatus] = useState<EventStatus>(event?.status ?? 'draft');
-  const [eventType, setEventType] = useState<EventType>(event?.type ?? 'taller');
+  const [participation, setParticipation] = useState(String(event.collaborator_participation_percentage ?? 0));
+  const [status, setStatus] = useState<EventStatus>(event.status ?? 'draft');
+  const [eventType, setEventType] = useState<EventType>(event.type ?? 'taller');
   // ADR-064: a Muestra sells through its participant types, so it has no price rules here.
   const isShowcase = eventType === 'showcase';
   const usesExternalPlace = eventType === 'recital' || isShowcase;
-  const [basePrice, setBasePrice] = useState(String(event?.base_price ?? ''));
+  const [basePrice, setBasePrice] = useState(String(event.base_price ?? ''));
   const [tiers, setTiers] = useState<Array<EventPriceTierInput>>(
-    event?.price_tiers.map(tier => ({
+    event.price_tiers.map(tier => ({
       condition_type: tier.condition_type,
       condition_params: tier.condition_params,
       price: tier.price,
     })) ?? [],
   );
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(event?.image_url ?? null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(event.image_url ?? null);
   const [qrFile, setQrFile] = useState<File | null>(null);
-  const [qrPreviewUrl, setQrPreviewUrl] = useState<string | null>(event?.payment_qr_url ?? null);
+  const [qrPreviewUrl, setQrPreviewUrl] = useState<string | null>(event.payment_qr_url ?? null);
   const [saving, setSaving] = useState(false);
   const [paymentOpen, setPaymentOpen] = useState(false);
   const [installmentDateError, setInstallmentDateError] = useState(false);
@@ -123,9 +127,9 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
   const { response: instructorsResponse } = usePromise(() => DansshipAPI.instructorsAdmin.getInstructors());
   const { response: conditionsResponse } = usePromise(() => DansshipAPI.eventosAdmin.listPriceConditions());
   const { response: rosterResponse, reFetch: reFetchRoster } = usePromise(
-    () => DansshipAPI.eventosAdmin.listRoster(event?.id ?? ''),
-    Boolean(event?.id && (event.is_collaboration || isCollaboration || event.type === 'recital')),
-    [event?.id, isCollaboration, event?.type],
+    () => DansshipAPI.eventosAdmin.listRoster(event.id ?? ''),
+    Boolean(event.id && (event.is_collaboration || isCollaboration || event.type === 'recital')),
+    [event.id, isCollaboration, event.type],
   );
   const { call: lookupCollaborator } = useCallablePromise((email: string) =>
     DansshipAPI.eventosAdmin.lookupCollaborator(email),
@@ -217,12 +221,6 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
           requires_partner: false,
           simple_registration_enabled: simpleRegistration,
           is_collaboration: false,
-          ...(event
-            ? {}
-            : {
-                base_price: 0,
-                price_tiers: isShowcase ? [] : [{ condition_type: 'has_active_plan', condition_params: {}, price: 0 }],
-              }),
           ...(locked ? {} : { type: eventType, ...(isShowcase ? {} : { installments: installmentPayload }) }),
         }
       : {
@@ -245,82 +243,40 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
         };
 
     try {
-      if (event) {
-        const { data, ok } = await DansshipAPI.eventosAdmin.updateEvent(event.id, {
-          ...payload,
-          status,
-        });
+      const { data, ok } = await DansshipAPI.eventosAdmin.updateEvent(event.id, {
+        ...payload,
+        status,
+      });
 
-        if (!ok || !data) {
-          toast.error(t('eventos:admin.saveFailed'));
+      if (!ok || !data) {
+        toast.error(t('eventos:admin.saveFailed'));
 
-          return;
-        }
-
-        if (imageFile) {
-          const upload = await DansshipAPI.eventosAdmin.uploadImage(event.id, imageFile);
-
-          if (!upload.data) {
-            toast.error(t('eventos:admin.imageUploadFailed'));
-          } else {
-            setPreviewUrl(upload.data.image_url);
-            setImageFile(null);
-          }
-        }
-
-        if (qrFile) {
-          const upload = await DansshipAPI.eventosAdmin.uploadPaymentQr(event.id, qrFile);
-
-          if (!upload.data) {
-            toast.error(t('eventos:admin.qrUploadFailed'));
-          } else {
-            setQrPreviewUrl(upload.data.payment_qr_url);
-            setQrFile(null);
-          }
-        }
-
-        toast.success(t('eventos:admin.updateSuccess'));
-      } else {
-        const basePriceValue = payload.base_price;
-        const priceTiers = payload.price_tiers;
-
-        if (basePriceValue === undefined || priceTiers === undefined) {
-          toast.error(t('eventos:admin.saveFailed'));
-
-          return;
-        }
-
-        const { data, ok } = await DansshipAPI.eventosAdmin.createEvent({
-          ...payload,
-          base_price: basePriceValue,
-          price_tiers: priceTiers,
-        });
-
-        if (!ok || !data) {
-          toast.error(t('eventos:admin.saveFailed'));
-
-          return;
-        }
-
-        if (imageFile) {
-          const upload = await DansshipAPI.eventosAdmin.uploadImage(data.id, imageFile);
-
-          if (!upload.data) {
-            toast.error(t('eventos:admin.imageUploadFailed'));
-          }
-        }
-
-        if (qrFile) {
-          const upload = await DansshipAPI.eventosAdmin.uploadPaymentQr(data.id, qrFile);
-
-          if (!upload.data) {
-            toast.error(t('eventos:admin.qrUploadFailed'));
-          }
-        }
-
-        toast.success(t('eventos:admin.createSuccess'));
-        navigate(PageURLS.admin.eventoEdit(data.id));
+        return;
       }
+
+      if (imageFile) {
+        const upload = await DansshipAPI.eventosAdmin.uploadImage(event.id, imageFile);
+
+        if (!upload.data) {
+          toast.error(t('eventos:admin.imageUploadFailed'));
+        } else {
+          setPreviewUrl(upload.data.image_url);
+          setImageFile(null);
+        }
+      }
+
+      if (qrFile) {
+        const upload = await DansshipAPI.eventosAdmin.uploadPaymentQr(event.id, qrFile);
+
+        if (!upload.data) {
+          toast.error(t('eventos:admin.qrUploadFailed'));
+        } else {
+          setQrPreviewUrl(upload.data.payment_qr_url);
+          setQrFile(null);
+        }
+      }
+
+      toast.success(t('eventos:admin.updateSuccess'));
     } catch (error) {
       const code = error instanceof DansshipAPIError ? error.body.error_code : '';
       toast.error(
@@ -345,15 +301,12 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
             {t('eventos:admin.backToList')}
           </Link>
           <div className='flex flex-wrap items-center gap-2.5'>
-            <SectionHeading
-              className='mb-0'
-              title={event ? t('eventos:admin.editEvent') : t('eventos:admin.newEvent')}
-            />
+            <SectionHeading className='mb-0' title={t('eventos:admin.editEvent')} />
             <Badge variant={status === 'published' ? 'default' : 'outline'}>
               {status === 'published' ? t('eventos:admin.published') : t('eventos:admin.draft')}
             </Badge>
           </div>
-          {event?.name ? <p className='m-0 text-sm text-muted-foreground'>{event.name}</p> : null}
+          {event.name ? <p className='m-0 text-sm text-muted-foreground'>{event.name}</p> : null}
         </div>
         <div className='flex flex-wrap items-center gap-2.5'>
           <label className='flex cursor-pointer items-center gap-2 rounded-full border bg-white px-3 py-1.5'>
@@ -523,7 +476,7 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
             helperText={t('eventos:admin.imageHint')}
             onChange={(file, nextPreviewUrl) => {
               setImageFile(file);
-              setPreviewUrl(nextPreviewUrl ?? event?.image_url ?? null);
+              setPreviewUrl(nextPreviewUrl ?? event.image_url ?? null);
             }}
           />
         </CardContent>
@@ -575,7 +528,7 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
                   helperText={t('eventos:admin.qrHint')}
                   onChange={(file, nextPreviewUrl) => {
                     setQrFile(file);
-                    setQrPreviewUrl(nextPreviewUrl ?? event?.payment_qr_url ?? null);
+                    setQrPreviewUrl(nextPreviewUrl ?? event.payment_qr_url ?? null);
                   }}
                 />
               </>
@@ -727,9 +680,10 @@ export function EventoEditForm({ event }: EventoEditFormProps) {
           </CardContent>
         </Card>
       )}
-      {event ? <EventSessionsPanel event={event} rooms={rooms} /> : null}
+      <EventSessionsPanel event={event} rooms={rooms} />
+      <LegacyEventAccessPanel event={event} />
 
-      {event && (isCollaboration || event.type === 'recital') ? (
+      {isCollaboration || event.type === 'recital' ? (
         <Card>
           <CardHeader>
             <CardTitle>{t('eventos:admin.roster')}</CardTitle>

@@ -9,6 +9,12 @@ import { ParticipationSummaryPanel } from './participation-summary';
 import { DansshipAPI, type ParticipationPeople, type ParticipationPersonRow } from '@core/api';
 import '@core/i18n';
 
+// Inscritos asks for "+ Inscribir persona" (enroll:event); the print tests need no session.
+vi.mock('@contexts', async importOriginal => ({
+  ...(await importOriginal<typeof import('@contexts')>()),
+  useOrPermissions: () => false,
+}));
+
 const ok = <T,>(data: T) => ({ ok: true, data, status: 200, error: null }) as never;
 
 function person(overrides: Partial<ParticipationPersonRow>): ParticipationPersonRow {
@@ -178,6 +184,8 @@ describe('Inscritos print button', () => {
 
     expect(screen.queryByTestId('print-root')).toBeNull();
     fireEvent.click(await screen.findByRole('button', { name: 'Invitados · 2' }));
+    // Without enroll:event there is no "+ Inscribir persona".
+    expect(screen.queryByRole('link', { name: /Inscribir persona/ })).toBeNull();
     fireEvent.change(screen.getByRole('combobox', { name: 'Filtrar por estado' }), { target: { value: 'approved' } });
     await waitFor(() =>
       expect(DansshipAPI.participationAdmin.listPeople).toHaveBeenLastCalledWith(

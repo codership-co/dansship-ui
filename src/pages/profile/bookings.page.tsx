@@ -17,7 +17,7 @@ import {
 } from '@components/modules/my-bookings';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@components/ui';
 import { FEATURE_FLAG, SecurityGuard, useAuth, useStudentSession } from '@contexts';
-import { DansshipAPI, MyBooking, type RentalRequest, type RentalSeries } from '@core/api';
+import { DansshipAPI, MyBooking, configuredParticipationRows, type RentalRequest, type RentalSeries } from '@core/api';
 import { PageURLS } from '@core/constants';
 import {
   classReservation,
@@ -155,7 +155,9 @@ function BookingsPage() {
   );
 
   const guardianUpcomingExtras = useMemo(() => {
-    const events = (eventUpcomingResponse?.data ?? []).length + (participationUpcomingResponse?.data ?? []).length;
+    const events =
+      (eventUpcomingResponse?.data ?? []).length +
+      configuredParticipationRows(participationUpcomingResponse?.data).length;
     const rentals = rentalRequests.filter(request => isUpcomingRental(request)).length;
     const series = rentalSeries.filter(item => isUpcomingRentalSeries(item)).length;
 
@@ -198,7 +200,7 @@ function BookingsPage() {
     const classes = upcomingBookings.filter(matchesAttendee).map(classReservation);
     const events = [
       ...(eventUpcomingResponse?.data ?? []).map(eventReservation),
-      ...(participationUpcomingResponse?.data ?? []).map(participationReservation),
+      ...configuredParticipationRows(participationUpcomingResponse?.data).map(participationReservation),
     ];
     const rentals = rentalRequests
       .filter(request => isUpcomingRental(request))
@@ -226,7 +228,7 @@ function BookingsPage() {
   const extraHistory = useMemo(() => {
     const events = [
       ...(eventHistoryResponse?.data ?? []).map(eventReservation),
-      ...(participationHistoryResponse?.data ?? []).map(participationReservation),
+      ...configuredParticipationRows(participationHistoryResponse?.data).map(participationReservation),
     ];
     const rentals = rentalRequests
       .filter(request => !isUpcomingRental(request))
