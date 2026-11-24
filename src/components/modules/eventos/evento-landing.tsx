@@ -7,19 +7,29 @@ import { toast } from 'sonner';
 
 import { EventoCheckoutModal } from './evento-checkout-modal';
 import { landingHasInstallmentAmounts, paymentNotice } from './installment-notice';
+import { PreviewBanner } from './preview-banner';
 import { sessionSummaryText } from './session-summary';
+import { SignupCheckoutModal } from './signup-checkout-modal';
 import { SimpleRegistrationDialog, type SimpleRegistrationOutcome } from './simple-registration-dialog';
 
 import { SpinnerLoader } from '@components/loaders';
+import { ParticipantTypeCard } from '@components/modules/event-participation';
 import { Badge } from '@components/ui';
 import { useAuth, useOrPermissions } from '@contexts';
-import { DansshipAPI, DansshipAPIError, type EventLanding, type SimplePersonInput } from '@core/api';
+import {
+  DansshipAPI,
+  DansshipAPIError,
+  type EventLanding,
+  type LandingParticipantType,
+  type LandingPriceRow,
+  type SimplePersonInput,
+} from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions } from '@core/permissions';
 import { consumePendingEventoCheckoutIntent, formatPrice, setPendingEventoCheckoutIntent } from '@helpers';
 import { usePromise } from '@hooks';
 
-function LandingHero({ landing }: { landing: EventLanding }) {
+function LandingHero({ landing, showCapacity }: { landing: EventLanding; showCapacity: boolean }) {
   const { t } = useTranslation();
 
   return (
@@ -42,11 +52,13 @@ function LandingHero({ landing }: { landing: EventLanding }) {
           </Badge>
           {landing.requires_partner ? <Badge variant='outlineTertiary'>{t('eventos:landing.pairBadge')}</Badge> : null}
         </div>
-        <Badge variant={landing.sold_out ? 'destructive' : 'outlineActive'}>
-          {landing.sold_out
-            ? t('eventos:landing.soldOut')
-            : t('eventos:landing.capacity', { remaining: landing.remaining, capacity: landing.capacity })}
-        </Badge>
+        {showCapacity ? (
+          <Badge variant={landing.sold_out ? 'destructive' : 'outlineActive'}>
+            {landing.sold_out
+              ? t('eventos:landing.soldOut')
+              : t('eventos:landing.capacity', { remaining: landing.remaining, capacity: landing.capacity })}
+          </Badge>
+        ) : null}
       </div>
       <div className='grid gap-2'>
         <h1 className='m-0 text-[1.75rem] font-bold leading-tight text-foreground sm:text-3xl'>{landing.name}</h1>
@@ -58,7 +70,7 @@ function LandingHero({ landing }: { landing: EventLanding }) {
   );
 }
 
-function EventDetails({ landing }: { landing: EventLanding }) {
+function EventDetails({ landing, showInstructor }: { landing: EventLanding; showInstructor: boolean }) {
   const { t } = useTranslation();
   const sessionSummary = sessionSummaryText(landing, t);
 
@@ -79,21 +91,23 @@ function EventDetails({ landing }: { landing: EventLanding }) {
         </div>
         <div className='min-w-0'>
           <dt className='text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground'>
-            {t('eventos:landing.room')}
+            {landing.room_name ? t('eventos:landing.room') : t('eventos:landing.place')}
           </dt>
           <dd className='m-0 text-sm font-semibold leading-snug'>{landing.room_name || landing.external_location}</dd>
         </div>
       </dl>
       {sessionSummary ? <p className='m-0 text-sm font-medium'>{sessionSummary}</p> : null}
-      <div className='flex items-center gap-2.5'>
-        <div className='grid size-8 shrink-0 place-content-center rounded-full bg-primary/15 text-[11px] font-semibold text-primary'>
-          {landing.instructor?.initials}
+      {showInstructor ? (
+        <div className='flex items-center gap-2.5'>
+          <div className='grid size-8 shrink-0 place-content-center rounded-full bg-primary/15 text-[11px] font-semibold text-primary'>
+            {landing.instructor?.initials}
+          </div>
+          <div>
+            <p className='m-0 text-sm font-semibold'>{landing.instructor?.name}</p>
+            <p className='m-0 text-[10.5px] text-muted-foreground'>{t('eventos:landing.instructor')}</p>
+          </div>
         </div>
-        <div>
-          <p className='m-0 text-sm font-semibold'>{landing.instructor?.name}</p>
-          <p className='m-0 text-[10.5px] text-muted-foreground'>{t('eventos:landing.instructor')}</p>
-        </div>
-      </div>
+      ) : null}
     </div>
   );
 }
@@ -115,7 +129,7 @@ function installmentCaption(
   return values.map(value => formatPrice(value, 'COP')).join(' · ');
 }
 
-function PriceBlock({ landing }: { landing: EventLanding }) {
+function PriceBlock({ landing, rows }: { landing: EventLanding; rows: Array<LandingPriceRow> }) {
   const { t } = useTranslation();
 
   return (
@@ -124,11 +138,11 @@ function PriceBlock({ landing }: { landing: EventLanding }) {
         {landing.kind === 'combo' ? t('eventos:landing.priceTitleCombo') : t('eventos:landing.priceTitle')}
       </h2>
       <div className='grid gap-2.5'>
-        {landing.price_rows.map((row, index) => (
+        {rows.map((row, index) => (
           <div
             key={row.label}
             className={`flex items-start justify-between gap-4 ${
-              index < landing.price_rows.length - 1 ? 'border-b border-border pb-2.5' : ''
+              index < rows.length - 1 ? 'border-b border-border pb-2.5' : ''
             }`}
           >
             <span className='text-sm'>{row.label}</span>
@@ -139,7 +153,9 @@ function PriceBlock({ landing }: { landing: EventLanding }) {
                 </span>
               ) : null}
               <span className={`block text-base font-bold ${index === 0 ? 'text-primary' : ''}`}>
-                {formatPrice(Number(row.price), 'COP')}
+                {Number(row.price) === 0 && landing.participation
+                  ? t('eventos:participation.free')
+                  : formatPrice(Number(row.price), 'COP')}
               </span>
             </span>
           </div>
@@ -154,10 +170,14 @@ export function EventoLanding({
   slug,
   preview,
   accessToken,
+  repayPurchaseId = null,
 }: {
   slug: string;
   preview: boolean;
+  /** Legacy link-only events (`/eventos/acceso/:token`). */
   accessToken?: string;
+  /** "Volver a pagar" from Mis reservas: opens the payment step of that purchase. */
+  repayPurchaseId?: string | null;
 }) {
   const { t } = useTranslation();
   const { isAuthenticated, ready, startSession } = useAuth();
@@ -166,6 +186,8 @@ export function EventoLanding({
   const canPreview = useOrPermissions(AdminPermissions.eventos);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [simpleOpen, setSimpleOpen] = useState(false);
+  const [repayOpen, setRepayOpen] = useState(Boolean(repayPurchaseId));
+  const [pendingTypeId, setPendingTypeId] = useState<string | null>(null);
   const useAdminPreview = preview && canPreview;
   const canFetch = Boolean(accessToken || slug) && (!preview || (ready && canPreview));
 
@@ -247,7 +269,12 @@ export function EventoLanding({
 
     if (ok) {
       await startSession();
-      setCheckoutOpen(true);
+
+      if (pendingTypeId) {
+        navigate(PageURLS.eventoSignupForm(landing.slug, pendingTypeId), { viewTransition: true });
+      } else {
+        setCheckoutOpen(true);
+      }
 
       return 'created';
     }
@@ -263,6 +290,23 @@ export function EventoLanding({
     return 'failed';
   };
 
+  // Events configured by participant types show one card per active type; the label never decides it.
+  const participation = landing.participation ?? null;
+  const offersSimpleRegistration =
+    landing.simple_registration_enabled || Boolean(participation?.types.some(type => !type.requires_account));
+  const priceRows: Array<LandingPriceRow> = participation ? [] : landing.price_rows;
+
+  /** A type's button: simple registration when it allows it, otherwise the signup page (which asks to sign in). */
+  const startType = (type: LandingParticipantType) => {
+    if (!isAuthenticated && !type.requires_account) {
+      setPendingTypeId(type.id);
+      setSimpleOpen(true);
+
+      return;
+    }
+
+    navigate(PageURLS.eventoSignupForm(landing.slug, type.id, useAdminPreview), { viewTransition: true });
+  };
   const ctaDisabled = landing.sold_out || landing.already_registered;
   const ctaLabel = landing.already_registered
     ? t('eventos:landing.ctaAlreadyRegistered')
@@ -281,9 +325,10 @@ export function EventoLanding({
 
   return (
     <div className='mx-auto grid max-w-xl gap-5 pb-8 lg:max-w-3xl'>
-      <LandingHero landing={landing} />
+      {useAdminPreview ? <PreviewBanner /> : null}
+      <LandingHero landing={landing} showCapacity />
       {landing.kind === 'event' ? (
-        <EventDetails landing={landing} />
+        <EventDetails landing={landing} showInstructor={!participation} />
       ) : (
         <div className='grid gap-3 sm:grid-cols-2'>
           {landing.components.map(component => (
@@ -312,19 +357,24 @@ export function EventoLanding({
           ))}
         </div>
       )}
-      <PriceBlock landing={landing} />
+      {participation?.types.map(type => (
+        <ParticipantTypeCard key={type.id} type={type} onStart={startType} />
+      ))}
+      {priceRows.length > 0 ? <PriceBlock landing={landing} rows={priceRows} /> : null}
       {notice ? (
         <div className='flex items-start gap-2.5 rounded-xl bg-secondary p-3'>
           <LuInfo className='mt-0.5 size-4 shrink-0' aria-hidden />
           <p className='m-0 text-xs font-medium leading-relaxed'>{notice}</p>
         </div>
       ) : null}
-      <div className='flex justify-end'>
-        <Button type='button' color='primary' variant='solid' disabled={ctaDisabled} onClick={startCheckout}>
-          {ctaLabel}
-        </Button>
-      </div>
-      {landing.simple_registration_enabled ? (
+      {participation ? null : (
+        <div className='flex justify-end'>
+          <Button type='button' color='primary' variant='solid' disabled={ctaDisabled} onClick={startCheckout}>
+            {ctaLabel}
+          </Button>
+        </div>
+      )}
+      {offersSimpleRegistration ? (
         <SimpleRegistrationDialog
           open={simpleOpen}
           onOpenChange={setSimpleOpen}
@@ -356,12 +406,21 @@ export function EventoLanding({
           }
         />
       ) : null}
-      <EventoCheckoutModal
-        landing={landing}
-        accessToken={accessToken}
-        isOpen={checkoutOpen && !ctaDisabled}
-        onClose={() => setCheckoutOpen(false)}
-      />
+      {participation ? (
+        <SignupCheckoutModal
+          landing={landing}
+          isOpen={repayOpen && isAuthenticated && Boolean(repayPurchaseId)}
+          repayPurchaseId={repayPurchaseId}
+          onClose={() => setRepayOpen(false)}
+        />
+      ) : (
+        <EventoCheckoutModal
+          landing={landing}
+          accessToken={accessToken}
+          isOpen={checkoutOpen && !ctaDisabled}
+          onClose={() => setCheckoutOpen(false)}
+        />
+      )}
     </div>
   );
 }

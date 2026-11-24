@@ -1,0 +1,165 @@
+import type { LandingParticipantType, MySignup, ParticipantForm, ParticipantTypeAdmin } from '@core/api';
+
+/** Test data shaped like the Clausura artists type (ADR-064). */
+export const artistForm: ParticipantForm = {
+  participant_type_id: 'type-1',
+  participant_type_name: 'Artistas',
+  event_id: 'event-1',
+  event_name: 'Clausura Dansship',
+  event_slug: 'clausura-dansship',
+  starts_at: '2026-12-12T20:30:00Z',
+  place_label: 'Estudio Dansship',
+  state: 'open',
+  closes_at: '2026-11-28T04:59:00Z',
+  signer_name: 'Valentina Ríos',
+  fields: [
+    {
+      key: 'act_type',
+      label: 'Tipo de presentación',
+      kind: 'choice',
+      required: true,
+      options: { choices: ['Pole', 'Lira', 'Baile'] },
+      visible_when: null,
+    },
+    { key: 'act_name', label: 'Nombre de la presentación', kind: 'short_text', required: true, options: {} },
+    {
+      key: 'members',
+      label: 'Integrantes del grupo',
+      kind: 'people',
+      required: true,
+      options: { max_people: 30 },
+      visible_when: { field_key: 'act_type', equals: 'Baile' },
+    },
+    { key: 'music', label: 'Música', kind: 'link', required: true, options: { with_note: true } },
+    {
+      key: 'announcement',
+      label: 'Mensaje antes de la presentación',
+      kind: 'long_text',
+      required: true,
+      options: { max_length: 1000 },
+    },
+    { key: 'photo_video', label: 'Foto y video', kind: 'checkbox', required: false, options: {} },
+  ],
+  takes_donations: true,
+  donation_types: [
+    { id: 'don-1', label: 'Juguetes para niños' },
+    { id: 'don-2', label: 'Útiles escolares' },
+  ],
+  minors: { allowed: true, max_age: 18, per_adult_max: null },
+  family_minors: [{ user_id: 'minor-1', full_name: 'Lucía Ríos', age: 9 }],
+  registration_options: [
+    { kind: 'single', label: 'Sola' },
+    { kind: 'group', label: 'En grupo', max_members: 30, members_required: true },
+  ],
+  terms: { version_id: 'terms-1', version: 1, title: 'Términos', file_url: 'https://cdn.test/terms.pdf' },
+  my_signup_id: null,
+};
+
+export const mySignup: MySignup = {
+  id: 'signup-1',
+  event_id: 'event-1',
+  event_name: 'Clausura Dansship',
+  event_slug: 'clausura-dansship',
+  starts_at: '2026-12-12T20:30:00Z',
+  place_label: 'Estudio Dansship',
+  participant_type_id: 'type-1',
+  participant_type_name: 'Artistas',
+  status: 'in_review',
+  answers: [
+    { key: 'act_type', label: 'Tipo de presentación', kind: 'choice', value: 'Lira' },
+    { key: 'act_name', label: 'Nombre de la presentación', kind: 'short_text', value: 'Raíces' },
+    { key: 'music', label: 'Música', kind: 'link', value: { url: 'https://youtu.be/x', note: 'Desde 0:08' } },
+  ],
+  raw_answers: {
+    act_type: 'Lira',
+    act_name: 'Raíces',
+    music: { url: 'https://youtu.be/x', note: 'Desde 0:08' },
+    announcement: 'Hola',
+  },
+  members: [],
+  donation_type_ids: ['don-1'],
+  donations: ['Juguetes para niños'],
+  closes_at: '2026-11-28T04:59:00Z',
+  editable: true,
+  submitted_at: '2026-11-20T21:05:00Z',
+};
+
+/** A participant type as the admin API returns it; override what each reference configuration needs. */
+export function typeAdmin(overrides: Partial<ParticipantTypeAdmin> = {}): ParticipantTypeAdmin {
+  return {
+    id: 'type-1',
+    event_id: 'event-1',
+    position: 0,
+    name: 'General',
+    registration_options: [{ kind: 'single', label: null }],
+    card_copy: { button_text: null, title: null, text: null, closing_message: null },
+    requires_account: true,
+    requires_approval: false,
+    contribution_model: 'money',
+    counts_toward_capacity: true,
+    quota: null,
+    condition_subject: 'holder',
+    minors_allowed: false,
+    minor_max_age: null,
+    minors_per_adult_max: null,
+    minors_count_toward_capacity: false,
+    minor_price: null,
+    closes_at: null,
+    issues_entry_qr: false,
+    is_active: true,
+    fields: [],
+    fees: [{ id: 'fee-all', label: 'Público general', condition_type: null, condition_params: {}, price: '75000.00' }],
+    pricing_model: 'per_person',
+    packages: [],
+    condition_discounts: [],
+    payment_plan: [],
+    installment_reminder_days: null,
+    pay_later_deadline: null,
+    email_settings: null,
+    available_notices: ['pending_payment'],
+    donation_types: [],
+    signup_count: 0,
+    people_count: 0,
+    ...overrides,
+  };
+}
+
+export const artistTypeAdmin: ParticipantTypeAdmin = typeAdmin({
+  name: 'Artistas',
+  registration_options: [
+    { kind: 'single', label: 'Sola' },
+    { kind: 'group', label: 'En grupo', max_members: 30, members_required: true },
+  ],
+  requires_approval: true,
+  contribution_model: 'in_kind',
+  counts_toward_capacity: false,
+  minors_allowed: true,
+  minor_max_age: 18,
+  closes_at: '2026-11-28T04:59:00Z',
+  issues_entry_qr: true,
+  fields: artistForm.fields,
+  fees: [],
+  donation_types: [{ id: 'don-1', label: 'Juguetes para niños' }],
+  available_notices: ['signup_approved', 'signup_not_approved', 'group_member_added', 'entry_pass'],
+  signup_count: 3,
+  people_count: 3,
+});
+
+/** A type as the event page lists it. */
+export function landingType(overrides: Partial<LandingParticipantType> = {}): LandingParticipantType {
+  return {
+    id: 'type-1',
+    name: 'Artistas',
+    registration_options: [{ kind: 'single', label: null }],
+    card_copy: { button_text: null, title: null, text: null, closing_message: null },
+    state: 'open',
+    closes_at: null,
+    requires_account: true,
+    fees: [],
+    minors: { allowed: false, max_age: null, per_adult_max: null, price: null },
+    pricing_model: 'per_person',
+    packages: [],
+    my_signup_id: null,
+    ...overrides,
+  };
+}

@@ -16,5 +16,7 @@ export * from './schedule-builder.page';
 export * from './campaigns.page';
 export * from './eventos.page';
 export * from './evento-edit.page';
+export * from './evento-inscripcion.page';
+export * from './entradas.page';
 export * from './evento-combo-edit.page';
 export * from './assisted.page';

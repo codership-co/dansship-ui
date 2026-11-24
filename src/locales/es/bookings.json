@@ -155,5 +155,33 @@
     "lateCancelToast": "Reserva cancelada. La clase no se devolvió a tu plan.",
     "lateCancelHint_one": "Podrás recuperarla pagando {{price}} durante el día siguiente.",
     "lateCancelHint_other": "Podrás recuperarla pagando {{price}} durante los próximos {{count}} días."
+  },
+  "participation": {
+    "signupLabel": "Inscripción · {{type}}",
+    "actName": "Presentación: {{name}}",
+    "viewSignup": "Ver inscripción",
+    "performed": "Te presentaste",
+    "ticketFor": "Entrada de {{name}}",
+    "withMinors": "Entra con: {{names}} (menor, sin QR)",
+    "repay": "Volver a pagar",
+    "viewQr": "Ver QR",
+    "viewMyEntry": "Ver mi entrada",
+    "history": {
+      "used": "Usada · {{time}}",
+      "not_used": "No usada",
+      "performed": "Te presentaste",
+      "approved": "Inscripción aprobada"
+    },
+    "pay": "Pagar",
+    "payDeposit": "Pagar anticipo",
+    "payNextInstallment": "Pagar siguiente cuota",
+    "paymentSent": "Recibimos tu comprobante. Lo revisamos y te avisamos.",
+    "payFailed": "No pudimos abrir el pago.",
+    "installmentStatus": {
+      "pending": "Pendiente",
+      "overdue": "Vencida",
+      "in_review": "En revisión",
+      "paid": "Pagada"
+    }
   }
 }

@@ -9,11 +9,9 @@ import {
   DansshipAPI,
   DansshipAPIError,
   type EventAdmin,
-  type EventInvite,
   type EventSession,
   type RecurrencePreview,
 } from '@core/api';
-import { PageURLS } from '@core/constants';
 import { usePromise } from '@hooks';
 
 interface EventSessionsPanelProps {
@@ -21,16 +19,11 @@ interface EventSessionsPanelProps {
   rooms: Array<{ id: string; name: string }>;
 }
 
+/** Sessions of an event: list and edit, one more session, or "Repetir cada semana". */
 export function EventSessionsPanel({ event, rooms }: EventSessionsPanelProps) {
   const { t } = useTranslation();
   const { response, reFetch } = usePromise(() => DansshipAPI.eventosAdmin.listSessions(event.id), true, [event.id]);
-  const { response: invitesResponse, reFetch: reFetchInvites } = usePromise(
-    () => DansshipAPI.eventosAdmin.listInvites(event.id),
-    true,
-    [event.id],
-  );
-  const [visibility, setVisibility] = useState(event.visibility ?? 'public');
-  const [token, setToken] = useState(event.access_token ?? '');
+  const allowsExternalPlace = usesExternalPlace(event);
   const [starts, setStarts] = useState('');
   const [ends, setEnds] = useState('');
   const [label, setLabel] = useState('');
@@ -43,17 +36,14 @@ export function EventSessionsPanel({ event, rooms }: EventSessionsPanelProps) {
   const [lastDate, setLastDate] = useState('');
   const [excludedDates, setExcludedDates] = useState('');
   const [preview, setPreview] = useState<RecurrencePreview | null>(null);
-  const [inviteQuery, setInviteQuery] = useState('');
-  const [matches, setMatches] = useState<Array<{ id: string; email: string; full_name: string }>>([]);
   const sessions = response?.data ?? event.sessions ?? [];
-  const invites = invitesResponse?.data ?? [];
   const weekdays = WEEKDAY_KEYS.map((day, index) => ({
     value: String(index),
     label: t(`common:days.${day}`),
   }));
 
   const placePayload = () =>
-    event.type === 'recital' && externalLocation.trim()
+    allowsExternalPlace && externalLocation.trim()
       ? { external_location: externalLocation.trim(), room_id: null }
       : { room_id: roomId || null, external_location: null };
 
@@ -114,66 +104,6 @@ export function EventSessionsPanel({ event, rooms }: EventSessionsPanelProps) {
     await reFetch();
   };
 
-  const saveVisibility = async (next: 'public' | 'link_only' | 'invite_only') => {
-    const { data, ok } = await DansshipAPI.eventosAdmin.setVisibility(event.id, next);
-
-    if (!ok || !data) {
-      toast.error(t('eventos:admin.sessionSaveFailed'));
-
-      return;
-    }
-
-    setVisibility(data.visibility ?? next);
-    setToken(data.access_token ?? '');
-  };
-
-  const rotate = async () => {
-    if (!window.confirm(t('eventos:admin.rotateLinkConfirm'))) {
-      return;
-    }
-
-    const { data, ok } = await DansshipAPI.eventosAdmin.rotateAccessToken(event.id);
-
-    if (!ok || !data) {
-      toast.error(t('eventos:admin.sessionSaveFailed'));
-
-      return;
-    }
-
-    setToken(data.access_token ?? '');
-  };
-
-  const copyLink = async () => {
-    const link = `${window.location.origin}${PageURLS.eventoAccess(token)}`;
-
-    try {
-      await navigator.clipboard.writeText(link);
-      toast.success(t('eventos:admin.linkCopied'));
-    } catch {
-      toast.error(t('eventos:admin.linkCopyFailed'));
-    }
-  };
-
-  const searchInvites = async () => {
-    const { data } = await DansshipAPI.usersAdmin.search({ search: inviteQuery.trim(), limit: 8 });
-
-    setMatches(data?.items ?? []);
-  };
-
-  const inviteUser = async (userId: string) => {
-    const { ok } = await DansshipAPI.eventosAdmin.invite(event.id, userId);
-
-    if (!ok) {
-      toast.error(t('eventos:admin.sessionSaveFailed'));
-
-      return;
-    }
-
-    setMatches([]);
-    setInviteQuery('');
-    await reFetchInvites();
-  };
-
   return (
     <section className='grid gap-4 rounded-2xl border p-4'>
       <h2 className='m-0 text-lg font-semibold'>{t('eventos:admin.sessionsTitle')}</h2>
@@ -182,7 +112,7 @@ export function EventSessionsPanel({ event, rooms }: EventSessionsPanelProps) {
           <SessionRow
             key={session.id}
             eventId={event.id}
-            eventType={event.type}
+            allowsExternalPlace={allowsExternalPlace}
             fieldsLocked={event.fields_locked}
             rooms={rooms}
             session={session}
@@ -203,7 +133,7 @@ export function EventSessionsPanel({ event, rooms }: EventSessionsPanelProps) {
           {t('eventos:admin.sessionLabel')}
           <Input value={label} onChange={event => setLabel(event.target.value)} />
         </Label>
-        {event.type === 'recital' ? (
+        {allowsExternalPlace ? (
           <Label className='grid gap-1'>
             {t('eventos:admin.externalLocation')}
             <Input value={externalLocation} onChange={event => setExternalLocation(event.target.value)} />
@@ -288,81 +218,20 @@ export function EventSessionsPanel({ event, rooms }: EventSessionsPanelProps) {
           ))}
         </div>
       ) : null}
-      <Label className='grid gap-1'>
-        {t('eventos:admin.visibility')}
-        <select
-          className='h-10 rounded-md border px-3'
-          value={visibility}
-          onChange={event => void saveVisibility(event.target.value as 'public' | 'link_only' | 'invite_only')}
-        >
-          <option value='public'>{t('eventos:admin.visibilityPublic')}</option>
-          <option value='link_only'>{t('eventos:admin.visibilityLink')}</option>
-          <option value='invite_only'>{t('eventos:admin.visibilityInvite')}</option>
-        </select>
-      </Label>
-      {visibility === 'link_only' && token ? (
-        <div className='flex flex-wrap items-center gap-2'>
-          <Input readOnly value={`${window.location.origin}${PageURLS.eventoAccess(token)}`} />
-          <Button color='primary' variant='outlined' type='button' onClick={() => void copyLink()}>
-            {t('eventos:admin.copyLink')}
-          </Button>
-          <Button color='primary' variant='outlined' type='button' onClick={() => void rotate()}>
-            {t('eventos:admin.rotateLink')}
-          </Button>
-        </div>
-      ) : null}
-      <div className='grid gap-2'>
-        <Label className='grid gap-1'>
-          {t('eventos:admin.inviteSearch')}
-          <Input value={inviteQuery} onChange={event => setInviteQuery(event.target.value)} />
-        </Label>
-        <Button color='primary' variant='outlined' type='button' onClick={() => void searchInvites()}>
-          {t('eventos:admin.searchPeople')}
-        </Button>
-        {matches.map(person => (
-          <button
-            key={person.id}
-            type='button'
-            className='text-left text-sm'
-            onClick={() => void inviteUser(person.id)}
-          >
-            {person.full_name} · {person.email}
-          </button>
-        ))}
-        <ul className='grid gap-1 text-sm'>
-          {invites.map((invite: EventInvite) => (
-            <li key={invite.id} className='flex items-center justify-between gap-2'>
-              <span>
-                {invite.display_name} · {invite.email}
-              </span>
-              <Button
-                color='primary'
-                variant='outlined'
-                type='button'
-                onClick={() =>
-                  void DansshipAPI.eventosAdmin.uninvite(event.id, invite.user_id).then(() => reFetchInvites())
-                }
-              >
-                {t('eventos:admin.removeInvite')}
-              </Button>
-            </li>
-          ))}
-        </ul>
-      </div>
     </section>
   );
 }
 
 function SessionRow({
   eventId,
-  eventType,
+  allowsExternalPlace,
   fieldsLocked,
   rooms,
   session,
   onChanged,
 }: {
   eventId: string;
-  eventType: EventAdmin['type'];
+  allowsExternalPlace: boolean;
   fieldsLocked: boolean;
   rooms: Array<{ id: string; name: string }>;
   session: EventSession;
@@ -458,7 +327,7 @@ function SessionRow({
             {t('eventos:admin.sessionLabel')}
             <Input value={label} onChange={event => setLabel(event.target.value)} />
           </Label>
-          {eventType === 'recital' ? (
+          {allowsExternalPlace ? (
             <Label className='grid gap-1'>
               {t('eventos:admin.externalLocation')}
               <Input value={externalLocation} onChange={event => setExternalLocation(event.target.value)} />
@@ -490,9 +359,14 @@ function SessionRow({
   );
 }
 
-const WEEKDAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
+/** Recitals and events configured by participant types may take place outside the studio. */
+export function usesExternalPlace(event: Pick<EventAdmin, 'type' | 'configuration_model'>): boolean {
+  return event.type === 'recital' || event.configuration_model === 'participant_types';
+}
 
-function parseExcludedDates(value: string) {
+export const WEEKDAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as const;
+
+export function parseExcludedDates(value: string) {
   return value
     .split(',')
     .map(item => item.trim())
@@ -506,7 +380,7 @@ function toDatetimeLocal(value: string) {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-function conflictMessage(error: unknown, t: (key: string, options?: Record<string, unknown>) => string) {
+export function conflictMessage(error: unknown, t: (key: string, options?: Record<string, unknown>) => string) {
   if (!(error instanceof DansshipAPIError)) {
     return t('eventos:admin.sessionSaveFailed');
   }

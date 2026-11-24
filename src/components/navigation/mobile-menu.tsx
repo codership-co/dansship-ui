@@ -48,12 +48,15 @@ export function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
   const { response: collaborations } = usePromise(() => DansshipAPI.eventos.listCollaborations(), isAuthenticated);
   const scheduleBuilderNavItem = getScheduleBuilderNavItem(t);
   const canAccessAdminMenu = useOrPermissions(getAdminMenuPermissions());
+  const canValidateEntries = useOrPermissions([PERMISSION.EVENT_ENTRY_VALIDATE]);
+  const canManageEvents = useOrPermissions(AdminPermissions.eventos);
 
   const primaryMenuItems: Array<NavItem> = [
     ...(isAuthenticated ? [getMobileProfileNavItem(t)] : []),
     ...getPrimaryNavItems(t, {
       isAuthenticated,
       showManagedEvents: (collaborations?.data?.length ?? 0) > 0,
+      showEntryValidation: canValidateEntries && !canManageEvents,
     }),
   ];
 

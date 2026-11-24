@@ -2,8 +2,10 @@ import { format, parseISO } from 'date-fns';
 import { Button } from 'polpo/components';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link, useSearchParams } from 'react-router';
 import { toast } from 'sonner';
 
+import { EventEnrollmentForm } from './event-enrollment-form';
 import { PersonGate } from './person-gate';
 
 import { CheckoutPaymentProofForm } from '@components/forms/checkout-payment-proof-form';
@@ -35,7 +37,8 @@ import {
   type PersonSearchResult,
   type SimplePersonInput,
 } from '@core/api';
-import { PERMISSION } from '@core/permissions';
+import { PageURLS } from '@core/constants';
+import { AssistedPermissions, PERMISSION } from '@core/permissions';
 import { formatPrice } from '@helpers';
 import { useDateLocale, usePromise } from '@hooks';
 
@@ -48,20 +51,24 @@ function SummaryRow({ label, value, strong = false }: { label: string; value: st
   );
 }
 
-function EventForm({ person }: { person: PersonSearchResult }) {
+function EventForm({ person, initialEventId }: { person: PersonSearchResult; initialEventId: string }) {
   const { t } = useTranslation('assisted');
   const { t: tAll } = useTranslation();
   const locale = useDateLocale();
   const { response } = usePromise(() => DansshipAPI.eventosAdmin.list());
-  const [eventId, setEventId] = useState('');
+  const [eventId, setEventId] = useState(initialEventId);
+  const canEnroll = useOrPermissions(AssistedPermissions.eventEnroll);
+  const canRegisterPayment = useOrPermissions([PERMISSION.EVENT_INSTALLMENT_PAYMENT_REGISTER]);
   const [paidOn, setPaidOn] = useState(() => format(new Date(), 'yyyy-MM-dd'));
   const [note, setNote] = useState('');
   const [registered, setRegistered] = useState(false);
   const [formKey, setFormKey] = useState(0);
   const events = (response?.data ?? []).filter(event => event.kind === 'event');
   const event = events.find(item => item.id === eventId);
+  // The list marks events configured by participant types with `type: "configured"` (they enroll; legacy events pay).
+  const configured = event?.type === 'configured';
   const payment = useManualInstallmentPayment({
-    eventId,
+    eventId: configured || !canRegisterPayment ? '' : eventId,
     userId: person.id,
     onRegistered: () => {
       setRegistered(true);
@@ -97,40 +104,62 @@ function EventForm({ person }: { person: PersonSearchResult }) {
             </SelectContent>
           </Select>
         </div>
-        <div className='grid content-start gap-2'>
-          <Label htmlFor='assisted-event-concept'>{t('event.concept')}</Label>
-          <Select
-            value={selectedOption ? installmentOptionKey(selectedOption) : ''}
-            disabled={options.length === 0}
-            onValueChange={value => {
-              const option = options.find(item => installmentOptionKey(item) === value);
+        {configured ? null : (
+          <div className='grid content-start gap-2'>
+            <Label htmlFor='assisted-event-concept'>{t('event.concept')}</Label>
+            <Select
+              value={selectedOption ? installmentOptionKey(selectedOption) : ''}
+              disabled={options.length === 0}
+              onValueChange={value => {
+                const option = options.find(item => installmentOptionKey(item) === value);
 
-              if (option) {
-                payment.setSelected(option.sequences);
-              }
-            }}
-          >
-            <SelectTrigger id='assisted-event-concept'>
-              <SelectValue placeholder={isQuoteLoading ? t('common.loading') : t('event.conceptPlaceholder')} />
-            </SelectTrigger>
-            <SelectContent>
-              {options.map(option => (
-                <SelectItem key={installmentOptionKey(option)} value={installmentOptionKey(option)}>
-                  {installmentOptionLabel(option, (key, values) => tAll(key, values), formatAmount)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+                if (option) {
+                  payment.setSelected(option.sequences);
+                }
+              }}
+            >
+              <SelectTrigger id='assisted-event-concept'>
+                <SelectValue placeholder={isQuoteLoading ? t('common.loading') : t('event.conceptPlaceholder')} />
+              </SelectTrigger>
+              <SelectContent>
+                {options.map(option => (
+                  <SelectItem key={installmentOptionKey(option)} value={installmentOptionKey(option)}>
+                    {installmentOptionLabel(option, (key, values) => tAll(key, values), formatAmount)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
-      {event && !isQuoteLoading && options.length === 0 ? (
+      {event && configured ? (
+        canEnroll ? (
+          <EventEnrollmentForm
+            key={event.id}
+            eventId={event.id}
+            eventName={event.name}
+            person={person}
+            onEnrolled={() => setRegistered(true)}
+          />
+        ) : (
+          <p className='m-0 rounded-md border border-warning-600 bg-warning-50 p-3 text-sm'>
+            {t('event.enroll.noPermission')}
+          </p>
+        )
+      ) : null}
+      {event && !configured && !canRegisterPayment ? (
+        <p className='m-0 rounded-md border border-warning-600 bg-warning-50 p-3 text-sm'>
+          {t('event.noPaymentPermission')}
+        </p>
+      ) : null}
+      {event && !configured && canRegisterPayment && !isQuoteLoading && options.length === 0 ? (
         <p className='m-0 rounded-md border border-warning-600 bg-warning-50 p-3 text-sm'>
           {t(
             `event.noOptions.${quoteErrorCode === DANSSHIP_ERROR_CODE.EVENT_MANUAL_PAYMENT_PAIR_NOT_SUPPORTED ? 'pair' : 'generic'}`,
           )}
         </p>
       ) : null}
-      {event && selectedOption ? (
+      {event && !configured && canRegisterPayment && selectedOption ? (
         <>
           <div className='divide-y divide-border overflow-hidden rounded-2xl border border-border bg-white'>
             <SummaryRow label={t('event.summary.event')} value={event.name} />
@@ -194,7 +223,7 @@ function EventForm({ person }: { person: PersonSearchResult }) {
           />
         </>
       ) : null}
-      {registered ? <p className='text-sm text-active'>{t('event.registered')}</p> : null}
+      {registered && !configured ? <p className='text-sm text-active'>{t('event.registered')}</p> : null}
     </div>
   );
 }
@@ -248,9 +277,25 @@ function CreatePersonAction({ onCreated }: { onCreated: (person: PersonSearchRes
 }
 
 export function EventTab() {
+  const { t } = useTranslation('assisted');
+  const [params] = useSearchParams();
+  // "+ Inscribir persona" from Inscritos opens this tab with the event preselected.
+  const fromEventId = params.get('event') ?? '';
+
   return (
-    <PersonGate emptyAction={select => <CreatePersonAction onCreated={select} />}>
-      {person => <EventForm key={person.id} person={person} />}
-    </PersonGate>
+    <div className='grid gap-4'>
+      {fromEventId ? (
+        <Link
+          className='w-fit text-sm font-semibold text-primary'
+          to={`${PageURLS.admin.eventoEdit(fromEventId)}?tab=people`}
+          viewTransition
+        >
+          {t('event.backToEvent')}
+        </Link>
+      ) : null}
+      <PersonGate emptyAction={select => <CreatePersonAction onCreated={select} />}>
+        {person => <EventForm key={person.id} person={person} initialEventId={fromEventId} />}
+      </PersonGate>
+    </div>
   );
 }

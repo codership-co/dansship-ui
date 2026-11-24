@@ -6,6 +6,7 @@ import {
   LuCalendarHeart,
   LuDoorOpen,
   LuFootprints,
+  LuScanLine,
   LuUser,
 } from 'react-icons/lu';
 
@@ -36,6 +37,8 @@ type Translate = (key: string) => string;
 interface PrimaryNavOptions {
   isAuthenticated: boolean;
   showManagedEvents?: boolean;
+  /** Door staff (validate:event_entry without event admin); admins reach it from the event. */
+  showEntryValidation?: boolean;
 }
 
 /** Permissions that reveal the hamburger Admin section. */
@@ -77,7 +80,7 @@ export function getScheduleBuilderNavItem(t: Translate): NavItem {
  */
 export function getPrimaryNavItems(
   t: Translate,
-  { isAuthenticated, showManagedEvents = false }: PrimaryNavOptions,
+  { isAuthenticated, showManagedEvents = false, showEntryValidation = false }: PrimaryNavOptions,
 ): Array<NavItem> {
   return !isAuthenticated
     ? [
@@ -156,6 +159,18 @@ export function getPrimaryNavItems(
                 requireAuthentication: true,
                 featureFlags: [FEATURE_FLAG.isTalleresPageEnabled],
                 icon: LuCalendarClock,
+              },
+            ]
+          : []),
+        ...(showEntryValidation
+          ? [
+              {
+                to: PageURLS.admin.entryDoor,
+                label: t('eventos:door.nav'),
+                requireAuthentication: true,
+                andPermissions: [PERMISSION.EVENT_ENTRY_VALIDATE],
+                featureFlags: [FEATURE_FLAG.areAdminPagesEnabled],
+                icon: LuScanLine,
               },
             ]
           : []),

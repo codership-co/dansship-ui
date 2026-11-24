@@ -21,6 +21,7 @@ describe('assisted attention tabs', () => {
     expect(visibleFor(PERMISSION.PLAN_PURCHASE_REGISTER)).toEqual([ASSISTED_TAB.plan]);
     expect(visibleFor(PERMISSION.BOOKING_MANAGE)).toEqual([ASSISTED_TAB.class]);
     expect(visibleFor(PERMISSION.EVENT_INSTALLMENT_PAYMENT_REGISTER)).toEqual([ASSISTED_TAB.event]);
+    expect(visibleFor(PERMISSION.EVENT_ENROLL)).toEqual([ASSISTED_TAB.event]);
     expect(visibleFor(PERMISSION.BENEFIT_GRANT)).toEqual([ASSISTED_TAB.benefits]);
   });
 

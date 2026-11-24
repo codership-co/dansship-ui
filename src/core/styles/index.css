@@ -173,6 +173,13 @@
     --uplift: 10rem;
   }
 
+  /* polpo locks the page scroll (overflow: hidden on <html>) for every modal, tooltips included. For a tooltip
+     that hides the 10px scrollbar, the page shifts under the cursor and the tooltip flickers open and closed.
+     A tooltip never needs the lock; real modals keep it. (scrollbar-gutter is ignored with ::-webkit-scrollbar.) */
+  html:has(.polpo-tooltip) {
+    overflow: auto !important;
+  }
+
   html,
   body,
   #root {
@@ -228,3 +235,39 @@
     }
   }
 }
+
+/* Printed list (ADR-064 Part 3): only the list portal prints, never the app chrome. */
+.print-root {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm 12mm 16mm;
+
+    /* Page numbers where the browser supports margin boxes (Chrome, Edge). */
+    @bottom-right {
+      content: counter(page) ' / ' counter(pages);
+      font-size: 9pt;
+    }
+  }
+
+  body.printing-list > *:not(.print-root) {
+    display: none !important;
+  }
+
+  body.printing-list > .print-root {
+    display: block;
+    font-size: 11pt;
+  }
+
+  .print-root tr {
+    break-inside: avoid;
+  }
+
+  .print-root thead {
+    display: table-header-group;
+  }
+}
+

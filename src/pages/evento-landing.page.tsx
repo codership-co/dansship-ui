@@ -8,10 +8,11 @@ function EventoLandingPage() {
   const { slug = '', token } = useParams();
   const [params] = useSearchParams();
   const preview = params.get('preview') === '1';
+  const repayPurchaseId = params.get('repagar');
 
   return (
     <Section navbarPadding>
-      <EventoLanding slug={slug} preview={preview} accessToken={token} />
+      <EventoLanding slug={slug} preview={preview} accessToken={token} repayPurchaseId={repayPurchaseId} />
     </Section>
   );
 }

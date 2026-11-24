@@ -22,7 +22,10 @@ import type {
   EventLanding,
   EventRosterEntry,
   EventSession,
+  EventTypeLabel,
+  EventTypeLabelUpdatePayload,
   EventUpdatePayload,
+  EventVisibility,
   RecurrencePreview,
   InstallmentProofContentType,
   InstallmentQuote,
@@ -386,7 +389,8 @@ export class EventosAdminAPI {
     });
   }
 
-  async setVisibility(eventId: string, visibility: 'public' | 'link_only' | 'invite_only') {
+  /** Configured events: Público (`public`) or Privado (`invite_only`); `link_only` stays only on legacy events. */
+  async setVisibility(eventId: string, visibility: EventVisibility) {
     return this.httpClient.callNoError<EventAdmin>({
       path: `/admin/events/${eventId}/visibility`,
       method: 'PUT',
@@ -394,10 +398,43 @@ export class EventosAdminAPI {
     });
   }
 
-  async rotateAccessToken(eventId: string) {
+  /** Removes the event's own QR; the page falls back to Dansship's. */
+  async removePaymentQr(eventId: string) {
     return this.httpClient.callNoError<EventAdmin>({
-      path: `/admin/events/${eventId}/access-token/rotate`,
+      path: `/admin/events/${eventId}/payment-qr`,
+      method: 'DELETE',
+    });
+  }
+
+  /** Copies Información, types and terms (not people, payments or dates) into an undated draft. */
+  async duplicate(eventId: string) {
+    return this.httpClient.callNoError<EventAdmin>({
+      path: `/admin/events/${eventId}/duplicate`,
       method: 'POST',
+    });
+  }
+
+  async listTypeLabels() {
+    return this.httpClient.callNoError<Array<EventTypeLabel>>({
+      path: '/admin/event-type-labels',
+      method: 'GET',
+      params: { offered_only: 'false' },
+    });
+  }
+
+  async createTypeLabel(name: string) {
+    return this.httpClient.callNoError<EventTypeLabel, { name: string }>({
+      path: '/admin/event-type-labels',
+      method: 'POST',
+      data: { name },
+    });
+  }
+
+  async updateTypeLabel(labelId: string, payload: EventTypeLabelUpdatePayload) {
+    return this.httpClient.callNoError<EventTypeLabel, EventTypeLabelUpdatePayload>({
+      path: `/admin/event-type-labels/${labelId}`,
+      method: 'PATCH',
+      data: payload,
     });
   }
 

@@ -1,5 +1,11 @@
+import type { LandingParticipation } from './participation.models';
+
 export type EventStatus = 'draft' | 'published';
-export type EventType = 'taller' | 'clase_especial' | 'recital';
+export type EventType = 'taller' | 'clase_especial' | 'recital' | 'showcase' | 'configured';
+/** `participant_types`: Información + participant types; `legacy`: the old flat events. Chooses the editor. */
+export type EventConfigurationModel = 'legacy' | 'participant_types';
+/** Público / Privado; `link_only` survives only on legacy events (read-only, inherited). */
+export type EventVisibility = 'public' | 'link_only' | 'invite_only';
 export type EventOfferingKind = 'event' | 'combo';
 export type EventRegistrationSource = 'direct' | 'combo';
 export type EventRegistrationStatus = 'pending_payment' | 'confirmed' | 'expired' | 'rejected' | 'withdrawn';
@@ -136,7 +142,10 @@ export interface EventLanding {
   requires_partner: boolean;
   simple_registration_enabled?: boolean;
   starts_at?: string | null;
+  /** Null when the event hides its end time. */
   ends_at?: string | null;
+  /** Off: people only see the start (`schedule_label` has no end). */
+  shows_end_time?: boolean;
   room_name?: string | null;
   external_location?: string | null;
   instructor?: InstructorLanding | null;
@@ -156,6 +165,8 @@ export interface EventLanding {
   } | null;
   components: Array<LandingComponentCard>;
   payment_qr_url?: string | null;
+  /** ADR-064: participant types this viewer can see (showcase events only). */
+  participation?: LandingParticipation | null;
 }
 
 export interface AdminEventListItem {
@@ -166,6 +177,7 @@ export interface AdminEventListItem {
   date_label: string | null;
   starts_at: string | null;
   status: EventStatus;
+  /** `configured` marks an event configured by participant types (the list carries no `configuration_model`). */
   type?: EventType | null;
   type_label?: string | null;
   holding_registrations: number;
@@ -173,15 +185,45 @@ export interface AdminEventListItem {
   simple_registration_enabled?: boolean;
 }
 
+/** A dateless session of a duplicated draft (Bogotá weekday 0 = Monday, HH:MM times). */
+export interface EventSessionTemplate {
+  label: string | null;
+  weekday: number;
+  start_time: string;
+  end_time: string;
+  room_id: string | null;
+  external_location: string | null;
+  is_main: boolean;
+}
+
+/** "Editar lista": a label carries no behavior; it is never deleted, only stops being offered. */
+export interface EventTypeLabel {
+  id: string;
+  name: string;
+  position: number;
+  is_offered: boolean;
+  events_count: number;
+}
+
+export interface EventTypeLabelUpdatePayload {
+  name?: string;
+  position?: number;
+  is_offered?: boolean;
+}
+
 export interface EventAdmin {
   id: string;
   name: string;
   description: string | null;
-  starts_at: string;
-  ends_at: string;
+  /** Null only for a duplicated draft that still waits for its dates. */
+  starts_at: string | null;
+  ends_at: string | null;
+  /** Off: the end is stored (room booking) but people only see the start. */
+  shows_end_time?: boolean;
+  session_templates?: Array<EventSessionTemplate> | null;
   room_id: string | null;
   external_location?: string | null;
-  instructor_id: string;
+  instructor_id: string | null;
   capacity: number;
   image_key: string | null;
   image_url: string | null;
@@ -198,6 +240,8 @@ export interface EventAdmin {
   base_price: string | number;
   type: EventType;
   type_label: string;
+  type_label_id?: string | null;
+  configuration_model?: EventConfigurationModel;
   tax_type_id: string;
   status: EventStatus;
   published_at: string | null;
@@ -205,9 +249,10 @@ export interface EventAdmin {
   installments?: Array<EventInstallmentDefinition>;
   holding_registrations: number;
   fields_locked: boolean;
-  visibility?: 'public' | 'link_only' | 'invite_only';
+  visibility?: EventVisibility;
   access_token?: string | null;
   sessions?: Array<EventSession>;
+  uses_participant_types?: boolean;
   created_at: string;
   updated_at: string;
 }
@@ -247,19 +292,18 @@ export interface EventCreatePayload {
   description?: string | null;
   starts_at: string;
   ends_at: string;
+  shows_end_time?: boolean;
   room_id?: string | null;
   external_location?: string | null;
-  instructor_id: string;
+  instructor_id?: string | null;
   capacity: number;
-  requires_partner: boolean;
-  simple_registration_enabled?: boolean;
+  requires_partner?: boolean;
   is_collaboration?: boolean;
   collaborator_email?: string | null;
   collaborator_participation_percentage?: number | string;
-  base_price: number | string;
-  type?: EventType;
-  price_tiers: Array<EventPriceTierInput>;
-  installments?: Array<EventInstallmentDefinition>;
+  /** Legacy creation is closed (`EVENT_LEGACY_CREATE_CLOSED`): the UI only creates configured events. */
+  configuration_model: 'participant_types';
+  type_label_id: string;
 }
 
 export interface EventUpdatePayload {
@@ -267,8 +311,12 @@ export interface EventUpdatePayload {
   description?: string | null;
   starts_at?: string;
   ends_at?: string;
-  room_id?: string;
+  shows_end_time?: boolean;
+  room_id?: string | null;
   instructor_id?: string;
+  /** Configured events only: drop the instructor. */
+  clear_instructor?: boolean;
+  type_label_id?: string;
   capacity?: number;
   requires_partner?: boolean;
   simple_registration_enabled?: boolean;
@@ -301,6 +349,8 @@ export interface PriceConditionCatalogItem {
   condition_type: string;
   label: string;
   param_schema: Record<string, unknown>;
+  /** The participant-type editor offers only these ("Comunidad Dansship"). */
+  offered_in_editor?: boolean;
 }
 
 export interface PartnerLookupResponse {

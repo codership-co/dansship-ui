@@ -22,8 +22,17 @@ export function sessionSummaryText(
     return null;
   }
 
-  if (summary.weekday === null || summary.weekday === undefined || !summary.start_time || !summary.end_time) {
+  if (summary.weekday === null || summary.weekday === undefined || !summary.start_time) {
     return translate('eventos:landing.sessionCount', { count: summary.extra_count });
+  }
+
+  // The event hides its end time: only the start.
+  if (!summary.end_time) {
+    return translate('eventos:landing.sessionCountWithStart', {
+      count: summary.extra_count,
+      weekday: WEEKDAYS[summary.weekday] ?? '',
+      start: clockLabel(summary.start_time),
+    });
   }
 
   return translate('eventos:landing.sessionCountWithTime', {

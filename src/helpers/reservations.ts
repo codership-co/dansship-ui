@@ -1,12 +1,13 @@
-import type { MyBooking, MyEventRegistration, RentalRequest, RentalSeries } from '@core/api';
+import type { MyBooking, MyEventRegistration, MyParticipationRow, RentalRequest, RentalSeries } from '@core/api';
 
-export type ReservationKind = 'class' | 'event' | 'rental' | 'rental_series';
+export type ReservationKind = 'class' | 'event' | 'rental' | 'rental_series' | 'participation';
 
 export type ReservationItem =
   | { kind: 'class'; id: string; startsAt: string; booking: MyBooking }
   | { kind: 'event'; id: string; startsAt: string; registration: MyEventRegistration }
   | { kind: 'rental'; id: string; startsAt: string; request: RentalRequest; roomName: string }
-  | { kind: 'rental_series'; id: string; startsAt: string; series: RentalSeries; roomName: string };
+  | { kind: 'rental_series'; id: string; startsAt: string; series: RentalSeries; roomName: string }
+  | { kind: 'participation'; id: string; startsAt: string; participation: MyParticipationRow };
 
 export function classReservation(booking: MyBooking): ReservationItem {
   return {
@@ -23,6 +24,16 @@ export function eventReservation(registration: MyEventRegistration): Reservation
     id: `event-${registration.id}`,
     startsAt: registration.starts_at,
     registration,
+  };
+}
+
+/** ADR-064: an artist registration or a ticket of a participant-type event. */
+export function participationReservation(row: MyParticipationRow): ReservationItem {
+  return {
+    kind: 'participation',
+    id: `participation-${row.kind}-${row.id}`,
+    startsAt: row.starts_at,
+    participation: row,
   };
 }
 
@@ -62,6 +73,10 @@ export function reservationDisplayTitle(
 
   if (item.kind === 'event') {
     return t('bookings:eventNamedTitle', { name: item.registration.event_name });
+  }
+
+  if (item.kind === 'participation') {
+    return item.participation.event_name;
   }
 
   if (item.roomName) {

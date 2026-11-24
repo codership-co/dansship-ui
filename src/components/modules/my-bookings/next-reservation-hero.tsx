@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router';
 import { EventInstallmentActions } from './event-installment-actions';
 import { EventSessionLines } from './event-session-lines';
 import { NextClassHero } from './next-class-hero';
+import { ParticipationReservationCard } from './participation-reservation-card';
 
 import { PageURLS } from '@core/constants';
 import { getBookingCountdown, rentalStatusI18nKey, reservationDisplayTitle, type ReservationItem } from '@helpers';
@@ -127,6 +128,10 @@ export function NextReservationHero({ item, isCancelDisabled, onCancelClass }: N
 
   if (item.kind === 'class') {
     return <NextClassHero booking={item.booking} isCancelDisabled={isCancelDisabled} onCancel={onCancelClass} />;
+  }
+
+  if (item.kind === 'participation') {
+    return <ParticipationReservationCard row={item.participation} />;
   }
 
   if (item.kind === 'event') {

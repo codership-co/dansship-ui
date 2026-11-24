@@ -145,6 +145,9 @@ export enum PERMISSION {
   // EVENT
   EVENT_MANAGE = 'manage:event',
   EVENT_PURCHASE = 'purchase:event',
+  EVENT_ENTRY_VALIDATE = 'validate:event_entry',
+  /** "+ Inscribir persona" on events configured by participant types (admin only). */
+  EVENT_ENROLL = 'enroll:event',
 
   // CLASS FEEDBACK
   CLASS_FEEDBACK_READ = 'read:class_feedback',
@@ -180,7 +183,9 @@ export const AssistedPermissions = {
   accountMerge: [PERMISSION.USER_ACCOUNTS_MERGE],
   plan: [PERMISSION.PLAN_PURCHASE_REGISTER],
   class: [PERMISSION.BOOKING_MANAGE],
-  event: [PERMISSION.EVENT_INSTALLMENT_PAYMENT_REGISTER],
+  /** Legacy manual payment or the enrollment of configured events. */
+  event: [PERMISSION.EVENT_INSTALLMENT_PAYMENT_REGISTER, PERMISSION.EVENT_ENROLL],
+  eventEnroll: [PERMISSION.EVENT_ENROLL],
   contacts: [PERMISSION.CONTACT_LEAD_READ],
   benefits: [PERMISSION.BENEFIT_GRANT],
 };
