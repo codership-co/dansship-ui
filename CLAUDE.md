@@ -5,12 +5,12 @@ Guidance for Claude Code when working in `dansship-ui` (React SPA for Dansship; 
 ## Stack
 React 19 + TypeScript SPA on Vite. React Router 7, i18next, Tailwind v4, Radix/shadcn-style UI, `polpo` / `polpo-http-client`, react-hook-form + zod, Sentry. No Redux/Zustand: React Context + service hooks. Hosted on Vercel (SPA).
 
-Deeper technical context: `docs/admin-ui-architecture.md`. The backend is a separate repo (`../polership-api`); error codes are in `../polership-api/docs/ERROR_CODES.md`.
+Deeper technical context: `docs/admin-ui-architecture.md`. The backend is a separate repo, cloned next to this one as `../dansship-api` or `../polership-api` depending on the clone; error codes are in its `docs/ERROR_CODES.md`.
 
 ## Tooling
 - Node `>24.14.0`, `pnpm@11.2.2` (use `corepack pnpm` if `pnpm` isn't on PATH). Don't use npm (`package-lock.json` is stale).
 - Commands: `pnpm dev`, `pnpm build`, `pnpm lint` (`--max-warnings 0`), `pnpm lint:fix`, `pnpm exec tsc --noEmit`, `pnpm test` (vitest, jsdom; setup in `src/test/setup.ts`).
-- After meaningful changes validate in this order: `pnpm build` → `pnpm lint` → `pnpm exec tsc --noEmit` → `pnpm test` (CI runs lint + tsc; the pre-commit hook runs `lint:fix` + `tsc`).
+- After meaningful changes validate in this order: `pnpm build` → `pnpm lint` → `pnpm exec tsc --noEmit` → `pnpm exec vitest run <related test files>` (CI runs lint + tsc; the pre-commit hook runs `lint:fix` + `tsc`).
 - Local dev runs at `http://localhost.dansship.com` (hosts entry required so cookies work). Env via `vercel env pull`; never commit `.env.local`.
 - Add shadcn primitives with `pnpm create-component <name>`.
 
@@ -75,7 +75,7 @@ Deeper technical context: `docs/admin-ui-architecture.md`. The backend is a sepa
 - Keep list rows/cards clean: no itemized breakdowns in list rows (e.g. cuentas de cobro); put detail in the PDF/detail view.
 
 ## Testing
-- Vitest, co-located `*.test.ts(x)` next to the source (see `src/core/*.test.ts`, `src/hooks/*.test.tsx`). Add tests for new hooks, helpers and API clients; run `pnpm test` before finishing.
+- Vitest, co-located `*.test.ts(x)` next to the source (see `src/core/*.test.ts`, `src/hooks/*.test.tsx`). Add tests for new hooks, helpers and API clients. Before finishing, run only the Vitest files you created or changed plus those of the touched components (`pnpm exec vitest run <files>`), never the whole suite (`pnpm test`); the team runs that.
 
 ## Safety (UI specifics)
 Needs explicit approval: auth contexts/`SecurityGuard`/permission logic, session/cookie handling in the HTTP client, `vercel.json`, `.husky`, `.github/workflows`, env handling. Never edit `dist/`, `ds-bundle/`, `.ds-sync/`, `.design-sync/` or `claude_design/` by hand unless asked (generated/design-sync assets).
