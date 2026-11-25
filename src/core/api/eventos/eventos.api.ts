@@ -25,14 +25,17 @@ import type {
   EventAdmin,
 } from './eventos.models';
 import type { SimplePersonInput } from '../assisted/assisted.models';
+import type { OffsetPage, OffsetPageParams } from '../common/common.models';
 
 export class EventosAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
-  async listCatalog() {
-    return this.httpClient.callNoError<Array<EventCatalogCard>>({
-      path: '/events/catalog',
+  /** One page of the published catalog, newest to oldest; the API orders, filters and paginates. */
+  async listCatalogPage(params: OffsetPageParams) {
+    return this.httpClient.callNoError<OffsetPage<EventCatalogCard>>({
+      path: '/events/catalog/page',
       method: 'GET',
+      params,
     });
   }
 

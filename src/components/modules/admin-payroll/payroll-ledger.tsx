@@ -5,12 +5,12 @@ import { toast } from 'sonner';
 import { formatMonthLabel } from './adjustment-months';
 import { PayrollBreakdownDialog } from './payroll-breakdown-dialog';
 import { PayrollFilters, getDefaultPayrollFilters, type PayrollFilterValues } from './payroll-filters';
-import { PayrollPagination } from './payroll-pagination';
 import { PayrollSummary } from './payroll-summary';
 import { PayrollCards, PayrollTable, type PayrollDownloadKind } from './payroll-table';
 
 import { SectionEmpty } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
+import { ListPagination } from '@components/navigation';
 import { DansshipAPI, type PayrollDocument, type PayrollQuery } from '@core/api';
 import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
 
@@ -107,7 +107,7 @@ export function PayrollLedger() {
         <>
           <PayrollTable documents={documents} onDownload={handleDownload} onShowBreakdown={setBreakdown} />
           <PayrollCards documents={documents} onDownload={handleDownload} onShowBreakdown={setBreakdown} />
-          <PayrollPagination page={page} pageSize={PAGE_SIZE} total={total} onPageChange={setPage} />
+          <ListPagination page={page} pageSize={PAGE_SIZE} total={total} onPageChange={setPage} />
         </>
       )}
       <PayrollBreakdownDialog

@@ -5,3 +5,4 @@ export * from './mobile-menu';
 export * from './nav-items';
 export * from './language-flag';
 export * from './language-selector';
+export * from './list-pagination';

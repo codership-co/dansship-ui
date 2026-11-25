@@ -32,6 +32,7 @@ import type {
   ManualInstallmentConfirmPayload,
   ManualInstallmentPaymentResult,
 } from './eventos.models';
+import type { OffsetPage, OffsetPageParams } from '../common/common.models';
 
 export class EventosAdminAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
@@ -40,6 +41,15 @@ export class EventosAdminAPI {
     return this.httpClient.callNoError<Array<AdminEventListItem>>({
       path: '/admin/events',
       method: 'GET',
+    });
+  }
+
+  /** One page of events and combos, newest to oldest; the API orders and paginates. */
+  async listPage(params: OffsetPageParams) {
+    return this.httpClient.callNoError<OffsetPage<AdminEventListItem>>({
+      path: '/admin/events/page',
+      method: 'GET',
+      params,
     });
   }
 

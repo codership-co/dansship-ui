@@ -86,5 +86,11 @@
     "emailPlaceholder": "tucorreo@correo.com",
     "phone": "Celular",
     "phonePlaceholder": "300 000 0000"
+  },
+  "pagination": {
+    "label": "Paginación",
+    "previous": "Anterior",
+    "next": "Siguiente",
+    "page": "Página {{page}} de {{pages}}"
   }
 }
