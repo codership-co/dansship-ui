@@ -715,11 +715,6 @@
     },
     "empty": "No hay cuentas con estos filtros.",
     "loadFailed": "No se pudo cargar la nómina.",
-    "pagination": {
-      "previous": "Anterior",
-      "next": "Siguiente",
-      "page": "Página {{page}} de {{pages}}"
-    },
     "adjustmentsSubtitle": "Pagos extra y adelantos que se reflejan en la siguiente cuenta de cobro.",
     "breakdown": {
       "title": "Detalle de la cuenta",

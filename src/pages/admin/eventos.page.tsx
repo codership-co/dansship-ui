@@ -5,15 +5,16 @@ import { Link } from 'react-router';
 import { SectionHeading } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { EventosList } from '@components/modules/admin-eventos';
+import { ListPagination } from '@components/navigation';
 import { FEATURE_FLAG, SecurityGuard } from '@contexts';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { AdminPermissions } from '@core/permissions';
-import { usePromise } from '@hooks';
+import { usePagedList } from '@hooks';
 
 function AdminEventosPage() {
   const { t } = useTranslation();
-  const { response, isLoading } = usePromise(() => DansshipAPI.eventosAdmin.list());
+  const list = usePagedList(params => DansshipAPI.eventosAdmin.listPage(params));
 
   return (
     <div className='mx-auto max-w-7xl space-y-6 px-4 py-8 pt-20'>
@@ -32,7 +33,14 @@ function AdminEventosPage() {
           </Link>
         </div>
       </div>
-      {isLoading || response === null ? <SpinnerLoader /> : <EventosList items={response.data ?? []} />}
+      {list.isLoading ? (
+        <SpinnerLoader />
+      ) : (
+        <>
+          <EventosList items={list.items} />
+          <ListPagination page={list.page} pageSize={list.pageSize} total={list.total} onPageChange={list.setPage} />
+        </>
+      )}
     </div>
   );
 }

@@ -18,7 +18,7 @@ describe('payroll copy', () => {
       ...['table.person', 'table.period', 'table.amount', 'table.paidAmount', 'table.paidAt', 'table.status'],
       ...['table.documents', 'downloads.invoice', 'downloads.receipt', 'downloads.openFailed'],
       ...['export.button', 'export.success', 'export.failed', 'loadFailed'],
-      ...['pagination.previous', 'pagination.next', 'paymentTypes.hourly_classes', 'paymentTypes.fixed_amount'],
+      ...['paymentTypes.hourly_classes', 'paymentTypes.fixed_amount'],
       ...['paymentTypes.mixed', ...STATUSES.map(status => `status.${status}`)],
     ];
 
@@ -32,7 +32,6 @@ describe('payroll copy', () => {
       }
     }
 
-    expect(t('pagination.page', { page: 2, pages: 5 })).toBe('Página 2 de 5');
     expect(getDefaultPayrollFilters().status).toBe('all');
   });
 });

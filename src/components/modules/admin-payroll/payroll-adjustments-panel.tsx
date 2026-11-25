@@ -7,11 +7,11 @@ import { AdjustmentDialog } from './adjustment-dialog';
 import { AdjustmentsFilters, getDefaultAdjustmentFilters, type AdjustmentFilterValues } from './adjustments-filters';
 import { AdjustmentsSummary } from './adjustments-summary';
 import { AdjustmentsCards, AdjustmentsTable } from './adjustments-table';
-import { PayrollPagination } from './payroll-pagination';
 
 import { SectionEmpty } from '@components/containers';
 import { SpinnerLoader } from '@components/loaders';
 import { ConfirmDialog } from '@components/modals';
+import { ListPagination } from '@components/navigation';
 import {
   DansshipAPI,
   type PayrollAdjustment,
@@ -166,7 +166,7 @@ export function PayrollAdjustmentsPanel({ onOpenAssignments }: { onOpenAssignmen
             onDelete={setToDelete}
             onOpenDocument={documentId => void handleOpenDocument(documentId)}
           />
-          <PayrollPagination page={page} pageSize={PAGE_SIZE} total={total} onPageChange={setPage} />
+          <ListPagination page={page} pageSize={PAGE_SIZE} total={total} onPageChange={setPage} />
         </>
       )}
 
