@@ -3,6 +3,8 @@ export interface ClassFeedbackCreatePayload {
   class_rating: number;
   instructor_rating: number;
   comment?: string | null;
+  /** The managed minor whose class a guardian rates; omitted = the signed-in user. */
+  attendee_user_id?: string;
 }
 
 export interface ClassFeedbackItem {
@@ -20,6 +22,10 @@ export interface ClassFeedbackItem {
   instructor_name?: string | null;
   user_email?: string | null;
   user_name?: string | null;
+  /** Set when a guardian rated a managed minor's class (`user_id` is the minor). */
+  rated_by_user_id?: string | null;
+  /** Guardian's name; admin report only. */
+  rated_by_name?: string | null;
 }
 
 export interface ClassFeedbackListResponse {

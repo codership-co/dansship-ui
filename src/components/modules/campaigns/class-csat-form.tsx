@@ -201,11 +201,12 @@ export function ClassCsatForm({ campaign, isSubmitting, onSubmit, onDismiss }: C
   return (
     <div className='grid gap-3 p-6'>
       <h2 className='text-xl font-semibold text-gray-900'>
-        {t('campaigns:classCsat.title', {
+        {t(context.attendee_name ? 'campaigns:classCsat.titleFor' : 'campaigns:classCsat.title', {
           headline: formatClassCsatHeadline(
             context.class_name?.trim() || t('campaigns:classCsat.classFallback'),
             context.class_start_time ?? context.class_end_time,
           ),
+          name: context.attendee_name,
         })}
       </h2>
       <ClassCsatFields
@@ -215,6 +216,7 @@ export function ClassCsatForm({ campaign, isSubmitting, onSubmit, onDismiss }: C
         onSubmit={async values => {
           await onSubmit({
             scheduled_class_id: context.scheduled_class_id,
+            ...(context.attendee_user_id ? { attendee_user_id: context.attendee_user_id } : {}),
             class_rating: values.class_rating,
             instructor_rating: values.instructor_rating,
             ...(values.comment ? { comment: values.comment } : {}),

@@ -89,6 +89,7 @@
   },
   "classCsat": {
     "title": "Califica {{headline}}",
+    "titleFor": "Califica la clase de {{name}}: {{headline}}",
     "classRating": "¿Qué te pareció la clase?",
     "instructorRating": "¿Qué te pareció la instructora?",
     "instructorRatingNamed": "¿Qué te pareció {{name}}?",

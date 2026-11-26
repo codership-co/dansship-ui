@@ -20,6 +20,8 @@ import { FEATURE_FLAG, SecurityGuard, useAuth, useStudentSession } from '@contex
 import { DansshipAPI, MyBooking, configuredParticipationRows, type RentalRequest, type RentalSeries } from '@core/api';
 import { PageURLS } from '@core/constants';
 import {
+  classFeedbackErrorKey,
+  classFeedbackKey,
   classReservation,
   isUpcomingRental,
   isUpcomingRentalSeries,
@@ -125,10 +127,15 @@ function BookingsPage() {
   const [isSubmittingRating, setIsSubmittingRating] = useState(false);
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-  const ratedClassIds = useMemo(
-    () => new Set((myFeedbackResponse?.data?.items ?? []).map(item => item.scheduled_class_id)),
+  const ratedClassKeys = useMemo(
+    () =>
+      new Set(
+        (myFeedbackResponse?.data?.items ?? []).map(item => classFeedbackKey(item.user_id, item.scheduled_class_id)),
+      ),
     [myFeedbackResponse?.data?.items],
   );
+  // A guardian rates a managed minor's class on the minor's behalf (ADR-035 addendum 2026-11-25).
+  const rateForOther = Boolean(bookingToRate && user?.id && bookingToRate.user_id !== String(user.id));
 
   const roomNameById = useMemo(() => {
     const dictionary: Record<string, string> = {};
@@ -405,7 +412,11 @@ function BookingsPage() {
                 <HistoryReservationCard
                   key={item.id}
                   item={item}
-                  alreadyRated={item.kind === 'class' ? ratedClassIds.has(item.booking.scheduled_class.id) : false}
+                  alreadyRated={
+                    item.kind === 'class'
+                      ? ratedClassKeys.has(classFeedbackKey(item.booking.user_id, item.booking.scheduled_class.id))
+                      : false
+                  }
                   onRateClass={setBookingToRate}
                 />
               ))}
@@ -478,12 +489,18 @@ function BookingsPage() {
           <DialogHeader>
             <DialogTitle>
               {bookingToRate
-                ? t('bookings:rateClassTitle', {
-                    headline: formatClassCsatHeadline(
-                      bookingToRate.scheduled_class.class_definition?.name ?? t('bookings:classFallback'),
-                      bookingToRate.scheduled_class.start_time,
-                    ),
-                  })
+                ? t(
+                    rateForOther && bookingToRate.attendee_name
+                      ? 'bookings:rateClassTitleFor'
+                      : 'bookings:rateClassTitle',
+                    {
+                      headline: formatClassCsatHeadline(
+                        bookingToRate.scheduled_class.class_definition?.name ?? t('bookings:classFallback'),
+                        bookingToRate.scheduled_class.start_time,
+                      ),
+                      name: bookingToRate.attendee_name,
+                    },
+                  )
                 : null}
             </DialogTitle>
           </DialogHeader>
@@ -500,10 +517,11 @@ function BookingsPage() {
                     class_rating: values.class_rating,
                     instructor_rating: values.instructor_rating,
                     comment: values.comment,
+                    ...(rateForOther ? { attendee_user_id: bookingToRate.user_id } : {}),
                   });
 
                   if (!result.ok) {
-                    toast.error(t('bookings:rateFailed'));
+                    toast.error(t(classFeedbackErrorKey(result.error)));
 
                     return;
                   }

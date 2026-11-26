@@ -115,6 +115,11 @@ export function ClassFeedbackTable({ instructorId, hideInstructorColumn = false 
                     <TableCell>
                       <div className='font-medium'>{item.user_name || t('reports:classFeedback.anonymousName')}</div>
                       {item.user_email ? <div className='text-xs text-gray-500'>{item.user_email}</div> : null}
+                      {item.rated_by_name ? (
+                        <div className='text-xs text-gray-500'>
+                          {t('reports:classFeedback.ratedBy', { name: item.rated_by_name })}
+                        </div>
+                      ) : null}
                     </TableCell>
                     <TableCell>{item.class_name || '—'}</TableCell>
                     <TableCell>
