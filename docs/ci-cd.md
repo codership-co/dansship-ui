@@ -3,7 +3,7 @@
 Decision: ADR-065 (workspace repo, `context/import/03_Bitacora_Decisiones_Arquitectura.md`).
 
 - Vercel is unchanged: every PR gets a preview, and every merge to `main` gets a Preview deployment served as dev.
-- Production: Actions → **Promote to production** → Run workflow (empty commit = the latest commit of `main`). It promotes that commit's Preview deployment to production; Vercel builds the same commit again with the production environment variables, exactly like the "Promote" button in the Vercel dashboard. Only the repository variable `DEPLOY_APPROVER` can run it; for anyone else the job is skipped.
+- Production: Actions → **Promote to production** → Run workflow (empty commit = the latest commit of `main`). It does the dashboard's two clicks: it promotes that commit's Preview deployment, so Vercel builds the same commit again with the production environment variables (a staged production deployment, not live yet), waits for that build, then promotes it so it becomes the live production. If a production build of that commit already exists, it reuses it. Only the repository variable `DEPLOY_APPROVER` can run it; for anyone else the job is skipped.
 - Order with the API is the owner's call (accepted risk): publish the API first when the UI needs a new endpoint.
 
 ## One-time setup (owner)
