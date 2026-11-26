@@ -38,7 +38,7 @@ export function CheckRow({
       <Checkbox id={id} checked={checked} onCheckedChange={value => onChange(value === true)} />
       <span className='grid gap-0.5'>
         <span className='text-sm'>{label}</span>
-        {hint ? <span className='text-xs text-muted-foreground'>{hint}</span> : null}
+        {hint ? <span className='text-xs whitespace-pre-line text-muted-foreground'>{hint}</span> : null}
       </span>
     </label>
   );
@@ -71,7 +71,9 @@ function LongTextInput<T extends FieldValues>({ control, name, item }: AnswerInp
         maxLength={max}
       />
       <div className='flex justify-between gap-3 text-xs text-muted-foreground'>
-        <small>{[item.help_text, t('forms:answer.maxLengthHint', { max: maxLabel })].filter(Boolean).join(' ')}</small>
+        <small className='whitespace-pre-line'>
+          {[item.help_text, t('forms:answer.maxLengthHint', { max: maxLabel })].filter(Boolean).join(' ')}
+        </small>
         <small className='shrink-0'>
           {t('forms:answer.counter', { count: length.toLocaleString('es-CO'), max: maxLabel })}
         </small>
