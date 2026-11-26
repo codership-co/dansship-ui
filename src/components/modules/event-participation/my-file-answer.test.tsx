@@ -12,7 +12,6 @@ const answer: SignupAnswerView = {
   kind: 'file',
   value: { file_key: 'event-answer-files/u/a.mp3', file_name: 'cancion.mp3', content_type: 'audio/mpeg' },
   replaceable: true,
-  replace_closes_at: '2026-12-12T04:59:59Z',
 };
 
 describe('MyFileAnswer', () => {
@@ -44,7 +43,7 @@ describe('MyFileAnswer', () => {
     render(<MyFileAnswer signupId='s-1' participantTypeId='type-1' answer={answer} />);
 
     expect(screen.getByText('cancion.mp3')).toBeVisible();
-    expect(screen.getByText(/Puedes cambiarlo hasta el/)).toBeVisible();
+    expect(screen.queryByText(/Puedes cambiarlo hasta el/)).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Cambiar archivo' }));
     fireEvent.mouseDown(await screen.findByRole('tab', { name: 'Pegar enlace' }));
     fireEvent.change(screen.getByPlaceholderText('https://'), { target: { value: 'https://youtu.be/x' } });

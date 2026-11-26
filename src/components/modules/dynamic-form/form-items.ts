@@ -26,8 +26,6 @@ export interface FormItemOptions {
   accepts?: Array<FileCategory>;
   /** «Archivo o enlace»: a link is accepted instead of a file. */
   allow_link?: boolean;
-  /** «Archivo o enlace»: null = until the signup closes; or N days before the event. */
-  replaceable_until?: { anchor: 'days_before_event'; days: number } | null;
 }
 
 export interface FormItemVisibleWhen {
@@ -46,8 +44,6 @@ export interface FormItem {
   visible_when?: FormItemVisibleWhen | null;
   admin_editable_copy?: boolean;
   show_in_admin_list?: boolean;
-  /** «Archivo o enlace» in a person's form: last instant the file can be replaced. */
-  replace_closes_at?: string | null;
 }
 
 export interface FileFormAnswer {
@@ -100,7 +96,7 @@ export interface FormItemKindMeta {
   adminCopy?: boolean;
   /** May be shown as a column in the answers list. */
   listColumn?: boolean;
-  /** «Archivo o enlace»: accepted categories, link alternative and replace window. */
+  /** «Archivo o enlace»: accepted categories and link alternative. */
   file?: boolean;
   /** Fixed options sent with the item. */
   defaults?: FormItemOptions;

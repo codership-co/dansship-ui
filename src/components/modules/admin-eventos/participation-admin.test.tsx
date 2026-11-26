@@ -9,7 +9,7 @@ import { ParticipationPeopleTable } from './participation-people-table';
 import { ParticipationSummaryPanel } from './participation-summary';
 import { SignupDetail } from './signup-detail';
 
-import { artistTypeAdmin, mySignup } from '@components/modules/event-participation/participation.fixtures';
+import { artistTypeAdmin, mySignup, typeAdmin } from '@components/modules/event-participation/participation.fixtures';
 import { DansshipAPI, type AdminSignupDetail, type EventAdmin, type ParticipationPeople } from '@core/api';
 import '@core/i18n';
 
@@ -159,6 +159,43 @@ describe('participant-type admin', () => {
     expect(onSave).toHaveBeenCalledWith(
       expect.objectContaining({ name: 'Artistas 2026', closes_at: '2026-11-27T23:59:00-05:00' }),
     );
+  });
+
+  it('saves the edit deadline in days before the event, empty meaning the close date', async () => {
+    const onSave = vi.fn().mockResolvedValue({ ok: true, data: artistTypeAdmin });
+
+    inRouter(
+      <ParticipantTypeEditor
+        type={artistTypeAdmin}
+        conditions={[]}
+        eventCapacity={100}
+        isPrivate={false}
+        onSave={onSave}
+      />,
+    );
+
+    const deadline = screen.getByLabelText(/Se pueden cambiar los datos hasta/);
+    expect(deadline).toHaveValue(null);
+    fireEvent.change(deadline, { target: { value: '1' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }));
+
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ edit_days_before_event: 1 }));
+  });
+
+  it('hides the edit deadline on a ticket-only type: tickets are never edited', () => {
+    inRouter(
+      <ParticipantTypeEditor
+        type={typeAdmin({ registration_options: [{ kind: 'multi_ticket', label: null }] })}
+        conditions={[]}
+        eventCapacity={100}
+        isPrivate={false}
+        onSave={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByLabelText(/Cierre de venta/)).toBeVisible();
+    expect(screen.queryByLabelText(/Se pueden cambiar los datos hasta/)).toBeNull();
   });
 
   it('locks the options in use once the type has signups', () => {

@@ -27,6 +27,7 @@ describe('participant type helpers', () => {
       registration_options: [{ kind: 'pair', label: null }],
       quota: 16,
       closes_at: '2026-11-28T04:59:00Z',
+      edit_days_before_event: 1,
       card_copy: { button_text: 'Inscribirme con mi pareja', title: null, text: null, closing_message: null },
     });
     const upsert = toParticipantTypeUpsert(participantTypeFormValues(type), type.available_notices);
@@ -36,6 +37,7 @@ describe('participant type helpers', () => {
       requires_account: true,
       quota: 16,
       closes_at: '2026-11-27T23:59:00-05:00',
+      edit_days_before_event: 1,
       card_copy: { button_text: 'Inscribirme con mi pareja', title: null },
       fees: type.fees,
       payment_plan: [],
@@ -69,6 +71,14 @@ describe('participant type helpers', () => {
       'pricing_model',
     );
     expect(editorErrorPath(apiError('EVENT_PARTICIPANT_TYPE_INVALID', { field: 'closes_at' }))).toBe('closes_at_local');
+    expect(
+      editorErrorPath(
+        apiError('EVENT_PARTICIPANT_TYPE_INVALID', {
+          field: 'edit_days_before_event',
+          reason: 'edit_deadline_before_close',
+        }),
+      ),
+    ).toBe('edit_days_before_event');
     expect(editorErrorPath(apiError('EVENT_PAYMENT_PLAN_INVALID'))).toBe('payment_plan');
     expect(
       editorErrorPath(apiError('EVENT_REGISTRATION_OPTION_INVALID', { kind: 'group', reason: 'max_members' })),

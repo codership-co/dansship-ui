@@ -185,6 +185,12 @@ describe('ParticipantSignupForm', () => {
     expect(screen.getByText(/Sábado 12 de diciembre · 3:30 p\. m\./)).toBeVisible();
   });
 
+  it('tells until when she can change her data: the type deadline, not the close date', () => {
+    renderForm();
+
+    expect(screen.getByText(/Puedes cambiar tus datos hasta el viernes, 11 de diciembre, 11:59/)).toBeVisible();
+  });
+
   it('asks the option when there are several', async () => {
     renderForm();
     await fillArtistAnswers();

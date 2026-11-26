@@ -20,7 +20,6 @@ import type {
   FileAnswer,
   ParticipantTermsVersion,
   ParticipantTypeAdmin,
-  ParticipantTypePreset,
   ParticipantTypeUpsert,
   TicketLine,
   ParticipationPeople,
@@ -75,11 +74,12 @@ export class ParticipationAdminAPI {
     });
   }
 
-  async createType(eventId: string, preset: ParticipantTypePreset | null) {
-    return this.httpClient.callNoError<ParticipantTypeAdmin, { preset: ParticipantTypePreset | null }>({
+  /** A new type always starts blank; the editor then saves its settings. */
+  async createType(eventId: string) {
+    return this.httpClient.callNoError<ParticipantTypeAdmin, Record<string, never>>({
       path: `/admin/events/${eventId}/participant-types`,
       method: 'POST',
-      data: { preset },
+      data: {},
     });
   }
 

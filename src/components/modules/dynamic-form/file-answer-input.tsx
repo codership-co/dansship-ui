@@ -28,18 +28,6 @@ export function useAnswerFileUploader(): AnswerFileUploader | null {
   return useContext(AnswerFileUploaderContext);
 }
 
-/** "Puedes cambiarlo hasta el jueves 11 de diciembre, 11:59 p. m." in Bogotá time. */
-export function formatReplaceUntil(iso: string): string {
-  return new Intl.DateTimeFormat('es-CO', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    hour: 'numeric',
-    minute: '2-digit',
-    timeZone: 'America/Bogota',
-  }).format(new Date(iso));
-}
-
 type FileOrLinkValue = FileFormAnswer | { url?: string; note?: string | null } | null | undefined;
 
 interface FileOrLinkControlProps {
@@ -151,11 +139,6 @@ export function FileOrLinkControl({ item, value, onChange, error, uploader }: Fi
             onChange={change => setNote(change.target.value)}
           />
         </div>
-      ) : null}
-      {item.replace_closes_at ? (
-        <FieldHint>
-          {t('forms:answer.file.replaceUntil', { date: formatReplaceUntil(item.replace_closes_at) })}
-        </FieldHint>
       ) : null}
       <FieldError message={error} />
     </div>

@@ -46,12 +46,6 @@ export interface FieldVisibleWhen {
 
 export type AnswerFileCategory = 'audio' | 'image' | 'pdf';
 
-/** File fields: replaceable until the type closes (null) or N days before the event. */
-export interface ReplaceableUntil {
-  anchor: 'days_before_event';
-  days: number;
-}
-
 export interface ParticipantFieldOptions {
   choices?: Array<string>;
   max_length?: number;
@@ -59,7 +53,6 @@ export interface ParticipantFieldOptions {
   max_people?: number;
   accepts?: Array<AnswerFileCategory>;
   allow_link?: boolean;
-  replaceable_until?: ReplaceableUntil | null;
 }
 
 export interface ParticipantField {
@@ -73,8 +66,6 @@ export interface ParticipantField {
   visible_when?: FieldVisibleWhen | null;
   admin_editable_copy?: boolean;
   show_in_admin_list?: boolean;
-  /** File fields in the person's form: last instant the file can be replaced. */
-  replace_closes_at?: string | null;
 }
 
 export interface ParticipantFee {
@@ -192,6 +183,8 @@ export interface ParticipantTypeUpsert {
   minors_count_toward_capacity: boolean;
   minor_price: string | number | null;
   closes_at: string | null;
+  /** «Se pueden cambiar los datos hasta»: N days before the event (0 = until it starts); null = until `closes_at`. */
+  edit_days_before_event: number | null;
   issues_entry_qr: boolean;
   is_active: boolean;
   fields: Array<ParticipantField>;
@@ -216,8 +209,6 @@ export interface ParticipantTypeAdmin extends ParticipantTypeUpsert {
   signup_count: number;
   people_count: number;
 }
-
-export type ParticipantTypePreset = 'general' | 'artists' | 'guests';
 
 export interface ParticipantMinorsRules {
   allowed: boolean;
@@ -275,6 +266,8 @@ export interface ParticipantForm {
   place_label: string | null;
   state: 'open' | 'closed';
   closes_at: string | null;
+  /** Until when a signup can be changed (the type's edit deadline); null = no limit. */
+  edits_close_at: string | null;
   signer_name: string;
   fields: Array<ParticipantField>;
   takes_donations: boolean;
@@ -369,9 +362,8 @@ export interface SignupAnswerView {
   label: string;
   kind: EventFormFieldKind;
   value: SignupAnswerValue;
-  /** File answers: the person can still replace it alone, until `replace_closes_at`. */
+  /** File answers: the person can still replace it alone, until the signup's `edits_close_at`. */
   replaceable?: boolean;
-  replace_closes_at?: string | null;
 }
 
 export interface MySignup {
@@ -391,6 +383,8 @@ export interface MySignup {
   donation_type_ids: Array<string>;
   donations: Array<string>;
   closes_at: string | null;
+  /** Until when the signup can be changed (the type's edit deadline); null = no limit. */
+  edits_close_at: string | null;
   editable: boolean;
   submitted_at: string;
 }

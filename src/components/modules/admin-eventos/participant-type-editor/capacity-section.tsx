@@ -11,12 +11,14 @@ import { Card, CardContent, CardHeader, CardTitle, Input, Switch } from '@compon
 
 type SwitchName = 'counts_toward_capacity' | 'issues_entry_qr' | 'is_active';
 
-/** Cupos, fechas y entrada: capacity, the type's own quota, close date (Bogotá), entry QR and active. */
+/** Cupos, fechas y entrada: capacity, the type's own quota, close date (Bogotá), edit deadline, entry QR and active. */
 export function CapacitySection({ form, eventCapacity }: TypeEditorSectionProps) {
   const { t } = useTranslation();
   const { control, register, formState } = form;
   const options = useWatch({ control, name: 'registration_options' });
   const sells = options.some(option => REGISTRATION_OPTION_EDITORS[option.kind].asksTicketPeople);
+  // Tickets are never edited by the person, so a ticket-only type has no edit deadline.
+  const editable = options.some(option => !REGISTRATION_OPTION_EDITORS[option.kind].asksTicketPeople);
   const closeLabel = sells
     ? t('eventos:participation.editor.salesClose')
     : t('eventos:participation.editor.registrationClose');
@@ -70,6 +72,28 @@ export function CapacitySection({ form, eventCapacity }: TypeEditorSectionProps)
             <Input id='type-closes-at' type='datetime-local' {...register('closes_at_local')} />
           </EditorField>
         </div>
+        {editable ? (
+          <EditorField
+            label={t('eventos:participation.editor.editDeadline')}
+            optional
+            htmlFor='type-edit-deadline'
+            tooltip={t('eventos:participation.editor.editDeadlineTooltip')}
+            error={formState.errors.edit_days_before_event?.message}
+          >
+            <span className='flex items-center gap-2'>
+              <Input
+                id='type-edit-deadline'
+                className='w-28'
+                type='number'
+                min={0}
+                max={365}
+                placeholder={t('eventos:participation.editor.editDeadlinePlaceholder')}
+                {...register('edit_days_before_event')}
+              />
+              <span className='text-sm'>{t('eventos:participation.editor.editDeadlineDays')}</span>
+            </span>
+          </EditorField>
+        ) : null}
         {switchRow(
           'issues_entry_qr',
           t('eventos:participation.editor.entryQr'),

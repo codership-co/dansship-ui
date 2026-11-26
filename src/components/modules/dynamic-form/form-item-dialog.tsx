@@ -28,7 +28,6 @@ import {
 const SELECT_CLASS = 'h-10 rounded-md border border-input bg-background px-3 text-sm';
 const HELP_TEXT_MAX = 300;
 const FILE_CATEGORIES = Object.keys(FILE_CATEGORY_TYPES) as Array<FileCategory>;
-const REPLACE_DAYS_MAX = 365;
 
 /** Optional parts of the item editor; a survey may not need the team's copy or the list column. */
 export interface FormBuilderFeatures {
@@ -76,8 +75,6 @@ export function FormItemDialog<T extends FormItem>({
   const [visibleValue, setVisibleValue] = useState('');
   const [accepts, setAccepts] = useState<Array<FileCategory>>(['audio']);
   const [allowLink, setAllowLink] = useState(false);
-  // '' = until the signup closes; a number = that many days before the event.
-  const [replaceDays, setReplaceDays] = useState('');
 
   useEffect(() => {
     if (!open) return;
@@ -95,7 +92,6 @@ export function FormItemDialog<T extends FormItem>({
     setVisibleValue(item?.visible_when?.equals ?? '');
     setAccepts(item?.options.accepts?.length ? item.options.accepts : ['audio']);
     setAllowLink(Boolean(item?.options.allow_link));
-    setReplaceDays(item?.options.replaceable_until ? String(item.options.replaceable_until.days) : '');
   }, [item, open, isSection, kinds]);
 
   const meta = FORM_ITEM_KINDS[kind];
@@ -118,11 +114,8 @@ export function FormItemDialog<T extends FormItem>({
     if (meta.note) options.with_note = withNote;
 
     if (meta.file) {
-      const days = Math.min(REPLACE_DAYS_MAX, Math.max(0, Math.round(Number(replaceDays))));
-
       options.accepts = accepts;
       options.allow_link = allowLink;
-      options.replaceable_until = replaceDays.trim() === '' ? null : { anchor: 'days_before_event', days };
     }
 
     Object.assign(options, meta.defaults, meta.defaults ? item?.options : undefined);
@@ -259,23 +252,6 @@ export function FormItemDialog<T extends FormItem>({
                 </span>
                 <Switch checked={allowLink} onCheckedChange={setAllowLink} />
               </label>
-              <div className='grid gap-2'>
-                <Label htmlFor='form-item-replace'>{t('forms:dialog.replaceUntil')}</Label>
-                <div className='flex items-center gap-2'>
-                  <Input
-                    id='form-item-replace'
-                    type='number'
-                    min={0}
-                    max={REPLACE_DAYS_MAX}
-                    className='w-24'
-                    value={replaceDays}
-                    placeholder='—'
-                    onChange={change => setReplaceDays(change.target.value)}
-                  />
-                  <span className='text-sm'>{t('forms:dialog.replaceDaysBefore')}</span>
-                </div>
-                <small className='text-xs text-muted-foreground'>{t('forms:dialog.replaceUntilHint')}</small>
-              </div>
             </>
           ) : null}
           {meta.note ? (
