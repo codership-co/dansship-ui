@@ -11,6 +11,7 @@ Deeper technical context: `docs/admin-ui-architecture.md`. The backend is a sepa
 - Node `>24.14.0`, `pnpm@11.2.2` (use `corepack pnpm` if `pnpm` isn't on PATH). Don't use npm (`package-lock.json` is stale).
 - Commands: `pnpm dev`, `pnpm build`, `pnpm lint` (`--max-warnings 0`), `pnpm lint:fix`, `pnpm exec tsc --noEmit`, `pnpm test` (vitest, jsdom; setup in `src/test/setup.ts`).
 - After meaningful changes validate in this order: `pnpm build` → `pnpm lint` → `pnpm exec tsc --noEmit` → `pnpm exec vitest run <related test files>` (CI runs lint + tsc; the pre-commit hook runs `lint:fix` + `tsc`).
+- Publishing: Vercel deploys PRs (preview) and `main` (dev); production is the owner-only **Promote to production** workflow (`docs/ci-cd.md`, ADR-065).
 - Local dev runs at `http://localhost.dansship.com` (hosts entry required so cookies work). Env via `vercel env pull`; never commit `.env.local`.
 - Add shadcn primitives with `pnpm create-component <name>`.
 
