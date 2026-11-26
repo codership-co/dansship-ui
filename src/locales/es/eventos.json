@@ -745,7 +745,6 @@
       "back": "← {{name}}",
       "title": "Inscríbete como artista",
       "editTitle": "Editar inscripción",
-      "intro": "Te inscribes con tu cuenta, {{name}}. Revisamos cada inscripción y te escribimos al correo cuando esté lista.",
       "editUntil": "Puedes cambiar tus datos hasta el {{date}}.",
       "groupCount_one": "Son {{count}} persona, contándote.",
       "groupCount_other": "Son {{count}} personas, contándote.",
