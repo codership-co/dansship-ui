@@ -6,7 +6,7 @@ import { ADMIN_CARD } from '../event-admin-styles';
 import { CARD_COPY_LIMITS } from './schema';
 import { type TypeEditorSectionProps } from './section-props';
 
-import { Card, CardContent, CardHeader, CardTitle, Input } from '@components/ui';
+import { Card, CardContent, CardHeader, CardTitle, Input, Textarea } from '@components/ui';
 
 /** Cómo se ve: the card copy on the event page. Empty fields use the default copy. */
 export function CardCopySection({ form }: TypeEditorSectionProps) {
@@ -43,8 +43,9 @@ export function CardCopySection({ form }: TypeEditorSectionProps) {
           tooltip={t('eventos:participation.editor.closingMessageTooltip')}
           error={errors?.closing_message?.message}
         >
-          <Input
+          <Textarea
             id='card-closing'
+            rows={3}
             maxLength={CARD_COPY_LIMITS.closing_message}
             placeholder={t('eventos:participation.card.defaultClosed')}
             {...register('card_copy.closing_message')}
@@ -65,7 +66,7 @@ export function CardCopySection({ form }: TypeEditorSectionProps) {
           htmlFor='card-text'
           error={errors?.text?.message}
         >
-          <Input id='card-text' maxLength={CARD_COPY_LIMITS.text} {...register('card_copy.text')} />
+          <Textarea id='card-text' rows={4} maxLength={CARD_COPY_LIMITS.text} {...register('card_copy.text')} />
         </EditorField>
       </CardContent>
     </Card>
