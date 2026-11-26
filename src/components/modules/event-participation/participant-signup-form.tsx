@@ -232,7 +232,7 @@ export function ParticipantSignupForm({ form, landing, signup, preview = false }
     return (
       <div className={cn('grid gap-3 p-5 text-center', EVENT_CARD)}>
         <p className='m-0 font-semibold'>{t('eventos:participation.card.closedTitle')}</p>
-        <p className='m-0 text-sm text-muted-foreground'>
+        <p className='m-0 text-sm whitespace-pre-line text-muted-foreground'>
           {landingType?.card_copy.closing_message || t('eventos:participation.card.closedText')}
         </p>
       </div>

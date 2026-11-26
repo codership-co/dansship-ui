@@ -39,7 +39,7 @@ export function DynamicFormSections<T extends FieldValues>({
               {group.section.label}
             </h3>
             {group.section.help_text ? (
-              <p className='m-0 text-xs text-muted-foreground'>{group.section.help_text}</p>
+              <p className='m-0 text-xs whitespace-pre-line text-muted-foreground'>{group.section.help_text}</p>
             ) : null}
           </div>
         ) : null}

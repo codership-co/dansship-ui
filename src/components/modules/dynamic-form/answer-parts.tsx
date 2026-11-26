@@ -7,7 +7,8 @@ export function FieldError({ message }: { message?: string }) {
 }
 
 export function FieldHint({ children }: { children?: React.ReactNode }) {
-  return children ? <small className='text-xs text-muted-foreground'>{children}</small> : null;
+  // Help texts keep the line breaks the admin typed.
+  return children ? <small className='text-xs whitespace-pre-line text-muted-foreground'>{children}</small> : null;
 }
 
 export interface AnswerInputProps<T extends FieldValues = FieldValues> {
