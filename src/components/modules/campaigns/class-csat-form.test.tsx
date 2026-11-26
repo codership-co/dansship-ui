@@ -18,11 +18,8 @@ function campaign(deliveryContext: Record<string, unknown>): PendingCampaign {
   } as PendingCampaign;
 }
 
-async function rateAndSubmit() {
-  const [classStars, instructorStars] = [
-    screen.getAllByRole('radio', { name: '¡Me encantó!' })[0],
-    screen.getAllByRole('radio', { name: '¡Me encantó!' })[1],
-  ];
+async function rateAndSubmit(starLabel = '¡Me encantó!') {
+  const [classStars, instructorStars] = screen.getAllByRole('radio', { name: starLabel });
 
   fireEvent.click(classStars);
   fireEvent.click(instructorStars);
@@ -42,13 +39,17 @@ describe('ClassCsatForm', () => {
           class_name: 'Pole Kids',
           attendee_user_id: 'minor-1',
           attendee_name: 'Sofía',
+          instructor_name: 'Laura',
         })}
         onSubmit={onSubmit}
       />,
     );
 
     expect(screen.getByRole('heading', { name: /Califica la clase de Sofía: Pole Kids/ })).toBeInTheDocument();
-    await rateAndSubmit();
+    expect(screen.getByText('¿Cómo le fue a Sofía en la clase?')).toBeInTheDocument();
+    expect(screen.getByText('¿Cómo le fue a Sofía con Laura?')).toBeInTheDocument();
+    expect(screen.getByText('Cuéntanos cómo le fue a Sofía (opcional)')).toBeInTheDocument();
+    await rateAndSubmit('¡Le encantó!');
 
     await waitFor(() =>
       expect(onSubmit).toHaveBeenCalledWith({
@@ -71,6 +72,7 @@ describe('ClassCsatForm', () => {
     );
 
     expect(screen.getByRole('heading', { name: /^Califica Flow/ })).toBeInTheDocument();
+    expect(screen.getByText('¿Qué te pareció la clase?')).toBeInTheDocument();
     await rateAndSubmit();
 
     await waitFor(() =>

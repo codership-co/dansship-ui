@@ -507,6 +507,7 @@ function BookingsPage() {
           {bookingToRate ? (
             <ClassCsatFields
               instructorName={bookingToRate.scheduled_class.instructor?.full_name}
+              attendeeName={rateForOther ? bookingToRate.attendee_name : null}
               isSubmitting={isSubmittingRating}
               submitLabel={t('bookings:submitRating')}
               onSubmit={async values => {
