@@ -12,6 +12,8 @@ import { type CampaignAnswerValue, type PendingCampaign } from '@core/api';
 interface ClassCsatFieldsProps {
   className?: string;
   instructorName?: string | null;
+  /** Name of the managed minor when their guardian rates for them; the questions then ask about the minor. */
+  attendeeName?: string | null;
   isSubmitting?: boolean;
   submitLabel?: string;
   onSubmit: (values: { class_rating: number; instructor_rating: number; comment?: string }) => Promise<void>;
@@ -43,11 +45,13 @@ function StarRating({
   value,
   onChange,
   disabled,
+  scaleKey,
 }: {
   id: string;
   value: number | null;
   onChange: (next: number) => void;
   disabled?: boolean;
+  scaleKey: string;
 }) {
   const { t } = useTranslation();
   const [hovered, setHovered] = useState<number | null>(null);
@@ -72,7 +76,7 @@ function StarRating({
               )}
               onClick={() => onChange(star)}
               onPointerEnter={() => setHovered(star)}
-              aria-label={t(`campaigns:classCsat.starScale.${star}`)}
+              aria-label={t(`${scaleKey}.${star}`)}
             >
               ★
             </button>
@@ -80,7 +84,7 @@ function StarRating({
         })}
       </div>
       <p className={cn('mt-1 h-5 text-sm font-medium text-primary', !preview && 'invisible')}>
-        {preview ? t(`campaigns:classCsat.starScale.${preview}`) : '\u00a0'}
+        {preview ? t(`${scaleKey}.${preview}`) : '\u00a0'}
       </p>
     </div>
   );
@@ -89,6 +93,7 @@ function StarRating({
 export function ClassCsatFields({
   className,
   instructorName,
+  attendeeName,
   isSubmitting,
   submitLabel,
   onSubmit,
@@ -99,6 +104,8 @@ export function ClassCsatFields({
   const [instructorRating, setInstructorRating] = useState<number | null>(null);
   const [comment, setComment] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const copy = attendeeName ? 'campaigns:classCsat.forAttendee' : 'campaigns:classCsat';
+  const scaleKey = `${copy}.starScale`;
 
   const handleSubmit = async () => {
     if (classRating === null || instructorRating === null) {
@@ -118,31 +125,33 @@ export function ClassCsatFields({
   return (
     <div className={cn('grid gap-3', className)}>
       <div className='space-y-1'>
-        <Label id='class-csat-class-rating'>{t('campaigns:classCsat.classRating')}</Label>
+        <Label id='class-csat-class-rating'>{t(`${copy}.classRating`, { attendee: attendeeName })}</Label>
         <StarRating
           id='class-csat-class-rating'
           value={classRating}
           onChange={setClassRating}
           disabled={isSubmitting}
+          scaleKey={scaleKey}
         />
       </div>
 
       <div className='space-y-1'>
         <Label id='class-csat-instructor-rating'>
           {instructorName
-            ? t('campaigns:classCsat.instructorRatingNamed', { name: instructorName })
-            : t('campaigns:classCsat.instructorRating')}
+            ? t(`${copy}.instructorRatingNamed`, { name: instructorName, attendee: attendeeName })
+            : t(`${copy}.instructorRating`, { attendee: attendeeName })}
         </Label>
         <StarRating
           id='class-csat-instructor-rating'
           value={instructorRating}
           onChange={setInstructorRating}
           disabled={isSubmitting}
+          scaleKey={scaleKey}
         />
       </div>
 
       <div className='space-y-1'>
-        <Label htmlFor='class-csat-comment'>{t('campaigns:classCsat.comment')}</Label>
+        <Label htmlFor='class-csat-comment'>{t(`${copy}.comment`, { attendee: attendeeName })}</Label>
         <Textarea
           id='class-csat-comment'
           value={comment}
@@ -201,20 +210,23 @@ export function ClassCsatForm({ campaign, isSubmitting, onSubmit, onDismiss }: C
   return (
     <div className='grid gap-3 p-6'>
       <h2 className='text-xl font-semibold text-gray-900'>
-        {t('campaigns:classCsat.title', {
+        {t(context.attendee_name ? 'campaigns:classCsat.titleFor' : 'campaigns:classCsat.title', {
           headline: formatClassCsatHeadline(
             context.class_name?.trim() || t('campaigns:classCsat.classFallback'),
             context.class_start_time ?? context.class_end_time,
           ),
+          name: context.attendee_name,
         })}
       </h2>
       <ClassCsatFields
         instructorName={context.instructor_name}
+        attendeeName={context.attendee_name}
         isSubmitting={isSubmitting}
         onDismiss={onDismiss}
         onSubmit={async values => {
           await onSubmit({
             scheduled_class_id: context.scheduled_class_id,
+            ...(context.attendee_user_id ? { attendee_user_id: context.attendee_user_id } : {}),
             class_rating: values.class_rating,
             instructor_rating: values.instructor_rating,
             ...(values.comment ? { comment: values.comment } : {}),

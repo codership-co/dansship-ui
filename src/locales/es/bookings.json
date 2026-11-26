@@ -133,6 +133,7 @@
   "dismissBanner": "Cerrar",
   "rateClass": "Calificar",
   "rateClassTitle": "Califica {{headline}}",
+  "rateClassTitleFor": "Califica la clase de {{name}}: {{headline}}",
   "submitRating": "Enviar calificación",
   "rated": "Calificada",
   "rateSuccess": "Gracias por tu calificación.",

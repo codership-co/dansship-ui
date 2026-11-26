@@ -21,10 +21,11 @@ import { useDateLocale, usePromise } from '@hooks';
 
 interface ClassFeedbackTableProps {
   instructorId?: string;
+  studentId?: string;
   hideInstructorColumn?: boolean;
 }
 
-export function ClassFeedbackTable({ instructorId, hideInstructorColumn = false }: ClassFeedbackTableProps) {
+export function ClassFeedbackTable({ instructorId, studentId, hideInstructorColumn = false }: ClassFeedbackTableProps) {
   const { t } = useTranslation();
   const locale = useDateLocale();
   const initialDateRange = {
@@ -35,9 +36,13 @@ export function ClassFeedbackTable({ instructorId, hideInstructorColumn = false 
   const [appliedDateRange, setAppliedDateRange] = useState(initialDateRange);
 
   const { response, isLoading } = usePromise(
-    () => DansshipAPI.classFeedbackAdmin.list(appliedDateRange.start, appliedDateRange.end, instructorId),
+    () =>
+      DansshipAPI.classFeedbackAdmin.list(appliedDateRange.start, appliedDateRange.end, {
+        instructorId,
+        userId: studentId,
+      }),
     true,
-    [appliedDateRange.start, appliedDateRange.end, instructorId],
+    [appliedDateRange.start, appliedDateRange.end, instructorId, studentId],
   );
   const report = response?.ok ? response.data : null;
   const items = report?.items ?? [];
@@ -115,6 +120,11 @@ export function ClassFeedbackTable({ instructorId, hideInstructorColumn = false 
                     <TableCell>
                       <div className='font-medium'>{item.user_name || t('reports:classFeedback.anonymousName')}</div>
                       {item.user_email ? <div className='text-xs text-gray-500'>{item.user_email}</div> : null}
+                      {item.rated_by_name ? (
+                        <div className='text-xs text-gray-500'>
+                          {t('reports:classFeedback.ratedBy', { name: item.rated_by_name })}
+                        </div>
+                      ) : null}
                     </TableCell>
                     <TableCell>{item.class_name || '—'}</TableCell>
                     <TableCell>

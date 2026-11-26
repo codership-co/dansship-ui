@@ -236,7 +236,8 @@
     "instructorStars": "Instructora",
     "comment": "Comentario",
     "empty": "No hay calificaciones en este período.",
-    "anonymousName": "Estudiante sin nombre"
+    "anonymousName": "Estudiante sin nombre",
+    "ratedBy": "Calificó: {{name}}"
   },
   "events": {
     "revenueTitle": "Ingresos de eventos y combos",

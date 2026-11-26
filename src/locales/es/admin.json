@@ -274,6 +274,7 @@
         "paymentDocuments": "Documentos de pago",
         "instructorClasses": "Clases del instructor",
         "instructorCsat": "CSAT",
+        "studentCsat": "Calificaciones dadas",
         "family": "Familia"
       },
       "columns": {

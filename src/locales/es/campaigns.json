@@ -89,6 +89,7 @@
   },
   "classCsat": {
     "title": "Califica {{headline}}",
+    "titleFor": "Califica la clase de {{name}}: {{headline}}",
     "classRating": "¿Qué te pareció la clase?",
     "instructorRating": "¿Qué te pareció la instructora?",
     "instructorRatingNamed": "¿Qué te pareció {{name}}?",
@@ -103,7 +104,20 @@
       "4": "¡Me encantó!",
       "5": "¡Quiero repetirla!"
     },
-    "classFallback": "Clase"
+    "classFallback": "Clase",
+    "forAttendee": {
+      "classRating": "¿Cómo le fue a {{attendee}} en la clase?",
+      "instructorRating": "¿Cómo le fue a {{attendee}} con la instructora?",
+      "instructorRatingNamed": "¿Cómo le fue a {{attendee}} con {{name}}?",
+      "comment": "Cuéntanos cómo le fue a {{attendee}} (opcional)",
+      "starScale": {
+        "1": "No fue lo suyo",
+        "2": "Puede mejorar",
+        "3": "Estuvo bien",
+        "4": "¡Le encantó!",
+        "5": "¡Quiere repetirla!"
+      }
+    }
   },
   "validation": {
     "titleRequired": "El título es obligatorio",
