@@ -38,3 +38,9 @@ export interface ClassFeedbackAdminReport {
   rating_count: number;
   items: Array<ClassFeedbackItem>;
 }
+
+/** Optional filters of the admin CSAT report: the instructor rated, or the student the rating belongs to. */
+export interface ClassFeedbackAdminFilters {
+  instructorId?: string;
+  userId?: string;
+}

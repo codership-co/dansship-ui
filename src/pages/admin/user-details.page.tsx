@@ -12,6 +12,7 @@ import {
   UserDetailsHeader,
   UserInstructorClassesTab,
   UserInstructorCsatTab,
+  UserStudentCsatTab,
   UserNotesTab,
   UserPaymentDocumentsTab,
   UserRolesManager,
@@ -40,6 +41,7 @@ const NOTES_TAB = 'notes';
 const PAYMENT_DOCUMENTS_TAB = 'payment-documents';
 const INSTRUCTOR_CLASSES_TAB = 'instructor-classes';
 const INSTRUCTOR_CSAT_TAB = 'instructor-csat';
+const STUDENT_CSAT_TAB = 'student-csat';
 const FAMILY_TAB = 'family';
 const RECOVERIES_TAB = 'recoveries';
 
@@ -94,6 +96,7 @@ function UserDetailsPage() {
     ...(showPaymentDocuments ? [PAYMENT_DOCUMENTS_TAB] : []),
     ...(showInstructorClasses ? [INSTRUCTOR_CLASSES_TAB] : []),
     ...(showInstructorCsat ? [INSTRUCTOR_CSAT_TAB] : []),
+    ...(canReadClassFeedback ? [STUDENT_CSAT_TAB] : []),
     ...(showFamily ? [FAMILY_TAB] : []),
   ];
   const activeTab = availableTabs.includes(requestedTab) ? requestedTab : PROFILE_TAB;
@@ -182,6 +185,9 @@ function UserDetailsPage() {
               {showInstructorCsat ? (
                 <TabsTrigger value={INSTRUCTOR_CSAT_TAB}>{t('admin:users.details.tabs.instructorCsat')}</TabsTrigger>
               ) : null}
+              {canReadClassFeedback ? (
+                <TabsTrigger value={STUDENT_CSAT_TAB}>{t('admin:users.details.tabs.studentCsat')}</TabsTrigger>
+              ) : null}
               {showFamily ? <TabsTrigger value={FAMILY_TAB}>{t('admin:users.details.tabs.family')}</TabsTrigger> : null}
             </TabsList>
 
@@ -267,6 +273,12 @@ function UserDetailsPage() {
                 {activeTab === INSTRUCTOR_CSAT_TAB ? (
                   <UserInstructorCsatTab instructorId={user.instructor_profile.id} />
                 ) : null}
+              </TabsContent>
+            ) : null}
+
+            {canReadClassFeedback ? (
+              <TabsContent value={STUDENT_CSAT_TAB}>
+                {activeTab === STUDENT_CSAT_TAB && userId ? <UserStudentCsatTab userId={userId} /> : null}
               </TabsContent>
             ) : null}
 
