@@ -20,7 +20,7 @@ import {
   PublicPlan,
 } from '@core/api';
 import { addSentryBreadcrumb, captureUnexpectedException, withSentrySpan } from '@core/sentry';
-import { cn, formatPrice } from '@helpers';
+import { cn, formatCalendarDay, formatPrice } from '@helpers';
 import { useCallablePromise } from '@hooks';
 
 const PDF_CONTENT_TYPE = 'application/pdf';
@@ -62,6 +62,8 @@ interface CheckoutPaymentProofFormProps {
   uploadProofForIntent?: (intentId: string, file: File) => Promise<unknown>;
   /** A promotion owns the start date: none is sent and the plan starts when the payment is approved. */
   promotionStartFixed?: boolean;
+  /** Last Bogotá day (YYYY-MM-DD) of the plan, from the checkout preview. Null when not known in advance. */
+  planExpiresOn?: string | null;
   /** Set when the buyer accepted the promotion terms shown in the previous step. */
   promotionTermsVersionId?: string | null;
   /** Replaces the whole intent + proof flow: the caller registers the payment from the chosen proof. */
@@ -95,6 +97,7 @@ export function CheckoutPaymentProofForm({
   onCreateIntent,
   uploadProofForIntent,
   promotionStartFixed = false,
+  planExpiresOn = null,
   promotionTermsVersionId = null,
   onConfirmWithProof,
   paymentQrUrl,
@@ -107,7 +110,12 @@ export function CheckoutPaymentProofForm({
   bodyClassName,
   footerClassName,
 }: CheckoutPaymentProofFormProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const planExpiryLine = planExpiresOn ? (
+    <label className='block'>
+      {t('subscriptions:planExpiresOn', { date: formatCalendarDay(planExpiresOn, i18n.language) })}
+    </label>
+  ) : null;
 
   // The terms were edited after the buyer saw them, or were not accepted: say that instead of a generic failure.
   const createFailureMessage = (error: unknown): string => {
@@ -610,11 +618,15 @@ export function CheckoutPaymentProofForm({
                       </label>
                     ) : null}
                     <label className='block text-gray-600'>{t('gifts:startDateGiftNote')}</label>
+                    {planExpiryLine}
                   </div>
                 ) : plan && checkoutData?.start_date ? (
-                  <label className='block'>
-                    {t('payments:startDate')}: {format(checkoutData.start_date, 'yyyy-MM-dd')}
-                  </label>
+                  <>
+                    <label className='block'>
+                      {t('payments:startDate')}: {format(checkoutData.start_date, 'yyyy-MM-dd')}
+                    </label>
+                    {planExpiryLine}
+                  </>
                 ) : null}
                 {plan && isQuarterlyCheckout ? (
                   <div className='mt-2 grid gap-1 text-sm text-gray-700'>

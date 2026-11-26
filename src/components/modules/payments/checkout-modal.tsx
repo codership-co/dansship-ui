@@ -18,7 +18,7 @@ import { FormStepperLayout } from '@components/layouts/form-stepper-layout';
 import { PaymentMethod, type PublicPlan } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { addSentryBreadcrumb } from '@core/sentry';
-import { acceptedTermsVersion, cn, previewFixesStart } from '@helpers';
+import { acceptedTermsVersion, cn, formatCalendarDay, previewFixesStart, promotionFixedExpiry } from '@helpers';
 
 export enum CheckoutStep {
   MODE = 'MODE',
@@ -55,12 +55,13 @@ interface ModalContentProps {
 }
 
 function ModalContent({ onClose, plan }: ModalContentProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const navigate = useNavigate();
   const [step, setStep] = useState<CheckoutStep>(CheckoutStep.MODE);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(null);
   const [isQuarterly, setIsQuarterly] = useState(false);
+  const [isDuo, setIsDuo] = useState(false);
   const [acceptedTermsVersionId, setAcceptedTermsVersionId] = useState<string | null>(null);
   const [checkoutData, setCheckoutData] = useState<CheckoutFormValues>({
     ...defaultCheckoutFormValues,
@@ -74,9 +75,13 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
 
   const isWalletCovered = paymentData.amountToCharge === 0 && paymentData.walletAmountApplied > 0;
   const isGiftCheckout = checkoutData.is_gift;
+  // A promotion's fixed last day comes from the API; without it the plan keeps its own validity days.
+  const fixedExpiry = promotionFixedExpiry(plan, { isQuarterly, isDuo });
   const planSubtitle = t('subscriptions:checkoutPlanSubtitle', {
     name: plan.name,
-    validity: t('subscriptions:validForDays', { count: isQuarterly ? 90 : plan.validity_days }),
+    validity: fixedExpiry
+      ? t('subscriptions:planExpiresOn', { date: formatCalendarDay(fixedExpiry, i18n.language) })
+      : t('subscriptions:validForDays', { count: isQuarterly ? 90 : plan.validity_days }),
   });
 
   const handleQuarterlyChange = useCallback((nextIsQuarterly: boolean) => {
@@ -151,6 +156,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
             onSubmit={handleModeSubmit}
             defaultFormValues={checkoutData}
             onQuarterlyChange={handleQuarterlyChange}
+            onDuoChange={setIsDuo}
           />
         </section>
       ),
@@ -207,6 +213,7 @@ function ModalContent({ onClose, plan }: ModalContentProps) {
           walletAmountApplied={paymentData.walletAmountApplied}
           originalPrice={paymentData.originalPrice}
           promotionStartFixed={previewFixesStart(paymentData.promotion)}
+          planExpiresOn={paymentData.planExpiresOn}
           promotionTermsVersionId={acceptedTermsVersion(paymentData.promotion?.terms, acceptedTermsVersionId)}
           onClose={onClose}
           onBack={() => setStep(CheckoutStep.PAY)}

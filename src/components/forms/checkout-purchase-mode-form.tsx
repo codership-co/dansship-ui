@@ -75,6 +75,7 @@ interface CheckoutPurchaseModeFormProps {
   onSubmit: (data: CheckoutFormValues, paymentData: PaymentData) => Promise<void>;
   defaultFormValues: CheckoutFormValues;
   onQuarterlyChange?: (isQuarterly: boolean) => void;
+  onDuoChange?: (isDuo: boolean) => void;
 }
 
 export function CheckoutPurchaseModeForm({
@@ -83,6 +84,7 @@ export function CheckoutPurchaseModeForm({
   onSubmit,
   defaultFormValues,
   onQuarterlyChange,
+  onDuoChange,
 }: CheckoutPurchaseModeFormProps) {
   const { t } = useTranslation();
   const classesIncluded = plan.classes_included ?? 0;
@@ -196,6 +198,10 @@ export function CheckoutPurchaseModeForm({
   }, [isDuo, isQuarterly, onQuarterlyChange]);
 
   useEffect(() => {
+    onDuoChange?.(isDuo);
+  }, [isDuo, onDuoChange]);
+
+  useEffect(() => {
     setGiftEligibilityError(null);
   }, [giftRecipientEmail]);
 
@@ -277,6 +283,11 @@ export function CheckoutPurchaseModeForm({
           previewPayload.referral_code =
             mode !== 'gift' && nextReferralCode ? nextReferralCode.toUpperCase() : undefined;
           previewPayload.is_quarterly = Boolean(nextData.is_quarterly);
+
+          // Only to preview the plan's last day; the server ignores it when it owns the start.
+          if (mode === 'self' && !rules.startIsFixed && nextData.start_date) {
+            previewPayload.start_date = nextData.start_date.toISOString();
+          }
 
           if (mode === 'gift') {
             previewPayload.is_gift = true;
@@ -362,6 +373,7 @@ export function CheckoutPurchaseModeForm({
           amountToCharge: amount_to_charge,
           promotion: data.promotion,
           giftClaim: data.gift_claim,
+          planExpiresOn: data.plan_expires_on ?? null,
         } satisfies PaymentData;
       });
 

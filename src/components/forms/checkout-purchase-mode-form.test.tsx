@@ -1,13 +1,12 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import i18n from 'i18next';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { CheckoutPurchaseModeForm } from './checkout-purchase-mode-form';
 import { defaultCheckoutFormValues } from './checkout-review-plan-form';
 
+import { DansshipAPI, type PublicPlan } from '@core/api';
 import '@core/i18n';
-
-import type { PublicPlan } from '@core/api';
 
 const basePlan: PublicPlan = {
   id: 'plan-1',
@@ -44,15 +43,44 @@ const START_DATE_LABEL = 'Fecha de Inicio del Plan';
 const START_NOTE = 'Durante Black Friday tu plan empieza apenas se apruebe el pago.';
 const QUARTERLY_NOTE = 'El pago trimestral conserva su 10 %. El 30 % de Black Friday aplica solo a planes mensuales.';
 
-function renderForm(plan: PublicPlan) {
+function renderForm(plan: PublicPlan, onSubmit = vi.fn().mockResolvedValue(undefined)) {
   return render(
     <CheckoutPurchaseModeForm
       plan={plan}
       onCancel={vi.fn()}
-      onSubmit={vi.fn().mockResolvedValue(undefined)}
+      onSubmit={onSubmit}
       defaultFormValues={defaultCheckoutFormValues}
     />,
   );
+}
+
+function mockPreview(planExpiresOn: string | null) {
+  return vi.spyOn(DansshipAPI.payments, 'previewPayment').mockResolvedValue({
+    ok: true,
+    data: {
+      base_amount: 0,
+      discount_applied: false,
+      discount_type: null,
+      discount_value: 0,
+      final_price: 230000,
+      is_valid: true,
+      original_price: 230000,
+      rejection_reason: null,
+      tax_amount: 0,
+      tax_rate_percentage: 0,
+      tax_type_name: 'iva',
+      bonus_classes_granted: null,
+      bonus_expires_days: null,
+      bonus_benefit_name: null,
+      discount_benefit_code: null,
+      applied_discounts: [],
+      wallet_amount_applied: 0,
+      amount_to_charge: 230000,
+      promotion: null,
+      gift_claim: null,
+      plan_expires_on: planExpiresOn,
+    },
+  } as never);
 }
 
 const codePlaceholder = () => i18n.t('subscriptions:discountCodePlaceholder');
@@ -136,6 +164,35 @@ describe('CheckoutPurchaseModeForm inside a promotion', () => {
 
     expect(screen.getByText('La destinataria tiene 90 días para reclamar tu regalo.')).toBeInTheDocument();
     expect(screen.getByText(/no se devuelve el dinero/)).toBeInTheDocument();
+  });
+
+  it('sends the chosen start date to preview the last day and hands that day on', async () => {
+    const preview = mockPreview('2026-12-26');
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    renderForm(basePlan, onSubmit);
+
+    fireEvent.click(screen.getByRole('button', { name: /Siguiente/ }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(preview.mock.calls[0][0].start_date).toEqual(expect.any(String));
+    expect(onSubmit.mock.calls[0][1].planExpiresOn).toBe('2026-12-26');
+    preview.mockRestore();
+  });
+
+  it('sends no start date when the promotion owns it, and keeps the server last day', async () => {
+    const preview = mockPreview('2027-01-31');
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    renderForm(
+      { ...promotionalPlan, promotion: { ...promotionalPlan.promotion!, expires_on: '2027-01-31' } },
+      onSubmit,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /Siguiente/ }));
+
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(preview.mock.calls[0][0].start_date).toBeUndefined();
+    expect(onSubmit.mock.calls[0][1].planExpiresOn).toBe('2027-01-31');
+    preview.mockRestore();
   });
 
   it('does not invent a claim policy the server did not send', () => {

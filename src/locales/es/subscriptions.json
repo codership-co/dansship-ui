@@ -34,6 +34,7 @@
   "validForDays_zero": "Válido por {{count}} días",
   "validForDays_one": "Válido por {{count}} día",
   "validForDays_other": "Válido por {{count}} días",
+  "planExpiresOn": "Vence el {{date}}",
   "accessAllClasses": "Acceso a todas las clases del catálogo estándar",
   "choosePlan": "Elegir {{name}}",
   "completePurchase": "Completar Compra",

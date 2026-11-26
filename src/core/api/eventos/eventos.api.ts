@@ -84,6 +84,7 @@ export class EventosAPI {
         applied_discounts: mapAppliedDiscounts(data.applied_discounts),
         promotion: null,
         gift_claim: null,
+        plan_expires_on: null,
         is_first_plan_purchase: data.is_first_plan_purchase ?? false,
         wallet_amount_applied: toNumber(data.wallet_amount_applied),
         amount_to_charge: toNumber(data.amount_to_charge, toNumber(data.final_price)),

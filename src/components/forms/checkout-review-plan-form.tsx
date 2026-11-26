@@ -110,6 +110,8 @@ export interface PaymentData {
   amountToCharge: number;
   promotion: PromotionPreviewMapped | null;
   giftClaim: GiftClaimPolicyPreview | null;
+  /** Last Bogotá day (YYYY-MM-DD) of the plan, from the server. Null when it is not known in advance. */
+  planExpiresOn: string | null;
 }
 
 export const DefaultPaymentData: PaymentData = {
@@ -133,6 +135,7 @@ export const DefaultPaymentData: PaymentData = {
   amountToCharge: 0,
   promotion: null,
   giftClaim: null,
+  planExpiresOn: null,
 };
 
 export const defaultCheckoutFormValues: CheckoutFormValues = {

@@ -178,6 +178,8 @@ export interface PaymentPreviewRequest {
   is_duo?: boolean;
   duo_partner_email?: string;
   is_quarterly?: boolean;
+  /** Plan start the buyer picked (ISO). Only used to preview `plan_expires_on`; the server ignores it when it owns the start. */
+  start_date?: string;
   room_id?: string;
   resource_id?: string | null;
   start_time?: string;
@@ -283,6 +285,8 @@ export interface PaymentPreviewResponse {
   installment_options?: Array<InstallmentChargeOption>;
   promotion?: PromotionPreview | null;
   gift_claim?: GiftClaimPolicyPreview | null;
+  /** Last Bogotá day (YYYY-MM-DD) of the plan this checkout creates. Null when unknown (a gift that starts at claim). */
+  plan_expires_on?: string | null;
 }
 
 export interface PaymentPreviewMappedResponse {
@@ -311,4 +315,5 @@ export interface PaymentPreviewMappedResponse {
   installment_options: Array<InstallmentChargeOptionMapped>;
   promotion: PromotionPreviewMapped | null;
   gift_claim: GiftClaimPolicyPreview | null;
+  plan_expires_on: string | null;
 }

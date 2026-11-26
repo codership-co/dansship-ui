@@ -36,6 +36,21 @@ export function promotionSkipsQuarterly(plan: Pick<PublicPlan, 'promotion'>, isQ
   return Boolean(plan.promotion) && isQuarterly && !plan.promotion?.discount_modes.includes('quarterly');
 }
 
+/**
+ * Fixed last Bogotá day (YYYY-MM-DD) the open promotion gives this purchase mode, from the server.
+ * Only modes that get the discount carry it (gifts too). Null: the plan keeps its own validity.
+ */
+export function promotionFixedExpiry(
+  plan: Pick<PublicPlan, 'promotion'>,
+  mode: { isQuarterly: boolean; isDuo: boolean },
+): string | null {
+  if (mode.isDuo || !promotionDiscountApplies(plan, mode.isQuarterly)) {
+    return null;
+  }
+
+  return plan.promotion?.expires_on ?? null;
+}
+
 /** Claim policy the server gives for a gift of this plan and mode. Null when the server did not send it. */
 export function giftClaimPolicyFor(plan: Pick<PublicPlan, 'gift_claim'>, isQuarterly: boolean): GiftClaimPolicy | null {
   return plan.gift_claim?.[isQuarterly ? 'quarterly' : 'monthly'] ?? null;
