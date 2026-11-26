@@ -260,6 +260,9 @@ export enum DANSSHIP_ERROR_CODE {
   CLASS_RECOVERY_INVALID_PAYMENT_METHOD = 'CLASS_RECOVERY_INVALID_PAYMENT_METHOD', // VALIDATION_ERROR = Transfer/QR or wallet only |
   CLASS_RECOVERY_NOT_FOUND = 'CLASS_RECOVERY_NOT_FOUND', // RESOURCE_NOT_FOUND = Unknown recovery |
   CLASS_RECOVERY_SETTINGS_INVALID = 'CLASS_RECOVERY_SETTINGS_INVALID', // VALIDATION_ERROR = Settings must be positive integers |
+  CLASS_FEEDBACK_NOT_ELIGIBLE = 'CLASS_FEEDBACK_NOT_ELIGIBLE', // VALIDATION_ERROR = The attendee cannot rate this class (not attended, cancelled, no instructor, out of the 15-day window or already rated) |
+  CLASS_FEEDBACK_ALREADY_SUBMITTED = 'CLASS_FEEDBACK_ALREADY_SUBMITTED', // CONFLICT = The attendee already rated this class |
+  ACTING_FOR_FORBIDDEN = 'ACTING_FOR_FORBIDDEN', // AUTHORIZATION_ERROR = The requester is not the active guardian of that person |
 }
 /* eslint-enable */
 

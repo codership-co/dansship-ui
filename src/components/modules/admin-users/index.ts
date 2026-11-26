@@ -13,6 +13,7 @@ export * from './user-events-tab';
 export * from './user-family-tab';
 export * from './user-instructor-classes-tab';
 export * from './user-instructor-csat-tab';
+export * from './user-student-csat-tab';
 export * from './user-wallet-tab';
 export * from './user-notes-tab';
 export * from './user-channels-section';

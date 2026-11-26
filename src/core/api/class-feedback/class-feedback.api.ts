@@ -3,6 +3,7 @@ import { HttpClient } from 'polpo-http-client';
 import { DansshipAPIError } from '@core/api';
 
 import type {
+  ClassFeedbackAdminFilters,
   ClassFeedbackAdminReport,
   ClassFeedbackCreatePayload,
   ClassFeedbackItem,
@@ -31,14 +32,15 @@ export class ClassFeedbackAPI {
 export class ClassFeedbackAdminAPI {
   constructor(private readonly httpClient: HttpClient<DansshipAPIError>) {}
 
-  async list(startDate?: string, endDate?: string, instructorId?: string) {
+  async list(startDate?: string, endDate?: string, filters: ClassFeedbackAdminFilters = {}) {
     return this.httpClient.callNoError<ClassFeedbackAdminReport>({
       path: '/admin/class-feedback',
       method: 'GET',
       params: {
         from_date: startDate,
         to_date: endDate,
-        ...(instructorId ? { instructor_id: instructorId } : {}),
+        ...(filters.instructorId ? { instructor_id: filters.instructorId } : {}),
+        ...(filters.userId ? { user_id: filters.userId } : {}),
       },
     });
   }
