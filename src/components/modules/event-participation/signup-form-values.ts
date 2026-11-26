@@ -1,6 +1,12 @@
 import { emptyTicket, ticketPayload, type TicketDraft } from './tickets';
 
-import { answerErrorPath, emptyAnswer, isAnswerEmpty, isAnswerItem } from '@components/modules/dynamic-form/form-items';
+import {
+  answerErrorPath,
+  emptyAnswer,
+  isAnswerEmpty,
+  isAnswerItem,
+  isFileAnswer,
+} from '@components/modules/dynamic-form/form-items';
 
 import type {
   MySignup,
@@ -48,8 +54,13 @@ export function initialSignupValues(
 
     const saved = signup?.raw_answers[field.key];
 
+    // A saved file stays as is; a saved link fills both inputs.
     answers[field.key] =
-      field.kind === 'link' && saved && typeof saved === 'object' && !Array.isArray(saved)
+      (field.kind === 'link' || field.kind === 'file') &&
+      saved &&
+      typeof saved === 'object' &&
+      !Array.isArray(saved) &&
+      !isFileAnswer(saved)
         ? { url: saved.url ?? '', note: saved.note ?? '' }
         : (saved ?? (emptyAnswer(field) as SignupAnswerValue));
   });
@@ -149,6 +160,8 @@ export function toSignupPayload(
 
     if (typeof value === 'string') {
       answers[field.key] = value.trim();
+    } else if (isFileAnswer(value)) {
+      answers[field.key] = { ...value, note: value.note?.trim() || null };
     } else if (value && typeof value === 'object' && !Array.isArray(value)) {
       answers[field.key] = { url: value.url.trim(), note: value.note?.trim() || null };
     } else {

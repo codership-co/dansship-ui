@@ -7,13 +7,31 @@
     "multi_choice": "Selección múltiple",
     "checkbox": "Casilla",
     "people": "Personas",
-    "section": "Sección"
+    "section": "Sección",
+    "file": "Archivo o enlace"
   },
   "answer": {
     "choicePlaceholder": "Elige una opción",
     "maxLengthHint": "Máximo {{max}} caracteres.",
     "counter": "{{count}} / {{max}}",
-    "linkNote": "¿Algo que debamos saber? (opcional)"
+    "linkNote": "¿Algo que debamos saber? (opcional)",
+    "file": {
+      "upload": "Subir archivo",
+      "tabFile": "Subir archivo",
+      "tabLink": "Pegar enlace",
+      "current": "Archivo:",
+      "accepts": "Formatos: {{types}}.",
+      "invalidType": "Este formato no se acepta. Sube {{types}}.",
+      "tooLarge": "El archivo es muy pesado. Prueba con uno más liviano.",
+      "uploadFailed": "No pudimos subir tu archivo. Inténtalo de nuevo.",
+      "previewOff": "En la vista previa no se suben archivos.",
+      "replaceUntil": "Puedes cambiarlo hasta el {{date}}.",
+      "category": {
+        "audio": "audio (mp3, m4a o wav)",
+        "image": "imagen (jpg, png o webp)",
+        "pdf": "PDF"
+      }
+    }
   },
   "builder": {
     "addQuestion": "Agregar pregunta",
@@ -54,6 +72,23 @@
     "alwaysVisible": "Siempre",
     "chooseValue": "Elige una opción",
     "cancel": "Cancelar",
-    "apply": "Aplicar"
+    "apply": "Aplicar",
+    "fileAccepts": "Formatos que se aceptan",
+    "fileCategory": {
+      "audio": "Audio",
+      "image": "Imagen",
+      "pdf": "PDF"
+    },
+    "fileCategoryHint": {
+      "audio": "mp3, m4a o wav, hasta 25 MB",
+      "image": "jpg, png o webp, hasta 10 MB",
+      "pdf": "Hasta 10 MB"
+    },
+    "fileVideoHint": "Los videos se piden por enlace: pesan demasiado para subirlos.",
+    "allowLink": "Permitir un enlace en lugar del archivo",
+    "allowLinkHint": "Por ejemplo, el enlace de un video en YouTube o Google Drive.",
+    "replaceUntil": "Se puede cambiar hasta",
+    "replaceDaysBefore": "días antes del evento",
+    "replaceUntilHint": "Vacío = hasta el cierre de la inscripción. 1 = hasta el día anterior al evento, aunque la inscripción ya haya cerrado."
   }
 }

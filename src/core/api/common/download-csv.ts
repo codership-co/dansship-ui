@@ -16,7 +16,11 @@ export async function downloadCsvFile(path: string, filename: string, params: Re
     throw new Error(`CSV export failed: ${path}`);
   }
 
-  const blob = await response.blob();
+  saveBlobAs(await response.blob(), filename);
+}
+
+/** Saves a blob built in the browser (a CSV, a zip) as a download. */
+export function saveBlobAs(blob: Blob, filename: string) {
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement('a');
   anchor.href = url;

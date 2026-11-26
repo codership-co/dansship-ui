@@ -18,7 +18,7 @@ import { choiceRowClass, EVENT_CARD, EVENT_FIELDS } from './signup-styles';
 import { validateTickets } from './tickets';
 
 import { SectionHeading } from '@components/containers';
-import { CheckRow, DynamicFormSections } from '@components/modules/dynamic-form';
+import { AnswerFileUploaderProvider, CheckRow, DynamicFormSections } from '@components/modules/dynamic-form';
 import { SignupCheckoutModal } from '@components/modules/eventos/signup-checkout-modal';
 import { PromotionTermsLink } from '@components/modules/payments/promotion-terms-link';
 import { Checkbox, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
@@ -85,6 +85,14 @@ export function ParticipantSignupForm({ form, landing, signup, preview = false }
   const closesLabel = bogotaDayLabel(form.closes_at);
   const editing = Boolean(signup);
   const eventUrl = preview ? PageURLS.eventoPreview(form.event_slug) : PageURLS.eventoLanding(form.event_slug);
+  // File questions upload through the person's route; the admin preview has no uploads.
+  const fileUploader = useMemo(
+    () => ({
+      upload: (item: { key: string }, file: File) =>
+        DansshipAPI.participation.uploadAnswerFile(form.participant_type_id, item.key, file),
+    }),
+    [form.participant_type_id],
+  );
 
   const markServerError = (error: unknown) => {
     const details = participationErrorDetails(error) as {
@@ -365,7 +373,9 @@ export function ParticipantSignupForm({ form, landing, signup, preview = false }
         />
       ) : null}
 
-      <DynamicFormSections control={control} name='answers' items={visibleFields} />
+      <AnswerFileUploaderProvider value={preview ? null : fileUploader}>
+        <DynamicFormSections control={control} name='answers' items={visibleFields} />
+      </AnswerFileUploaderProvider>
 
       {form.takes_donations && donationOptions.length > 0 ? (
         <section className={cn('grid gap-3 p-4 sm:p-5', EVENT_CARD)}>

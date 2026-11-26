@@ -1,13 +1,17 @@
 import { type ComponentType } from 'react';
-import { Controller, useWatch, type Control, type FieldValues, type Path } from 'react-hook-form';
+import { Controller, useWatch, type FieldValues, type Path } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 
+import { FieldError, FieldHint, type AnswerInputProps } from './answer-parts';
+import { FileOrLinkInput } from './file-answer-input';
 import { FORM_ITEM_KINDS, LONG_TEXT_DEFAULT_MAX, type FormItem, type FormItemKind } from './form-items';
 import { choiceRowClass } from './form-styles';
 
 import { TextareaField, TextField } from '@components/form-fields';
 import { Checkbox, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
 import { cn } from '@helpers';
+
+export { FieldError, FieldHint, type AnswerInputProps } from './answer-parts';
 
 /** A checkbox row of a list (multiple choice, donations): the whole row toggles, primary when on. */
 export function CheckRow({
@@ -38,21 +42,6 @@ export function CheckRow({
       </span>
     </label>
   );
-}
-
-export function FieldError({ message }: { message?: string }) {
-  return message ? <small className='text-alert-600'>{message}</small> : null;
-}
-
-export function FieldHint({ children }: { children?: React.ReactNode }) {
-  return children ? <small className='text-xs text-muted-foreground'>{children}</small> : null;
-}
-
-export interface AnswerInputProps<T extends FieldValues = FieldValues> {
-  control: Control<T>;
-  /** The form path of this item's answer, e.g. `answers.music`. */
-  name: Path<T>;
-  item: FormItem;
 }
 
 function ShortTextInput<T extends FieldValues>({ control, name, item }: AnswerInputProps<T>) {
@@ -214,6 +203,7 @@ export const ANSWER_INPUTS: Partial<Record<FormItemKind, ComponentType<AnswerInp
   choice: ChoiceInput,
   multi_choice: MultiChoiceInput,
   checkbox: CheckboxInput,
+  file: FileOrLinkInput,
 };
 
 /** The input of one question, by its kind. */

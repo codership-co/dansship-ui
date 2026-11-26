@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
 
+import { AdminFileAnswer } from './admin-file-answer';
 import { PersonStatusBadge } from './participation-people-table';
 
 import { SectionHeading } from '@components/containers';
@@ -180,6 +181,9 @@ export function SignupDetail({ eventId, signupId }: { eventId: string; signupId:
                   <div key={item.key} className='grid min-w-0 gap-0.5'>
                     <dt className='text-xs font-semibold text-muted-foreground'>{item.label}</dt>
                     <dd className='m-0 text-sm break-words whitespace-pre-wrap'>{answerText(item.value, t)}</dd>
+                    {item.kind === 'file' ? (
+                      <AdminFileAnswer signupId={detail.id} fieldKey={item.key} value={item.value} />
+                    ) : null}
                   </div>
                 ))}
                 <div className='grid gap-0.5'>

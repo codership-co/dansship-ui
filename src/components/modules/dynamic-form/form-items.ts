@@ -12,13 +12,22 @@ export type FormItemKind =
   | 'multi_choice'
   | 'checkbox'
   | 'people'
-  | 'section';
+  | 'section'
+  | 'file';
+
+export type FileCategory = 'audio' | 'image' | 'pdf';
 
 export interface FormItemOptions {
   choices?: Array<string>;
   max_length?: number;
   with_note?: boolean;
   max_people?: number;
+  /** «Archivo o enlace»: the file categories it takes. */
+  accepts?: Array<FileCategory>;
+  /** «Archivo o enlace»: a link is accepted instead of a file. */
+  allow_link?: boolean;
+  /** «Archivo o enlace»: null = until the signup closes; or N days before the event. */
+  replaceable_until?: { anchor: 'days_before_event'; days: number } | null;
 }
 
 export interface FormItemVisibleWhen {
@@ -37,9 +46,43 @@ export interface FormItem {
   visible_when?: FormItemVisibleWhen | null;
   admin_editable_copy?: boolean;
   show_in_admin_list?: boolean;
+  /** «Archivo o enlace» in a person's form: last instant the file can be replaced. */
+  replace_closes_at?: string | null;
 }
 
-export type FormAnswer = string | boolean | Array<string> | { url?: string; note?: string | null } | null;
+export interface FileFormAnswer {
+  file_key: string;
+  file_name: string;
+  content_type: string;
+  size_bytes?: number;
+  note?: string | null;
+}
+
+export type FormAnswer =
+  | string
+  | boolean
+  | Array<string>
+  | { url?: string; note?: string | null }
+  | FileFormAnswer
+  | null;
+
+/**
+ * Content types each file category takes; the server checks them again (and the size) on submit.
+ * Keep in sync with the API's `AnswerFileCategoryPolicy`.
+ */
+export const FILE_CATEGORY_TYPES: Record<FileCategory, Array<string>> = {
+  audio: ['audio/mpeg', 'audio/mp3', 'audio/mp4', 'audio/x-m4a', 'audio/wav', 'audio/x-wav', 'audio/wave'],
+  image: ['image/jpeg', 'image/png', 'image/webp'],
+  pdf: ['application/pdf'],
+};
+
+export function acceptedFileTypes(item: Pick<FormItem, 'options'>): Array<string> {
+  return (item.options.accepts ?? []).flatMap(category => FILE_CATEGORY_TYPES[category] ?? []);
+}
+
+export function isFileAnswer(value: unknown): value is FileFormAnswer {
+  return typeof value === 'object' && value !== null && Boolean((value as { file_key?: string }).file_key);
+}
 
 /** What the builder asks for each kind. A new kind is one entry here (plus its input in `ANSWER_INPUTS`). */
 export interface FormItemKindMeta {
@@ -57,6 +100,8 @@ export interface FormItemKindMeta {
   adminCopy?: boolean;
   /** May be shown as a column in the answers list. */
   listColumn?: boolean;
+  /** «Archivo o enlace»: accepted categories, link alternative and replace window. */
+  file?: boolean;
   /** Fixed options sent with the item. */
   defaults?: FormItemOptions;
 }
@@ -70,6 +115,7 @@ export const FORM_ITEM_KINDS: Record<FormItemKind, FormItemKindMeta> = {
   checkbox: { fullWidth: true, listColumn: true },
   people: { external: true, defaults: { max_people: 30 } },
   section: { layout: true },
+  file: { fullWidth: true, note: true, listColumn: true, file: true },
 };
 
 export const LONG_TEXT_DEFAULT_MAX = 1000;
@@ -125,7 +171,7 @@ export function emptyAnswer(item: Pick<FormItem, 'kind'>): FormAnswer {
 
   if (item.kind === 'multi_choice') return [];
 
-  if (item.kind === 'link') return { url: '', note: '' };
+  if (item.kind === 'link' || item.kind === 'file') return { url: '', note: '' };
 
   return '';
 }
@@ -136,6 +182,8 @@ export function isAnswerEmpty(item: Pick<FormItem, 'kind'>, value: unknown): boo
   if (item.kind === 'checkbox') return value !== true;
 
   if (Array.isArray(value)) return value.length === 0;
+
+  if (isFileAnswer(value)) return false;
 
   if (typeof value === 'object') return !(value as { url?: string }).url?.trim();
 

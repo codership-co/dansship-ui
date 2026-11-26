@@ -718,7 +718,11 @@
       "undoRefundedDescription": "La inscripción vuelve a quedar por devolver.",
       "undoRefundedSaved": "Quitamos la marca de devolución.",
       "termsBySelf": "Aceptó los términos (versión {{version}}) el {{date}}.",
-      "termsByAdmin": "Términos (versión {{version}}) registrados por {{name}} el {{date}}."
+      "termsByAdmin": "Términos (versión {{version}}) registrados por {{name}} el {{date}}.",
+      "listen": "Escuchar",
+      "download": "Descargar",
+      "openFile": "Ver archivo",
+      "fileUnavailable": "No pudimos abrir el archivo. Inténtalo de nuevo."
     },
     "card": {
       "viewSignup": "Ver inscripción",
@@ -795,7 +799,15 @@
       "closed": "Las inscripciones cerraron el {{date}}, así que ya no puedes hacer cambios.",
       "edit": "Editar inscripción",
       "notFound": "No encontramos esta inscripción.",
-      "notEditable": "Esta inscripción ya no se puede editar."
+      "notEditable": "Esta inscripción ya no se puede editar.",
+      "listen": "Escuchar",
+      "openFile": "Ver archivo",
+      "fileUnavailable": "No pudimos abrir el archivo. Inténtalo de nuevo.",
+      "replaceFile": "Cambiar archivo",
+      "cancelReplace": "Cancelar",
+      "saveReplace": "Guardar",
+      "replaced": "¡Listo! Guardamos tu nuevo archivo.",
+      "replaceFailed": "No pudimos guardar el cambio. Revisa el archivo e inténtalo de nuevo."
     },
     "editPerson": {
       "title": "Editar entrada",
@@ -937,6 +949,19 @@
         "label": "Recordatorio de cuota",
         "tooltip": "Antes de cada vencimiento, según los días configurados."
       }
+    },
+    "files": {
+      "button": "Descargar todos",
+      "title": "Descargar los archivos",
+      "hint": "Bajamos en un .zip los archivos que subieron las personas inscritas, numerados y con el nombre que elijas.",
+      "field": "Pregunta",
+      "nameBy": "Nombrar cada archivo por",
+      "byPerson": "Nombre de la persona",
+      "progress": "Descargando {{done}} de {{total}}…",
+      "download": "Descargar .zip",
+      "cancel": "Cancelar",
+      "empty": "Todavía nadie ha subido archivos en esta pregunta.",
+      "failed": "No pudimos descargar los archivos. Inténtalo de nuevo."
     }
   },
   "tickets": {
