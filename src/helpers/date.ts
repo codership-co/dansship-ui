@@ -30,6 +30,9 @@ export const formatDate = (date: string | Date, lang = 'en'): string => {
   }).format(dateObj);
 };
 
+/** A calendar day from the API (YYYY-MM-DD), formatted as that same day. `new Date(day)` would read it as UTC midnight. */
+export const formatCalendarDay = (day: string, lang = 'en'): string => formatDate(parseISO(day), lang);
+
 export const formatDateTime = (date: string | Date, lang = 'en'): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 

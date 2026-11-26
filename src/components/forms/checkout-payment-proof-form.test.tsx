@@ -2,6 +2,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { CheckoutPaymentProofForm } from './checkout-payment-proof-form';
+import { defaultCheckoutFormValues } from './checkout-review-plan-form';
 
 import { PaymentMethod } from '@core/api';
 import '@core/i18n';
@@ -76,5 +77,57 @@ describe('CheckoutPaymentProofForm (event variant)', () => {
     fireEvent.click(confirm);
     await waitFor(() => expect(onConfirm).toHaveBeenCalled());
     expect(onConfirm.mock.calls[0][0].type).toBe('image/jpeg');
+  });
+});
+
+describe('CheckoutPaymentProofForm plan summary', () => {
+  beforeAll(() => {
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      },
+    );
+  });
+
+  afterEach(cleanup);
+
+  const plan = {
+    id: 'plan-1',
+    name: 'Floreciendo Impulso',
+    price: 161000,
+    currency: 'COP',
+    classes_included: 8,
+    validity_days: 30,
+  };
+
+  function renderSummary(planExpiresOn: string | null) {
+    render(
+      <CheckoutPaymentProofForm
+        plan={plan}
+        checkoutData={{ ...defaultCheckoutFormValues, start_date: new Date(2026, 10, 26) }}
+        paymentMethod={PaymentMethod.TRANSFER}
+        finalPrice={161000}
+        amountToCharge={161000}
+        walletAmountApplied={0}
+        planExpiresOn={planExpiresOn}
+        onClose={() => undefined}
+        onSubmit={() => undefined}
+      />,
+    );
+  }
+
+  it('shows the last day of the plan the server previewed', () => {
+    renderSummary('2027-01-31');
+
+    expect(screen.getByText('Vence el 31 de enero de 2027')).toBeInTheDocument();
+  });
+
+  it('shows no last day when the server did not send one', () => {
+    renderSummary(null);
+
+    expect(screen.queryByText(/Vence el/)).not.toBeInTheDocument();
   });
 });

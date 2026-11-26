@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { colombiaCalendarDaysUntil } from './date';
+import { colombiaCalendarDaysUntil, formatCalendarDay } from './date';
+
+describe('formatCalendarDay', () => {
+  it('shows the API calendar day as that same day, not the day before', () => {
+    expect(formatCalendarDay('2027-01-31', 'es')).toBe('31 de enero de 2027');
+    expect(formatCalendarDay('2026-12-01', 'es')).toBe('1 de diciembre de 2026');
+  });
+});
 
 describe('colombiaCalendarDaysUntil', () => {
   // 10:46 a. m. in Bogota on Nov 13.

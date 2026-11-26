@@ -7,6 +7,7 @@ import {
   resolveCheckoutPromotion,
   promotionCopyKey,
   promotionDiscountApplies,
+  promotionFixedExpiry,
   promotionFixesStart,
   promotionSkipsQuarterly,
 } from './promotion';
@@ -25,6 +26,16 @@ const promotion: PlanPromotion = {
 };
 
 describe('promotion helpers', () => {
+  it('gives the fixed last day only to the discounted mode, gifts included, never to Duo', () => {
+    const fixed = { promotion: { ...promotion, expires_on: '2027-01-31' } };
+
+    expect(promotionFixedExpiry(fixed, { isQuarterly: false, isDuo: false })).toBe('2027-01-31');
+    expect(promotionFixedExpiry(fixed, { isQuarterly: true, isDuo: false })).toBeNull();
+    expect(promotionFixedExpiry(fixed, { isQuarterly: false, isDuo: true })).toBeNull();
+    expect(promotionFixedExpiry({ promotion }, { isQuarterly: false, isDuo: false })).toBeNull();
+    expect(promotionFixedExpiry({ promotion: null }, { isQuarterly: false, isDuo: false })).toBeNull();
+  });
+
   it('fixes the start for every purchase mode while a promotion is open', () => {
     expect(promotionFixesStart({ promotion })).toBe(true);
     expect(promotionFixesStart({ promotion: null })).toBe(false);

@@ -13,6 +13,8 @@ export interface PlanPromotion {
   promotional_price: number;
   start_rule: string;
   terms_required: boolean;
+  /** Fixed last Bogotá day (YYYY-MM-DD) of a plan bought with the discount, for oneself or as a gift. Null: own validity. */
+  expires_on?: string | null;
 }
 
 export interface PublicPlan {
