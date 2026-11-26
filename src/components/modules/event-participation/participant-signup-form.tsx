@@ -260,13 +260,12 @@ export function ParticipantSignupForm({ form, landing, signup, preview = false }
           subtitle={[form.event_name, bogotaStartLabel(form.starts_at), form.place_label].filter(Boolean).join(' · ')}
         />
       </div>
-      <p className='m-0 flex items-start gap-2.5 rounded-xl bg-secondary px-3.5 py-3 text-sm'>
-        <LuInfo className='mt-0.5 size-4 flex-none' aria-hidden />
-        <span>
-          {t('eventos:participation.form.intro', { name: form.signer_name })}
-          {closesLabel ? ` ${t('eventos:participation.form.editUntil', { date: closesLabel })}` : ''}
-        </span>
-      </p>
+      {closesLabel ? (
+        <p className='m-0 flex items-start gap-2.5 rounded-xl bg-secondary px-3.5 py-3 text-sm'>
+          <LuInfo className='mt-0.5 size-4 flex-none' aria-hidden />
+          <span>{t('eventos:participation.form.editUntil', { date: closesLabel })}</span>
+        </p>
+      ) : null}
 
       {options.length > 1 ? (
         <Controller

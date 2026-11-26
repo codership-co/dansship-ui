@@ -63,7 +63,7 @@ function LandingHero({ landing, showCapacity }: { landing: EventLanding; showCap
       <div className='grid gap-2'>
         <h1 className='m-0 text-[1.75rem] font-bold leading-tight text-foreground sm:text-3xl'>{landing.name}</h1>
         {landing.description ? (
-          <p className='m-0 text-sm leading-relaxed text-muted-foreground whitespace-pre-wrap'>{landing.description}</p>
+          <p className='m-0 leading-relaxed text-muted-foreground whitespace-pre-wrap'>{landing.description}</p>
         ) : null}
       </div>
     </div>
@@ -134,7 +134,7 @@ function PriceBlock({ landing, rows }: { landing: EventLanding; rows: Array<Land
 
   return (
     <div className='grid gap-3 rounded-[14px] border bg-white p-4'>
-      <h2 className='m-0 text-base font-semibold'>
+      <h2 className='m-0 text-header4'>
         {landing.kind === 'combo' ? t('eventos:landing.priceTitleCombo') : t('eventos:landing.priceTitle')}
       </h2>
       <div className='grid gap-2.5'>
@@ -368,8 +368,16 @@ export function EventoLanding({
         </div>
       ) : null}
       {participation ? null : (
-        <div className='flex justify-end'>
-          <Button type='button' color='primary' variant='solid' disabled={ctaDisabled} onClick={startCheckout}>
+        // Full width on phones (easy to reach with the thumb), right-aligned from tablets up.
+        <div className='grid sm:flex sm:justify-end'>
+          <Button
+            type='button'
+            color='primary'
+            variant='solid'
+            className='w-full sm:w-auto'
+            disabled={ctaDisabled}
+            onClick={startCheckout}
+          >
             {ctaLabel}
           </Button>
         </div>

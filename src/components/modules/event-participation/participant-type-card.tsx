@@ -25,7 +25,8 @@ export function ParticipantTypeCard({ type, onStart }: ParticipantTypeCardProps)
   return (
     <section className='grid gap-3 rounded-[14px] border border-primary/30 bg-white p-4'>
       <div className='flex flex-wrap items-center justify-between gap-2'>
-        <h2 className='m-0 text-base font-semibold'>{title}</h2>
+        {/* Theme heading size (between the event name and the body text). */}
+        <h2 className='m-0 text-header4'>{title}</h2>
         {type.state === 'sold_out' ? (
           <Badge variant='destructive' size='small'>
             {t('eventos:participation.card.soldOut')}
@@ -37,11 +38,11 @@ export function ParticipantTypeCard({ type, onStart }: ParticipantTypeCardProps)
         ) : null}
       </div>
       {open ? (
-        <p className='m-0 text-sm whitespace-pre-line text-muted-foreground'>
+        <p className='m-0 leading-relaxed whitespace-pre-line text-muted-foreground'>
           {type.card_copy.text || (closesLabel ? t('eventos:participation.card.openUntil', { date: closesLabel }) : '')}
         </p>
       ) : (
-        <p className='m-0 text-sm whitespace-pre-line text-muted-foreground'>
+        <p className='m-0 leading-relaxed whitespace-pre-line text-muted-foreground'>
           {type.card_copy.closing_message ||
             (type.state === 'sold_out'
               ? t('eventos:participation.card.soldOutText')
@@ -64,9 +65,11 @@ export function ParticipantTypeCard({ type, onStart }: ParticipantTypeCardProps)
           ))}
         </ul>
       ) : null}
-      <div className='flex flex-wrap justify-end gap-2'>
+      {/* Full width on phones (easy to reach with the thumb), right-aligned from tablets up. */}
+      <div className='grid gap-2 sm:flex sm:flex-wrap sm:justify-end'>
         {type.my_signup_id ? (
           <Button
+            className='w-full sm:w-auto'
             type='button'
             variant='outlined'
             color='primary'
@@ -75,12 +78,18 @@ export function ParticipantTypeCard({ type, onStart }: ParticipantTypeCardProps)
             {t('eventos:participation.card.viewSignup')}
           </Button>
         ) : open ? (
-          <Button type='button' variant='solid' color='primary' onClick={() => onStart(type)}>
+          <Button
+            className='w-full sm:w-auto'
+            type='button'
+            variant='solid'
+            color='primary'
+            onClick={() => onStart(type)}
+          >
             {type.card_copy.button_text || t('eventos:participation.card.defaultCta')}
           </Button>
         ) : (
           <a href={buildStudioWhatsAppLink()} target='_blank' rel='noopener noreferrer'>
-            <Button type='button' variant='outlined' color='primary'>
+            <Button className='w-full sm:w-auto' type='button' variant='outlined' color='primary'>
               {t('eventos:participation.card.contact')}
             </Button>
           </a>
