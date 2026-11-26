@@ -1,0 +1,116 @@
+name: Promote to production
+
+# The owner's button to publish the UI (ADR-065). Vercel keeps deploying main to
+# dev (a Preview deployment) and every PR to a preview; this publishes one main
+# commit to production in the same two steps as the Vercel dashboard: build it
+# for production (Vercel builds the same commit again with the production
+# environment variables), then make that build live. Running it is the
+# approval: it is skipped for anyone but the repository variable DEPLOY_APPROVER.
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Commit of main to publish (empty: the latest commit of main)"
+        type: string
+        default: ""
+
+concurrency:
+  group: promote-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  deployments: read
+
+jobs:
+  promote:
+    if: github.ref == 'refs/heads/main' && github.actor == vars.DEPLOY_APPROVER && github.triggering_actor == vars.DEPLOY_APPROVER
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # Holds VERCEL_TOKEN; its deployment branch policy allows main only.
+    environment: vercel-production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # The project stages production: promoting a Preview deployment only builds
+      # a production deployment (not live yet); promoting that one makes it live.
+      # These are the two clicks of the dashboard. Deployment URLs come from the
+      # GitHub deployments Vercel records for each commit.
+      - name: Commit and its deployments
+        id: target
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_SHA: ${{ inputs.sha }}
+        run: |
+          sha="$(git rev-parse --verify "${INPUT_SHA:-HEAD}^{commit}")"
+          if ! git merge-base --is-ancestor "$sha" origin/main; then
+            echo "::error::$sha is not a commit of main."
+            exit 1
+          fi
+          echo "sha=$sha" >>"$GITHUB_OUTPUT"
+          cat >"$RUNNER_TEMP/deployment_url.sh" <<'EOF'
+          # deployment_url <Preview|Production> <sha>: URL of its latest successful deployment.
+          deployment_url() {
+            local id url
+            for id in $(gh api "repos/$GITHUB_REPOSITORY/deployments?sha=$2&environment=$1" --jq '.[].id'); do
+              url="$(gh api "repos/$GITHUB_REPOSITORY/deployments/$id/statuses" \
+                --jq '[.[] | select(.state == "success")][0].environment_url // empty')"
+              if [ -n "$url" ]; then
+                echo "$url"
+                return 0
+              fi
+            done
+            return 1
+          }
+          EOF
+
+      - name: Build it for production
+        id: build
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_SCOPE: ${{ vars.VERCEL_SCOPE }}
+          SHA: ${{ steps.target.outputs.sha }}
+        run: |
+          source "$RUNNER_TEMP/deployment_url.sh"
+          if url="$(deployment_url Production "$SHA")"; then
+            echo "A production build of $SHA already exists; reusing it."
+          else
+            if ! preview="$(deployment_url Preview "$SHA")"; then
+              echo "::error::No successful Vercel Preview deployment for $SHA yet (dev). Wait for it and try again."
+              exit 1
+            fi
+            scope=()
+            [ -n "$VERCEL_SCOPE" ] && scope=(--scope "$VERCEL_SCOPE")
+            # The CLI reads VERCEL_TOKEN from the environment (kept off the command line).
+            npx --yes vercel@65.12.1 promote "$preview" --yes "${scope[@]}"
+            for _ in $(seq 1 45); do
+              url="$(deployment_url Production "$SHA")" && break
+              sleep 20
+            done
+            if [ -z "${url:-}" ]; then
+              echo "::error::The production build of $SHA did not finish in 15 minutes; check it in Vercel."
+              exit 1
+            fi
+          fi
+          echo "url=$url" >>"$GITHUB_OUTPUT"
+
+      - name: Make it the live production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_SCOPE: ${{ vars.VERCEL_SCOPE }}
+          URL: ${{ steps.build.outputs.url }}
+        run: |
+          scope=()
+          [ -n "$VERCEL_SCOPE" ] && scope=(--scope "$VERCEL_SCOPE")
+          npx --yes vercel@65.12.1 promote "$URL" --yes --timeout 10m "${scope[@]}"
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### UI production: ${{ job.status }}"
+            echo "Commit \`${{ steps.target.outputs.sha }}\`. Publish the API first when the UI needs it."
+          } >>"$GITHUB_STEP_SUMMARY"
