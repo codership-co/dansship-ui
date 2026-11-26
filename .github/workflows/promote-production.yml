@@ -1,0 +1,78 @@
+name: Promote to production
+
+# The owner's button to publish the UI (ADR-065). Vercel keeps deploying main to
+# dev (a Preview deployment) and every PR to a preview; this promotes the Preview
+# deployment of one main commit to production. Vercel builds that same commit
+# again with the production environment variables, as the "Promote" button in
+# the Vercel dashboard does. Running it is the approval: it is skipped for
+# anyone but the repository variable DEPLOY_APPROVER.
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: "Commit of main to publish (empty: the latest commit of main)"
+        type: string
+        default: ""
+
+concurrency:
+  group: promote-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  deployments: read
+
+jobs:
+  promote:
+    if: github.ref == 'refs/heads/main' && github.actor == vars.DEPLOY_APPROVER && github.triggering_actor == vars.DEPLOY_APPROVER
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Holds VERCEL_TOKEN; its deployment branch policy allows main only.
+    environment: vercel-production
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Preview deployment of the commit
+        id: preview
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INPUT_SHA: ${{ inputs.sha }}
+        run: |
+          sha="$(git rev-parse --verify "${INPUT_SHA:-HEAD}^{commit}")"
+          if ! git merge-base --is-ancestor "$sha" origin/main; then
+            echo "::error::$sha is not a commit of main."
+            exit 1
+          fi
+          url=""
+          for id in $(gh api "repos/$GITHUB_REPOSITORY/deployments?sha=$sha&environment=Preview" --jq '.[].id'); do
+            url="$(gh api "repos/$GITHUB_REPOSITORY/deployments/$id/statuses" \
+              --jq '[.[] | select(.state == "success")][0].environment_url // empty')"
+            [ -n "$url" ] && break
+          done
+          if [ -z "$url" ]; then
+            echo "::error::No successful Vercel Preview deployment for $sha yet (dev). Wait for it and try again."
+            exit 1
+          fi
+          echo "sha=$sha" >>"$GITHUB_OUTPUT"
+          echo "url=$url" >>"$GITHUB_OUTPUT"
+
+      - name: Promote it to production
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_SCOPE: ${{ vars.VERCEL_SCOPE }}
+          URL: ${{ steps.preview.outputs.url }}
+        run: |
+          scope=()
+          [ -n "$VERCEL_SCOPE" ] && scope=(--scope "$VERCEL_SCOPE")
+          # The CLI reads VERCEL_TOKEN from the environment (kept off the command line).
+          npx --yes vercel@65.12.1 promote "$URL" --yes --timeout 10m "${scope[@]}"
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### UI production: ${{ job.status }}"
+            echo "Commit \`${{ steps.preview.outputs.sha }}\`. Publish the API first when the UI needs it."
+          } >>"$GITHUB_STEP_SUMMARY"
