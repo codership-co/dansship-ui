@@ -7,6 +7,7 @@ import { LuDownload, LuPlus, LuPrinter } from 'react-icons/lu';
 import { Link } from 'react-router';
 import { toast } from 'sonner';
 
+import { DownloadAnswerFiles } from './download-answer-files';
 import { EntryPersonDialog } from './entry-person-dialog';
 import { ParticipationPrintList, PRINT_BODY_CLASS } from './participation-print-list';
 
@@ -253,6 +254,7 @@ export function ParticipationPeopleTable({
               </Button>
             </Link>
           ) : null}
+          <DownloadAnswerFiles eventId={eventId} eventSlug={eventSlug} />
           <Button type='button' variant='outlined' color='primary' disabled={!data} onClick={printList}>
             <LuPrinter className='size-4' aria-hidden />
             {t('eventos:participation.print.button')}

@@ -24,7 +24,9 @@ export type EventFormFieldKind =
   | 'checkbox'
   | 'people'
   /** A section title (Google Forms style): its `help_text` is the description. */
-  | 'section';
+  | 'section'
+  /** «Archivo o enlace»: an uploaded file, or a link when the field allows it. */
+  | 'file';
 export type EventSignupStatus =
   | 'in_review'
   | 'approved'
@@ -42,11 +44,22 @@ export interface FieldVisibleWhen {
   equals: string;
 }
 
+export type AnswerFileCategory = 'audio' | 'image' | 'pdf';
+
+/** File fields: replaceable until the type closes (null) or N days before the event. */
+export interface ReplaceableUntil {
+  anchor: 'days_before_event';
+  days: number;
+}
+
 export interface ParticipantFieldOptions {
   choices?: Array<string>;
   max_length?: number;
   with_note?: boolean;
   max_people?: number;
+  accepts?: Array<AnswerFileCategory>;
+  allow_link?: boolean;
+  replaceable_until?: ReplaceableUntil | null;
 }
 
 export interface ParticipantField {
@@ -60,6 +73,8 @@ export interface ParticipantField {
   visible_when?: FieldVisibleWhen | null;
   admin_editable_copy?: boolean;
   show_in_admin_list?: boolean;
+  /** File fields in the person's form: last instant the file can be replaced. */
+  replace_closes_at?: string | null;
 }
 
 export interface ParticipantFee {
@@ -276,7 +291,48 @@ export interface LinkAnswer {
   note?: string | null;
 }
 
-export type SignupAnswerValue = string | boolean | Array<string> | LinkAnswer | null;
+/** An uploaded file answer (the storage key is opaque; the name is the person's). */
+export interface FileAnswer {
+  file_key: string;
+  file_name: string;
+  content_type: string;
+  size_bytes?: number;
+  note?: string | null;
+}
+
+export type SignupAnswerValue = string | boolean | Array<string> | LinkAnswer | FileAnswer | null;
+
+/** `POST …/fields/{key}/upload-url`. */
+export interface AnswerFileUpload {
+  upload_url: string;
+  /** Form fields to POST before the file; S3 refuses a file above `max_bytes`. */
+  fields: Record<string, string>;
+  file_key: string;
+  max_bytes: number;
+}
+
+/** A short-lived link to an uploaded file. */
+export interface AnswerFileView {
+  view_url: string;
+  expires_in: number;
+  file_name: string;
+  content_type: string;
+}
+
+/** «Descargar todos»: every file of one field, with a suggested name for the zip. */
+export interface AnswerFileDownloads {
+  field_key: string;
+  field_label: string;
+  expires_in: number;
+  items: Array<{
+    signup_id: string;
+    person_name: string;
+    file_name: string;
+    content_type: string;
+    download_name: string;
+    view_url: string;
+  }>;
+}
 
 export interface SignupMemberPayload {
   full_name: string;
@@ -313,6 +369,9 @@ export interface SignupAnswerView {
   label: string;
   kind: EventFormFieldKind;
   value: SignupAnswerValue;
+  /** File answers: the person can still replace it alone, until `replace_closes_at`. */
+  replaceable?: boolean;
+  replace_closes_at?: string | null;
 }
 
 export interface MySignup {

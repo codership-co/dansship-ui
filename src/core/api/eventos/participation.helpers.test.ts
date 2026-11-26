@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
+import { DansshipAPIError } from '../dansship.error';
+
 import {
   answerText,
   bogotaLocalToIso,
@@ -7,6 +9,7 @@ import {
   isoToBogotaLocal,
   configuredParticipationRows,
   nextPayableSequences,
+  participationErrorMessage,
   signupStatusTone,
 } from './participation.helpers';
 
@@ -76,5 +79,19 @@ describe('participation helpers', () => {
 
     expect(configuredParticipationRows(rows).map(row => row.kind)).toEqual(['signup', 'ticket']);
     expect(configuredParticipationRows(null)).toEqual([]);
+  });
+});
+
+describe('participationErrorMessage', () => {
+  const translate = (key: string, options?: Record<string, unknown>) =>
+    key === 'errors:reasons.file_too_large' ? 'El archivo es muy pesado.' : String(options?.defaultValue ?? key);
+
+  it('prefers the copy of the precise reason', () => {
+    const error = new DansshipAPIError(
+      { error_code: 'EVENT_SIGNUP_FIELD_INVALID', details: { field_key: 'music', reason: 'file_too_large' } } as never,
+      422,
+    );
+
+    expect(participationErrorMessage(error, translate, 'fallback')).toBe('El archivo es muy pesado.');
   });
 });

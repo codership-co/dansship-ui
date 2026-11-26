@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
 import { CheckoutPaymentProofForm } from '@components/forms/checkout-payment-proof-form';
-import { DynamicFormSections } from '@components/modules/dynamic-form';
+import { AnswerFileUploaderProvider, DynamicFormSections } from '@components/modules/dynamic-form';
 import {
   SIGNUP_OPTION_RENDERERS,
   initialSignupValues,
@@ -142,6 +142,14 @@ function TypeEnrollment({ type, eventId, eventName, person, hasTerms, onEnrolled
   });
   const { control, setError, clearErrors, getValues } = form;
   const values = useWatch({ control });
+  // The admin uploads the files on the person's behalf (enroll:event).
+  const fileUploader = useMemo(
+    () => ({
+      upload: (item: { key: string }, file: File) =>
+        DansshipAPI.participationAdmin.uploadAnswerFile(type.id, item.key, file),
+    }),
+    [type.id],
+  );
 
   const options = type.registration_options;
   const chosen = options.find(option => option.kind === values.registration_option) ?? null;
@@ -294,7 +302,9 @@ function TypeEnrollment({ type, eventId, eventName, person, hasTerms, onEnrolled
         <OptionFields control={control} option={chosen} minors={minors} familyMinors={[]} ticketErrors={ticketErrors} />
       ) : null}
 
-      <DynamicFormSections control={control} name='answers' items={visibleFields} columns={1} />
+      <AnswerFileUploaderProvider value={fileUploader}>
+        <DynamicFormSections control={control} name='answers' items={visibleFields} columns={1} />
+      </AnswerFileUploaderProvider>
 
       {summary ? (
         <div className='divide-y divide-border overflow-hidden rounded-2xl border border-border bg-white'>

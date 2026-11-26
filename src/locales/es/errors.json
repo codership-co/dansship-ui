@@ -98,7 +98,12 @@
     "EVENT_ENROLLMENT_INVALID": "Indica si la persona ya pagó o paga después.",
     "EVENT_PROOF_KEY_INVALID": "No pudimos usar ese comprobante. Súbelo de nuevo.",
     "EVENT_PROOF_NOT_FOUND": "No encontramos el comprobante. Súbelo de nuevo.",
-    "PAYMENT_IDEMPOTENCY_CONFLICT": "Este pago ya se registró. Recarga antes de intentarlo otra vez."
+    "PAYMENT_IDEMPOTENCY_CONFLICT": "Este pago ya se registró. Recarga antes de intentarlo otra vez.",
+    "EVENT_ANSWER_FILE_TYPE_NOT_ALLOWED": "Este formato de archivo no se acepta en esta pregunta.",
+    "EVENT_ANSWER_FILE_NOT_FOUND": "No encontramos ese archivo.",
+    "EVENT_FORM_FIELD_NOT_FOUND": "No encontramos esa pregunta del formulario.",
+    "EVENT_ANSWER_FILE_UPLOAD_NOT_CONFIGURED": "La subida de archivos no está disponible en este momento.",
+    "EVENT_ANSWER_FILE_UPLOAD_FAILED": "No pudimos preparar la subida del archivo. Inténtalo de nuevo."
   },
   "combo": {
     "addFigureFailed": "Error al agregar la figura al combo",
@@ -107,5 +112,13 @@
   "progress": {
     "updateFailed": "Error al actualizar el progreso",
     "fetchFailed": "Error al obtener el progreso"
+  },
+  "reasons": {
+    "file_too_large": "El archivo es muy pesado. Prueba con uno más liviano.",
+    "file_type_not_allowed": "Este formato no se acepta en esta pregunta.",
+    "file_not_found": "No encontramos tu archivo. Súbelo de nuevo.",
+    "file_not_owned": "Ese archivo no es tuyo. Sube el tuyo de nuevo.",
+    "link_not_allowed": "Aquí hay que subir el archivo; no se acepta un enlace.",
+    "field_window_closed": "La fecha para cambiar este archivo ya pasó."
   }
 }

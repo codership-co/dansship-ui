@@ -1,7 +1,10 @@
+import { postFileToPresignedForm } from '../common/put-file-to-presigned-url';
 import { DansshipAPIError } from '../dansship.error';
 
 import type {
+  AnswerFileUpload,
   EventSignupStatus,
+  FileAnswer,
   MyParticipationRow,
   ParticipantField,
   ParticipantTypeAdmin,
@@ -113,7 +116,9 @@ export function answerText(value: SignupAnswerValue, t: Translate): string {
   }
 
   if (typeof value === 'object') {
-    return value.note ? `${value.url} · ${value.note}` : value.url;
+    const main = 'file_key' in value ? value.file_name : value.url;
+
+    return value.note ? `${main} · ${value.note}` : main;
   }
 
   return value;
@@ -146,6 +151,14 @@ export function signupStatusLabel(status: EventSignupStatus, t: Translate, audie
 /** Spanish copy for an API error, falling back to a generic message. */
 export function participationErrorMessage(error: unknown, t: Translate, fallbackKey: string): string {
   if (error instanceof DansshipAPIError) {
+    // A precise reason ("file_too_large", "field_window_closed"…) beats the code's general copy.
+    const { reason } = participationErrorDetails(error);
+    const byReason = reason ? t(`errors:reasons.${reason}`, { defaultValue: '' }) : '';
+
+    if (byReason) {
+      return byReason;
+    }
+
     const code = error.body.error_code;
     const message = t(`errors:codes.${code}`, { defaultValue: '' });
 
@@ -252,4 +265,24 @@ export function draftParticipantType(eventId: string, name: string, position: nu
     signup_count: 0,
     people_count: 0,
   };
+}
+
+/**
+ * Uploads a file answer ("Archivo o enlace"): asks for the upload form, checks the size the server allows
+ * (S3 enforces it too), posts the file and resolves with the answer to send.
+ * Rejects with `Error('too_large')` before uploading.
+ */
+export async function uploadAnswerFile(
+  file: File,
+  requestUpload: () => Promise<AnswerFileUpload | null | undefined>,
+): Promise<FileAnswer> {
+  const target = await requestUpload();
+
+  if (!target?.upload_url || !target.file_key) throw new Error('upload_url');
+
+  if (file.size > target.max_bytes) throw new Error('too_large');
+
+  await postFileToPresignedForm(file, target.upload_url, target.fields);
+
+  return { file_key: target.file_key, file_name: file.name, content_type: file.type };
 }

@@ -4,6 +4,8 @@ import { downloadCsvFile } from '../common/download-csv';
 import { uploadFileWithPresignedRetry } from '../common/put-file-to-presigned-url';
 import { toNumber } from '../payments/payments.helpers';
 
+import { uploadAnswerFile } from './participation.helpers';
+
 import { DansshipAPIError } from '@core/api';
 
 import type {
@@ -12,6 +14,10 @@ import type {
   AdminEnrollmentResult,
   AdminSignupDetail,
   AdminSignupUpdatePayload,
+  AnswerFileDownloads,
+  AnswerFileUpload,
+  AnswerFileView,
+  FileAnswer,
   ParticipantTermsVersion,
   ParticipantTypeAdmin,
   ParticipantTypePreset,
@@ -171,6 +177,44 @@ export class ParticipationAdminAPI {
     return this.httpClient.callNoError<AdminSignupDetail>({
       path: `/admin/events/signups/${signupId}`,
       method: 'GET',
+    });
+  }
+
+  /** A short-lived link to a person's uploaded file (listen or download). */
+  /** `download`: the link saves the file with its original name instead of opening it. */
+  async getAnswerFile(signupId: string, fieldKey: string, download = false) {
+    return this.httpClient.callNoError<AnswerFileView>({
+      path: `/admin/events/signups/${signupId}/answers/${fieldKey}/file`,
+      method: 'GET',
+      params: download ? { download: 'true' } : undefined,
+    });
+  }
+
+  /** «Descargar todos»: short-lived links to every file of one field, with names for the zip. */
+  async listAnswerFiles(eventId: string, fieldKey: string, nameFieldKey?: string | null) {
+    const params: Record<string, string> = { field_key: fieldKey };
+
+    if (nameFieldKey) params.name_field_key = nameFieldKey;
+
+    return this.httpClient.callNoError<AnswerFileDownloads>({
+      path: `/admin/events/${eventId}/participation/files`,
+      method: 'GET',
+      params,
+    });
+  }
+
+  /** "+ Inscribir persona": the admin uploads the file on the person's behalf (enroll:event). */
+  async uploadAnswerFile(typeId: string, fieldKey: string, file: File): Promise<FileAnswer> {
+    return uploadAnswerFile(file, async () => {
+      const { ok, data, error } = await this.httpClient.callNoError<AnswerFileUpload, { content_type: string }>({
+        path: `/admin/events/participant-types/${typeId}/fields/${fieldKey}/upload-url`,
+        method: 'POST',
+        data: { content_type: file.type },
+      });
+
+      if (!ok) throw error;
+
+      return data;
     });
   }
 

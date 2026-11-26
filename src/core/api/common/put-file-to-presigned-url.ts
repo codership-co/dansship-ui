@@ -72,6 +72,21 @@ export async function putFileToPresignedUrl(
   }
 }
 
+/**
+ * Uploads a file with a presigned S3 form (POST): every field first, then the file. S3 enforces the
+ * form's conditions (for example the maximum size), so a file over the limit is refused there.
+ */
+export async function postFileToPresignedForm(file: File, uploadUrl: string, fields: Record<string, string>) {
+  const body = new FormData();
+
+  Object.entries(fields).forEach(([name, value]) => body.append(name, value));
+  body.append('file', file);
+
+  const response = await fetch(uploadUrl, { method: 'POST', body });
+
+  if (!response.ok) throw new Error(`Failed to upload file (${response.status})`);
+}
+
 type PresignedUploadTarget = {
   upload_url?: string;
   file_key?: string;

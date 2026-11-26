@@ -2,13 +2,20 @@ import { HttpClient } from 'polpo-http-client';
 
 import { toNumber } from '../payments/payments.helpers';
 
+import { uploadAnswerFile } from './participation.helpers';
+
 import { DansshipAPIError } from '@core/api';
 
 import type {
+  AnswerFileUpload,
+  AnswerFileView,
+  FileAnswer,
+  LinkAnswer,
   MyParticipationRow,
   MySignup,
   ParticipantForm,
   SignupApplication,
+  SignupAnswerView,
   SignupApplicationResult,
   SignupPaymentResult,
   SignupQuote,
@@ -147,6 +154,42 @@ export class ParticipationAPI {
       path: `/events/signups/${signupId}`,
       method: 'PUT',
       data: payload,
+    });
+  }
+
+  /** Presigned upload for a file answer; the person needs access to the event. */
+  async requestAnswerUpload(typeId: string, fieldKey: string, contentType: string) {
+    return this.httpClient.callNoError<AnswerFileUpload, { content_type: string }>({
+      path: `/events/participant-types/${typeId}/fields/${fieldKey}/upload-url`,
+      method: 'POST',
+      data: { content_type: contentType },
+    });
+  }
+
+  async uploadAnswerFile(typeId: string, fieldKey: string, file: File): Promise<FileAnswer> {
+    return uploadAnswerFile(file, async () => {
+      const { ok, data, error } = await this.requestAnswerUpload(typeId, fieldKey, file.type);
+
+      if (!ok) throw error;
+
+      return data;
+    });
+  }
+
+  /** A short-lived link to my uploaded file. */
+  async getMyAnswerFile(signupId: string, fieldKey: string) {
+    return this.httpClient.callNoError<AnswerFileView>({
+      path: `/events/signups/${signupId}/answers/${fieldKey}/file`,
+      method: 'GET',
+    });
+  }
+
+  /** Replaces one file answer while its window is open, even after the type closed. */
+  async replaceAnswer(signupId: string, fieldKey: string, value: FileAnswer | LinkAnswer) {
+    return this.httpClient.callNoError<SignupAnswerView, { value: FileAnswer | LinkAnswer }>({
+      path: `/events/signups/${signupId}/answers/${fieldKey}`,
+      method: 'PUT',
+      data: { value },
     });
   }
 

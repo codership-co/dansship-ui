@@ -3,9 +3,11 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import {
+  FILE_CATEGORY_TYPES,
   FORM_ITEM_KINDS,
   formItemKeyFrom,
   LONG_TEXT_DEFAULT_MAX,
+  type FileCategory,
   type FormItem,
   type FormItemKind,
 } from './form-items';
@@ -25,6 +27,8 @@ import {
 
 const SELECT_CLASS = 'h-10 rounded-md border border-input bg-background px-3 text-sm';
 const HELP_TEXT_MAX = 300;
+const FILE_CATEGORIES = Object.keys(FILE_CATEGORY_TYPES) as Array<FileCategory>;
+const REPLACE_DAYS_MAX = 365;
 
 /** Optional parts of the item editor; a survey may not need the team's copy or the list column. */
 export interface FormBuilderFeatures {
@@ -70,6 +74,10 @@ export function FormItemDialog<T extends FormItem>({
   const [adminCopy, setAdminCopy] = useState(false);
   const [visibleField, setVisibleField] = useState('');
   const [visibleValue, setVisibleValue] = useState('');
+  const [accepts, setAccepts] = useState<Array<FileCategory>>(['audio']);
+  const [allowLink, setAllowLink] = useState(false);
+  // '' = until the signup closes; a number = that many days before the event.
+  const [replaceDays, setReplaceDays] = useState('');
 
   useEffect(() => {
     if (!open) return;
@@ -85,6 +93,9 @@ export function FormItemDialog<T extends FormItem>({
     setAdminCopy(Boolean(item?.admin_editable_copy));
     setVisibleField(item?.visible_when?.field_key ?? '');
     setVisibleValue(item?.visible_when?.equals ?? '');
+    setAccepts(item?.options.accepts?.length ? item.options.accepts : ['audio']);
+    setAllowLink(Boolean(item?.options.allow_link));
+    setReplaceDays(item?.options.replaceable_until ? String(item.options.replaceable_until.days) : '');
   }, [item, open, isSection, kinds]);
 
   const meta = FORM_ITEM_KINDS[kind];
@@ -94,7 +105,8 @@ export function FormItemDialog<T extends FormItem>({
     .split('\n')
     .map(choice => choice.trim())
     .filter(Boolean);
-  const canSave = label.trim().length > 0 && (!meta.choices || parsedChoices.length > 0);
+  const canSave =
+    label.trim().length > 0 && (!meta.choices || parsedChoices.length > 0) && (!meta.file || accepts.length > 0);
 
   const submit = () => {
     const options: FormItem['options'] = {};
@@ -104,6 +116,14 @@ export function FormItemDialog<T extends FormItem>({
     if (meta.maxLength) options.max_length = Math.max(1, Number(maxLength) || LONG_TEXT_DEFAULT_MAX);
 
     if (meta.note) options.with_note = withNote;
+
+    if (meta.file) {
+      const days = Math.min(REPLACE_DAYS_MAX, Math.max(0, Math.round(Number(replaceDays))));
+
+      options.accepts = accepts;
+      options.allow_link = allowLink;
+      options.replaceable_until = replaceDays.trim() === '' ? null : { anchor: 'days_before_event', days };
+    }
 
     Object.assign(options, meta.defaults, meta.defaults ? item?.options : undefined);
 
@@ -207,6 +227,56 @@ export function FormItemDialog<T extends FormItem>({
                 onChange={change => setMaxLength(change.target.value)}
               />
             </div>
+          ) : null}
+          {meta.file ? (
+            <>
+              <fieldset className='m-0 grid gap-2 border-0 p-0'>
+                <legend className='mb-1 text-sm font-medium'>{t('forms:dialog.fileAccepts')}</legend>
+                {FILE_CATEGORIES.map(category => (
+                  <label key={category} className='flex items-center justify-between gap-3'>
+                    <span className='grid gap-0.5'>
+                      <span className='text-sm'>{t(`forms:dialog.fileCategory.${category}`)}</span>
+                      <small className='text-xs text-muted-foreground'>
+                        {t(`forms:dialog.fileCategoryHint.${category}`)}
+                      </small>
+                    </span>
+                    <Switch
+                      checked={accepts.includes(category)}
+                      onCheckedChange={on =>
+                        setAccepts(current =>
+                          on ? [...current, category] : current.filter(value => value !== category),
+                        )
+                      }
+                    />
+                  </label>
+                ))}
+                <small className='text-xs text-muted-foreground'>{t('forms:dialog.fileVideoHint')}</small>
+              </fieldset>
+              <label className='flex items-center justify-between gap-3'>
+                <span className='grid gap-0.5'>
+                  <span className='text-sm'>{t('forms:dialog.allowLink')}</span>
+                  <small className='text-xs text-muted-foreground'>{t('forms:dialog.allowLinkHint')}</small>
+                </span>
+                <Switch checked={allowLink} onCheckedChange={setAllowLink} />
+              </label>
+              <div className='grid gap-2'>
+                <Label htmlFor='form-item-replace'>{t('forms:dialog.replaceUntil')}</Label>
+                <div className='flex items-center gap-2'>
+                  <Input
+                    id='form-item-replace'
+                    type='number'
+                    min={0}
+                    max={REPLACE_DAYS_MAX}
+                    className='w-24'
+                    value={replaceDays}
+                    placeholder='—'
+                    onChange={change => setReplaceDays(change.target.value)}
+                  />
+                  <span className='text-sm'>{t('forms:dialog.replaceDaysBefore')}</span>
+                </div>
+                <small className='text-xs text-muted-foreground'>{t('forms:dialog.replaceUntilHint')}</small>
+              </div>
+            </>
           ) : null}
           {meta.note ? (
             <label className='flex items-center justify-between gap-3'>

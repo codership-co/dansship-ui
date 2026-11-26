@@ -2,6 +2,7 @@ import { Button } from 'polpo/components';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
 
+import { MyFileAnswer } from './my-file-answer';
 import { SignupStatusBadge } from './signup-status-badge';
 
 import { SectionHeading } from '@components/containers';
@@ -49,12 +50,21 @@ export function MySignupSummary({ signup }: { signup: MySignup }) {
       <section className='grid gap-3 rounded-[14px] border border-border bg-white p-4'>
         <h2 className='m-0 text-base font-semibold'>{t('eventos:participation.mine.sent')}</h2>
         <dl className='m-0 grid gap-3'>
-          {signup.answers.map(item => (
-            <div key={item.key} className='grid gap-0.5'>
-              <dt className='text-xs font-semibold text-muted-foreground'>{item.label}</dt>
-              <dd className='m-0 text-sm break-words whitespace-pre-wrap'>{answerText(item.value, t)}</dd>
-            </div>
-          ))}
+          {signup.answers.map(item =>
+            item.kind === 'file' ? (
+              <MyFileAnswer
+                key={item.key}
+                signupId={signup.id}
+                participantTypeId={signup.participant_type_id}
+                answer={item}
+              />
+            ) : (
+              <div key={item.key} className='grid gap-0.5'>
+                <dt className='text-xs font-semibold text-muted-foreground'>{item.label}</dt>
+                <dd className='m-0 text-sm break-words whitespace-pre-wrap'>{answerText(item.value, t)}</dd>
+              </div>
+            ),
+          )}
           {signup.members.length > 0 ? (
             <div className='grid gap-0.5'>
               <dt className='text-xs font-semibold text-muted-foreground'>{t('eventos:participation.mine.members')}</dt>
