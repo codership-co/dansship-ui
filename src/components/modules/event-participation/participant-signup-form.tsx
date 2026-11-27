@@ -23,7 +23,7 @@ import { SignupCheckoutModal } from '@components/modules/eventos/signup-checkout
 import { PromotionTermsLink } from '@components/modules/payments/promotion-terms-link';
 import { Checkbox, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@components/ui';
 import {
-  bogotaDayLabel,
+  bogotaDeadlineLabel,
   bogotaStartLabel,
   DANSSHIP_ERROR_CODE,
   DansshipAPI,
@@ -82,7 +82,7 @@ export function ParticipantSignupForm({ form, landing, signup, preview = false }
   const visibleFields = form.fields.filter(field => field.kind !== 'people' && isFieldVisible(field, answers ?? {}));
   const chosen = options.find(option => option.kind === chosenKind) ?? null;
   const OptionFields = chosen ? SIGNUP_OPTION_RENDERERS[chosen.kind] : null;
-  const closesLabel = bogotaDayLabel(form.closes_at);
+  const editsLabel = bogotaDeadlineLabel(form.edits_close_at);
   const editing = Boolean(signup);
   const eventUrl = preview ? PageURLS.eventoPreview(form.event_slug) : PageURLS.eventoLanding(form.event_slug);
   // File questions upload through the person's route; the admin preview has no uploads.
@@ -260,10 +260,10 @@ export function ParticipantSignupForm({ form, landing, signup, preview = false }
           subtitle={[form.event_name, bogotaStartLabel(form.starts_at), form.place_label].filter(Boolean).join(' · ')}
         />
       </div>
-      {closesLabel ? (
+      {editsLabel ? (
         <p className='m-0 flex items-start gap-2.5 rounded-xl bg-secondary px-3.5 py-3 text-sm'>
           <LuInfo className='mt-0.5 size-4 flex-none' aria-hidden />
-          <span>{t('eventos:participation.form.editUntil', { date: closesLabel })}</span>
+          <span>{t('eventos:participation.form.editUntil', { date: editsLabel })}</span>
         </p>
       ) : null}
 

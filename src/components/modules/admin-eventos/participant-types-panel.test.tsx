@@ -67,7 +67,7 @@ describe('ParticipantTypesPanel', () => {
     await waitFor(() =>
       expect(updateType).toHaveBeenCalledWith('event-1', 'type-2', expect.objectContaining({ name: 'Invitados' })),
     );
-    expect(createType).toHaveBeenCalledWith('event-1', null);
+    expect(createType).toHaveBeenCalledWith('event-1');
     expect(screen.queryByText('Sin guardar')).toBeNull();
   });
 

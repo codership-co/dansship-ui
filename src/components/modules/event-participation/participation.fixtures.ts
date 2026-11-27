@@ -11,6 +11,7 @@ export const artistForm: ParticipantForm = {
   place_label: 'Estudio Dansship',
   state: 'open',
   closes_at: '2026-11-28T04:59:00Z',
+  edits_close_at: '2026-12-12T04:59:59Z',
   signer_name: 'Valentina Ríos',
   fields: [
     {
@@ -80,6 +81,7 @@ export const mySignup: MySignup = {
   donation_type_ids: ['don-1'],
   donations: ['Juguetes para niños'],
   closes_at: '2026-11-28T04:59:00Z',
+  edits_close_at: '2026-12-12T04:59:59Z',
   editable: true,
   submitted_at: '2026-11-20T21:05:00Z',
 };
@@ -105,6 +107,7 @@ export function typeAdmin(overrides: Partial<ParticipantTypeAdmin> = {}): Partic
     minors_count_toward_capacity: false,
     minor_price: null,
     closes_at: null,
+    edit_days_before_event: null,
     issues_entry_qr: false,
     is_active: true,
     fields: [],

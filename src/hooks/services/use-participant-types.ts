@@ -59,7 +59,7 @@ export const useParticipantTypes = (eventId: string) => {
       let targetId = createdIds.current.get(typeId) ?? typeId;
 
       if (isDraftType({ id: targetId })) {
-        const created = await DansshipAPI.participationAdmin.createType(eventId, null);
+        const created = await DansshipAPI.participationAdmin.createType(eventId);
 
         if (!created.ok) return created;
 

@@ -61,6 +61,8 @@ export interface ParticipantTypeFormValues {
   counts_toward_capacity: boolean;
   quota: NumberInput;
   closes_at_local: string;
+  /** «Se pueden cambiar los datos hasta»: days before the event; empty = until the close date. */
+  edit_days_before_event: NumberInput;
   issues_entry_qr: boolean;
   is_active: boolean;
   card_copy: Required<{ [K in keyof CardCopy]: string }>;
@@ -132,6 +134,7 @@ export function participantTypeFormValues(type: ParticipantTypeAdmin): Participa
     counts_toward_capacity: type.counts_toward_capacity,
     quota: type.quota ?? null,
     closes_at_local: isoToBogotaLocal(type.closes_at),
+    edit_days_before_event: type.edit_days_before_event ?? null,
     issues_entry_qr: type.issues_entry_qr,
     is_active: type.is_active,
     card_copy: {
@@ -203,6 +206,7 @@ export function toParticipantTypeUpsert(
     minors_count_toward_capacity: values.minors_allowed && values.minors_count_toward_capacity,
     minor_price: values.minors_allowed && money ? numberOrNull(values.minor_price) : null,
     closes_at: bogotaLocalToIso(values.closes_at_local),
+    edit_days_before_event: numberOrNull(values.edit_days_before_event),
     issues_entry_qr: values.issues_entry_qr,
     is_active: values.is_active,
     fields: values.fields,

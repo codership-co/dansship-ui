@@ -21,7 +21,6 @@ const music: FormItem = {
   kind: 'file',
   required: true,
   options: { accepts: ['audio'], allow_link: true, with_note: true },
-  replace_closes_at: '2026-12-12T04:59:59Z',
 };
 
 const uploaded: FileFormAnswer = {
@@ -59,7 +58,7 @@ describe('file answers', () => {
     expect(acceptedFileTypes(music)).not.toContain('application/pdf');
   });
 
-  it('uploads the picked audio and keeps it as the answer, with the replace date', async () => {
+  it('uploads the picked audio and keeps it as the answer, with no deadline of its own', async () => {
     const upload = vi.fn().mockResolvedValue(uploaded);
 
     render(<Harness uploader={{ upload }} />);
@@ -68,7 +67,8 @@ describe('file answers', () => {
     await waitFor(() => expect(upload).toHaveBeenCalledWith(music, expect.any(File)));
     await waitFor(() => expect(screen.getByTestId('value').textContent).toContain('event-answer-files/u/a.mp3'));
     expect(screen.getByText('cancion.mp3')).toBeVisible();
-    expect(screen.getByText(/Puedes cambiarlo hasta el/)).toBeVisible();
+    // The deadline belongs to the participant type and shows once, above the form.
+    expect(screen.queryByText(/Puedes cambiarlo hasta el/)).toBeNull();
   });
 
   it('takes a video link from the link tab', () => {
@@ -87,7 +87,7 @@ describe('file answers', () => {
     expect(screen.getByText('En la vista previa no se suben archivos.')).toBeVisible();
   });
 
-  it('the builder saves accepted types, the link option and the replace window', () => {
+  it('the builder saves accepted types and the link option, with no deadline of its own', () => {
     const onSave = vi.fn();
 
     render(
@@ -106,7 +106,7 @@ describe('file answers', () => {
     fireEvent.change(within(dialog).getByLabelText('Pregunta'), { target: { value: 'Tu canción' } });
     fireEvent.click(within(dialog).getByRole('switch', { name: /PDF/ }));
     fireEvent.click(within(dialog).getByRole('switch', { name: /Permitir un enlace/ }));
-    fireEvent.change(within(dialog).getByLabelText('Se puede cambiar hasta'), { target: { value: '1' } });
+    expect(within(dialog).queryByLabelText('Se puede cambiar hasta')).toBeNull();
     fireEvent.click(within(dialog).getByRole('button', { name: 'Aplicar' }));
 
     expect(onSave).toHaveBeenCalledWith(
@@ -115,9 +115,9 @@ describe('file answers', () => {
         options: expect.objectContaining({
           accepts: ['audio', 'pdf'],
           allow_link: true,
-          replaceable_until: { anchor: 'days_before_event', days: 1 },
         }),
       }),
     );
+    expect(onSave.mock.calls[0][0].options).not.toHaveProperty('replaceable_until');
   });
 });

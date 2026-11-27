@@ -69,6 +69,24 @@ export function bogotaDayLabel(iso: string | null | undefined): string {
     .replace(',', '');
 }
 
+/** «viernes, 11 de diciembre, 11:59 p. m.» in Bogotá: until when a signup can be changed. */
+export function bogotaDeadlineLabel(iso: string | null | undefined): string {
+  if (!iso) {
+    return '';
+  }
+
+  return new Intl.DateTimeFormat('es-CO', {
+    timeZone: 'America/Bogota',
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+    .format(new Date(iso))
+    .replace(/\u00a0|\u202f/g, ' ');
+}
+
 /** «Sábado 12 de diciembre · 3:30 p. m.», in Bogotá: the start of an event (its end may be hidden). */
 export function bogotaStartLabel(iso: string | null | undefined): string {
   if (!iso) {
@@ -151,7 +169,7 @@ export function signupStatusLabel(status: EventSignupStatus, t: Translate, audie
 /** Spanish copy for an API error, falling back to a generic message. */
 export function participationErrorMessage(error: unknown, t: Translate, fallbackKey: string): string {
   if (error instanceof DansshipAPIError) {
-    // A precise reason ("file_too_large", "field_window_closed"…) beats the code's general copy.
+    // A precise reason ("file_too_large", "edit_window_closed"…) beats the code's general copy.
     const { reason } = participationErrorDetails(error);
     const byReason = reason ? t(`errors:reasons.${reason}`, { defaultValue: '' }) : '';
 
@@ -249,6 +267,7 @@ export function draftParticipantType(eventId: string, name: string, position: nu
     minors_count_toward_capacity: false,
     minor_price: null,
     closes_at: null,
+    edit_days_before_event: null,
     issues_entry_qr: false,
     is_active: true,
     fields: [],

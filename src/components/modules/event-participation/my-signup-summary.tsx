@@ -6,15 +6,18 @@ import { MyFileAnswer } from './my-file-answer';
 import { SignupStatusBadge } from './signup-status-badge';
 
 import { SectionHeading } from '@components/containers';
-import { answerText, bogotaDayLabel, type MySignup } from '@core/api';
+import { answerText, bogotaDeadlineLabel, type MySignup } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { buildStudioWhatsAppLink, formatDateTime } from '@helpers';
 
 function statusMessage(signup: MySignup, t: (key: string, options?: Record<string, unknown>) => string) {
   if (signup.status === 'not_approved') return t('eventos:participation.mine.notApproved');
 
-  if (!signup.editable && signup.status !== 'approved') {
-    return t('eventos:participation.mine.closed', { date: bogotaDayLabel(signup.closes_at) });
+  // Only when the deadline really passed: a paid signup is not editable by status, yet its deadline may be ahead.
+  const deadlinePassed = Boolean(signup.edits_close_at) && new Date(signup.edits_close_at as string) <= new Date();
+
+  if (!signup.editable && signup.status !== 'approved' && deadlinePassed) {
+    return t('eventos:participation.mine.closed', { date: bogotaDeadlineLabel(signup.edits_close_at) });
   }
 
   if (signup.status === 'approved') return t('eventos:participation.mine.approved');
@@ -22,11 +25,11 @@ function statusMessage(signup: MySignup, t: (key: string, options?: Record<strin
   return t('eventos:participation.mine.inReview');
 }
 
-/** "Tu inscripción": what she sent, its status and "Editar inscripción" until the close date. */
+/** "Tu inscripción": what she sent, its status and "Editar inscripción" until the type's edit deadline. */
 export function MySignupSummary({ signup }: { signup: MySignup }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const closesLabel = bogotaDayLabel(signup.closes_at);
+  const editsLabel = bogotaDeadlineLabel(signup.edits_close_at);
   const showEdit = signup.status !== 'not_approved';
 
   return (
@@ -91,9 +94,9 @@ export function MySignupSummary({ signup }: { signup: MySignup }) {
       </section>
       {showEdit ? (
         <div className='grid justify-items-end gap-2'>
-          {signup.editable && closesLabel ? (
+          {signup.editable && editsLabel ? (
             <p className='m-0 text-sm text-muted-foreground'>
-              {t('eventos:participation.form.editUntil', { date: closesLabel })}
+              {t('eventos:participation.form.editUntil', { date: editsLabel })}
             </p>
           ) : null}
           <Button

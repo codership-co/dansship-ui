@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 
-import { FileOrLinkControl, formatReplaceUntil, isFileAnswer, type FormItem } from '@components/modules/dynamic-form';
+import { FileOrLinkControl, isFileAnswer, type FormItem } from '@components/modules/dynamic-form';
 import {
   answerText,
   DansshipAPI,
@@ -104,7 +104,7 @@ export function MyFileAnswer({ signupId, participantTypeId, answer }: MyFileAnsw
         {field ? (
           <div className='grid gap-3 rounded-[10px] border border-border p-3'>
             <FileOrLinkControl
-              item={{ ...field, replace_closes_at: current.replace_closes_at ?? null }}
+              item={field}
               value={draft as never}
               onChange={next => setDraft(next as SignupAnswerValue)}
               uploader={uploader}
@@ -126,17 +126,10 @@ export function MyFileAnswer({ signupId, participantTypeId, answer }: MyFileAnsw
             </div>
           </div>
         ) : current.replaceable ? (
-          <span className='grid gap-1'>
-            <span>
-              <Button type='button' variant='outlined' color='primary' size='small' onClick={() => void startReplace()}>
-                {t('eventos:participation.mine.replaceFile')}
-              </Button>
-            </span>
-            {current.replace_closes_at ? (
-              <small className='text-xs text-muted-foreground'>
-                {t('forms:answer.file.replaceUntil', { date: formatReplaceUntil(current.replace_closes_at) })}
-              </small>
-            ) : null}
+          <span>
+            <Button type='button' variant='outlined' color='primary' size='small' onClick={() => void startReplace()}>
+              {t('eventos:participation.mine.replaceFile')}
+            </Button>
           </span>
         ) : null}
       </dd>

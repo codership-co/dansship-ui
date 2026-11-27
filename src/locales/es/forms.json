@@ -25,7 +25,6 @@
       "tooLarge": "El archivo es muy pesado. Prueba con uno más liviano.",
       "uploadFailed": "No pudimos subir tu archivo. Inténtalo de nuevo.",
       "previewOff": "En la vista previa no se suben archivos.",
-      "replaceUntil": "Puedes cambiarlo hasta el {{date}}.",
       "category": {
         "audio": "audio (mp3, m4a o wav)",
         "image": "imagen (jpg, png o webp)",
@@ -86,9 +85,6 @@
     },
     "fileVideoHint": "Los videos se piden por enlace: pesan demasiado para subirlos.",
     "allowLink": "Permitir un enlace en lugar del archivo",
-    "allowLinkHint": "Por ejemplo, el enlace de un video en YouTube o Google Drive.",
-    "replaceUntil": "Se puede cambiar hasta",
-    "replaceDaysBefore": "días antes del evento",
-    "replaceUntilHint": "Vacío = hasta el cierre de la inscripción. 1 = hasta el día anterior al evento, aunque la inscripción ya haya cerrado."
+    "allowLinkHint": "Por ejemplo, el enlace de un video en YouTube o Google Drive."
   }
 }
