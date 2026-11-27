@@ -19,7 +19,7 @@ import { FEATURE_FLAG, useAuth, SecurityGuard, useOrPermissions } from '@context
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
 import { InstructorPermissions, PERMISSION } from '@core/permissions';
-import { toColombiaDateKey } from '@helpers';
+import { ageInColombia, parseCalendarDay } from '@helpers';
 import { usePromise } from '@hooks';
 
 enum ProfileTabs {
@@ -30,22 +30,14 @@ enum ProfileTabs {
   AVAILABILITY = 'AVAILABILITY',
 }
 
-function ageInColombia(birthDate: string) {
-  const [year, month, day] = birthDate.slice(0, 10).split('-').map(Number);
-  const today = toColombiaDateKey(new Date()).split('-').map(Number);
-  const years = today[0] - year;
-  const before = today[1] < month || (today[1] === month && today[2] < day);
-
-  return before ? years - 1 : years;
-}
-
 function ProfilePage() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { response: savedFiguresResponse } = usePromise(() => DansshipAPI.figures.getSavedFigures());
   const { response: agePolicyResponse } = usePromise(() => DansshipAPI.auth.getAgePolicy());
   const adultFrom = agePolicyResponse?.data?.guardian_contact_required_before_age ?? 18;
-  const age = user?.birthDate ? ageInColombia(user.birthDate) : null;
+  const birthDate = parseCalendarDay(user?.birthDate);
+  const age = birthDate ? ageInColombia(birthDate) : null;
   const showFamily = Boolean(user?.managedUsersEnabled) && !user?.isManaged && age !== null && age >= adultFrom;
   const hasInstructorPermissions = useOrPermissions([...InstructorPermissions.dashboard, PERMISSION.SCHEDULE_MANAGE]);
   const savedFigures = savedFiguresResponse?.data ?? [];

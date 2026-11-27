@@ -6,6 +6,7 @@ import { SectionHeading } from '@components/containers';
 import { HealthProfileForm, PreferencesProfileForm, BasicProfileForm } from '@components/forms';
 import { FormStepperLayout } from '@components/layouts';
 import { ProfileDataKey } from '@core/api';
+import { toCalendarDay } from '@helpers';
 import { useStudentOnboarding } from '@hooks';
 
 export const OnboardingStudentTrack = () => {
@@ -45,7 +46,7 @@ export const OnboardingStudentTrack = () => {
                 onSubmit={data =>
                   submitProfileStep({
                     ...data,
-                    birth_date: `${data.birth_date.getFullYear()}-${String(data.birth_date.getMonth() + 1).padStart(2, '0')}-${String(data.birth_date.getDate()).padStart(2, '0')}`,
+                    birth_date: toCalendarDay(data.birth_date),
                     terms_accepted: true,
                   })
                 }
