@@ -67,12 +67,36 @@ const companionErrorToastKey = (errorCode: string | undefined) => {
       return 'bookings:companionSelfReference';
     case DANSSHIP_ERROR_CODE.TWO_FOR_ONE_NOT_ELIGIBLE:
       return 'bookings:companionNotEligible';
+    case DANSSHIP_ERROR_CODE.ACTING_FOR_FORBIDDEN:
+      return 'bookings:companionNotInFamily';
+    case DANSSHIP_ERROR_CODE.MANAGED_ACCOUNT_INACTIVE:
+    case DANSSHIP_ERROR_CODE.MANAGED_NO_ACTIVE_GUARDIAN:
+    case DANSSHIP_ERROR_CODE.MANAGED_AGE_RANGE:
+      return 'bookings:companionMinorCannotBook';
     case DANSSHIP_ERROR_CODE.BOOKING_CLASS_FULL:
     case DANSSHIP_ERROR_CODE.CLASS_FULL:
       return 'bookings:companionClassFull';
     default:
       return 'bookings:companionFailed';
   }
+};
+
+const MINOR_BOOKING_ERROR_CODES = new Set<string>([
+  DANSSHIP_ERROR_CODE.ACTING_FOR_FORBIDDEN,
+  DANSSHIP_ERROR_CODE.MANAGED_ACCOUNT_INACTIVE,
+  DANSSHIP_ERROR_CODE.MANAGED_NO_ACTIVE_GUARDIAN,
+  DANSSHIP_ERROR_CODE.MANAGED_AGE_RANGE,
+]);
+
+/** Minor/acting-for rejections speak of the companion only when one was sent. */
+export const minorBookingToastKey = (errorCode: string, withCompanion: boolean) => {
+  if (withCompanion) {
+    return companionErrorToastKey(errorCode);
+  }
+
+  return errorCode === DANSSHIP_ERROR_CODE.ACTING_FOR_FORBIDDEN
+    ? 'bookings:attendeeNotInCare'
+    : 'bookings:minorCannotBook';
 };
 
 export const useMyBookings = () => {
@@ -142,6 +166,10 @@ export const useMyBookings = () => {
               error_code === DANSSHIP_ERROR_CODE.TWO_FOR_ONE_NOT_ELIGIBLE
             ) {
               toast.error(t(companionErrorToastKey(error_code)));
+            } else if (MINOR_BOOKING_ERROR_CODES.has(error_code)) {
+              const withCompanion = Boolean(payload.companion_email || payload.companion_user_id);
+
+              toast.error(t(minorBookingToastKey(error_code, withCompanion)));
             } else {
               toast.error(t('bookings:bookingFailedDesc'));
             }

@@ -2,6 +2,8 @@ export interface PersonSearchResult {
   id: string;
   full_name: string;
   email: string | null;
+  /** A managed minor: no email, and notifications go to the guardian. */
+  is_managed?: boolean;
 }
 
 export type BookingOrigin = 'plan' | 'first_free_class' | 'gift' | 'two_for_one';

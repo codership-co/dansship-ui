@@ -64,6 +64,8 @@ export interface MyBookingsPage {
 export interface BookClassPayload {
   scheduled_class_id: string;
   companion_email?: string | null;
+  /** 2x1 companion from the family: the requester or one of their minors. Send it or `companion_email`. */
+  companion_user_id?: string;
   attendee_user_id?: string;
 }
 

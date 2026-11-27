@@ -91,6 +91,8 @@ export function BookingModal({
   const { bookClass, cancelClass, isBookingClass, isCancelingClass } = useMyBookings();
   const [confirmAction, setConfirmAction] = useState<BookingConfirmAction | null>(null);
   const [companionFieldError, setCompanionFieldError] = useState<string | null>(null);
+  const [companionSource, setCompanionSource] = useState<'email' | 'family'>('email');
+  const [familyCompanionId, setFamilyCompanionId] = useState<string | null>(null);
   const companionForm = useForm<{ companion_email: string }>({
     defaultValues: { companion_email: '' },
   });
@@ -212,7 +214,9 @@ export function BookingModal({
   useEffect(() => {
     companionForm.reset({ companion_email: '' });
     setCompanionFieldError(null);
-  }, [selectedClass?.id, companionForm]);
+    setCompanionSource('email');
+    setFamilyCompanionId(null);
+  }, [selectedClass?.id, attendeeUserId, companionForm]);
 
   if (!selectedClass) return null;
 
@@ -258,9 +262,25 @@ export function BookingModal({
       return;
     }
 
-    const companionEmail = companionForm.getValues('companion_email').trim();
+    const fromFamily = showCompanionField && canPickFamilyCompanion && companionSource === 'family';
+    const typedEmail = companionForm.getValues('companion_email').trim();
 
-    if (companionEmail && user?.email && companionEmail.toLowerCase() === user.email.trim().toLowerCase()) {
+    // Never drop silently a companion the person already typed before switching to the family list.
+    if (fromFamily && !familyCompanionId && typedEmail) {
+      setCompanionFieldError(t('bookings:companionFamilyMissing'));
+
+      return;
+    }
+
+    const companionEmail = showCompanionField && !fromFamily ? typedEmail : '';
+
+    // A minor has no email, so only self-booking can collide with the requester's own address.
+    if (
+      !bookingForOther &&
+      companionEmail &&
+      user?.email &&
+      companionEmail.toLowerCase() === user.email.trim().toLowerCase()
+    ) {
       setCompanionFieldError(t('bookings:companionSelfReference'));
 
       return;
@@ -269,7 +289,8 @@ export function BookingModal({
     setCompanionFieldError(null);
     const result = await bookClass({
       scheduled_class_id: selectedClass.id,
-      companion_email: bookingForOther ? undefined : companionEmail || undefined,
+      companion_email: companionEmail || undefined,
+      companion_user_id: fromFamily ? (familyCompanionId ?? undefined) : undefined,
       attendee_user_id: attendeeUserId ?? undefined,
     });
 
@@ -355,7 +376,14 @@ export function BookingModal({
     !isCancelled &&
     !isOwnClass,
   );
-  const showCompanionField = Boolean(showThursday2x1Note && !isFull && !hasTimeOverlap && !bookingForOther);
+  const showCompanionField = Boolean(showThursday2x1Note && !isFull && !hasTimeOverlap);
+  // Family companions: the guardian and their minors, never the attendee (ADR-055, 2026-11-27).
+  const familyCompanionOptions = attendeeOptions.filter(option => option.id !== attendeeUserId);
+  const canPickFamilyCompanion = familyMode && familyCompanionOptions.length > 0;
+  const selectCompanionSource = (source: 'email' | 'family') => {
+    setCompanionSource(source);
+    setCompanionFieldError(null);
+  };
 
   return (
     <>
@@ -531,14 +559,73 @@ export function BookingModal({
                   <p className='m-0 rounded border border-primary/20 bg-primary/5 p-3 text-primary'>
                     {t('bookings:twoForOneNote')}
                   </p>
-                  <EmailField
-                    control={companionForm.control}
-                    name='companion_email'
-                    label={t('bookings:companionEmail')}
-                    helperText={t('bookings:companionEmailHelper')}
-                    errorMessage={companionFieldError ?? undefined}
-                    disabled={isLoading}
-                  />
+                  {canPickFamilyCompanion ? (
+                    <div className='flex gap-2' role='group' aria-label={t('bookings:companionSource')}>
+                      <Button
+                        color='primary'
+                        size='small'
+                        variant={companionSource === 'email' ? 'solid' : 'outlined'}
+                        type='button'
+                        aria-pressed={companionSource === 'email'}
+                        disabled={isLoading}
+                        onClick={() => selectCompanionSource('email')}
+                      >
+                        {t('bookings:companionByEmail')}
+                      </Button>
+                      <Button
+                        color='primary'
+                        size='small'
+                        variant={companionSource === 'family' ? 'solid' : 'outlined'}
+                        type='button'
+                        aria-pressed={companionSource === 'family'}
+                        disabled={isLoading}
+                        onClick={() => selectCompanionSource('family')}
+                      >
+                        {t('bookings:companionFromFamily')}
+                      </Button>
+                    </div>
+                  ) : null}
+                  {canPickFamilyCompanion && companionSource === 'family' ? (
+                    <label className='grid gap-1 text-sm'>
+                      {t('bookings:companionFamilyLabel')}
+                      <Select
+                        value={familyCompanionId ?? ''}
+                        disabled={isLoading}
+                        onValueChange={value => {
+                          setFamilyCompanionId(value);
+                          setCompanionFieldError(null);
+                        }}
+                      >
+                        <SelectTrigger aria-label={t('bookings:companionFamilyLabel')}>
+                          <SelectValue placeholder={t('bookings:companionFamilyPlaceholder')} />
+                        </SelectTrigger>
+                        <SelectContent
+                          onMouseDown={event => event.stopPropagation()}
+                          onPointerDown={event => event.stopPropagation()}
+                        >
+                          {familyCompanionOptions.map(option => (
+                            <SelectItem key={option.id} value={option.id}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {companionFieldError ? (
+                        <span className='text-sm text-alert-600' role='alert'>
+                          {companionFieldError}
+                        </span>
+                      ) : null}
+                    </label>
+                  ) : (
+                    <EmailField
+                      control={companionForm.control}
+                      name='companion_email'
+                      label={t('bookings:companionEmail')}
+                      helperText={t('bookings:companionEmailHelper')}
+                      errorMessage={companionFieldError ?? undefined}
+                      disabled={isLoading}
+                    />
+                  )}
                 </>
               ) : null}
               {isCancelled ? (
