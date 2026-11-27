@@ -6,6 +6,7 @@ import { Link } from 'react-router';
 import { toast } from 'sonner';
 
 import { AdminPaymentReviewModal } from './admin-payment-review-modal';
+import { useLinkedPaymentReview } from './use-linked-payment-review';
 
 import { SpinnerLoader } from '@components/loaders';
 import { PaymentStatusBadge } from '@components/modules';
@@ -75,6 +76,7 @@ export function AdminPaymentList({
   const [statusFilter, setStatusFilter] = useState<'all' | PaymentStatus>('all');
   const [typeFilter, setTypeFilter] = useState<'all' | PurchaseType>('all');
   const [selectedIntent, setSelectedIntent] = useState<PaymentIntent | null>(null);
+  const { clearLinkedPayment } = useLinkedPaymentReview(setSelectedIntent, !readOnly);
 
   const filters = useMemo(
     () => ({
@@ -268,6 +270,7 @@ export function AdminPaymentList({
           onOpenChange={open => {
             if (!open) {
               setSelectedIntent(null);
+              clearLinkedPayment();
             }
           }}
           onReview={reviewPayment}

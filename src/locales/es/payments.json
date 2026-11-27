@@ -77,19 +77,19 @@
     "cash": "Efectivo",
     "nequi": "Nequi",
     "daviplata": "Daviplata",
-    "card": "Tarjeta de crédito/débito o PSE",
+    "card": "Tarjeta de crédito o débito",
     "breb": "Bre-B/Transferencia"
   },
   "methodDesc": {
     "breb": "Envía tu pago a Bre-B y sube el comprobante",
     "transfer": "Transfiere a nuestra cuenta bancaria y sube el recibo.",
     "cash": "Paga directamente en la recepción de Dansship antes de tu clase.",
-    "card": "Paga con tarjeta de débito, crédito o con PSE mediante Bold"
+    "card": "Paga con tarjeta de crédito o débito mediante Bold"
   },
   "methodHelper": {
     "transfer": "Paga a nuestra llave de Bre-B o escanea el código QR desde cualquier banco.",
     "cash": "",
-    "card": "Tarjeta débito/crédito, PSE."
+    "card": "Tarjeta de crédito o débito."
   },
   "purchaseType": {
     "plan": "Plan",
@@ -149,6 +149,7 @@
     "total": "{{count}} pagos",
     "viewProof": "Ver comprobante subido",
     "noProof": "Sin comprobante",
+    "linkedPaymentNotFound": "No encontramos ese pago. Búscalo en la lista.",
     "reviewTitle": "Revisar pago",
     "notesLabel": "Notas del admin",
     "notesPlaceholder": "Notas opcionales para esta revisión",
