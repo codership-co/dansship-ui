@@ -9,6 +9,7 @@ import '@core/i18n';
 import type { ActiveSubscription, PublishedClass } from '@core/api';
 
 const bookClass = vi.fn();
+const bookingState = { isBookingClass: false };
 
 const DAY = 24 * 60 * 60 * 1000;
 const dateKey = (offsetDays: number) => new Date(Date.now() + offsetDays * DAY).toISOString().slice(0, 10);
@@ -42,7 +43,12 @@ vi.mock('@contexts', () => ({
 
 vi.mock('@hooks', async importOriginal => ({
   ...(await importOriginal<typeof import('@hooks')>()),
-  useMyBookings: () => ({ bookClass, cancelClass: vi.fn(), isBookingClass: false, isCancelingClass: false }),
+  useMyBookings: () => ({
+    bookClass,
+    cancelClass: vi.fn(),
+    isBookingClass: bookingState.isBookingClass,
+    isCancelingClass: false,
+  }),
 }));
 
 vi.mock('@core/api', async importOriginal => {
@@ -135,6 +141,7 @@ describe('BookingModal 2x1 companion', () => {
       },
     );
     bookClass.mockReset();
+    bookingState.isBookingClass = false;
     bookClass.mockResolvedValue({ ok: true });
   });
 
@@ -207,5 +214,42 @@ describe('BookingModal 2x1 companion', () => {
 
     expect(await screen.findByLabelText(/Correo de tu acompañante/)).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Mi familia' })).toBeNull();
+  });
+
+  it('does not drop a typed email when the family list is left empty', async () => {
+    renderModal('guardian');
+
+    fireEvent.change(await screen.findByLabelText(/Correo de tu acompañante/), {
+      target: { value: 'amiga@correo.com' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Mi familia' }));
+    fireEvent.click(screen.getByRole('button', { name: /Reservar/ }));
+
+    expect(await screen.findByRole('alert')).toBeTruthy();
+    expect(screen.getByText(/Elige a quién de tu familia traes/)).toBeTruthy();
+    expect(bookClass).not.toHaveBeenCalled();
+  });
+
+  it('clears an old companion error when the source changes', async () => {
+    renderModal('guardian');
+
+    fireEvent.change(await screen.findByLabelText(/Correo de tu acompañante/), {
+      target: { value: 'ana@correo.com' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /Reservar/ }));
+    expect(await screen.findByText(/No puedes nombrarte a ti misma/)).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Mi familia' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Correo' }));
+
+    expect(screen.queryByText(/No puedes nombrarte a ti misma/)).toBeNull();
+  });
+
+  it('locks the companion choice while the booking is being sent', async () => {
+    bookingState.isBookingClass = true;
+    renderModal('guardian');
+
+    expect(((await screen.findByRole('button', { name: 'Mi familia' })) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole('button', { name: 'Correo' }) as HTMLButtonElement).disabled).toBe(true);
   });
 });

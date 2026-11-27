@@ -81,6 +81,24 @@ const companionErrorToastKey = (errorCode: string | undefined) => {
   }
 };
 
+const MINOR_BOOKING_ERROR_CODES = new Set<string>([
+  DANSSHIP_ERROR_CODE.ACTING_FOR_FORBIDDEN,
+  DANSSHIP_ERROR_CODE.MANAGED_ACCOUNT_INACTIVE,
+  DANSSHIP_ERROR_CODE.MANAGED_NO_ACTIVE_GUARDIAN,
+  DANSSHIP_ERROR_CODE.MANAGED_AGE_RANGE,
+]);
+
+/** Minor/acting-for rejections speak of the companion only when one was sent. */
+export const minorBookingToastKey = (errorCode: string, withCompanion: boolean) => {
+  if (withCompanion) {
+    return companionErrorToastKey(errorCode);
+  }
+
+  return errorCode === DANSSHIP_ERROR_CODE.ACTING_FOR_FORBIDDEN
+    ? 'bookings:attendeeNotInCare'
+    : 'bookings:minorCannotBook';
+};
+
 export const useMyBookings = () => {
   const { t } = useTranslation();
   const { call: bookClassPromise, isLoading: isBookingClass } = useCallablePromise((payload: BookClassPayload) =>
@@ -145,13 +163,13 @@ export const useMyBookings = () => {
             } else if (
               error_code === DANSSHIP_ERROR_CODE.TWO_FOR_ONE_COMPANION_NOT_FOUND ||
               error_code === DANSSHIP_ERROR_CODE.TWO_FOR_ONE_SELF_REFERENCE ||
-              error_code === DANSSHIP_ERROR_CODE.TWO_FOR_ONE_NOT_ELIGIBLE ||
-              error_code === DANSSHIP_ERROR_CODE.ACTING_FOR_FORBIDDEN ||
-              error_code === DANSSHIP_ERROR_CODE.MANAGED_ACCOUNT_INACTIVE ||
-              error_code === DANSSHIP_ERROR_CODE.MANAGED_NO_ACTIVE_GUARDIAN ||
-              error_code === DANSSHIP_ERROR_CODE.MANAGED_AGE_RANGE
+              error_code === DANSSHIP_ERROR_CODE.TWO_FOR_ONE_NOT_ELIGIBLE
             ) {
               toast.error(t(companionErrorToastKey(error_code)));
+            } else if (MINOR_BOOKING_ERROR_CODES.has(error_code)) {
+              const withCompanion = Boolean(payload.companion_email || payload.companion_user_id);
+
+              toast.error(t(minorBookingToastKey(error_code, withCompanion)));
             } else {
               toast.error(t('bookings:bookingFailedDesc'));
             }

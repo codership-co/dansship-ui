@@ -263,7 +263,16 @@ export function BookingModal({
     }
 
     const fromFamily = showCompanionField && canPickFamilyCompanion && companionSource === 'family';
-    const companionEmail = showCompanionField && !fromFamily ? companionForm.getValues('companion_email').trim() : '';
+    const typedEmail = companionForm.getValues('companion_email').trim();
+
+    // Never drop silently a companion the person already typed before switching to the family list.
+    if (fromFamily && !familyCompanionId && typedEmail) {
+      setCompanionFieldError(t('bookings:companionFamilyMissing'));
+
+      return;
+    }
+
+    const companionEmail = showCompanionField && !fromFamily ? typedEmail : '';
 
     // A minor has no email, so only self-booking can collide with the requester's own address.
     if (
@@ -371,6 +380,10 @@ export function BookingModal({
   // Family companions: the guardian and their minors, never the attendee (ADR-055, 2026-11-27).
   const familyCompanionOptions = attendeeOptions.filter(option => option.id !== attendeeUserId);
   const canPickFamilyCompanion = familyMode && familyCompanionOptions.length > 0;
+  const selectCompanionSource = (source: 'email' | 'family') => {
+    setCompanionSource(source);
+    setCompanionFieldError(null);
+  };
 
   return (
     <>
@@ -554,7 +567,8 @@ export function BookingModal({
                         variant={companionSource === 'email' ? 'solid' : 'outlined'}
                         type='button'
                         aria-pressed={companionSource === 'email'}
-                        onClick={() => setCompanionSource('email')}
+                        disabled={isLoading}
+                        onClick={() => selectCompanionSource('email')}
                       >
                         {t('bookings:companionByEmail')}
                       </Button>
@@ -564,7 +578,8 @@ export function BookingModal({
                         variant={companionSource === 'family' ? 'solid' : 'outlined'}
                         type='button'
                         aria-pressed={companionSource === 'family'}
-                        onClick={() => setCompanionSource('family')}
+                        disabled={isLoading}
+                        onClick={() => selectCompanionSource('family')}
                       >
                         {t('bookings:companionFromFamily')}
                       </Button>
@@ -573,7 +588,14 @@ export function BookingModal({
                   {canPickFamilyCompanion && companionSource === 'family' ? (
                     <label className='grid gap-1 text-sm'>
                       {t('bookings:companionFamilyLabel')}
-                      <Select value={familyCompanionId ?? ''} onValueChange={value => setFamilyCompanionId(value)}>
+                      <Select
+                        value={familyCompanionId ?? ''}
+                        disabled={isLoading}
+                        onValueChange={value => {
+                          setFamilyCompanionId(value);
+                          setCompanionFieldError(null);
+                        }}
+                      >
                         <SelectTrigger aria-label={t('bookings:companionFamilyLabel')}>
                           <SelectValue placeholder={t('bookings:companionFamilyPlaceholder')} />
                         </SelectTrigger>
@@ -588,6 +610,11 @@ export function BookingModal({
                           ))}
                         </SelectContent>
                       </Select>
+                      {companionFieldError ? (
+                        <span className='text-sm text-alert-600' role='alert'>
+                          {companionFieldError}
+                        </span>
+                      ) : null}
                     </label>
                   ) : (
                     <EmailField
