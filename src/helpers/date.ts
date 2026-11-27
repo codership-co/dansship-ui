@@ -33,6 +33,41 @@ export const formatDate = (date: string | Date, lang = 'en'): string => {
 /** A calendar day from the API (YYYY-MM-DD), formatted as that same day. `new Date(day)` would read it as UTC midnight. */
 export const formatCalendarDay = (day: string, lang = 'en'): string => formatDate(parseISO(day), lang);
 
+/**
+ * A calendar day from the API (YYYY-MM-DD) as local midnight of that same day, the value date pickers
+ * expect. `new Date(day)` would read it as UTC midnight, which is the day before in Bogota.
+ * Returns `undefined` for an empty or invalid value.
+ */
+export function parseCalendarDay(day: string | null | undefined): Date | undefined {
+  if (!day) {
+    return undefined;
+  }
+
+  const parsed = parseISO(day.slice(0, 10));
+
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+}
+
+/** A day picked in a date picker (local midnight) as the API calendar day (YYYY-MM-DD). Counterpart of `parseCalendarDay`. */
+export const toCalendarDay = (date: Date): string => format(date, 'yyyy-MM-dd');
+
+/** Today in the academy's calendar (America/Bogota) as local midnight, comparable with `parseCalendarDay` values. */
+export const colombiaToday = (now: Date = new Date()): Date => parseISO(colombiaDay(now));
+
+/**
+ * Whole years from `birthDate` (a calendar day at local midnight) to today in Bogota.
+ * The birthday counts from its own calendar day, wherever the device clock is.
+ */
+export function ageInColombia(birthDate: Date, now: Date = new Date()): number {
+  const today = colombiaToday(now);
+  const years = today.getFullYear() - birthDate.getFullYear();
+  const beforeBirthday =
+    today.getMonth() < birthDate.getMonth() ||
+    (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate());
+
+  return beforeBirthday ? years - 1 : years;
+}
+
 export const formatDateTime = (date: string | Date, lang = 'en'): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 

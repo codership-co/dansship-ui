@@ -3,11 +3,12 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
-import { parseProfileDate, toHealthPayload, toPreferencesPayload, toProfilePayload } from './admin-user-profile';
+import { toHealthPayload, toPreferencesPayload, toProfilePayload } from './admin-user-profile';
 
 import { BasicProfileForm, HealthProfileForm, PreferencesProfileForm } from '@components/forms';
 import { DansshipAPI } from '@core/api';
 import { PageURLS } from '@core/constants';
+import { parseCalendarDay } from '@helpers';
 import { usePromise } from '@hooks';
 
 import type { HealthDataFormValues } from '@components/forms/health-profile-form';
@@ -72,7 +73,7 @@ export function AdminEditUser({ userId }: AdminEditUserProps) {
           submitLabel={t('admin:users.registration.saveProfile')}
           defaultValues={{
             full_name: user.full_name,
-            birth_date: parseProfileDate(user.birth_date),
+            birth_date: parseCalendarDay(user.birth_date),
             phone_country_code: user.phone_country_code ?? '+57',
             phone_number: user.phone_number ?? '',
             document_type: user.document_type ?? '',

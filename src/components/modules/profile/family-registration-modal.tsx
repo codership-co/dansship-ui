@@ -1,4 +1,3 @@
-import { format } from 'date-fns';
 import { ActionModal, Button, Checkbox } from 'polpo/components';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -18,7 +17,7 @@ import {
   type MinorSummary,
 } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { buildStudioWhatsAppLink, cn, toColombiaDateKey } from '@helpers';
+import { ageInColombia, buildStudioWhatsAppLink, cn, parseCalendarDay, toCalendarDay } from '@helpers';
 
 const RELATIONSHIPS = ['mother', 'father', 'guardian', 'grandparent', 'aunt_uncle', 'sibling', 'other'] as const;
 const DOCUMENT_TYPES = ['RC', 'TI', 'CE', 'PA'] as const;
@@ -50,24 +49,6 @@ interface FamilyRegistrationModalProps {
   minor: MinorSummary | null;
   onClose: () => void;
   onSaved: () => Promise<void>;
-}
-
-function parseDateOnly(value: string) {
-  const [year, month, day] = value.slice(0, 10).split('-').map(Number);
-
-  return new Date(year, month - 1, day);
-}
-
-function ageFromDate(value: Date) {
-  const today = toColombiaDateKey(new Date()).split('-').map(Number);
-  let years = today[0] - value.getFullYear();
-  const before = today[1] < value.getMonth() + 1 || (today[1] === value.getMonth() + 1 && today[2] < value.getDate());
-
-  if (before) {
-    years -= 1;
-  }
-
-  return years;
 }
 
 function tenDigitPhone(value: string | undefined) {
@@ -146,7 +127,7 @@ export function FamilyRegistrationModal({ minor, onClose, onSaved }: FamilyRegis
     defaultValues: {
       given_name: minor?.given_name ?? '',
       family_name: minor?.family_name ?? '',
-      birth_date: minor?.birth_date ? parseDateOnly(minor.birth_date) : undefined,
+      birth_date: parseCalendarDay(minor?.birth_date),
       document_type: minor?.document_type ?? '',
       document_value: '',
       relationship: '',
@@ -171,7 +152,7 @@ export function FamilyRegistrationModal({ minor, onClose, onSaved }: FamilyRegis
   const relationship = identity.watch('relationship');
   const healthValues = health.watch();
   const fullName = `${givenName.trim()} ${familyName.trim()}`.trim();
-  const age = birthDate instanceof Date && !Number.isNaN(birthDate.getTime()) ? ageFromDate(birthDate) : null;
+  const age = birthDate instanceof Date && !Number.isNaN(birthDate.getTime()) ? ageInColombia(birthDate) : null;
   const ageInRange = age !== null && age >= 3 && age <= 17;
   const identityReady = editing
     ? Boolean(givenName.trim() && familyName.trim())
@@ -230,7 +211,7 @@ export function FamilyRegistrationModal({ minor, onClose, onSaved }: FamilyRegis
       return;
     }
 
-    const ageYears = ageFromDate(values.birth_date);
+    const ageYears = ageInColombia(values.birth_date);
 
     if (ageYears < 3 || ageYears > 17) {
       setError(t('family:ageRange'));
@@ -244,7 +225,7 @@ export function FamilyRegistrationModal({ minor, onClose, onSaved }: FamilyRegis
     const result = await DansshipAPI.family.createMinor({
       given_name: values.given_name,
       family_name: values.family_name,
-      birth_date: format(values.birth_date, 'yyyy-MM-dd'),
+      birth_date: toCalendarDay(values.birth_date),
       document_type: values.document_type,
       document_value: values.document_value,
       relationship: values.relationship,
