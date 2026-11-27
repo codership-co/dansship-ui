@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { LuSearch } from 'react-icons/lu';
 import { Link } from 'react-router';
 
-import { Input, Label } from '@components/ui';
+import { Badge, Input, Label } from '@components/ui';
 import { useOrPermissions } from '@contexts';
 import { DansshipAPI, type PersonSearchResult } from '@core/api';
 import { PageURLS } from '@core/constants';
@@ -22,6 +22,14 @@ interface PersonPickerProps {
 }
 
 const MIN_QUERY_LENGTH = 3;
+
+function MinorBadge({ label }: { label: string }) {
+  return (
+    <Badge variant='outline' size='small'>
+      {label}
+    </Badge>
+  );
+}
 
 export function PersonPicker({ person, onSelect, search, label }: PersonPickerProps) {
   const { t } = useTranslation('assisted');
@@ -61,8 +69,12 @@ export function PersonPicker({ person, onSelect, search, label }: PersonPickerPr
         <p className='text-label font-medium'>{label ?? t('picker.label')}</p>
         <div className='flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-gray-100 p-4'>
           <div className='min-w-0'>
-            <p className='truncate font-semibold'>{person.full_name || t('picker.unknownName')}</p>
+            <p className='flex items-center gap-2 font-semibold'>
+              <span className='truncate'>{person.full_name || t('picker.unknownName')}</span>
+              {person.is_managed ? <MinorBadge label={t('picker.minorBadge')} /> : null}
+            </p>
             {person.email ? <p className='truncate text-sm text-muted-foreground'>{person.email}</p> : null}
+            {person.is_managed ? <p className='text-sm text-muted-foreground'>{t('picker.minorHint')}</p> : null}
           </div>
           <div className='flex flex-wrap items-center gap-2'>
             {canOpen360 ? (
@@ -119,7 +131,10 @@ export function PersonPicker({ person, onSelect, search, label }: PersonPickerPr
                   setIsOpen(false);
                 }}
               >
-                <span className='block font-medium'>{result.full_name}</span>
+                <span className='flex items-center gap-2 font-medium'>
+                  {result.full_name}
+                  {result.is_managed ? <MinorBadge label={t('picker.minorBadge')} /> : null}
+                </span>
                 {result.email ? <span className='block text-muted-foreground'>{result.email}</span> : null}
               </button>
             </li>

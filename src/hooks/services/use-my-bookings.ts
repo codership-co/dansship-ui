@@ -67,6 +67,12 @@ const companionErrorToastKey = (errorCode: string | undefined) => {
       return 'bookings:companionSelfReference';
     case DANSSHIP_ERROR_CODE.TWO_FOR_ONE_NOT_ELIGIBLE:
       return 'bookings:companionNotEligible';
+    case DANSSHIP_ERROR_CODE.ACTING_FOR_FORBIDDEN:
+      return 'bookings:companionNotInFamily';
+    case DANSSHIP_ERROR_CODE.MANAGED_ACCOUNT_INACTIVE:
+    case DANSSHIP_ERROR_CODE.MANAGED_NO_ACTIVE_GUARDIAN:
+    case DANSSHIP_ERROR_CODE.MANAGED_AGE_RANGE:
+      return 'bookings:companionMinorCannotBook';
     case DANSSHIP_ERROR_CODE.BOOKING_CLASS_FULL:
     case DANSSHIP_ERROR_CODE.CLASS_FULL:
       return 'bookings:companionClassFull';
@@ -139,7 +145,11 @@ export const useMyBookings = () => {
             } else if (
               error_code === DANSSHIP_ERROR_CODE.TWO_FOR_ONE_COMPANION_NOT_FOUND ||
               error_code === DANSSHIP_ERROR_CODE.TWO_FOR_ONE_SELF_REFERENCE ||
-              error_code === DANSSHIP_ERROR_CODE.TWO_FOR_ONE_NOT_ELIGIBLE
+              error_code === DANSSHIP_ERROR_CODE.TWO_FOR_ONE_NOT_ELIGIBLE ||
+              error_code === DANSSHIP_ERROR_CODE.ACTING_FOR_FORBIDDEN ||
+              error_code === DANSSHIP_ERROR_CODE.MANAGED_ACCOUNT_INACTIVE ||
+              error_code === DANSSHIP_ERROR_CODE.MANAGED_NO_ACTIVE_GUARDIAN ||
+              error_code === DANSSHIP_ERROR_CODE.MANAGED_AGE_RANGE
             ) {
               toast.error(t(companionErrorToastKey(error_code)));
             } else {

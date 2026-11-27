@@ -22,7 +22,9 @@
     "noResults": "Sin resultados",
     "view360": "Ver Vista 360",
     "change": "Cambiar",
-    "unknownName": "Persona seleccionada"
+    "unknownName": "Persona seleccionada",
+    "minorBadge": "Menor",
+    "minorHint": "Cuenta de menor: los avisos le llegan a su acudiente."
   },
   "account": {
     "subtabs": {
@@ -333,6 +335,10 @@
     "TWO_FOR_ONE_COMPANION_ALREADY_ADDED": "Esta reserva ya tiene acompañante.",
     "TWO_FOR_ONE_BOOKING_NOT_ACTIVE": "La reserva no está activa.",
     "TWO_FOR_ONE_COMPANION_NOT_FOUND": "No encontramos al acompañante.",
+    "MANAGED_ACCOUNT_RESTRICTED": "Una cuenta de menor no puede hacer esto.",
+    "MANAGED_ACCOUNT_INACTIVE": "La cuenta del menor está desactivada.",
+    "MANAGED_NO_ACTIVE_GUARDIAN": "El menor no tiene un acudiente activo.",
+    "MANAGED_AGE_RANGE": "La cuenta del menor está fuera del rango de 3 a 17 años.",
     "SIMPLE_REGISTRATION_IDENTITY_CONFLICT": "El correo y el celular pertenecen a cuentas distintas.",
     "SIMPLE_REGISTRATION_TERMS_REQUIRED": "Hay que aceptar los términos.",
     "SIMPLE_REGISTRATION_PHONE_INVALID": "El celular no es válido.",
