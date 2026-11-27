@@ -33,6 +33,21 @@ export const formatDate = (date: string | Date, lang = 'en'): string => {
 /** A calendar day from the API (YYYY-MM-DD), formatted as that same day. `new Date(day)` would read it as UTC midnight. */
 export const formatCalendarDay = (day: string, lang = 'en'): string => formatDate(parseISO(day), lang);
 
+/**
+ * A calendar day from the API (YYYY-MM-DD) as local midnight of that same day, the value date pickers
+ * expect. `new Date(day)` would read it as UTC midnight, which is the day before in Bogota.
+ * Returns `undefined` for an empty or invalid value.
+ */
+export function parseCalendarDay(day: string | null | undefined): Date | undefined {
+  if (!day) {
+    return undefined;
+  }
+
+  const parsed = parseISO(day.slice(0, 10));
+
+  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
+}
+
 export const formatDateTime = (date: string | Date, lang = 'en'): string => {
   const dateObj = typeof date === 'string' ? new Date(date) : date;
 

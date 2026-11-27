@@ -7,7 +7,7 @@ import { SpinnerLoader } from '@components/loaders';
 import { ProfilePicture, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { type AdminUserDetailsResponse, type AdminUserHealthProfile, type AdminUserPreferences } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { buildRegisteredPhoneWhatsAppLink, formatDate } from '@helpers';
+import { buildRegisteredPhoneWhatsAppLink, formatCalendarDay, formatDate } from '@helpers';
 
 interface UserDetailsHeaderProps {
   userId: string;
@@ -203,7 +203,7 @@ export function UserDetails({ user, isLoading, hasError }: UserDetailsProps) {
         <DetailField label={t('admin:users.details.alias')} value={displayValue(user.display_name)} />
         <DetailField
           label={t('admin:users.details.birthDate')}
-          value={user.birth_date ? formatDate(user.birth_date, i18n.language) : '-'}
+          value={user.birth_date ? formatCalendarDay(user.birth_date, i18n.language) : '-'}
         />
         {user.guardian_first_name || user.guardian_last_name || user.guardian_phone_number ? (
           <>

@@ -24,6 +24,7 @@ import {
   ProfileDataKey,
   User,
 } from '@core/api';
+import { parseCalendarDay } from '@helpers';
 import { useCallablePromise, usePromise } from '@hooks';
 
 export interface ProfileEditData {
@@ -36,16 +37,6 @@ export interface ProfileEditData {
 
 function asFormString(value: string | null | undefined) {
   return value ?? '';
-}
-
-function toDateInputValue(value: string | null | undefined) {
-  if (!value) {
-    return undefined;
-  }
-
-  const parsed = new Date(value);
-
-  return Number.isNaN(parsed.getTime()) ? undefined : parsed;
 }
 
 function toIsoDate(value: Date | string) {
@@ -300,7 +291,7 @@ export function ProfileEdit({ showInstructor }: ProfileEditProps) {
                 }}
                 defaultValues={{
                   ...defaultData[ProfileDataKey.PROFILE],
-                  birth_date: toDateInputValue(defaultData[ProfileDataKey.PROFILE].birth_date),
+                  birth_date: parseCalendarDay(defaultData[ProfileDataKey.PROFILE].birth_date),
                 }}
               />
             </section>
