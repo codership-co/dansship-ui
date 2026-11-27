@@ -7,7 +7,7 @@ import { SpinnerLoader } from '@components/loaders';
 import { ProfilePicture, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@components/ui';
 import { type AdminUserDetailsResponse, type AdminUserHealthProfile, type AdminUserPreferences } from '@core/api';
 import { PageURLS } from '@core/constants';
-import { buildRegisteredPhoneWhatsAppLink, formatCalendarDay, formatDate } from '@helpers';
+import { buildRegisteredPhoneWhatsAppLink, formatCalendarDay } from '@helpers';
 
 interface UserDetailsHeaderProps {
   userId: string;
@@ -395,7 +395,9 @@ export function UserDetails({ user, isLoading, hasError }: UserDetailsProps) {
                       <TableRow key={cert.id}>
                         <TableCell>{cert.title}</TableCell>
                         <TableCell>{cert.issuer}</TableCell>
-                        <TableCell>{cert.issue_date ? formatDate(cert.issue_date, i18n.language) : '-'}</TableCell>
+                        <TableCell>
+                          {cert.issue_date ? formatCalendarDay(cert.issue_date, i18n.language) : '-'}
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

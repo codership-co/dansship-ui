@@ -1,27 +1,8 @@
+import { toCalendarDay } from '@helpers';
+
 import type { BasicProfileFormValues } from '@components/forms/basic-profile-form';
 import type { HealthDataFormValues } from '@components/forms/health-profile-form';
 import type { PreferencesProfileFormValues } from '@components/forms/preferences-profile-form';
-
-export function formatProfileDate(value: Date) {
-  const month = String(value.getMonth() + 1).padStart(2, '0');
-  const day = String(value.getDate()).padStart(2, '0');
-
-  return `${value.getFullYear()}-${month}-${day}`;
-}
-
-export function parseProfileDate(value: string | null | undefined) {
-  if (!value) {
-    return undefined;
-  }
-
-  const [year, month, day] = value.slice(0, 10).split('-').map(Number);
-
-  if (!year || !month || !day) {
-    return undefined;
-  }
-
-  return new Date(year, month - 1, day);
-}
 
 function withoutEmpty(values: Record<string, unknown>) {
   return Object.fromEntries(
@@ -36,7 +17,7 @@ export function toProfilePayload(values: BasicProfileFormValues) {
     phone_number: values.phone_number,
     document_type: values.document_type,
     document_value: values.document_value,
-    birth_date: formatProfileDate(values.birth_date),
+    birth_date: toCalendarDay(values.birth_date),
     city: values.city || null,
     address: values.address || null,
     guardian_first_name: values.guardian_first_name || null,

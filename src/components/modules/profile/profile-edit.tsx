@@ -24,7 +24,7 @@ import {
   ProfileDataKey,
   User,
 } from '@core/api';
-import { parseCalendarDay } from '@helpers';
+import { parseCalendarDay, toCalendarDay } from '@helpers';
 import { useCallablePromise, usePromise } from '@hooks';
 
 export interface ProfileEditData {
@@ -37,17 +37,6 @@ export interface ProfileEditData {
 
 function asFormString(value: string | null | undefined) {
   return value ?? '';
-}
-
-function toIsoDate(value: Date | string) {
-  if (value instanceof Date) {
-    const month = String(value.getMonth() + 1).padStart(2, '0');
-    const day = String(value.getDate()).padStart(2, '0');
-
-    return `${value.getFullYear()}-${month}-${day}`;
-  }
-
-  return value;
 }
 
 function getDefaultProfileDataFromUser(user: User, selfProfile?: AuthUser | null): ProfileEditData {
@@ -140,7 +129,7 @@ export function ProfileEdit({ showInstructor }: ProfileEditProps) {
     try {
       await DansshipAPI.auth.updateProfile({
         full_name: data.full_name,
-        birth_date: toIsoDate(data.birth_date),
+        birth_date: data.birth_date,
         phone_country_code: data.phone_country_code,
         phone_number: data.phone_number,
         document_type: data.document_type,
@@ -276,7 +265,7 @@ export function ProfileEdit({ showInstructor }: ProfileEditProps) {
                 onSubmit={data => {
                   void saveBasicProfile({
                     full_name: data.full_name,
-                    birth_date: toIsoDate(data.birth_date),
+                    birth_date: toCalendarDay(data.birth_date),
                     phone_country_code: data.phone_country_code,
                     phone_number: data.phone_number,
                     document_type: data.document_type,

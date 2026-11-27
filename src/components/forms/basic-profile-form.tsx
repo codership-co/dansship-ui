@@ -11,7 +11,7 @@ import { z } from 'zod';
 import { DateField, PhoneField, SelectField, TextField } from '@components/form-fields';
 import { DansshipAPI, PaymentProofContentType, PaymentProofContentTypesList } from '@core/api';
 import { DOCUMENT_TYPE_OPTIONS } from '@core/constants';
-import { toColombiaDateKey } from '@helpers';
+import { ageInColombia, colombiaToday } from '@helpers';
 
 interface AgeRule {
   minAge: number;
@@ -20,27 +20,8 @@ interface AgeRule {
 
 const LEGACY_AGE_RULE: AgeRule = { minAge: 4, guardianBefore: 14 };
 
-function colombiaToday() {
-  const [year, month, day] = toColombiaDateKey(new Date()).split('-').map(Number);
-
-  return new Date(year, month - 1, day);
-}
-
-function ageInYears(birthDate: Date, today = colombiaToday()) {
-  let years = today.getFullYear() - birthDate.getFullYear();
-  const beforeBirthday =
-    today.getMonth() < birthDate.getMonth() ||
-    (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate());
-
-  if (beforeBirthday) {
-    years -= 1;
-  }
-
-  return years;
-}
-
 function requiresGuardian(birthDate: Date, rule: AgeRule) {
-  const age = ageInYears(birthDate);
+  const age = ageInColombia(birthDate);
 
   return age >= rule.minAge && age < rule.guardianBefore;
 }
