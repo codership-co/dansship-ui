@@ -150,6 +150,7 @@
     "viewProof": "Ver comprobante subido",
     "noProof": "Sin comprobante",
     "linkedPaymentNotFound": "No encontramos ese pago. Búscalo en la lista.",
+    "linkedPaymentLoadFailed": "No pudimos abrir ese pago. Recarga la página para intentarlo de nuevo.",
     "reviewTitle": "Revisar pago",
     "notesLabel": "Notas del admin",
     "notesPlaceholder": "Notas opcionales para esta revisión",

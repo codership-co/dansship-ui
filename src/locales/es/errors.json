@@ -102,6 +102,7 @@
     "EVENT_PROOF_KEY_INVALID": "No pudimos usar ese comprobante. Súbelo de nuevo.",
     "EVENT_PROOF_NOT_FOUND": "No encontramos el comprobante. Súbelo de nuevo.",
     "PAYMENT_IDEMPOTENCY_CONFLICT": "Este pago ya se registró. Recarga antes de intentarlo otra vez.",
+    "PAYMENT_PROOF_KEY_INVALID": "No pudimos usar ese comprobante. Súbelo de nuevo.",
     "EVENT_ANSWER_FILE_TYPE_NOT_ALLOWED": "Este formato de archivo no se acepta en esta pregunta.",
     "EVENT_ANSWER_FILE_NOT_FOUND": "No encontramos ese archivo.",
     "EVENT_FORM_FIELD_NOT_FOUND": "No encontramos esa pregunta del formulario.",

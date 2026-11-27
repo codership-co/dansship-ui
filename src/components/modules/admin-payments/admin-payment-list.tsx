@@ -6,7 +6,6 @@ import { Link } from 'react-router';
 import { toast } from 'sonner';
 
 import { AdminPaymentReviewModal } from './admin-payment-review-modal';
-import { useLinkedPaymentReview } from './use-linked-payment-review';
 
 import { SpinnerLoader } from '@components/loaders';
 import { PaymentStatusBadge } from '@components/modules';
@@ -43,7 +42,7 @@ import {
   purchaseTypeLabel,
   purchaseTypeLabelKey,
 } from '@helpers';
-import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
+import { useCallablePromise, useDateLocale, useLinkedPaymentReview, usePromise } from '@hooks';
 
 const STATUS_OPTIONS: Array<{ value: 'all' | PaymentStatus; labelKey: string }> = [
   { value: 'all', labelKey: 'payments:admin.filter.all' },
@@ -76,7 +75,11 @@ export function AdminPaymentList({
   const [statusFilter, setStatusFilter] = useState<'all' | PaymentStatus>('all');
   const [typeFilter, setTypeFilter] = useState<'all' | PurchaseType>('all');
   const [selectedIntent, setSelectedIntent] = useState<PaymentIntent | null>(null);
-  const { clearLinkedPayment } = useLinkedPaymentReview(setSelectedIntent, !readOnly);
+  // A row the admin already opened wins over a linked payment that loads later.
+  const { clearLinkedPayment } = useLinkedPaymentReview(
+    intent => setSelectedIntent(current => current ?? intent),
+    !readOnly,
+  );
 
   const filters = useMemo(
     () => ({

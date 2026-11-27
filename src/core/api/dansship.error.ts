@@ -108,6 +108,7 @@ export enum DANSSHIP_ERROR_CODE {
   PAYMENT_INTENT_UNAUTHORIZED = 'PAYMENT_INTENT_UNAUTHORIZED', // AUTHORIZATION_ERROR = User is not authorized to review/approve this payment intent |
   PAYMENT_METHOD_NOT_AVAILABLE = 'PAYMENT_METHOD_NOT_AVAILABLE', // VALIDATION_ERROR = Selected payment method is not available or configured |
   PAYMENT_PROOF_NOT_AVAILABLE = 'PAYMENT_PROOF_NOT_AVAILABLE', // RESOURCE_NOT_FOUND = Payment proof file does not exist |
+  PAYMENT_PROOF_KEY_INVALID = 'PAYMENT_PROOF_KEY_INVALID', // VALIDATION_ERROR = Proof file key was not issued for this payment |
   PAYMENT_PROOF_UPLOAD_FAILED = 'PAYMENT_PROOF_UPLOAD_FAILED', // SYSTEM_ERROR = File upload to storage service failed |
   INSTRUCTOR_PAYMENT_DOCUMENT_NOT_CONFIRMED = 'INSTRUCTOR_PAYMENT_DOCUMENT_NOT_CONFIRMED', // BUSINESS_RULE_VIOLATION = Only a confirmed cuenta de cobro can be marked paid |
   INSTRUCTOR_PAYMENT_NO_NEW_CLASSES = 'INSTRUCTOR_PAYMENT_NO_NEW_CLASSES', // BUSINESS_RULE_VIOLATION = No new already-started classes remain for this cuenta de cobro |
