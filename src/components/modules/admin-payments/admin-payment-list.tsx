@@ -42,7 +42,7 @@ import {
   purchaseTypeLabel,
   purchaseTypeLabelKey,
 } from '@helpers';
-import { useCallablePromise, useDateLocale, usePromise } from '@hooks';
+import { useCallablePromise, useDateLocale, useLinkedPaymentReview, usePromise } from '@hooks';
 
 const STATUS_OPTIONS: Array<{ value: 'all' | PaymentStatus; labelKey: string }> = [
   { value: 'all', labelKey: 'payments:admin.filter.all' },
@@ -75,6 +75,11 @@ export function AdminPaymentList({
   const [statusFilter, setStatusFilter] = useState<'all' | PaymentStatus>('all');
   const [typeFilter, setTypeFilter] = useState<'all' | PurchaseType>('all');
   const [selectedIntent, setSelectedIntent] = useState<PaymentIntent | null>(null);
+  // A row the admin already opened wins over a linked payment that loads later.
+  const { clearLinkedPayment } = useLinkedPaymentReview(
+    intent => setSelectedIntent(current => current ?? intent),
+    !readOnly,
+  );
 
   const filters = useMemo(
     () => ({
@@ -268,6 +273,7 @@ export function AdminPaymentList({
           onOpenChange={open => {
             if (!open) {
               setSelectedIntent(null);
+              clearLinkedPayment();
             }
           }}
           onReview={reviewPayment}

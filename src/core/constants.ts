@@ -98,6 +98,9 @@ export const LEGAL_TAB_QUERY = {
   classRecoveryTerms: 'class-recovery-terms',
 } as const;
 
+/** Query param of `/admin/payments` that opens one payment's review (API manager alert link). */
+export const ADMIN_PAYMENT_QUERY_PARAM = 'payment';
+
 export const PageURLS = {
   home: '/',
   plans: '/plans',
@@ -154,6 +157,9 @@ export const PageURLS = {
     /** "+ Inscribir persona": Atención asistida → Evento with the event preselected. */
     assistedEvent: (eventId: string) => `/admin/assisted?tab=event&event=${encodeURIComponent(eventId)}`,
     payments: '/admin/payments',
+    /** One payment's review, opened from the "Pago por revisar" manager email. */
+    paymentReview: (paymentId: string) =>
+      `/admin/payments?${ADMIN_PAYMENT_QUERY_PARAM}=${encodeURIComponent(paymentId)}`,
     merch: '/admin/merch',
     merchPos: '/admin/merch/pos',
     figures: '/admin/figures',
